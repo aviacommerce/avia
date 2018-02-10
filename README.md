@@ -1,0 +1,4 @@
+# Snitch
+
+**TODO: Add description**
+
