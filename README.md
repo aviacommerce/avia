@@ -1,4 +1,5 @@
 # Snitch
 
-**TODO: Add description**
+An umbrella application
 
+Core: Has all the main schemas
