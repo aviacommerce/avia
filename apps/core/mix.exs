@@ -40,6 +40,7 @@ defmodule Core.Mixfile do
     [
       {:postgrex, "~> 0.13.5"},
       {:ecto, "~> 2.1"},
+      {:poison, "~> 3.1"},
       {:ex_money, "~> 2.2.0"},
       {:credo, "~> 0.8.10", only: :dev, runtime: false},
 
