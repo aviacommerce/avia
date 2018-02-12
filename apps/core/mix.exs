@@ -13,7 +13,9 @@ defmodule Core.Mixfile do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [coveralls: :test, "coveralls.detail": :test, "coveralls.html": :test]
     ]
   end
 
@@ -36,8 +38,14 @@ defmodule Core.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:postgrex, ">= 0.0.0"},
-      {:ecto, "~> 2.1"}
+      {:postgrex, "~> 0.13.5"},
+      {:ecto, "~> 2.1"},
+      {:ex_money, "~> 2.2.0"},
+      {:credo, "~> 0.8.10", only: :dev, runtime: false},
+
+      # docs and tests
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.8", only: :test}
     ]
   end
 
