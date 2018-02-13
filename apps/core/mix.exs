@@ -44,6 +44,10 @@ defmodule Core.Mixfile do
       {:ex_money, "~> 2.2.0"},
       {:credo, "~> 0.8.10", only: :dev, runtime: false},
 
+      # auth
+      {:comeonin, "~> 4.0"},
+      {:argon2_elixir, "~> 1.2"},
+
       # docs and tests
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test}
