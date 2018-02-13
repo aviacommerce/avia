@@ -8,21 +8,20 @@ defmodule Core.Snitch.Variant do
   @type t :: %__MODULE__{}
   schema "snitch_variants" do
     field(:sku, :string, default: "")
-    field(:weight, :integer, precision: 8, scale: 2, default: 0.0)
-    field(:height, :integer, precision: 8, scale: 2)
-    field(:width, :integer, precision: 8, scale: 2)
-    field(:depth, :integer, precision: 8, scale: 2)
+    field(:weight, :decimal, precision: 8, scale: 2, default: 0)
+    field(:height, :decimal, precision: 8, scale: 2)
+    field(:width, :decimal, precision: 8, scale: 2)
+    field(:depth, :decimal, precision: 8, scale: 2)
     field(:is_master, :boolean, default: false)
-    field(:cost_price, :integer, precision: 10, scale: 2)
+    field(:cost_price, Money.Ecto.Composite.Type)
     field(:position, :integer)
-    field(:cost_currency, :string)
     field(:track_inventory, :boolean, default: true)
     field(:discontinue_on, :naive_datetime)
 
     timestamps()
   end
 
-  @permitted_fields ~w(sku weight height width depth is_master cost_price position cost_currency track_inventory discontinue_on)a
+  @permitted_fields ~w(sku weight height width depth is_master cost_price position track_inventory discontinue_on)a
 
   def changeset(%__MODULE__{} = variant, attrs) do
     variant
