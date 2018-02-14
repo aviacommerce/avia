@@ -8,10 +8,10 @@ defmodule Core.Snitch.Variant do
   @type t :: %__MODULE__{}
   schema "snitch_variants" do
     field(:sku, :string, default: "")
-    field(:weight, :decimal, precision: 8, scale: 2, default: 0)
-    field(:height, :decimal, precision: 8, scale: 2)
-    field(:width, :decimal, precision: 8, scale: 2)
-    field(:depth, :decimal, precision: 8, scale: 2)
+    field(:weight, :decimal, default: Decimal.new(0))
+    field(:height, :decimal)
+    field(:width, :decimal)
+    field(:depth, :decimal)
     field(:is_master, :boolean, default: false)
     field(:cost_price, Money.Ecto.Composite.Type)
     field(:position, :integer)
@@ -26,8 +26,9 @@ defmodule Core.Snitch.Variant do
   def changeset(%__MODULE__{} = variant, attrs) do
     variant
     |> cast(attrs, @permitted_fields)
+    |> unique_constraint(:sku)
 
     # Ensures a new variant takes the product master price when price is not supplied
-    # Ensure sku's are unique on all records which are not soft deleted
+    # Ensure variants? are not soft deleted
   end
 end
