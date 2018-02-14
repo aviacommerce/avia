@@ -6,7 +6,7 @@ defmodule Core.Snitch.User do
 
   import Ecto.Changeset
 
-  @password_min_length 7
+  @password_min_length 8
   @type t :: %__MODULE__{}
 
   schema "snitch_users" do
@@ -68,9 +68,9 @@ defmodule Core.Snitch.User do
   end
 
   @spec changeset(__MODULE__.t(), map()) :: Ecto.Changeset.t()
-  def changeset(user, params \\ %{}) do
+  def changeset(user, params) do
     user
-    |> cast(params, @required_fields ++ @password_fields)
+    |> cast(params, @required_fields)
     |> validate_required(@required_fields)
     |> validate_format(:email, ~r/@/)
     |> unique_constraint(:email)
