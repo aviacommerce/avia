@@ -6,7 +6,6 @@ defmodule Core.Snitch.Order do
   use Ecto.Schema
 
   import Ecto.Changeset
-  import Ecto.Query
 
   @type t :: %__MODULE__{}
 
@@ -49,21 +48,8 @@ defmodule Core.Snitch.Order do
     |> foreign_key_constraint(:shipping_shipping_id)
   end
 
-  def create_changeset(order, params, line_item_changesets) do
+  def create_changeset(order, params, _line_item_changesets) do
     order
     |> changeset(params)
-  end
-
-  def compute_prices(variant_ids) do
-    from(v in "snitch_variants", select: v.cost_price, where: v.id in ^variant_ids)
-    |> Core.Repo.all()
-    |> Stream.map(fn cp ->
-      {:ok, cost} = Money.Ecto.Composite.Type.load(cp)
-      cost
-    end)
-    |> Enum.reduce(fn cp1, cp2 ->
-      {:ok, sum} = Money.add!(cp1, cp2)
-      sum
-    end)
   end
 end
