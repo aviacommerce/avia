@@ -1,4 +1,5 @@
 defmodule Core.Snitch.Factory do
+  @moduledoc false
   use ExMachina.Ecto, repo: Core.Repo
   alias Core.Snitch.{User, Address, Variant, Order}
 

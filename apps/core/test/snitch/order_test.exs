@@ -9,11 +9,21 @@ defmodule Core.Snitch.OrderTest do
     setup [:three_variants, :a_user_and_address, :good_line_items, :order_changeset]
 
     test "", context do
+      %{variants: vs, line_items: lis} = context
+      quantities = Stream.map(lis, fn li -> li.quantity end)
+      # manually compute the total.
+      total =
+        vs
+        |> Stream.map(fn v -> v.cost_price end)
+        |> Stream.zip(quantities)
+        |> Stream.map(fn {price, quantity} -> Money.mult!(price, quantity) end)
+        |> Enum.reduce(&Money.add!/2)
+
       %{order: order} = context
       updated_order = Order.update_product_totals_changeset(order)
       %{valid?: validity, changes: changes} = updated_order
       assert validity
-      assert Map.has_key?(changes, :item_total)
+      assert Money.reduce(Map.fetch!(changes, :item_total)) == total
       assert Enum.all?(changes.line_items, fn %{valid?: validity} -> validity end)
       assert Enum.all?(changes.line_items, fn %{action: action} -> action == :insert end)
       # Core.Repo.insert!(updated_order)
