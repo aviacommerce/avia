@@ -1,6 +1,6 @@
 defmodule Core.Snitch.Factory do
   use ExMachina.Ecto, repo: Core.Repo
-  alias Core.Snitch.{User, Address, Variant}
+  alias Core.Snitch.{User, Address, Variant, Order}
 
   @iron_patriot %Variant{
     sku: "iron-patriot",
@@ -43,6 +43,18 @@ defmodule Core.Snitch.Factory do
       is_master: true,
       cost_price: random_price(9, 9)
     }
+  end
+
+  def basic_order_factory() do
+    %Order{
+      slug: sequence("order"),
+      state: "cart"
+    }
+  end
+
+  def checkout_repo(context) do
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Core.Repo)
+    context
   end
 
   defp random_price(min, delta) do

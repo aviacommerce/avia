@@ -3,9 +3,7 @@ defmodule Core.Snitch.LineItemTest do
   alias Core.Snitch.{LineItem}
   import Core.Snitch.Factory
 
-  setup do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Core.Repo)
-  end
+  setup :checkout_repo
 
   describe "line_items" do
     setup :three_variants

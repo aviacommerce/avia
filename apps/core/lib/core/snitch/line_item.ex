@@ -1,16 +1,6 @@
 defmodule Core.Snitch.LineItem do
   @moduledoc """
   Models a LineItem
-
-  ## Example
-
-  To build an order, first `build/2` the LineItem changesets and compute their
-  totals.
-
-  ```
-  line_items = [LineItem.build(1, 3), LineItem.build(2, 1)]
-  {product_total, changesets} = LineItem.compute_prices(line_items)
-  ```
   """
 
   use Ecto.Schema
@@ -30,14 +20,14 @@ defmodule Core.Snitch.LineItem do
   end
 
   @required_fields ~w(quantity variant_id)a
-  @optional_fields ~w()a
+  @optional_fields ~w(unit_price total)a
 
   @spec create_changeset(__MODULE__.t(), map()) :: Ecto.Changeset.t()
   @doc """
   Returns a `LineItem` changeset without `:total`.
 
-  Do not persist this to DB since price fields are not set! To set prices see
-  `price_changeset/2` and `compute_prices/1`.
+  Do not persist this to DB since price fields and order are not set! To set
+  prices see `price_and_total_changeset/2` and `update_totals/1`.
   """
   def create_changeset(line_item, params) do
     line_item
@@ -56,9 +46,9 @@ defmodule Core.Snitch.LineItem do
 
   ## Note
   This function will not fetch the selling price of the variant from DB. Use
-  `compute_prices/1` instead.
+  `update_totals/1` instead.
   """
-  def price_changeset(line_item_changeset, unit_price) do
+  defp price_and_total_changeset(line_item_changeset, unit_price) do
     {_, quantity} = fetch_field(line_item_changeset, :quantity)
     total = Money.mult!(unit_price, quantity)
 
@@ -68,52 +58,46 @@ defmodule Core.Snitch.LineItem do
   end
 
   @doc """
-  Returns a `LineItem` changeset without computing `:total`.
+  Computes and puts prices of all "changed" `LineItem`s in an `Order` changeset.
 
-  > Equivalent to `create_changeset/2`, but more explicit in arguments.
+  This function only looks at the `:line_items` under `:changes`, and is
+  guaranteed to return the totals for the new `:line_items`.
+
+  `:total` for each `LineItem` and the `:item_total` of `Order is updated.
+
+  Selling prices of all `LineItem`s are fetched together from the DB.
   """
-  @spec build(non_neg_integer(), non_neg_integer()) :: Ecto.Changeset.t()
-  def build(variant_id, quantity) do
-    %__MODULE__{}
-    |> create_changeset(%{variant_id: variant_id, quantity: quantity})
-  end
+  @spec update_totals(Ecto.Changeset.t()) :: Ecto.Changeset.t()
+  def update_totals(%Ecto.Changeset{valid?: true} = order_changeset) do
+    {:ok, line_item_changesets} = fetch_change(order_changeset, :line_items)
 
-  @doc """
-  Returns a `LineItem` changeset and also computes the price.
+    variant_ids =
+      Enum.map(line_item_changesets, fn x ->
+        {_, variant_id} = fetch_field(x, :variant_id)
+        variant_id
+      end)
 
-  This is a costly operation!
-  """
-  @spec build!(non_neg_integer(), non_neg_integer()) :: Ecto.Changeset.t()
-  def build!(variant_id, quantity) do
-    line_item = build(variant_id, quantity)
-    {_, line_item_with_price} = compute_prices([line_item])
-    line_item_with_price
-  end
-
-  @doc """
-  Compute prices of many `LineItem` changesets in a single DB query.
-
-  Fetching the selling price of all LineItems together from the DB makes it
-  faster to compute the order total than using `build!/2` on each LineItem of
-  the Order.
-  """
-  @spec compute_prices([Ecto.Changeset.t()]) :: {product_total :: Money.t(), [Ecto.Changeset.t()]}
-  def compute_prices(line_item_changesets) do
-    variant_ids = Enum.map(line_item_changesets, fn x -> x.changes.variant_id end)
     unit_prices = Core.Snitch.Variant.get_selling_prices(variant_ids)
 
     priced_changesets =
       line_item_changesets
       |> Stream.zip(unit_prices)
       |> Enum.map(fn {changeset, unit_selling_price} ->
-        price_changeset(changeset, unit_selling_price)
+        price_and_total_changeset(changeset, unit_selling_price)
       end)
 
-    product_total =
+    item_total =
       priced_changesets
       |> Stream.map(fn x -> x.changes.total end)
       |> Enum.reduce(&Money.add!/2)
 
-    {product_total, priced_changesets}
+    order_changeset
+    |> put_change(:item_total, item_total)
+    |> put_change(:line_items, priced_changesets)
+  end
+
+  def update_totals(order_changeset) do
+    order_changeset
+    |> add_error(:invalid_line_items, "could not compute product totals")
   end
 end
