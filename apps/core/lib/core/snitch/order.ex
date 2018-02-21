@@ -32,7 +32,7 @@ defmodule Core.Snitch.Order do
     belongs_to(:user, Core.Snitch.User)
     belongs_to(:billing_address, Core.Snitch.Address)
     belongs_to(:shipping_address, Core.Snitch.Address)
-    has_many(:line_items, Core.Snitch.LineItem, on_delete: :delete_all)
+    has_many(:line_items, Core.Snitch.LineItem, on_delete: :delete_all, on_replace: :delete)
 
     timestamps()
   end
@@ -56,20 +56,33 @@ defmodule Core.Snitch.Order do
     |> validate_required([:line_items])
     |> cast_assoc(:line_items, with: &LineItem.create_changeset/2)
     |> ensure_unique_line_items()
+    |> compute_totals()
   end
 
-  def update_product_totals_changeset(order_with_line_items) do
-    order_with_line_items
-    |> validate_required([:line_items])
-    |> LineItem.update_totals()
+  def compute_totals(%Ecto.Changeset{valid?: true} = order_changeset) do
+    item_total =
+      order_changeset
+      |> get_field(:line_items, [])
+      |> Stream.map(&Map.fetch!(&1, :total))
+      |> Enum.reduce(&Money.add!/2)
+      |> Money.reduce()
+
+    total = Enum.reduce([item_total], &Money.add!/2)
+
+    order_changeset
+    |> put_change(:item_total, item_total)
+    |> put_change(:total, total)
   end
 
-  def ensure_unique_line_items(%Ecto.Changeset{valid?: true} = order_changeset) do
-    {:ok, line_items} = fetch_change(order_changeset, :line_items)
+  def compute_totals(order_changeset), do: order_changeset
+
+  defp ensure_unique_line_items(%Ecto.Changeset{valid?: true} = order_changeset) do
+    line_item_changesets = get_field(order_changeset, :line_items)
 
     items_are_unique? =
-      Enum.reduce_while(line_items, MapSet.new(), fn item, map_set ->
-        v_id = item.changes.variant_id
+      line_item_changesets
+      |> Enum.reduce_while(MapSet.new(), fn item, map_set ->
+        v_id = item.variant_id
 
         if MapSet.member?(map_set, v_id) do
           {:halt, false}
@@ -85,5 +98,15 @@ defmodule Core.Snitch.Order do
     end
   end
 
-  def ensure_unique_line_items(order_changeset), do: order_changeset
+  defp ensure_unique_line_items(order_changeset), do: order_changeset
 end
+
+# item_total =
+#   priced_changesets
+#   |> Stream.map(fn x -> {_, total} = fetch_field(x, :total)
+#   total
+# end)
+# |> Enum.reduce(&Money.add!/2)
+
+#   order_changeset
+#   |> put_change(:item_total, item_total)

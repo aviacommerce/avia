@@ -46,6 +46,18 @@ defmodule Core.Snitch.Factory do
     }
   end
 
+  def variant_factory() do
+    %Variant{
+      sku: sequence(:sku, &"shoes-nike-#{&1}"),
+      weight: Decimal.new("0.45"),
+      height: Decimal.new("0.15"),
+      depth: Decimal.new("0.1"),
+      width: Decimal.new("0.4"),
+      is_master: true,
+      cost_price: Money.new("9.99", :USD)
+    }
+  end
+
   def basic_order_factory() do
     %Order{
       slug: sequence("order"),

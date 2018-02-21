@@ -44,13 +44,14 @@ defmodule Core.Snitch.Variant do
   @spec get_selling_prices([non_neg_integer]) :: [Money.t()]
   def get_selling_prices(variant_ids) do
     # change the table to snitch_prices when it becomes available
-    query = from(v in "snitch_variants", select: v.cost_price, where: v.id in ^variant_ids)
+    query =
+      from(v in "snitch_variants", select: [v.id, v.cost_price], where: v.id in ^variant_ids)
 
     query
     |> Core.Repo.all()
-    |> Stream.map(fn cp ->
+    |> Enum.reduce(%{}, fn [v_id, cp], acc ->
       {:ok, cost} = Money.Ecto.Composite.Type.load(cp)
-      cost
+      Map.put(acc, v_id, cost)
     end)
   end
 end

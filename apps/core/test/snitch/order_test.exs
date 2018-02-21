@@ -1,6 +1,6 @@
 defmodule Core.Snitch.OrderTest do
   use ExUnit.Case, async: true
-  alias Core.Snitch.{LineItem, Order}
+  alias Core.Snitch.{Order, LineItem}
   import Core.Snitch.Factory
 
   setup :checkout_repo
@@ -9,24 +9,13 @@ defmodule Core.Snitch.OrderTest do
     setup [:three_variants, :a_user_and_address, :good_line_items, :order_changeset]
 
     test "", context do
-      %{variants: vs, line_items: lis} = context
-      quantities = Stream.map(lis, fn li -> li.quantity end)
-      # manually compute the total.
-      total =
-        vs
-        |> Stream.map(fn v -> v.cost_price end)
-        |> Stream.zip(quantities)
-        |> Stream.map(fn {price, quantity} -> Money.mult!(price, quantity) end)
-        |> Enum.reduce(&Money.add!/2)
-
       %{order: order} = context
-      updated_order = Order.update_product_totals_changeset(order)
-      %{valid?: validity, changes: changes} = updated_order
+      %{valid?: validity, changes: changes} = order
       assert validity
-      assert Money.reduce(Map.fetch!(changes, :item_total)) == total
-      assert Enum.all?(changes.line_items, fn %{valid?: validity} -> validity end)
+      assert Map.has_key?(changes, :item_total)
       assert Enum.all?(changes.line_items, fn %{action: action} -> action == :insert end)
-      # Core.Repo.insert!(updated_order)
+      # check DB level constraints too
+      assert {:ok, _} = Core.Repo.insert(order)
     end
   end
 
@@ -35,56 +24,22 @@ defmodule Core.Snitch.OrderTest do
 
     test "", context do
       %{order: order} = context
-      %{valid?: validity} = order
+      %{valid?: validity, changes: changes, errors: [error]} = order
       refute validity
-
-      %{valid?: updated_validity, changes: changes, errors: errors} =
-        Order.update_product_totals_changeset(order)
-
-      refute updated_validity
       refute Map.has_key?(changes, :item_total)
-
-      assert errors == [
-               invalid_line_items: {"could not compute product totals", []},
-               duplicate_variants: {"line_items must have unique variant_ids", []}
-             ]
-
       assert Enum.all?(changes.line_items, fn %{valid?: validity} -> validity end)
-    end
-  end
-
-  describe "order can handle invalid line_items" do
-    setup [:three_variants, :a_user_and_address, :line_items_bad_quantity, :order_changeset]
-
-    test "", context do
-      %{order: order} = context
-      %{valid?: validity} = order
-      refute validity
-
-      %{valid?: updated_validity, changes: changes, errors: errors} =
-        Order.update_product_totals_changeset(order)
-
-      refute updated_validity
-      refute Map.has_key?(changes, :item_total)
-      assert errors == [invalid_line_items: {"could not compute product totals", []}]
-      assert Enum.all?(changes.line_items, fn %{valid?: validity} -> not validity end)
+      assert error == {:duplicate_variants, {"line_items must have unique variant_ids", []}}
     end
   end
 
   defp duplicate_line_items(context) do
-    Map.put(context, :line_items, [%{variant_id: 1, quantity: 2}, %{variant_id: 1, quantity: 2}])
-  end
-
-  defp line_items_bad_quantity(context) do
-    %{variants: vs} = context
-    quantities = Stream.cycle([0])
-    variant_ids = Stream.map(vs, fn x -> x.id end)
+    %{variants: [v | _]} = context
+    variant_ids = Stream.cycle([v.id]) |> Enum.take(3)
 
     line_items =
       variant_ids
-      |> Stream.zip(quantities)
-      |> Enum.into([], fn {variant_id, quantity} ->
-        %{variant_id: variant_id, quantity: quantity}
+      |> Enum.into([], fn variant_id ->
+        %{variant_id: variant_id, quantity: 2}
       end)
 
     Map.put(context, :line_items, line_items)
@@ -92,14 +47,12 @@ defmodule Core.Snitch.OrderTest do
 
   defp good_line_items(context) do
     %{variants: vs} = context
-    quantities = Stream.cycle([2])
     variant_ids = Stream.map(vs, fn x -> x.id end)
 
     line_items =
       variant_ids
-      |> Stream.zip(quantities)
-      |> Enum.into([], fn {variant_id, quantity} ->
-        %{variant_id: variant_id, quantity: quantity}
+      |> Enum.into([], fn variant_id ->
+        %{variant_id: variant_id, quantity: 2}
       end)
 
     Map.put(context, :line_items, line_items)
@@ -113,7 +66,7 @@ defmodule Core.Snitch.OrderTest do
       user_id: u.id,
       billing_address_id: a.id,
       shipping_address_id: a.id,
-      line_items: line_items
+      line_items: LineItem.update_price_and_totals(line_items)
     }
 
     Map.put(context, :order, Order.create_changeset(order, params))

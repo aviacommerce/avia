@@ -1,6 +1,6 @@
 defmodule Core.Snitch.LineItem do
   @moduledoc """
-  Models a LineItem
+  Models a LineItem.
   """
 
   use Ecto.Schema
@@ -22,14 +22,14 @@ defmodule Core.Snitch.LineItem do
   @required_fields ~w(quantity variant_id)a
   @optional_fields ~w(unit_price total)a
 
-  @spec create_changeset(__MODULE__.t(), map()) :: Ecto.Changeset.t()
   @doc """
   Returns a `LineItem` changeset without `:total`.
 
   Do not persist this to DB since price fields and order are not set! To set
-  prices see `price_and_total_changeset/2` and `update_totals/1`.
+  prices see `update_totals/1` and `create_changeset/2`.
   """
-  def create_changeset(line_item, params) do
+  @spec changeset(__MODULE__.t(), map()) :: Ecto.Changeset.t()
+  def changeset(line_item, params) do
     line_item
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
@@ -39,65 +39,69 @@ defmodule Core.Snitch.LineItem do
   end
 
   @doc """
-  Computes and "puts" the total for the changeset using the `unit_price`.
-
-  The `quantity` is fetched via `Ecto.Changeset.fetch_field`, which falls back
-  on "old" quantity if there is no change in quantity.
-
-  ## Note
-  This function will not fetch the selling price of the variant from DB. Use
-  `update_totals/1` instead.
+  Returns a `LineItem` changeset that can be used for `insert`/`update`.
   """
-  defp price_and_total_changeset(line_item_changeset, unit_price) do
-    {_, quantity} = fetch_field(line_item_changeset, :quantity)
-    total = Money.mult!(unit_price, quantity)
-
-    line_item_changeset
-    |> put_change(:unit_price, unit_price)
-    |> put_change(:total, total)
+  @spec create_changeset(__MODULE__.t(), map()) :: Ecto.Changeset.t()
+  def create_changeset(line_item, params) do
+    line_item
+    |> changeset(params)
+    |> validate_required(@optional_fields)
   end
 
   @doc """
-  Computes and puts prices of all "changed" `LineItem`s in an `Order` changeset.
+  Set `:unit_price` and `:total` for many `LineItem` `params`.
 
-  This function only looks at the `:line_items` under `:changes`, and is
-  guaranteed to return the totals for the new `:line_items`.
+  `params` from external sources might not include `unit_price` and `total`,
+  this function _can_ compute them and return updated `params`.
 
-  `:total` for each `LineItem` and the `:item_total` of `Order is updated.
+  Since it accepts any list of maps, and not validated changesets we might not
+  be able to compute said fields. Such items are returned as is in the list.
 
-  Selling prices of all `LineItem`s are fetched together from the DB.
+  ## Note
+  Selling prices of all `LineItem`s are fetched from the DB in a single query.
+
+  ## Example
+  When `variant_id` is `nil` or does not exist, no update is made.
+  ```
+  iex> LineItem.update_price_and_totals([%{variant_id: -1, quantity: 2}])
+  [%{variant_id: -1, quantity: 2}]
+  ```
+
+  When both `variant_id` and `quantity` are valid, update is made.
+  ```
+  iex> variant = Core.Repo.one(Core.Snitch.Variant)
+  iex> variant.cost_price
+  #Money<:USD, 9.99000000>
+  iex> [priced_item] = LineItem.update_price_and_totals(
+  ...>   [%{variant_id: variant.id, quantity: 2}]
+  ...> )
+  iex> priced_item.total
+  #Money<:USD, 19.98000000>
+  ```
   """
-  @spec update_totals(Ecto.Changeset.t()) :: Ecto.Changeset.t()
-  def update_totals(%Ecto.Changeset{valid?: true} = order_changeset) do
-    {:ok, line_item_changesets} = fetch_change(order_changeset, :line_items)
+  @spec update_price_and_totals([map()]) :: [map()]
+  def update_price_and_totals(line_items) do
+    unit_selling_prices =
+      line_items
+      |> Stream.map(&Map.get(&1, :variant_id))
+      |> Enum.reject(fn x -> is_nil(x) end)
+      |> Core.Snitch.Variant.get_selling_prices()
 
-    variant_ids =
-      Enum.map(line_item_changesets, fn x ->
-        {_, variant_id} = fetch_field(x, :variant_id)
-        variant_id
-      end)
-
-    unit_prices = Core.Snitch.Variant.get_selling_prices(variant_ids)
-
-    priced_changesets =
-      line_item_changesets
-      |> Stream.zip(unit_prices)
-      |> Enum.map(fn {changeset, unit_selling_price} ->
-        price_and_total_changeset(changeset, unit_selling_price)
-      end)
-
-    item_total =
-      priced_changesets
-      |> Stream.map(fn x -> x.changes.total end)
-      |> Enum.reduce(&Money.add!/2)
-
-    order_changeset
-    |> put_change(:item_total, item_total)
-    |> put_change(:line_items, priced_changesets)
+    line_items
+    |> Enum.map(&set_price_and_total(&1, unit_selling_prices))
   end
 
-  def update_totals(order_changeset) do
-    order_changeset
-    |> add_error(:invalid_line_items, "could not compute product totals")
+  @spec set_price_and_total(map(), %{non_neg_integer: Money.t()}) :: map()
+  defp set_price_and_total(line_item, unit_selling_prices) do
+    with {:ok, quantity} <- Map.fetch(line_item, :quantity),
+         {:ok, variant_id} <- Map.fetch(line_item, :variant_id),
+         {:ok, unit_price} <- Map.fetch(unit_selling_prices, variant_id),
+         {:ok, total} <- Money.mult(unit_price, quantity) do
+      line_item
+      |> Map.put(:unit_price, unit_price)
+      |> Map.put(:total, total)
+    else
+      _ -> line_item
+    end
   end
 end
