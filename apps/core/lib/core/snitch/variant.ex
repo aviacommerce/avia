@@ -36,12 +36,12 @@ defmodule Core.Snitch.Variant do
   end
 
   @doc """
-  Returns the selling prices of a list of `Variant`s as a stream.
+  Returns the selling prices of a list of `Variant`s.
 
   ## Note
   **The function currently returns the cost price (as there's no price table)**.
   """
-  @spec get_selling_prices([non_neg_integer]) :: [Money.t()]
+  @spec get_selling_prices([non_neg_integer]) :: %{non_neg_integer: Money.t()}
   def get_selling_prices(variant_ids) do
     # change the table to snitch_prices when it becomes available
     query =

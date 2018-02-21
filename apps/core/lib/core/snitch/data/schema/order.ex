@@ -46,15 +46,46 @@ defmodule Core.Snitch.Data.Schema.Order do
     |> foreign_key_constraint(:shipping_address_id)
   end
 
+  @doc """
+  Returns a complete changeset with totals.
+
+  ## Note
+  The changeset `action` is not set.
+
+  ## Associations
+  * A list of `LineItem` params are expected under the `:line_items` key, and
+    each of those must include price fields, use
+    `LineItem.update_price_and_totals/1` if needed. Note that `variant_id`s must
+    be unique in each line item.
+  """
+  @spec create_changeset(__MODULE__.t(), map()) :: Ecto.Changeset.t()
   def create_changeset(order, params) do
     order
     |> changeset(params)
-    |> validate_required([:line_items])
+    |> cast_assoc(:line_items, with: &LineItem.create_changeset/2, required: true)
+    |> ensure_unique_line_items()
+    |> compute_totals()
+  end
+
+  @doc """
+  Returns a changeset to update an existing `Order`.
+
+  ## Note
+  The changeset `action` is not set.
+  """
+  @spec update_changeset(__MODULE__.t(), map()) :: Ecto.Changeset.t()
+  def update_changeset(order, params) do
+    order
+    |> changeset(params)
     |> cast_assoc(:line_items, with: &LineItem.create_changeset/2)
     |> ensure_unique_line_items()
     |> compute_totals()
   end
 
+  @doc """
+  Computes the order totals and puts those changes in to the changeset.
+  """
+  @spec compute_totals(Ecto.Changeset.t()) :: Ecto.Changeset.t()
   def compute_totals(%Ecto.Changeset{valid?: true} = order_changeset) do
     item_total =
       order_changeset
@@ -72,6 +103,7 @@ defmodule Core.Snitch.Data.Schema.Order do
 
   def compute_totals(order_changeset), do: order_changeset
 
+  @spec ensure_unique_line_items(Ecto.Changeset.t()) :: Ecto.Changeset.t()
   defp ensure_unique_line_items(%Ecto.Changeset{valid?: true} = order_changeset) do
     line_item_changesets = get_field(order_changeset, :line_items)
 
@@ -96,13 +128,3 @@ defmodule Core.Snitch.Data.Schema.Order do
 
   defp ensure_unique_line_items(order_changeset), do: order_changeset
 end
-
-# item_total =
-#   priced_changesets
-#   |> Stream.map(fn x -> {_, total} = fetch_field(x, :total)
-#   total
-# end)
-# |> Enum.reduce(&Money.add!/2)
-
-#   order_changeset
-#   |> put_change(:item_total, item_total)

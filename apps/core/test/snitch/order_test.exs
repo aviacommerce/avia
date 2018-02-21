@@ -4,9 +4,11 @@ defmodule Core.Snitch.OrderTest do
   import Core.Snitch.Factory
 
   setup :checkout_repo
+  setup :three_variants
+  setup :a_user_and_address
 
   describe "order totals are updated and line_items are inserted to DB" do
-    setup [:three_variants, :a_user_and_address, :good_line_items, :order_changeset]
+    setup [:good_line_items, :order_changeset]
 
     test "", context do
       %{order: order} = context
@@ -20,7 +22,7 @@ defmodule Core.Snitch.OrderTest do
   end
 
   describe "order can handle duplicate line_items" do
-    setup [:three_variants, :a_user_and_address, :duplicate_line_items, :order_changeset]
+    setup [:duplicate_line_items, :order_changeset]
 
     test "", context do
       %{order: order} = context
@@ -29,6 +31,73 @@ defmodule Core.Snitch.OrderTest do
       refute Map.has_key?(changes, :item_total)
       assert Enum.all?(changes.line_items, fn %{valid?: validity} -> validity end)
       assert error == {:duplicate_variants, {"line_items must have unique variant_ids", []}}
+    end
+  end
+
+  describe "order cannot be created without line_items" do
+    setup [:order_changeset]
+
+    test "", context do
+      %{order: order} = context
+      %{valid?: validity, changes: changes, errors: [error]} = order
+      refute validity
+      assert error = {:line_items, {"can't be blank", [validation: :required]}}
+    end
+  end
+
+  describe "order updates" do
+    setup [:good_line_items, :order_changeset, :persist]
+
+    test "unassociated line_items", context do
+      %{persisted: persisted, line_items: line_items} = context
+      params = %{line_items: LineItem.update_price_and_totals(line_items)}
+      new_order = Order.update_changeset(persisted, params)
+      %{valid?: validity, changes: changes} = new_order
+
+      assert validity
+      assert {:ok, _} = Core.Repo.update(new_order)
+      assert Enum.all?(changes.line_items, fn x -> x.action in [:insert, :replace] end)
+    end
+
+    test "quantity, variant", context do
+      %{persisted: persisted, line_items: line_items} = context
+      [one, two, three] = persisted.line_items
+
+      new_line_items = [
+        %{id: two.id, variant_id: two.variant_id, quantity: 9},
+        %{id: one.id, variant_id: three.variant_id, quantity: one.quantity},
+        %{id: three.id, variant_id: one.variant_id, quantity: three.quantity}
+      ]
+
+      totals = [
+        Money.mult!(two.unit_price, 9),
+        Money.mult!(three.unit_price, one.quantity),
+        Money.mult!(one.unit_price, three.quantity)
+      ]
+
+      total = Enum.reduce(totals, &Money.add!/2)
+      params = %{line_items: LineItem.update_price_and_totals(new_line_items)}
+
+      new_order = Order.update_changeset(persisted, params)
+      %{valid?: validity, changes: changes} = new_order
+
+      assert validity
+      assert {:ok, _} = Core.Repo.update(new_order)
+      assert Map.fetch!(changes, :item_total) == Money.reduce(total)
+      assert Enum.all?(changes.line_items, fn x -> x.action == :update end)
+    end
+
+    test "no changes, bud!", context do
+      %{persisted: persisted, line_items: line_items} = context
+      [one, two, three] = persisted.line_items
+      new_line_items = [%{id: one.id}, %{id: two.id}, %{id: three.id}]
+      params = %{line_items: LineItem.update_price_and_totals(new_line_items)}
+      new_order = Order.update_changeset(persisted, params)
+      %{valid?: validity, changes: changes} = new_order
+
+      assert validity
+      assert {:ok, _} = Core.Repo.update(new_order)
+      assert changes == %{}
     end
   end
 
@@ -60,7 +129,8 @@ defmodule Core.Snitch.OrderTest do
 
   defp order_changeset(context) do
     order = build(:basic_order)
-    %{user: u, address: a, line_items: line_items} = context
+    %{user: u, address: a} = context
+    line_items = Map.get(context, :line_items, [])
 
     params = %{
       user_id: u.id,
@@ -71,4 +141,23 @@ defmodule Core.Snitch.OrderTest do
 
     Map.put(context, :order, Order.create_changeset(order, params))
   end
+
+  defp persist(%{order: order} = context) do
+    Map.put(context, :persisted, Core.Repo.insert!(order))
+  end
+end
+
+defmodule Core.Snitch.OrderDocTest do
+  use ExUnit.Case, async: true
+  use Core.Snitch.Data.Schema
+  import Core.Snitch.Factory
+
+  setup :checkout_repo
+
+  setup do
+    insert(:variant)
+    :ok
+  end
+
+  doctest Order
 end
