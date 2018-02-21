@@ -8,7 +8,6 @@ defmodule Core.Snitch.Data.Schema.Inventory.StockLocation do
 
   schema "snitch_stock_locations" do
     field(:name, :string, default: "New Location")
-    field(:deleted, :boolean, default: false)
 
     has_many(:stock_items, StockItem)
     belongs_to(:address, Core.Snitch.Address)
@@ -16,7 +15,7 @@ defmodule Core.Snitch.Data.Schema.Inventory.StockLocation do
     timestamps()
   end
 
-  @create_fields ~w(address_id)a
+  @create_fields ~w(name address_id)a
   @update_fields ~w(name)a
   @opt_update_fields []
 

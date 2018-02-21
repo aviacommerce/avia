@@ -8,7 +8,6 @@ defmodule Core.Snitch.Data.Schema.Inventory.StockItem do
 
   schema "snitch_stock_items" do
     field(:count_on_hand, :integer, default: 0)
-    field(:deleted, :boolean, default: false)
 
     belongs_to(:variant, Core.Snitch.Variant)
     belongs_to(:stock_location, StockLocation)
@@ -16,7 +15,7 @@ defmodule Core.Snitch.Data.Schema.Inventory.StockItem do
     timestamps()
   end
 
-  @create_fields ~w(variant_id stock_location_id)a
+  @create_fields ~w(variant_id stock_location_id count_on_hand)a
   @update_fields ~w(count_on_hand)a
   @opt_update_fields []
 
