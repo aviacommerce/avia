@@ -18,6 +18,8 @@ defmodule Core.Snitch.Variant do
     field(:track_inventory, :boolean, default: true)
     field(:discontinue_on, :naive_datetime)
 
+    has_many(:stock_items, Core.Snitch.StockItem)
+
     timestamps()
   end
 
