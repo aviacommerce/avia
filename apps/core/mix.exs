@@ -25,7 +25,7 @@ defmodule Core.Mixfile do
   def application do
     [
       mod: {Core.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :yamerl, :worldly]
     ]
   end
 
@@ -40,7 +40,7 @@ defmodule Core.Mixfile do
     [
       {:postgrex, "~> 0.13.5"},
       {:ecto, "~> 2.1"},
-      {:poison, "~> 3.1"},
+      {:poison, "~> 3.1", override: true},
       {:ex_money, "~> 2.2.0"},
       {:credo, "~> 0.8.10", only: :dev, runtime: false},
 
@@ -51,7 +51,11 @@ defmodule Core.Mixfile do
       # docs and tests
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
-      {:dialyxir, "~> 0.5", only: [:dev], runtime: false}
+      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
+      {:excountries, "~> 0.0.1"},
+      {:yamerl, github: "yakaz/yamerl", override: true},
+      {:worldly, github: "martide/worldly"},
+      {:uuid, "~> 1.1"}
     ]
   end
 
