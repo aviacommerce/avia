@@ -4,6 +4,7 @@ defmodule Core.Snitch.Variant do
   """
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Query
 
   @type t :: %__MODULE__{}
   schema "snitch_variants" do
@@ -32,5 +33,24 @@ defmodule Core.Snitch.Variant do
 
     # Ensures a new variant takes the product master price when price is not supplied
     # Ensure variants? are not soft deleted
+  end
+
+  @doc """
+  Returns the selling prices of a list of `Variant`s as a stream.
+
+  ## Note
+  **The function currently returns the cost price (as there's no price table)**.
+  """
+  @spec get_selling_prices([non_neg_integer]) :: [Money.t()]
+  def get_selling_prices(variant_ids) do
+    # change the table to snitch_prices when it becomes available
+    query = from(v in "snitch_variants", select: v.cost_price, where: v.id in ^variant_ids)
+
+    query
+    |> Core.Repo.all()
+    |> Stream.map(fn cp ->
+      {:ok, cost} = Money.Ecto.Composite.Type.load(cp)
+      cost
+    end)
   end
 end

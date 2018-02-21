@@ -51,6 +51,7 @@ defmodule Core.Mixfile do
       # docs and tests
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
+      {:ex_machina, "~> 2.1", only: :test},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
       {:excountries, "~> 0.0.1"},
       {:yamerl, github: "yakaz/yamerl", override: true},
