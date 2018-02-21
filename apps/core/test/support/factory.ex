@@ -1,7 +1,8 @@
 defmodule Core.Snitch.Factory do
   @moduledoc false
   use ExMachina.Ecto, repo: Core.Repo
-  alias Core.Snitch.{User, Address, Variant, Order}
+  alias Core.Snitch.{User, Address, Variant}
+  alias Core.Snitch.Data.Schema.{Order}
 
   @iron_patriot %Variant{
     sku: "iron-patriot",

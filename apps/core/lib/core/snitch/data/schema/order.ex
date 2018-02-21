@@ -1,13 +1,9 @@
-defmodule Core.Snitch.Order do
+defmodule Core.Snitch.Data.Schema.Order do
   @moduledoc """
   Models an Order
   """
 
-  use Ecto.Schema
-
-  alias Core.Snitch.{LineItem}
-
-  import Ecto.Changeset
+  use Core.Snitch.Data.Schema
 
   @type t :: %__MODULE__{}
 
@@ -32,7 +28,7 @@ defmodule Core.Snitch.Order do
     belongs_to(:user, Core.Snitch.User)
     belongs_to(:billing_address, Core.Snitch.Address)
     belongs_to(:shipping_address, Core.Snitch.Address)
-    has_many(:line_items, Core.Snitch.LineItem, on_delete: :delete_all, on_replace: :delete)
+    has_many(:line_items, LineItem, on_delete: :delete_all, on_replace: :delete)
 
     timestamps()
   end

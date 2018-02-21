@@ -1,6 +1,6 @@
 defmodule Core.Snitch.OrderTest do
   use ExUnit.Case, async: true
-  alias Core.Snitch.{Order, LineItem}
+  use Core.Snitch.Data.Schema
   import Core.Snitch.Factory
 
   setup :checkout_repo
@@ -34,7 +34,7 @@ defmodule Core.Snitch.OrderTest do
 
   defp duplicate_line_items(context) do
     %{variants: [v | _]} = context
-    variant_ids = Stream.cycle([v.id]) |> Enum.take(3)
+    variant_ids = [v.id, v.id, v.id]
 
     line_items =
       variant_ids
