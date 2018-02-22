@@ -1,8 +1,16 @@
 defmodule Core.Snitch.Data.Model.LineItem do
   @moduledoc """
-  Order API
+  LineItem API and utilities.
   """
   use Core.Snitch.Data.Model
+
+  @spec get(map()) :: Schema.LineItem.t() | nil | no_return
+  def get(query_fields) do
+    QH.get(Schema.LineItem, query_fields, Repo)
+  end
+
+  @spec get_all() :: [Schema.LineItem.t()]
+  def get_all, do: Repo.all(Schema.LineItem)
 
   @doc """
   Set `:unit_price` and `:total` for many `LineItem` `params`.
@@ -19,7 +27,7 @@ defmodule Core.Snitch.Data.Model.LineItem do
   ## Example
   When `variant_id` is `nil` or does not exist, no update is made.
   ```
-  iex> LineItem.update_price_and_totals([%{variant_id: -1, quantity: 2}])
+  iex> Model.LineItem.update_price_and_totals([%{variant_id: -1, quantity: 2}])
   [%{variant_id: -1, quantity: 2}]
   ```
 
@@ -28,7 +36,7 @@ defmodule Core.Snitch.Data.Model.LineItem do
   iex> variant = Core.Repo.one(Core.Snitch.Variant)
   iex> variant.cost_price
   #Money<:USD, 9.99000000>
-  iex> [priced_item] = LineItem.update_price_and_totals(
+  iex> [priced_item] = Model.LineItem.update_price_and_totals(
   ...>   [%{variant_id: variant.id, quantity: 2}]
   ...> )
   iex> priced_item.total

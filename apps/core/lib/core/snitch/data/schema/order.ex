@@ -4,6 +4,7 @@ defmodule Core.Snitch.Data.Schema.Order do
   """
 
   use Core.Snitch.Data.Schema
+  alias Core.Snitch.Data.Model
 
   @type t :: %__MODULE__{}
 
@@ -55,7 +56,7 @@ defmodule Core.Snitch.Data.Schema.Order do
   ## Associations
   * A list of `LineItem` params are expected under the `:line_items` key, and
     each of those must include price fields, use
-    `LineItem.update_price_and_totals/1` if needed. Note that `variant_id`s must
+    `Model.LineItem.update_price_and_totals/1` if needed. Note that `variant_id`s must
     be unique in each line item.
   """
   @spec create_changeset(__MODULE__.t(), map()) :: Ecto.Changeset.t()
