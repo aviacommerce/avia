@@ -6,22 +6,17 @@ defmodule Core.Snitch.Data.Model.Order do
 
   @spec create(map, [map]) :: {:ok, Schema.Order.t()} | {:error, Ecto.Changeset.t()}
   def create(params, line_items) do
-    order = struct(Schema.Order, params)
     priced_items = Model.LineItem.update_price_and_totals(line_items)
 
-    order
-    |> Schema.Order.create_changeset(Map.put(params, :line_items, priced_items))
-    |> Repo.insert()
+    QH.create(Schema.Order, Map.put(params, :line_items, priced_items), Repo)
   end
 
-  @spec update(Schema.Order.t(), map) :: {:ok, Schema.Order.t()} | {:error, Ecto.Changeset.t()}
-  def update(order, params) do
+  @spec update(map) :: {:ok, Schema.Order.t()} | {:error, Ecto.Changeset.t()}
+  def update(params) do
     line_items = Map.get(params, :line_items, [])
     priced_items = Model.LineItem.update_price_and_totals(line_items)
 
-    order
-    |> Schema.Order.update_changeset(Map.put(params, :line_items, priced_items))
-    |> Repo.update()
+    QH.update(Schema.Order, Map.put(params, :line_items, priced_items), Repo)
   end
 
   @spec delete(non_neg_integer | Schema.Order.t()) ::

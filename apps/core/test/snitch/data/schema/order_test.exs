@@ -52,7 +52,7 @@ defmodule Core.Snitch.OrderTest do
     test "unassociated line_items", context do
       %{persisted: persisted, line_items: line_items} = context
       params = %{line_items: Model.LineItem.update_price_and_totals(line_items)}
-      new_order = Order.update_changeset(persisted, params)
+      new_order = Order.changeset(persisted, params, :update)
       %{valid?: validity, changes: changes} = new_order
 
       assert validity
@@ -79,7 +79,7 @@ defmodule Core.Snitch.OrderTest do
       total = Enum.reduce(totals, &Money.add!/2)
       params = %{line_items: Model.LineItem.update_price_and_totals(new_line_items)}
 
-      new_order = Order.update_changeset(persisted, params)
+      new_order = Order.changeset(persisted, params, :update)
       %{valid?: validity, changes: changes} = new_order
 
       assert validity
@@ -93,7 +93,7 @@ defmodule Core.Snitch.OrderTest do
       [one, two, three] = persisted.line_items
       new_line_items = [%{id: one.id}, %{id: two.id}, %{id: three.id}]
       params = %{line_items: Model.LineItem.update_price_and_totals(new_line_items)}
-      new_order = Order.update_changeset(persisted, params)
+      new_order = Order.changeset(persisted, params, :update)
       %{valid?: validity, changes: changes} = new_order
 
       assert validity
@@ -140,7 +140,7 @@ defmodule Core.Snitch.OrderTest do
       line_items: Model.LineItem.update_price_and_totals(line_items)
     }
 
-    Map.put(context, :order, Order.create_changeset(order, params))
+    Map.put(context, :order, Order.changeset(order, params, :create))
   end
 
   defp persist(%{order: order} = context) do
