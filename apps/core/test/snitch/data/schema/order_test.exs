@@ -1,6 +1,7 @@
 defmodule Core.Snitch.OrderTest do
   use ExUnit.Case, async: true
   use Core.Snitch.Data.Schema
+  alias Core.Snitch.Data.Model
   import Core.Snitch.Factory
 
   setup :checkout_repo
@@ -39,9 +40,9 @@ defmodule Core.Snitch.OrderTest do
 
     test "", context do
       %{order: order} = context
-      %{valid?: validity, changes: changes, errors: [error]} = order
+      %{valid?: validity, errors: [error]} = order
       refute validity
-      assert error = {:line_items, {"can't be blank", [validation: :required]}}
+      assert error == {:line_items, {"can't be blank", [validation: :required]}}
     end
   end
 
@@ -50,7 +51,7 @@ defmodule Core.Snitch.OrderTest do
 
     test "unassociated line_items", context do
       %{persisted: persisted, line_items: line_items} = context
-      params = %{line_items: LineItem.update_price_and_totals(line_items)}
+      params = %{line_items: Model.LineItem.update_price_and_totals(line_items)}
       new_order = Order.update_changeset(persisted, params)
       %{valid?: validity, changes: changes} = new_order
 
@@ -60,7 +61,7 @@ defmodule Core.Snitch.OrderTest do
     end
 
     test "quantity, variant", context do
-      %{persisted: persisted, line_items: line_items} = context
+      %{persisted: persisted} = context
       [one, two, three] = persisted.line_items
 
       new_line_items = [
@@ -76,7 +77,7 @@ defmodule Core.Snitch.OrderTest do
       ]
 
       total = Enum.reduce(totals, &Money.add!/2)
-      params = %{line_items: LineItem.update_price_and_totals(new_line_items)}
+      params = %{line_items: Model.LineItem.update_price_and_totals(new_line_items)}
 
       new_order = Order.update_changeset(persisted, params)
       %{valid?: validity, changes: changes} = new_order
@@ -88,10 +89,10 @@ defmodule Core.Snitch.OrderTest do
     end
 
     test "no changes, bud!", context do
-      %{persisted: persisted, line_items: line_items} = context
+      %{persisted: persisted} = context
       [one, two, three] = persisted.line_items
       new_line_items = [%{id: one.id}, %{id: two.id}, %{id: three.id}]
-      params = %{line_items: LineItem.update_price_and_totals(new_line_items)}
+      params = %{line_items: Model.LineItem.update_price_and_totals(new_line_items)}
       new_order = Order.update_changeset(persisted, params)
       %{valid?: validity, changes: changes} = new_order
 
@@ -136,7 +137,7 @@ defmodule Core.Snitch.OrderTest do
       user_id: u.id,
       billing_address_id: a.id,
       shipping_address_id: a.id,
-      line_items: LineItem.update_price_and_totals(line_items)
+      line_items: Model.LineItem.update_price_and_totals(line_items)
     }
 
     Map.put(context, :order, Order.create_changeset(order, params))

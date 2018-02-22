@@ -1,6 +1,6 @@
-defmodule Core.Snitch.LineItemTest do
+defmodule Core.Snitch.Data.Model.LineItemTest do
   use ExUnit.Case, async: true
-  use Core.Snitch.Data.Schema
+  use Core.Snitch.Data.Model
   import Core.Snitch.Factory
 
   setup :checkout_repo
@@ -10,7 +10,7 @@ defmodule Core.Snitch.LineItemTest do
 
     test "", context do
       %{line_items: line_items, totals: totals} = context
-      priced_items = LineItem.update_price_and_totals(line_items)
+      priced_items = Model.LineItem.update_price_and_totals(line_items)
 
       assert Enum.all?(priced_items, fn x -> totals[x.variant_id] == Money.reduce(x.total) end)
     end
@@ -21,7 +21,7 @@ defmodule Core.Snitch.LineItemTest do
 
     test "", context do
       %{line_items: line_items, totals: totals} = context
-      priced_items = LineItem.update_price_and_totals(line_items)
+      priced_items = Model.LineItem.update_price_and_totals(line_items)
 
       assert Enum.all?(priced_items, &(not Map.has_key?(&1, :total)))
       assert Enum.all?(priced_items, &(not Map.has_key?(&1, :unit_price)))
