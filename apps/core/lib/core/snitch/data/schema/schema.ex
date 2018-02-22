@@ -10,11 +10,7 @@ defmodule Core.Snitch.Data.Schema do
 
       alias Core.Snitch.Data.Schema
 
-      alias Schema.{
-        # Stock
-        Stock.StockItem,
-        Stock.StockLocation
-      }
+      use Schema.{Stock}
     end
   end
 end
