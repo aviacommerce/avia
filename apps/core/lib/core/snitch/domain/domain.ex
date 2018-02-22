@@ -6,7 +6,7 @@ defmodule Core.Snitch.Domain do
   
   defmacro __using__(_) do
     quote do
-      alias Core.Snitch.{Data.Model, Data.Schema, Domain, Gateway, Repo}
+      alias Core.Snitch.{Data.Model, Data.Schema, Domain, Repo}
       alias Ecto.Multi
     end
   end

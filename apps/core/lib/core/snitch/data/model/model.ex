@@ -12,9 +12,10 @@ defmodule Core.Snitch.Data.Model do
       alias Core.{Repo, Tools.Helpers}
       alias Helpers.QueryHelper, as: QH
 
-      alias Core.Snitch.Data.{
-        Schema,
-        Model
+      alias Core.Snitch.Data.{Schema, Model}
+      
+      use Core.Snitch.Data.Model.{
+        Stock
       }
     end
   end
