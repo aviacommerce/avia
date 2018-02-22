@@ -1,4 +1,4 @@
-defmodule Core.Snitch.Data.Schema.Inventory.StockItem do
+defmodule Core.Snitch.Data.Schema.Stock.StockItem do
   @moduledoc """
   Model to track inventory
   """
