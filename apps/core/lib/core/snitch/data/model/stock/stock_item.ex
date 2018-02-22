@@ -1,4 +1,4 @@
-defmodule Core.Snitch.Data.Model.Inventory.StockItem do
+defmodule Core.Snitch.Data.Model.Stock.StockItem do
   @moduledoc """
 
   """
@@ -6,7 +6,7 @@ defmodule Core.Snitch.Data.Model.Inventory.StockItem do
 
   def create(variant_id, stock_location_id, count_on_hand) do
     QH.create(
-      Schema.Inventory.StockItem,
+      Schema.Stock.StockItem,
       %{
         variant_id: variant_id,
         stock_location_id: stock_location_id,
@@ -17,16 +17,16 @@ defmodule Core.Snitch.Data.Model.Inventory.StockItem do
   end
 
   def update(query_fields, instance \\ nil) do
-    QH.update(Schema.Inventory.StockItem, query_fields, instance, Repo)
+    QH.update(Schema.Stock.StockItem, query_fields, instance, Repo)
   end
 
   def delete(id_or_instance) do
-    QH.delete(Schema.Inventory.StockItem, id_or_instance, Repo)
+    QH.delete(Schema.Stock.StockItem, id_or_instance, Repo)
   end
 
   def get(query_fields) do
-    QH.get(Schema.Inventory.StockItem, query_fields, Repo)
+    QH.get(Schema.Stock.StockItem, query_fields, Repo)
   end
 
-  def get_all, do: Schema.Inventory.StockItem |> Repo.all()
+  def get_all, do: Schema.Stock.StockItem |> Repo.all()
 end
