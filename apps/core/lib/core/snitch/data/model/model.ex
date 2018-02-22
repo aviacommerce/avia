@@ -1,5 +1,7 @@
 defmodule Core.Snitch.Data.Model do
-  @moduledoc false
+  @moduledoc """
+    Interface for handling DB related changes
+  """
 
   alias Core.Repo
 

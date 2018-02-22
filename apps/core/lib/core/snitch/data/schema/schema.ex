@@ -1,5 +1,7 @@
 defmodule Core.Snitch.Data.Schema do
-  @moduledoc false
+  @moduledoc """
+    Interface for DB tables with rules.
+  """
 
   defmacro __using__(_) do
     quote do
