@@ -19,7 +19,7 @@ defmodule Core.Snitch.Variant do
     field(:track_inventory, :boolean, default: true)
     field(:discontinue_on, :naive_datetime)
 
-    has_many(:stock_items, Core.Snitch.StockItem)
+    has_many(:stock_items, Core.Snitch.Data.Schema.Stock.StockItem)
 
     timestamps()
   end
@@ -36,21 +36,22 @@ defmodule Core.Snitch.Variant do
   end
 
   @doc """
-  Returns the selling prices of a list of `Variant`s as a stream.
+  Returns the selling prices of a list of `Variant`s.
 
   ## Note
   **The function currently returns the cost price (as there's no price table)**.
   """
-  @spec get_selling_prices([non_neg_integer]) :: [Money.t()]
+  @spec get_selling_prices([non_neg_integer]) :: %{non_neg_integer: Money.t()}
   def get_selling_prices(variant_ids) do
     # change the table to snitch_prices when it becomes available
-    query = from(v in "snitch_variants", select: v.cost_price, where: v.id in ^variant_ids)
+    query =
+      from(v in "snitch_variants", select: [v.id, v.cost_price], where: v.id in ^variant_ids)
 
     query
     |> Core.Repo.all()
-    |> Stream.map(fn cp ->
+    |> Enum.reduce(%{}, fn [v_id, cp], acc ->
       {:ok, cost} = Money.Ecto.Composite.Type.load(cp)
-      cost
+      Map.put(acc, v_id, cost)
     end)
   end
 end

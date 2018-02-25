@@ -1,7 +1,8 @@
 defmodule Core.Snitch.Factory do
   @moduledoc false
   use ExMachina.Ecto, repo: Core.Repo
-  alias Core.Snitch.{User, Address, Variant, Order}
+  alias Core.Snitch.{User, Address, Variant}
+  alias Core.Snitch.Data.Schema.{Order}
 
   @iron_patriot %Variant{
     sku: "iron-patriot",
@@ -43,6 +44,18 @@ defmodule Core.Snitch.Factory do
       width: Decimal.new("0.4"),
       is_master: true,
       cost_price: random_price(9, 9)
+    }
+  end
+
+  def variant_factory() do
+    %Variant{
+      sku: sequence(:sku, &"shoes-nike-#{&1}"),
+      weight: Decimal.new("0.45"),
+      height: Decimal.new("0.15"),
+      depth: Decimal.new("0.1"),
+      width: Decimal.new("0.4"),
+      is_master: true,
+      cost_price: Money.new("9.99", :USD)
     }
   end
 
