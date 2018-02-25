@@ -6,11 +6,14 @@ defmodule Core.Snitch.Data.Schema do
   defmacro __using__(_) do
     quote do
       use Ecto.Schema
+      use Core.Snitch.Data.Schema.{Stock}
+
+      alias Core.Snitch.Data.Schema.{
+        LineItem,
+        Order
+      }
+
       import Ecto.Changeset
-
-      alias Core.Snitch.Data.Schema
-
-      use Schema.{Stock}
     end
   end
 end

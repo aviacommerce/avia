@@ -1,25 +1,37 @@
 defmodule Core.Snitch.VariantTest do
   use ExUnit.Case, async: true
-  alias Core.Snitch.{Variant}
+  alias Core.Snitch.Variant
   import Core.Snitch.Factory
 
   setup :checkout_repo
 
-  describe "fetch selling prices of many variants" do
+  describe "(in one query) fetch selling prices" do
     setup :three_variants
 
-    test "in one query", context do
+    test "of valid variants", context do
       %{variants: vs} = context
       variant_ids = Enum.map(vs, fn x -> x.id end)
 
-      selling_prices = Enum.map(vs, fn x -> x.cost_price end)
+      selling_prices = Enum.reduce(vs, %{}, fn x, acc -> Map.put(acc, x.id, x.cost_price) end)
 
       computed_prices =
         variant_ids
         |> Variant.get_selling_prices()
-        |> Enum.map(&Money.reduce/1)
+        |> Enum.reduce(%{}, fn {id, x}, acc -> Map.put(acc, id, Money.reduce(x)) end)
 
       assert computed_prices == selling_prices
+    end
+
+    test "of invalid variants", context do
+      %{variants: vs} = context
+      variant_ids = [-1]
+
+      computed_prices =
+        variant_ids
+        |> Variant.get_selling_prices()
+        |> Enum.reduce(%{}, fn {id, x}, acc -> Map.put(acc, id, Money.reduce(x)) end)
+
+      assert :error = Map.fetch(computed_prices, -1)
     end
   end
 end

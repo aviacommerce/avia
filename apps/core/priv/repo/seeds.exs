@@ -11,5 +11,5 @@
 # and so on) as they will fail if something goes wrong.
 alias Core.Seed.CountryStateSeeder, as: CSseed
 
-#seeds countries and states entity
-CSseed.seed_countries_and_states!
+# seeds countries and states entity
+CSseed.seed_countries_and_states!()
