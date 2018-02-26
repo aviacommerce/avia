@@ -16,11 +16,11 @@ defmodule Core.Snitch.Data.Schema.Payment do
     field(:state, :string, default: "pending")
 
     belongs_to(:payment_method, PaymentMethod)
-
+    belongs_to(:order, Order)
     timestamps()
   end
 
-  @required_fields ~w(slug amount state payment_type payment_method_id)a
+  @required_fields ~w(slug amount state payment_type payment_method_id order_id)a
 
   @doc """
   Returns a `Payment` changeset.
@@ -33,6 +33,7 @@ defmodule Core.Snitch.Data.Schema.Payment do
     |> validate_discriminator(:payment_type, @payment_types)
     |> validate_amount(:amount)
     |> foreign_key_constraint(:payment_method_id)
+    |> foreign_key_constraint(:order_id)
   end
 
   defp validate_discriminator(%{valid?: true} = changeset, key, permitted) do
@@ -55,7 +56,7 @@ defmodule Core.Snitch.Data.Schema.Payment do
       changeset
     else
       changeset
-      |> add_error(:amount, "must be greater than #{Decimal.new(0)}", validation: :amount)
+      |> add_error(:amount, "must be greater than 0", validation: :amount)
     end
   end
 

@@ -129,7 +129,7 @@ defmodule Snitch.Schema.OrderTest do
   end
 
   defp order_changeset(context) do
-    order = build(:basic_order)
+    order = build(:order)
     %{user: u, address: a} = context
     line_items = Map.get(context, :line_items, [])
 

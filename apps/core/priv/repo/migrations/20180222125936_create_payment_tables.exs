@@ -33,6 +33,7 @@ defmodule Core.Repo.Migrations.CreatePaymentTables do
       add :slug, :string, null: false
       add :amount, :money_with_currency
       add :state, :string, default: "pending"
+      add :order_id, references("snitch_orders"), null: false
       timestamps()
     end
 
