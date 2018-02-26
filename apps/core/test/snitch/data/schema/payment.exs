@@ -3,12 +3,13 @@ defmodule Core.Snitch.Data.Schema.PaymentTest do
   use Core.Snitch.Data.Schema
 
   import Core.Snitch.Factory
-  
+
   setup :checkout_repo
   setup :payment_methods
 
   test "Payments invalidate bad type", context do
     %{check_method: method} = context
+
     check_payment =
       :check_payment
       |> build(payment_type: "abc", payment_method_id: method.id)
@@ -20,6 +21,7 @@ defmodule Core.Snitch.Data.Schema.PaymentTest do
 
   test "Payments cannot have negative amount", context do
     %{check_method: method} = context
+
     check_payment =
       :check_payment
       |> build(payment_method_id: method.id)
@@ -38,4 +40,3 @@ defmodule Core.Snitch.Data.Schema.PaymentTest do
     |> Map.put(:check_method, check)
   end
 end
-

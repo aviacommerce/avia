@@ -3,7 +3,7 @@ defmodule Core.Snitch.Data.Schema.CardPaymentTest do
   use Core.Snitch.Data.Schema
 
   import Core.Snitch.Factory
-  
+
   setup :checkout_repo
   setup :payment_methods
 
@@ -33,7 +33,7 @@ defmodule Core.Snitch.Data.Schema.CardPaymentTest do
     |> Map.put(:card_method, card)
     |> Map.put(:check_method, check)
   end
-  
+
   defp super_card(%{card_method: method} = context) do
     card = insert(:payment_card, payment_method_id: method.id)
     Map.put(context, :super_card, card)
@@ -44,4 +44,3 @@ defmodule Core.Snitch.Data.Schema.CardPaymentTest do
     Map.put(context, :super_check, check)
   end
 end
-
