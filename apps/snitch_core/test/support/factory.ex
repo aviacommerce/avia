@@ -1,7 +1,6 @@
 defmodule Snitch.Factory do
   @moduledoc false
   use ExMachina.Ecto, repo: Snitch.Repo
-  use Snitch.Data.Schema
   alias Snitch.Data.Schema.{Variant, Address, User, Order}
 
   @iron_patriot %Variant{
@@ -59,10 +58,40 @@ defmodule Snitch.Factory do
     }
   end
 
-  def basic_order_factory() do
+  def order_factory() do
     %Order{
       slug: sequence("order"),
       state: "cart"
+    }
+  end
+
+  def payment_method_card_factory() do
+    %PaymentMethod{
+      name: "card",
+      code: "ccd",
+      active?: true
+    }
+  end
+
+  def payment_method_check_factory() do
+    %PaymentMethod{
+      name: "check",
+      code: "chk",
+      active?: true
+    }
+  end
+
+  def card_payment_factory() do
+    %Payment{
+      slug: sequence("card-payment"),
+      payment_type: "ccd"
+    }
+  end
+
+  def check_payment_factory() do
+    %Payment{
+      slug: sequence("check-payment"),
+      payment_type: "chk"
     }
   end
 

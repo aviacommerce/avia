@@ -1,6 +1,8 @@
 defmodule Core.Seed.PaymentMethods do
   @moduledoc """
-  Snitch come with two payment methods built-in:
+  Seeds supported PaymentMethods.
+
+  Snitch comes with two payment methods built-in:
   1. check or cash
   2. credit or debit cards
 
