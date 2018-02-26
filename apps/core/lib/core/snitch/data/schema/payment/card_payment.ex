@@ -35,6 +35,10 @@ defmodule Core.Snitch.Data.Schema.CardPayment do
     |> cast(params, @required_fields)
     |> unique_constraint(:payment_id)
     |> foreign_key_constraint(:payment_id)
-    |> check_constraint(:payment_id, name: :card_exclusivity)
+    |> check_constraint(
+      :payment_id,
+      name: :card_exclusivity,
+      message: "does not refer a card payment"
+    )
   end
 end
