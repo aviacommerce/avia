@@ -22,14 +22,14 @@ defmodule Snitch.Data.Model.Order do
   end
 
   @spec delete(non_neg_integer | Schema.Order.t()) ::
-          {:ok, Schema.Order.t()} | {:error, Ecto.Changeset.t()}
+          {:ok, Schema.Order.t()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
   def delete(id_or_instance) do
     QH.delete(Schema.Order, id_or_instance, Repo)
   end
 
-  @spec get(map) :: Schema.Order.t() | nil | no_return
-  def get(query_fields) do
-    QH.get(Schema.Order, query_fields, Repo)
+  @spec get(map | non_neg_integer) :: Schema.Order.t() | nil | no_return
+  def get(query_fields_or_primary_key) do
+    QH.get(Schema.Order, query_fields_or_primary_key, Repo)
   end
 
   @spec get_all() :: [Schema.Order.t()]
