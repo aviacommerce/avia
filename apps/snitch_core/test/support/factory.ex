@@ -81,17 +81,24 @@ defmodule Snitch.Factory do
     }
   end
 
-  def card_payment_factory() do
+  def payment_ccd_factory() do
     %Payment{
       slug: sequence("card-payment"),
       payment_type: "ccd"
     }
   end
 
-  def check_payment_factory() do
+  def payment_chk_factory() do
     %Payment{
       slug: sequence("check-payment"),
       payment_type: "chk"
+    }
+  end
+
+  def card_payment_factory() do
+    %CardPayment{
+      cvv_response: "V",
+      avs_response: "Z"
     }
   end
 
@@ -115,5 +122,33 @@ defmodule Snitch.Factory do
 
   def three_variants(context) do
     Map.put(context, :variants, insert_list(3, :random_variant))
+  end
+
+  def an_order(context) do
+    %{user: user} = context
+    order = insert(:order, user_id: user.id)
+
+    Map.put(context, :order, order)
+  end
+
+  def payment_methods(context) do
+    card = insert(:payment_method_card)
+    check = insert(:payment_method_check)
+
+    context
+    |> Map.put(:card_method, card)
+    |> Map.put(:check_method, check)
+  end
+
+  def payments(context) do
+    %{card_method: card_m, check_method: check_m, order: order} = context
+    card = insert(:payment_ccd, payment_method_id: card_m.id, order_id: order.id)
+    check = insert(:payment_chk, payment_method_id: check_m.id, order_id: order.id)
+    card_payment = insert(:card_payment, payment_id: card.id)
+
+    context
+    |> Map.put(:ccd, card)
+    |> Map.put(:chk, check)
+    |> Map.put(:card, card_payment)
   end
 end

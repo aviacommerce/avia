@@ -23,7 +23,7 @@ defmodule Core.Snitch.Data.Model.PaymentMethod do
     QH.create(Schema.PaymentMethod, pm, Repo)
   end
 
-  @spec create(map(), Schema.PaymentMethod.t() | nil) ::
+  @spec update(map, Schema.PaymentMethod.t() | nil) ::
           {:ok, Schema.PaymentMethod.t()} | {:error, Ecto.Changeset.t()}
   def update(query_fields, instance \\ nil) do
     QH.update(Schema.PaymentMethod, query_fields, instance, Repo)
@@ -33,14 +33,14 @@ defmodule Core.Snitch.Data.Model.PaymentMethod do
   Deletes a PaymentMethod.
   """
   @spec delete(non_neg_integer | Schema.PaymentMethod.t()) ::
-          {:ok, Schema.PaymentMethod.t()} | {:error, Ecto.Changeset.t()}
+          {:ok, Schema.PaymentMethod.t()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
   def delete(id_or_instance) do
     QH.delete(Schema.PaymentMethod, id_or_instance, Repo)
   end
 
-  @spec get(map()) :: Schema.PaymentMethod.t() | nil | no_return
-  def get(query_fields) do
-    QH.get(Schema.PaymentMethod, query_fields, Repo)
+  @spec get(map | non_neg_integer) :: Schema.PaymentMethod.t() | nil | no_return
+  def get(query_fields_or_primary_key) do
+    QH.get(Schema.PaymentMethod, query_fields_or_primary_key, Repo)
   end
 
   @spec get_card() :: Schema.PaymentMethod.t() | nil | no_return
