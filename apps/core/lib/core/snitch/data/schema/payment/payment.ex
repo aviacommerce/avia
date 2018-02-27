@@ -20,20 +20,40 @@ defmodule Core.Snitch.Data.Schema.Payment do
     timestamps()
   end
 
-  @required_fields ~w(slug amount state payment_type payment_method_id order_id)a
+  @update_fields ~w(slug amount state order_id)a
+  @create_fields @update_fields ++ ~w(payment_type payment_method_id order_id)a
 
   @doc """
   Returns a `Payment` changeset.
+
+  `:payment_type` is required when `action` is `:create`. When `action` is
+  `:update`, the `:payment_type` if provided, is simply ignored.
+
+  Consider deleting the payment if you wish to "change" the payment type.
   """
   @spec changeset(__MODULE__.t(), map(), :create | :update) :: Ecto.Changeset.t()
-  def changeset(payment, params, _) do
+  def changeset(payment, params, action)
+
+  def changeset(payment, params, :create) do
     payment
-    |> cast(params, @required_fields)
-    |> validate_required(@required_fields)
+    |> cast(params, @create_fields)
+    |> validate_required(@create_fields)
     |> validate_discriminator(:payment_type, @payment_types)
-    |> validate_amount(:amount)
     |> foreign_key_constraint(:payment_method_id)
+    |> do_changeset()
+  end
+
+  def changeset(payment, params, :update) do
+    payment
+    |> cast(params, @update_fields)
+    |> do_changeset()
+  end
+
+  defp do_changeset(changeset) do
+    changeset
     |> foreign_key_constraint(:order_id)
+    |> validate_amount(:amount)
+    |> unique_constraint(:slug)
   end
 
   defp validate_discriminator(%{valid?: true} = changeset, key, permitted) do

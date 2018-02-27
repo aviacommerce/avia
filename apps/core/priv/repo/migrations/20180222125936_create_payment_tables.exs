@@ -36,6 +36,7 @@ defmodule Core.Repo.Migrations.CreatePaymentTables do
       add :order_id, references("snitch_orders"), null: false
       timestamps()
     end
+    create unique_index("snitch_payments", :slug)
 
     create table("snitch_card_payments", comment: "payments made via credit or debit cards") do
       add :payment_id, references("snitch_payments", on_delete: :delete_all), null: false
