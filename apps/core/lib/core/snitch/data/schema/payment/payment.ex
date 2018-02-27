@@ -21,7 +21,7 @@ defmodule Core.Snitch.Data.Schema.Payment do
   end
 
   @update_fields ~w(slug amount state order_id)a
-  @create_fields @update_fields ++ ~w(payment_type payment_method_id order_id)a
+  @create_fields @update_fields ++ ~w(payment_type payment_method_id)a
 
   @doc """
   Returns a `Payment` changeset.
@@ -31,7 +31,7 @@ defmodule Core.Snitch.Data.Schema.Payment do
 
   Consider deleting the payment if you wish to "change" the payment type.
   """
-  @spec changeset(__MODULE__.t(), map(), :create | :update) :: Ecto.Changeset.t()
+  @spec changeset(__MODULE__.t(), map, :create | :update) :: Ecto.Changeset.t()
   def changeset(payment, params, action)
 
   def changeset(payment, params, :create) do
