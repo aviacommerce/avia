@@ -3,16 +3,6 @@ defmodule Snitch.Factory do
   use ExMachina.Ecto, repo: Snitch.Repo
   alias Snitch.Data.Schema.{Variant, Address, User, Order}
 
-  @iron_patriot %Variant{
-    sku: "iron-patriot",
-    weight: Decimal.new(128),
-    height: Decimal.new("1.8288"),
-    depth: Decimal.new(1),
-    width: Decimal.new(2),
-    is_master: true,
-    cost_price: Money.new("699599.99", :USD)
-  }
-
   def user_factory() do
     %User{
       first_name: sequence(:first_name, &"Tony-#{&1}"),

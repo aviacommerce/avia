@@ -20,7 +20,7 @@ defmodule Snitch.Data.Model.LineItemTest do
     setup [:three_variants, :bad_line_items]
 
     test "", context do
-      %{line_items: line_items, totals: totals} = context
+      %{line_items: line_items} = context
       priced_items = Model.LineItem.update_price_and_totals(line_items)
 
       assert Enum.all?(priced_items, &(not Map.has_key?(&1, :total)))

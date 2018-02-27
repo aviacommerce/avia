@@ -22,7 +22,7 @@ defmodule Core.Snitch.Data.Schema.PaymentMethod do
   @doc """
   Returns a `PaymentMethod` changeset.
   """
-  @spec changeset(__MODULE__.t(), map(), :create | :update) :: Ecto.Changeset.t()
+  @spec changeset(__MODULE__.t(), map, :create | :update) :: Ecto.Changeset.t()
   def changeset(payment_method, params, _) do
     payment_method
     |> cast(params, @required_fields)
