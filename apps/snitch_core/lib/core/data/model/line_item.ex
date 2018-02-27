@@ -5,7 +5,7 @@ defmodule Snitch.Data.Model.LineItem do
   use Snitch.Data.Model
   alias Snitch.Data.Schema
 
-  @spec get(map()) :: Schema.LineItem.t() | nil | no_return
+  @spec get(map) :: Schema.LineItem.t() | nil | no_return
   def get(query_fields) do
     QH.get(Schema.LineItem, query_fields, Repo)
   end
@@ -44,7 +44,7 @@ defmodule Snitch.Data.Model.LineItem do
   #Money<:USD, 19.98000000>
   ```
   """
-  @spec update_price_and_totals([map()]) :: [map()]
+  @spec update_price_and_totals([map]) :: [map]
   def update_price_and_totals(line_items) do
     unit_selling_prices =
       line_items
@@ -56,7 +56,7 @@ defmodule Snitch.Data.Model.LineItem do
     |> Enum.map(&set_price_and_total(&1, unit_selling_prices))
   end
 
-  @spec set_price_and_total(map(), %{non_neg_integer: Money.t()}) :: map()
+  @spec set_price_and_total(map, %{non_neg_integer: Money.t()}) :: map
   defp set_price_and_total(line_item, unit_selling_prices) do
     with {:ok, quantity} <- Map.fetch(line_item, :quantity),
          {:ok, variant_id} <- Map.fetch(line_item, :variant_id),

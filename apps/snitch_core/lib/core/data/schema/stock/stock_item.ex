@@ -24,7 +24,7 @@ defmodule Snitch.Data.Schema.StockItem do
   def create_fields, do: @create_fields
   def update_fields, do: @update_fields
 
-  @spec changeset(__MODULE__.t(), map(), atom) :: Ecto.Changeset.t()
+  @spec changeset(__MODULE__.t(), map, atom) :: Ecto.Changeset.t()
   def changeset(instance, params, operation \\ :create)
   def changeset(instance, params, :create), do: do_changeset(instance, params, @create_fields)
 

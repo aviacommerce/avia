@@ -22,8 +22,7 @@ defmodule Snitch.Schema.VariantTest do
       assert computed_prices == selling_prices
     end
 
-    test "of invalid variants", context do
-      %{variants: vs} = context
+    test "of invalid variants" do
       variant_ids = [-1]
 
       computed_prices =

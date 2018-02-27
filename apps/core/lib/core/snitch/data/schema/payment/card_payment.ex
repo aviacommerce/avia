@@ -35,7 +35,7 @@ defmodule Core.Snitch.Data.Schema.CardPayment do
 
   Consider deleting the payment if you wish to "change" the payment type.
   """
-  @spec changeset(__MODULE__.t(), map(), :create | :update) :: Ecto.Changeset.t()
+  @spec changeset(__MODULE__.t(), map, :create | :update) :: Ecto.Changeset.t()
   def changeset(payment, params, action)
 
   def changeset(payment, params, :create) do
