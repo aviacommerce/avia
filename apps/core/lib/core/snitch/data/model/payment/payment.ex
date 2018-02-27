@@ -14,6 +14,7 @@ defmodule Core.Snitch.Data.Model.Payment do
   """
   use Core.Snitch.Data.Model
 
+  @deprecated "Deletion of payments! Tsk tsk, bad idea sir."
   @doc """
   Deletes a Payment alongwith the concrete subtype!
 
@@ -26,6 +27,16 @@ defmodule Core.Snitch.Data.Model.Payment do
     QH.delete(Schema.Payment, id_or_instance, Repo)
   end
 
+  @deprecated "This is dangerous as it allows updating the amount."
+  @doc """
+  Updates an existing `Payment`
+
+  See `Core.Snitch.Data.Schema.Payment.changeset/3` with the `:update` action.
+  """
+  def update(id_or_instance, params) do
+    QH.update(Schema.Payment, params, id_or_instance, Repo)
+  end
+
   @spec get(map()) :: Schema.Payment.t() | nil | no_return
   def get(query_fields) do
     QH.get(Schema.Payment, query_fields, Repo)
@@ -36,6 +47,8 @@ defmodule Core.Snitch.Data.Model.Payment do
 
   @doc """
   Fetch the (associated) concrete Payment subtype.
+
+  > Note that the `:payment` association is not loaded.
   """
   @spec to_subtype(non_neg_integer | Schema.Payment.t()) :: struct()
   def to_subtype(id_or_instance)
