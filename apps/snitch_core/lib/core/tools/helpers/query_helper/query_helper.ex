@@ -41,10 +41,9 @@ defmodule Snitch.Tools.QueryHelper do
   @spec delete(module, non_neg_integer | struct(), Ecto.Repo.t()) ::
           {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
   def delete(schema, id, repo) when is_integer(id) do
-    with {:ok, instance} <- repo.get(schema, id) do
-      delete(schema, instance, repo)
-    else
-      _ -> {:error, :not_found}
+    case repo.get(schema, id) do
+      nil -> {:error, :not_found}
+      instance -> delete(schema, instance, repo)
     end
   end
 

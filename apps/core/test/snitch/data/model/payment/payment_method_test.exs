@@ -1,0 +1,51 @@
+defmodule Core.Snitch.Data.Model.PaymentMethodTest do
+  use ExUnit.Case, async: true
+  use Core.Snitch.Data.Model
+  import Core.Snitch.Factory
+
+  setup :checkout_repo
+
+  test "successful create" do
+    assert {:ok, ccd} = Model.PaymentMethod.create("card-payments", "ccd")
+
+    assert %Schema.PaymentMethod{
+             name: "card-payments",
+             code: "ccd",
+             active?: true
+           } = ccd
+  end
+
+  test "create with bad code fails" do
+    assert {:error,
+            [code: {"should be %{count} character(s)", [count: 3, validation: :length, is: 3]}]} =
+             Model.PaymentMethod.create("card-payments", "not-a-code")
+  end
+
+  describe "with existing" do
+    setup :payment_methods
+
+    test "get and update" do
+      card_method = Model.PaymentMethod.get_card()
+      params = %{id: card_method.id, active?: false, code: "abs", name: "by card"}
+      assert {:ok, ccd} = Model.PaymentMethod.update(params)
+
+      assert %Schema.PaymentMethod{
+               name: "by card",
+               code: "ccd",
+               active?: false
+             } = ccd
+    end
+
+    test "get and delete" do
+      check_method = Model.PaymentMethod.get_check()
+      assert {:ok, chk} = Model.PaymentMethod.delete(check_method.id)
+
+      assert %Schema.PaymentMethod{
+               name: "check",
+               code: "chk"
+             } = chk
+
+      assert nil == Model.PaymentMethod.get_check()
+    end
+  end
+end

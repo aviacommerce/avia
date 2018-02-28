@@ -12,25 +12,42 @@ defmodule Core.Snitch.Data.Model.CardPayment do
   use Core.Snitch.Data.Model
 
   @doc """
-  Creates both `Payment` and `CardPayment` records in a transaction.
+  Creates both `Payment` and `CardPayment` records in a transaction for Order
+  represented by `order_id`.
+
+  * `payment_params` are validated using
+    `Core.Snitch.Data.Schema.Payment.changeset/3` with the `:create` action and
+    because `slug` and `order_id` are passed explicitly to this function,
+    they'll be ignored if present in `payment_params`.
+  * `card_params` are validated using
+  `Core.Snitch.Data.Schema.CardPayment.changeset/3` with the `:create` action.
   """
-  @spec create(non_neg_integer(), map) ::
-          {:ok, Schema.CardPayment.t()} | {:error, Ecto.Changeset.t()}
-  def create(order_id, params) do
-    payment = struct(Schema.Payment, params)
+  @spec create(String.t(), non_neg_integer(), map, map) ::
+          {:ok, %{card_payment: Schema.CardPayment.t(), payment: Schema.Payment.t()}}
+          | {:error, Ecto.Changeset.t()}
+  def create(slug, order_id, payment_params, card_params) do
+    payment = struct(Schema.Payment, payment_params)
     card_method = Model.PaymentMethod.get_card()
-    other_params = %{order_id: order_id, payment_type: "ccd", payment_method_id: card_method.id}
-    payment_changeset = Schema.Payment.changeset(payment, other_params, :create)
+
+    more_payment_params = %{
+      order_id: order_id,
+      payment_type: "ccd",
+      payment_method_id: card_method.id,
+      slug: slug
+    }
+
+    payment_changeset = Schema.Payment.changeset(payment, more_payment_params, :create)
 
     Ecto.Multi.new()
     |> Ecto.Multi.insert(:payment, payment_changeset)
     |> Ecto.Multi.run(:card_payment, fn %{payment: payment} ->
-      QH.create(Schema.CardPayment, %{payment_id: payment.id}, Repo)
+      all_card_params = Map.put(card_params, :payment_id, payment.id)
+      QH.create(Schema.CardPayment, all_card_params, Repo)
     end)
     |> Core.Repo.transaction()
   end
 
-  @deprecated "This is dangerous as it allows changing the amoun"
+  @deprecated "This is dangerous as it allows changing the amount"
   @doc """
   Updates `CardPayment` and `Payment` together.
 
@@ -43,7 +60,8 @@ defmodule Core.Snitch.Data.Model.CardPayment do
     `:update` action.
   """
   @spec update(Schema.CardPayment.t(), map, map) ::
-          {:ok, Schema.CardPayment.t()} | {:error, Ecto.Changeset.t()}
+          {:ok, %{card_payment: Schema.CardPayment.t(), payment: Schema.Payment.t()}}
+          | {:error, Ecto.Changeset.t()}
   def update(card_payment, card_params, payment_params) do
     card_payment_changeset = Schema.CardPayment.changeset(card_payment, card_params, :update)
 
