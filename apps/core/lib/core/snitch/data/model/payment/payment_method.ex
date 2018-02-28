@@ -18,7 +18,7 @@ defmodule Core.Snitch.Data.Model.PaymentMethod do
 
   @spec create(String.t(), String.t(), boolean()) ::
           {:ok, Schema.PaymentMethod.t()} | {:error, Ecto.Changeset.t()}
-  def create(name, <<code::bytes-size(3)>>, is_active? \\ true) do
+  def create(name, code, is_active? \\ true) do
     pm = %{name: name, code: code, active?: is_active?}
     QH.create(Schema.PaymentMethod, pm, Repo)
   end
@@ -45,12 +45,12 @@ defmodule Core.Snitch.Data.Model.PaymentMethod do
 
   @spec get_card() :: Schema.PaymentMethod.t() | nil | no_return
   def get_card() do
-    get(%{name: "card", code: "ccd"})
+    get(%{code: "ccd"})
   end
 
   @spec get_check() :: Schema.PaymentMethod.t() | nil | no_return
   def get_check() do
-    get(%{name: "check", code: "chk"})
+    get(%{code: "chk"})
   end
 
   @spec get_all() :: [Schema.PaymentMethod.t()]

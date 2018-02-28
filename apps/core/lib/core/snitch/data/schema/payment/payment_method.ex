@@ -17,16 +17,23 @@ defmodule Core.Snitch.Data.Schema.PaymentMethod do
     timestamps()
   end
 
-  @required_fields ~w(name code active?)a
+  @update_fields ~w(name active?)a
+  @create_fields [:code | @update_fields]
 
   @doc """
   Returns a `PaymentMethod` changeset.
   """
   @spec changeset(__MODULE__.t(), map, :create | :update) :: Ecto.Changeset.t()
-  def changeset(payment_method, params, _) do
+  def changeset(payment_method, params, :create) do
     payment_method
-    |> cast(params, @required_fields)
-    |> validate_required(@required_fields)
+    |> cast(params, @create_fields)
+    |> validate_required(@create_fields)
+    |> validate_length(:code, is: 3)
     |> unique_constraint(:code)
+  end
+
+  def changeset(payment_method, params, :update) do
+    payment_method
+    |> cast(params, @update_fields)
   end
 end
