@@ -52,7 +52,7 @@ defmodule Core.Mixfile do
       {:excoveralls, "~> 0.8", only: :test},
       {:ex_machina, "~> 2.1", only: :test},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
-      {:inch_ex, "~> 0.5.6", only: :docs},
+      {:inch_ex, "~> 0.5.6", only: [:docs, :dev]},
       {:excountries, "~> 0.0.1"},
       {:yamerl, github: "yakaz/yamerl", override: true},
       {:worldly, github: "martide/worldly"},
