@@ -3,7 +3,8 @@
 /db
 /deps
 /*.ez
-/doc
+/doc*
+/cover
 # Generated on crash by the VM
 erl_crash.dump
 
