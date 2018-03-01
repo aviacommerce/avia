@@ -15,6 +15,9 @@ defmodule Snitch.Mixfile do
   #
   # Run "mix help deps" for examples and options.
   defp deps do
-    []
+    [
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
+      {:inch_ex, "~> 0.5.6", only: :docs}
+    ]
   end
 end
