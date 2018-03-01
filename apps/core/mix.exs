@@ -9,12 +9,13 @@ defmodule Core.Mixfile do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.4",
+      elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      test_coverage: [tool: ExCoveralls]
+      test_coverage: [tool: ExCoveralls],
+      docs: docs()
     ]
   end
 
@@ -47,16 +48,34 @@ defmodule Core.Mixfile do
       {:comeonin, "~> 4.0"},
       {:argon2_elixir, "~> 1.2"},
 
+      # countries etc
+      {:excountries, "~> 0.0.1"},
+      {:yamerl, github: "yakaz/yamerl", override: true},
+      {:worldly, github: "martide/worldly"},
+      {:uuid, "~> 1.1"},
+
       # docs and tests
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
       {:ex_machina, "~> 2.1", only: :test},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
-      {:inch_ex, "~> 0.5.6", only: [:docs, :dev]},
-      {:excountries, "~> 0.0.1"},
-      {:yamerl, github: "yakaz/yamerl", override: true},
-      {:worldly, github: "martide/worldly"},
-      {:uuid, "~> 1.1"}
+      {:inch_ex, "~> 0.5.6", only: [:docs, :dev]}
+    ]
+  end
+
+  defp docs do
+    [
+      main: Core.Snitch.Data.Schema.Order,
+      source_url: "https://github.com/aviabird/snitch",
+      groups_for_modules: groups_for_modules()
+    ]
+  end
+
+  defp groups_for_modules do
+    [
+      Schema: ~r/^Core.Snitch.Data.Schema.?/,
+      Models: ~r/^Core.Snitch.Data.Model.?/,
+      Domain: ~r/^Core.Snitch.Domain.?/
     ]
   end
 
