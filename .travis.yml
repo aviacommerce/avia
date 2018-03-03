@@ -1,0 +1,15 @@
+language: elixir
+elixir:
+  - 1.5.3
+  - 1.6.2
+otp_release:
+  - 20.2
+before_install:
+  - mix local.hex --force
+  - mix local.rebar --force
+  - mix deps.get
+script:
+  - mix coveralls.travis --umbrella
+after_script:
+  - mix deps.get --only docs
+  - MIX_ENV=docs mix inch.report
