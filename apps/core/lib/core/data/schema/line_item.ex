@@ -1,9 +1,9 @@
-defmodule Core.Snitch.Data.Schema.LineItem do
+defmodule Snitch.Core.Data.Schema.LineItem do
   @moduledoc """
   Models a LineItem.
   """
 
-  use Core.Snitch.Data.Schema
+  use Snitch.Core.Data.Schema
 
   @type t :: %__MODULE__{}
 
@@ -12,7 +12,7 @@ defmodule Core.Snitch.Data.Schema.LineItem do
     field(:unit_price, Money.Ecto.Composite.Type)
     field(:total, Money.Ecto.Composite.Type)
 
-    belongs_to(:variant, Core.Snitch.Variant)
+    belongs_to(:variant, Variant)
     belongs_to(:order, Order)
     timestamps()
   end

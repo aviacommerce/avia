@@ -1,8 +1,8 @@
-defmodule Core.Snitch.OrderTest do
+defmodule Snitch.Core.OrderTest do
   use ExUnit.Case, async: true
-  use Core.Snitch.Data.Schema
-  alias Core.Snitch.Data.Model
-  import Core.Snitch.Factory
+  use Snitch.Core.Data.Schema
+  alias Snitch.Core.Data.Model
+  import Snitch.Core.Factory
 
   setup :checkout_repo
   setup :three_variants
@@ -148,10 +148,10 @@ defmodule Core.Snitch.OrderTest do
   end
 end
 
-defmodule Core.Snitch.OrderDocTest do
+defmodule Snitch.Core.OrderDocTest do
   use ExUnit.Case, async: true
-  use Core.Snitch.Data.Schema
-  import Core.Snitch.Factory
+  use Snitch.Core.Data.Schema
+  import Snitch.Core.Factory
 
   setup :checkout_repo
 

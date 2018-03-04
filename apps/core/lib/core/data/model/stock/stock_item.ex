@@ -1,8 +1,8 @@
-defmodule Core.Snitch.Data.Model.Stock.StockItem do
+defmodule Snitch.Core.Data.Model.Stock.StockItem do
   @moduledoc """
 
   """
-  use Core.Snitch.Data.Model
+  use Snitch.Core.Data.Model
 
   def create(variant_id, stock_location_id, count_on_hand) do
     QH.create(

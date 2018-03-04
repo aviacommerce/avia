@@ -1,4 +1,4 @@
-defmodule Core.Seed.CountryStateSeeder do
+defmodule Snitch.Core.Seed.CountryStateSeeder do
   @moduledoc """
   This module has functions to create and insert seed data for the state and the country
   entitites.
@@ -6,7 +6,7 @@ defmodule Core.Seed.CountryStateSeeder do
 
   alias Worldly.Country, as: WorldCountry
   alias Worldly.Region, as: WorldRegion
-  alias Core.Snitch.{Country}
+  use Snitch.Core.Data.Schema
   alias Core.Repo
 
   def seed_countries_and_states! do
@@ -26,7 +26,7 @@ defmodule Core.Seed.CountryStateSeeder do
 
   def seed_state_data(country, state) do
     country
-    |> Ecto.build_assoc(:snitch_states, to_param(state))
+    |> Ecto.build_assoc(:states, to_param(state))
     |> Repo.insert!()
   end
 

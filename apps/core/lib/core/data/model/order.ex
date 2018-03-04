@@ -2,7 +2,7 @@ defmodule Core.Snitch.Data.Model.Order do
   @moduledoc """
   Order API
   """
-  use Core.Snitch.Data.Model
+  use Snitch.Core.Data.Model
 
   @spec create(map, [map]) :: {:ok, Schema.Order.t()} | {:error, Ecto.Changeset.t()}
   def create(params, line_items) do

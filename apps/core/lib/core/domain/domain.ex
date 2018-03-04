@@ -1,4 +1,4 @@
-defmodule Core.Snitch.Domain do
+defmodule Snitch.Core.Domain do
   @moduledoc """
     Interface for handling Business related logics.
     Uses Models for DB related queries.
@@ -6,7 +6,8 @@ defmodule Core.Snitch.Domain do
 
   defmacro __using__(_) do
     quote do
-      alias Core.Snitch.{Data.Model, Data.Schema, Domain, Repo}
+      alias Core.Repo
+      alias Snitch.Core.{Data.Model, Data.Schema, Domain}
       alias Ecto.Multi
     end
   end

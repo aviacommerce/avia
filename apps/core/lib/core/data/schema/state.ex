@@ -1,13 +1,14 @@
-defmodule Core.Snitch.State do
-  use Ecto.Schema
-  import Ecto.Changeset
-  alias Core.Snitch.Country
-  alias __MODULE__, as: State
+defmodule Snitch.Core.Data.Schema.State do
+  @moduledoc """
+  Models a State
+  """
+
+  use Snitch.Core.Data.Schema
 
   schema "snitch_states" do
     field(:name, :string)
     field(:abbr, :string)
-    belongs_to(:snitch_countries, Country, foreign_key: :country_id)
+    belongs_to(:country, Country, foreign_key: :country_id)
 
     timestamps()
   end

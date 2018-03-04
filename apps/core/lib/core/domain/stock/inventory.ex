@@ -1,7 +1,7 @@
-defmodule Core.Snitch.Domain.Stock.Inventory do
+defmodule Snitch.Core.Domain.Stock.Inventory do
   @moduledoc """
     Interface for handling inventory related business logic
   """
 
-  use Core.Snitch.Domain
+  use Snitch.Core.Domain
 end

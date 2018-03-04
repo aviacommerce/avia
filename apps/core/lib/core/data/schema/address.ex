@@ -1,15 +1,13 @@
-defmodule Core.Snitch.Address do
+defmodule Snitch.Core.Data.Schema.Address do
   @moduledoc """
   Models an Address
 
-  An `Address` must contain a reference to `Core.Snitch.Country` and only if the
-  country has states a reference to a `Core.Snitch.State`. This means some
+  An `Address` must contain a reference to `Snitch.Core.Data.Schema.Country` and only if the
+  country has states a reference to a `Snitch.Core.Data.Schema.State`. This means some
   Addresses might not have a State.
   """
 
-  use Ecto.Schema
-
-  import Ecto.Changeset
+  use Snitch.Core.Data.Schema
 
   @type t :: %__MODULE__{}
 
@@ -39,7 +37,7 @@ defmodule Core.Snitch.Address do
     |> validate_required(@required_fields)
     |> validate_length(:address_line_1, min: 10)
 
-    # |> foreign_key_constraint(:state_id, Core.Snitch.State)
-    # |> foreign_key_constraint(:country_id, Core.Snitch.Country)
+    # |> foreign_key_constraint(:state_id, Snitch.Core.Data.Schema.State)
+    # |> foreign_key_constraint(:country_id, Snitch.Core.Data.Schema.Country)
   end
 end

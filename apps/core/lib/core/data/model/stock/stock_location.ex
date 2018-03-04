@@ -1,8 +1,8 @@
-defmodule Core.Snitch.Data.Model.Stock.StockLocation do
+defmodule Snitch.Core.Data.Model.Stock.StockLocation do
   @moduledoc """
 
   """
-  use Core.Snitch.Data.Model
+  use Snitch.Core.Data.Model
 
   def create(address_id, name) do
     QH.create(

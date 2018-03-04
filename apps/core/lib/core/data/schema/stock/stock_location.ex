@@ -1,8 +1,8 @@
-defmodule Core.Snitch.Data.Schema.Stock.StockLocation do
+defmodule Snitch.Core.Data.Schema.Stock.StockLocation do
   @moduledoc """
   Model to track inventory
   """
-  use Core.Snitch.Data.Schema
+  use Snitch.Core.Data.Schema
 
   @type t :: %__MODULE__{}
 
@@ -10,7 +10,7 @@ defmodule Core.Snitch.Data.Schema.Stock.StockLocation do
     field(:name, :string, default: "New Location")
 
     has_many(:stock_items, StockItem)
-    belongs_to(:address, Core.Snitch.Address)
+    belongs_to(:address, Address)
 
     timestamps()
   end

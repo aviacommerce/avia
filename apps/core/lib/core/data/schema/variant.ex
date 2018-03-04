@@ -1,10 +1,10 @@
-defmodule Core.Snitch.Variant do
+defmodule Snitch.Core.Data.Schema.Variant do
   @moduledoc """
   Models a Product variant.
   """
-  use Ecto.Schema
-  import Ecto.Changeset
+
   import Ecto.Query
+  use Snitch.Core.Data.Schema
 
   @type t :: %__MODULE__{}
   schema "snitch_variants" do
@@ -19,7 +19,7 @@ defmodule Core.Snitch.Variant do
     field(:track_inventory, :boolean, default: true)
     field(:discontinue_on, :naive_datetime)
 
-    has_many(:stock_items, Core.Snitch.Data.Schema.Stock.StockItem)
+    has_many(:stock_items, StockItem)
 
     timestamps()
   end

@@ -1,8 +1,8 @@
-defmodule Core.Snitch.Data.Model.LineItem do
+defmodule Snitch.Core.Data.Model.LineItem do
   @moduledoc """
   LineItem API and utilities.
   """
-  use Core.Snitch.Data.Model
+  use Snitch.Core.Data.Model
 
   @spec get(map()) :: Schema.LineItem.t() | nil | no_return
   def get(query_fields) do
@@ -33,7 +33,7 @@ defmodule Core.Snitch.Data.Model.LineItem do
 
   When both `variant_id` and `quantity` are valid, update is made.
   ```
-  iex> variant = Core.Repo.one(Core.Snitch.Variant)
+  iex> variant = Core.Repo.one(Snitch.Core.Data.Schema.Variant)
   iex> variant.cost_price
   #Money<:USD, 9.99000000>
   iex> [priced_item] = Model.LineItem.update_price_and_totals(
@@ -49,7 +49,7 @@ defmodule Core.Snitch.Data.Model.LineItem do
       line_items
       |> Stream.map(&Map.get(&1, :variant_id))
       |> Enum.reject(fn x -> is_nil(x) end)
-      |> Core.Snitch.Variant.get_selling_prices()
+      |> Schema.Variant.get_selling_prices()
 
     line_items
     |> Enum.map(&set_price_and_total(&1, unit_selling_prices))

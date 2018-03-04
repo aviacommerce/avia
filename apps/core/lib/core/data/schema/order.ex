@@ -1,9 +1,9 @@
-defmodule Core.Snitch.Data.Schema.Order do
+defmodule Snitch.Core.Data.Schema.Order do
   @moduledoc """
   Models an Order
   """
 
-  use Core.Snitch.Data.Schema
+  use Snitch.Core.Data.Schema
 
   @type t :: %__MODULE__{}
 
@@ -25,9 +25,9 @@ defmodule Core.Snitch.Data.Schema.Order do
     field(:completed_at, :naive_datetime)
 
     # associations
-    belongs_to(:user, Core.Snitch.User)
-    belongs_to(:billing_address, Core.Snitch.Address)
-    belongs_to(:shipping_address, Core.Snitch.Address)
+    belongs_to(:user, User)
+    belongs_to(:billing_address, Address)
+    belongs_to(:shipping_address, Address)
     has_many(:line_items, LineItem, on_delete: :delete_all, on_replace: :delete)
 
     timestamps()
@@ -44,7 +44,7 @@ defmodule Core.Snitch.Data.Schema.Order do
   * `:create`
     - A list of `LineItem` params are expected under the `:line_items` key, and
       each of those must include price fields, use
-      `Core.Snitch.Data.Model.LineItem.update_price_and_totals/1` if
+      `Snitch.Core.Data.Model.LineItem.update_price_and_totals/1` if
       needed. Note that `variant_id`s must be unique in each line item.
   * `:update`
     - `LineItem` params (if any) must include price fields.

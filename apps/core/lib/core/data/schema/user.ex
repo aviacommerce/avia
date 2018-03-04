@@ -1,10 +1,8 @@
-defmodule Core.Snitch.User do
+defmodule Snitch.Core.Data.Schema.User do
   @moduledoc """
   Models a User
   """
-  use Ecto.Schema
-
-  import Ecto.Changeset
+  use Snitch.Core.Data.Schema
 
   @password_min_length 8
   @type t :: %__MODULE__{}
