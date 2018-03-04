@@ -20,14 +20,14 @@ defmodule Core.Snitch.Data.Schema.Payment do
     timestamps()
   end
 
-  @update_fields ~w(slug amount state order_id)a
-  @create_fields @update_fields ++ ~w(payment_type payment_method_id)a
+  @update_fields ~w(slug state order_id)a
+  @create_fields @update_fields ++ ~w(amount payment_type payment_method_id)a
 
   @doc """
   Returns a `Payment` changeset.
 
   `:payment_type` is required when `action` is `:create`. When `action` is
-  `:update`, the `:payment_type` if provided, is simply ignored.
+  `:update`, the `:payment_type` and `amount` if provided, are simply ignored.
 
   Consider deleting the payment if you wish to "change" the payment type.
   """
