@@ -9,7 +9,6 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
-alias Snitch.Core.Seed.CountryStateSeeder, as: CSseed
 
 # seeds countries and states entity
-CSseed.seed_countries_and_states!()
+Snitch.Core.Seed.CountryState.seed_countries_and_states!()

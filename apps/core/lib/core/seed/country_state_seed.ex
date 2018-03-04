@@ -1,12 +1,12 @@
-defmodule Snitch.Core.Seed.CountryStateSeeder do
+defmodule Snitch.Core.Seed.CountryState do
   @moduledoc """
   This module has functions to create and insert seed data for the state and the country
   entitites.
   """
 
+  use Snitch.Core.Data.Schema
   alias Worldly.Country, as: WorldCountry
   alias Worldly.Region, as: WorldRegion
-  use Snitch.Core.Data.Schema
   alias Core.Repo
 
   def seed_countries_and_states! do

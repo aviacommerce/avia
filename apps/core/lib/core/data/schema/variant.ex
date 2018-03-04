@@ -3,8 +3,8 @@ defmodule Snitch.Core.Data.Schema.Variant do
   Models a Product variant.
   """
 
-  import Ecto.Query
   use Snitch.Core.Data.Schema
+  import Ecto.Query
 
   @type t :: %__MODULE__{}
   schema "snitch_variants" do

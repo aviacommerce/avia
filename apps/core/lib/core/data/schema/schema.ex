@@ -6,8 +6,8 @@ defmodule Snitch.Core.Data.Schema do
   defmacro __using__(_) do
     quote do
       use Ecto.Schema
-      import Ecto.Changeset
       use Snitch.Core.Data.Schema.{Stock}
+      import Ecto.Changeset
 
       alias Snitch.Core.Data.Schema.{
         Address,
