@@ -47,12 +47,11 @@ defmodule Core.Snitch.Data.Model.CardPayment do
     |> Core.Repo.transaction()
   end
 
-  @deprecated "This is dangerous as it allows changing the amount"
   @doc """
   Updates `CardPayment` and `Payment` together.
 
-  Everything except the `:payment_type` can be changed, because by changing the
-  type, `CardPayment` will have to be deleted.
+  Everything except the `:payment_type` and `amount` can be changed, because by
+  changing the type, `CardPayment` will have to be deleted.
 
   * `card_params` are validated using `Schema.CardPayment.changeset/3` with the
     `:update` action.
@@ -71,23 +70,6 @@ defmodule Core.Snitch.Data.Model.CardPayment do
       Model.Payment.update(nil, Map.put(payment_params, :id, card_payment.payment_id))
     end)
     |> Core.Repo.transaction()
-  end
-
-  @deprecated "Deletion of payments! Tsk tsk, bad idea sir/madam"
-  @doc """
-  Deletes a `CardPayment` alongwith the parent `Payment`!
-  """
-  @spec delete(non_neg_integer | Schema.CardPayment.t()) ::
-          {:ok, Schema.Payment.t()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
-  def delete(card_payment) when is_map(card_payment) do
-    Model.Payment.delete(card_payment.payment_id)
-  end
-
-  def delete(card_payment_id) when is_integer(card_payment_id) do
-    case get(card_payment_id) do
-      nil -> {:error, :not_found}
-      payment -> delete(payment)
-    end
   end
 
   @doc """

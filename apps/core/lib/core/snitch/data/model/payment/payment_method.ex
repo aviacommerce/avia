@@ -2,7 +2,7 @@ defmodule Core.Snitch.Data.Model.PaymentMethod do
   @moduledoc """
   PaymentMethod API and utilities.
 
-  Snitch currently supports the follwoing payment methods:
+  Snitch currently supports the following payment methods:
 
   ## Debit and Credit cards
 

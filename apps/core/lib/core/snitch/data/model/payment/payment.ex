@@ -14,20 +14,6 @@ defmodule Core.Snitch.Data.Model.Payment do
   """
   use Core.Snitch.Data.Model
 
-  @deprecated "Deletion of payments! Tsk tsk, bad idea sir/madam"
-  @doc """
-  Deletes a Payment alongwith the concrete subtype!
-
-  If a `payment` is of type "card", then deleting it will also
-  delete the associated entries from "`snitch_card_payments`" table.
-  """
-  @spec delete(non_neg_integer | Schema.Payment.t()) ::
-          {:ok, Schema.Payment.t()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
-  def delete(id_or_instance) do
-    QH.delete(Schema.Payment, id_or_instance, Repo)
-  end
-
-  @deprecated "This is dangerous as it allows updating the amount"
   @doc """
   Updates an existing `Payment`
 
