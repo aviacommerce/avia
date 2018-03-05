@@ -5,7 +5,7 @@ defmodule Core.Snitch.Data.Schema.PaymentTest do
   import Core.Snitch.Factory
 
   setup :checkout_repo
-  setup :a_user_and_address
+  setup :user_with_address
   setup :an_order
   setup :payment_methods
 

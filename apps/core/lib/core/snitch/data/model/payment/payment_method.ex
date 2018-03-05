@@ -19,8 +19,8 @@ defmodule Core.Snitch.Data.Model.PaymentMethod do
   @spec create(String.t(), String.t(), boolean()) ::
           {:ok, Schema.PaymentMethod.t()} | {:error, Ecto.Changeset.t()}
   def create(name, code, is_active? \\ true) do
-    pm = %{name: name, code: code, active?: is_active?}
-    QH.create(Schema.PaymentMethod, pm, Repo)
+    params = %{name: name, code: code, active?: is_active?}
+    QH.create(Schema.PaymentMethod, params, Repo)
   end
 
   @spec update(map, Schema.PaymentMethod.t() | nil) ::
