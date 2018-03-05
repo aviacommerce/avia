@@ -21,14 +21,6 @@ matrix:
       - mix coveralls.travis --umbrella
   - elixir: "1.6.2"
 
-branches:
-  only:
-    - master
-    - develop
-    - /^feature[\/-].*/
-    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
-    - /^travis.*/
-
 notifications:
   email:
     recipients:
