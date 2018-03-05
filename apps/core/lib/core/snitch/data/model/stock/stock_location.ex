@@ -1,16 +1,11 @@
 defmodule Core.Snitch.Data.Model.Stock.StockLocation do
-  @moduledoc """
-
-  """
+  @moduledoc false
   use Core.Snitch.Data.Model
 
-  def create(address_id, name) do
+  def create(attrbutes) do
     QH.create(
       Schema.Stock.StockLocation,
-      %{
-        address_id: address_id,
-        name: name
-      },
+      attrbutes,
       Repo
     )
   end

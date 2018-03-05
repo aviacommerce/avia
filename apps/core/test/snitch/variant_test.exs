@@ -1,7 +1,7 @@
 defmodule Core.Snitch.VariantTest do
   use ExUnit.Case, async: true
   alias Core.Snitch.Variant
-  import Core.Snitch.Factory
+  import Snitch.Factory
 
   setup :checkout_repo
 

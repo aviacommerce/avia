@@ -7,7 +7,7 @@ defmodule Core.Snitch.State do
   schema "snitch_states" do
     field(:name, :string)
     field(:abbr, :string)
-    belongs_to(:snitch_countries, Country, foreign_key: :country_id)
+    belongs_to(:country, Country, foreign_key: :country_id)
 
     timestamps()
   end

@@ -1,7 +1,7 @@
 defmodule Core.Snitch.Data.Model.LineItemTest do
   use ExUnit.Case, async: true
   use Core.Snitch.Data.Model
-  import Core.Snitch.Factory
+  import Snitch.Factory
 
   setup :checkout_repo
 
@@ -68,7 +68,7 @@ end
 defmodule Core.Snitch.Data.Model.LineItemDocTest do
   use ExUnit.Case, async: true
   use Core.Snitch.Data.Model
-  import Core.Snitch.Factory
+  import Snitch.Factory
 
   setup :checkout_repo
 

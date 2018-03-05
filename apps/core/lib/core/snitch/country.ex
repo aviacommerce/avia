@@ -11,7 +11,7 @@ defmodule Core.Snitch.Country do
     field(:name, :string)
     field(:numcode, :string)
     field(:states_required, :boolean, default: false)
-    has_many(:snitch_states, State)
+    has_many(:states, State)
 
     timestamps()
   end

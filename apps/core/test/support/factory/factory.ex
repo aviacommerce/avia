@@ -1,8 +1,13 @@
-defmodule Core.Snitch.Factory do
+defmodule Snitch.Factory do
   @moduledoc false
   use ExMachina.Ecto, repo: Core.Repo
   alias Core.Snitch.{User, Address, Variant}
   alias Core.Snitch.Data.Schema.{Order}
+
+  use Snitch.{
+    AddressFactory,
+    StockFactory
+  }
 
   @iron_patriot %Variant{
     sku: "iron-patriot",
@@ -19,19 +24,6 @@ defmodule Core.Snitch.Factory do
       first_name: sequence(:first_name, &"Tony-#{&1}"),
       last_name: sequence(:last_name, &"Stark-#{&1}"),
       email: sequence(:email, &"ceo-#{&1}@stark.com")
-    }
-  end
-
-  def address_factory() do
-    %Address{
-      first_name: sequence(:first_name, &"Tony-#{&1}"),
-      last_name: sequence(:last_name, &"Stark-#{&1}"),
-      address_line_1: "10-8-80 Malibu Point",
-      zip_code: "90265",
-      city: "Malibu",
-      phone: "1234567890"
-      # state_id: State.get_id("California"),
-      # country_id: Country.get_id("USA"),
     }
   end
 

@@ -13,6 +13,9 @@ defmodule Core.Snitch.Data.Schema do
         Order
       }
 
+      # TODO: Arjun update this according to folder structure
+      alias Core.Snitch.{State, Country, Address, User, Variant}
+
       import Ecto.Changeset
     end
   end

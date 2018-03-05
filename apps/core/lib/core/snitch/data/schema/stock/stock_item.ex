@@ -1,13 +1,12 @@
 defmodule Core.Snitch.Data.Schema.Stock.StockItem do
-  @moduledoc """
-  Model to track inventory
-  """
+  @moduledoc false
   use Core.Snitch.Data.Schema
 
   @type t :: %__MODULE__{}
 
   schema "snitch_stock_items" do
     field(:count_on_hand, :integer, default: 0)
+    field(:backorderable, :boolean, default: false)
 
     belongs_to(:variant, Core.Snitch.Variant)
     belongs_to(:stock_location, StockLocation)
