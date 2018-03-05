@@ -13,7 +13,7 @@ defmodule Core.Snitch.Data.Model do
       alias Helpers.QueryHelper, as: QH
 
       alias Core.Snitch.Data.{Schema, Model}
-      
+
       use Core.Snitch.Data.Model.{
         Stock
       }
