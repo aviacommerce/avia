@@ -1,9 +1,12 @@
 #!/bin/bash
 
-set -ev
-
+set -e
+bold=$(tput bold)
+purple='\e[106m'
+normal=$(tput sgr0)
 allowed_branches="^(master)|(develop)$"
 
+echo -e "${bold}${purple}"
 if [ $TRAVIS_PULL_REQUEST = false ]; then
     if [[ $TRAVIS_BRANCH =~ $allowed_branches ]]; then
         env MIX_ENV=docs mix deps.get
@@ -14,3 +17,4 @@ if [ $TRAVIS_PULL_REQUEST = false ]; then
 else
     echo "Skipping Inch CI report because this is a PR build"
 fi
+echo -e "${normal}"
