@@ -6,7 +6,7 @@ defmodule Snitch.Schema.OrderTest do
 
   setup :checkout_repo
   setup :three_variants
-  setup :a_user_and_address
+  setup :user_with_address
 
   describe "order totals are updated and line_items are inserted to DB" do
     setup [:good_line_items, :order_changeset]

@@ -101,10 +101,11 @@ defmodule Snitch.Factory do
     Money.new(:USD, "#{:rand.uniform(delta) + min}.99")
   end
 
-  def a_user_and_address(context) do
+  # TODO: associate the address with the user once user schema is corrected
+  def user_with_address(context) do
     inserts = %{
-      user: insert(:user),
-      address: insert(:address)
+      address: insert(:address),
+      user: insert(:user)
     }
 
     Map.merge(context, inserts)
