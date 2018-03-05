@@ -1,7 +1,5 @@
 language: elixir
-elixir:
-  - 1.5.3
-  - 1.6.2
+
 otp_release:
   - 20.2
 before_install:
@@ -9,7 +7,22 @@ before_install:
   - mix local.rebar --force
   - mix deps.get
 script:
-  - mix coveralls.travis --umbrella
+  - set -e
+  - MIX_ENV=test mix format --check-formatted
+  - set +e
+  - mix coveralls.json --umbrella
 after_script:
-  - mix deps.get --only docs
-  - MIX_ENV=docs mix inch.report
+  - bash <(curl -s https://codecov.io/bash)
+  - bash .scripts/inch_report.sh
+
+matrix:
+  include:
+  - elixir: "1.5.3"
+    script:
+      - mix coveralls.json --umbrella
+  - elixir: "1.6.2"
+
+notifications:
+  email:
+    recipients:
+      - ananya95+travis@gmail.com
