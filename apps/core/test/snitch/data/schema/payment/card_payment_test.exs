@@ -1,10 +1,11 @@
 defmodule Core.Snitch.Data.Schema.CardPaymentTest do
   use ExUnit.Case, async: true
-  use Core.Snitch.Data.Schema
+  use Core.DataCase
 
   import Core.Snitch.Factory
 
-  setup :checkout_repo
+  alias Core.Snitch.Data.Schema.CardPayment
+
   setup :user_with_address
   setup :an_order
   setup :payment_methods

@@ -1,7 +1,9 @@
 defmodule Snitch.Factory do
   @moduledoc false
+
   use ExMachina.Ecto, repo: Snitch.Repo
-  alias Snitch.Data.Schema.{Variant, Address, User, Order}
+
+  alias Snitch.Data.Schema.{Variant, Address, User, Order, Payment, PaymentMethod, CardPayment}
 
   def user_factory() do
     %User{
@@ -92,54 +94,43 @@ defmodule Snitch.Factory do
     }
   end
 
-  def checkout_repo(context) do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Snitch.Repo)
-    context
-  end
-
   defp random_price(min, delta) do
     Money.new(:USD, "#{:rand.uniform(delta) + min}.99")
   end
 
   # TODO: associate the address with the user once user schema is corrected
-  def user_with_address(context) do
-    inserts = %{
+  def user_with_address(_context) do
+    %{
       address: insert(:address),
       user: insert(:user)
     }
-
-    Map.merge(context, inserts)
   end
 
-  def three_variants(context) do
-    Map.put(context, :variants, insert_list(3, :random_variant))
+  def three_variants(_context) do
+    [variants: insert_list(3, :random_variant)]
   end
 
   def an_order(context) do
     %{user: user} = context
-    order = insert(:order, user_id: user.id)
-
-    Map.put(context, :order, order)
+    [order: insert(:order, user_id: user.id)]
   end
 
-  def payment_methods(context) do
-    card = insert(:payment_method_card)
-    check = insert(:payment_method_check)
-
-    context
-    |> Map.put(:card_method, card)
-    |> Map.put(:check_method, check)
+  def payment_methods(_context) do
+    [
+      card_method: insert(:payment_method_card),
+      check_method: insert(:payment_method_check)
+    ]
   end
 
   def payments(context) do
     %{card_method: card_m, check_method: check_m, order: order} = context
-    card = insert(:payment_ccd, payment_method_id: card_m.id, order_id: order.id)
-    check = insert(:payment_chk, payment_method_id: check_m.id, order_id: order.id)
-    card_payment = insert(:card_payment, payment_id: card.id)
+    ccd = insert(:payment_ccd, payment_method_id: card_m.id, order_id: order.id)
+    chk = insert(:payment_chk, payment_method_id: check_m.id, order_id: order.id)
 
-    context
-    |> Map.put(:ccd, card)
-    |> Map.put(:chk, check)
-    |> Map.put(:card, card_payment)
+    [
+      ccd: ccd,
+      chk: chk,
+      card: insert(:card_payment, payment_id: ccd.id)
+    ]
   end
 end

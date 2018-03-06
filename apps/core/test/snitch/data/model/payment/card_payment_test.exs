@@ -1,9 +1,11 @@
 defmodule Core.Snitch.Data.Model.CardPaymentMethodTest do
   use ExUnit.Case, async: true
-  use Core.Snitch.Data.Model
+  use Core.DataCase
+
+  alias Core.Snitch.Data.Model
+
   import Core.Snitch.Factory
 
-  setup :checkout_repo
   setup :user_with_address
   setup :an_order
   setup :payment_methods
@@ -36,8 +38,6 @@ defmodule Core.Snitch.Data.Model.CardPaymentMethodTest do
     {:ok, %{payment: payment, card_payment: card_payment}} =
       Model.CardPayment.create("card-payment", order.id, params, %{})
 
-    context
-    |> Map.put(:payment, payment)
-    |> Map.put(:card_payment, card_payment)
+    [payment: payment, card_payment: card_payment]
   end
 end

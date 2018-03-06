@@ -1,54 +1,50 @@
 defmodule Snitch.Schema.OrderTest do
   use ExUnit.Case, async: true
-  alias Snitch.Data.Schema
+  use Snitch.DataCase
+
   import Snitch.Factory
+
+  alias Snitch.Data.Schema
   alias Snitch.Data.Model
 
-  setup :checkout_repo
   setup :three_variants
   setup :user_with_address
+  setup :some_line_items
+  setup :order_changeset
 
-  describe "order totals are updated and line_items are inserted to DB" do
-    setup [:good_line_items, :order_changeset]
-
-    test "", context do
-      %{order: order} = context
-      %{valid?: validity, changes: changes} = order
-      assert validity
-      assert Map.has_key?(changes, :item_total)
-      assert Enum.all?(changes.line_items, fn %{action: action} -> action == :insert end)
-      # check DB level constraints too
-      assert {:ok, _} = Snitch.Repo.insert(order)
-    end
+  @tag line_item_type: :valid
+  test "order totals are updated and line_items are inserted to DB", context do
+    %{order: order} = context
+    %{valid?: validity, changes: changes} = order
+    assert validity
+    assert Map.has_key?(changes, :item_total)
+    assert Enum.all?(changes.line_items, fn %{action: action} -> action == :insert end)
+    # check DB level constraints too
+    assert {:ok, _} = Core.Repo.insert(order)
   end
 
-  describe "order can handle duplicate line_items" do
-    setup [:duplicate_line_items, :order_changeset]
-
-    test "", context do
-      %{order: order} = context
-      %{valid?: validity, changes: changes, errors: [error]} = order
-      refute validity
-      refute Map.has_key?(changes, :item_total)
-      assert Enum.all?(changes.line_items, fn %{valid?: validity} -> validity end)
-      assert error == {:duplicate_variants, {"line_items must have unique variant_ids", []}}
-    end
+  @tag line_item_type: :duplicate
+  test "order can handle duplicate line_items", context do
+    %{order: order} = context
+    %{valid?: validity, changes: changes, errors: [error]} = order
+    refute validity
+    refute Map.has_key?(changes, :item_total)
+    assert Enum.all?(changes.line_items, fn %{valid?: validity} -> validity end)
+    assert error == {:duplicate_variants, {"line_items must have unique variant_ids", []}}
   end
 
-  describe "order cannot be created without line_items" do
-    setup [:order_changeset]
-
-    test "", context do
-      %{order: order} = context
-      %{valid?: validity, errors: [error]} = order
-      refute validity
-      assert error == {:line_items, {"can't be blank", [validation: :required]}}
-    end
+  @tag line_item_type: :none
+  test "order cannot be created without line_items", context do
+    %{order: order} = context
+    %{valid?: validity, errors: [error]} = order
+    refute validity
+    assert error == {:line_items, {"can't be blank", [validation: :required]}}
   end
 
   describe "order updates" do
-    setup [:good_line_items, :order_changeset, :persist]
+    setup :persist
 
+    @tag line_item_type: :valid
     test "unassociated line_items", context do
       %{persisted: persisted, line_items: line_items} = context
       params = %{line_items: Model.LineItem.update_price_and_totals(line_items)}
@@ -60,6 +56,7 @@ defmodule Snitch.Schema.OrderTest do
       assert Enum.all?(changes.line_items, fn x -> x.action in [:insert, :replace] end)
     end
 
+    @tag line_item_type: :valid
     test "quantity, variant", context do
       %{persisted: persisted} = context
       [one, two, three] = persisted.line_items
@@ -88,6 +85,7 @@ defmodule Snitch.Schema.OrderTest do
       assert Enum.all?(changes.line_items, fn x -> x.action == :update end)
     end
 
+    @tag line_item_type: :valid
     test "no changes, bud!", context do
       %{persisted: persisted} = context
       [one, two, three] = persisted.line_items
@@ -102,22 +100,21 @@ defmodule Snitch.Schema.OrderTest do
     end
   end
 
-  defp duplicate_line_items(context) do
-    %{variants: [v | _]} = context
-    variant_ids = [v.id, v.id, v.id]
-
-    line_items =
-      variant_ids
-      |> Enum.into([], fn variant_id ->
-        %{variant_id: variant_id, quantity: 2}
-      end)
-
-    Map.put(context, :line_items, line_items)
-  end
-
-  defp good_line_items(context) do
+  defp some_line_items(context) do
     %{variants: vs} = context
-    variant_ids = Stream.map(vs, fn x -> x.id end)
+    v = List.first(vs)
+
+    variant_ids =
+      case context[:line_item_type] do
+        :valid ->
+          Stream.map(vs, fn x -> x.id end)
+
+        :duplicate ->
+          [v.id, v.id, v.id]
+
+        _ ->
+          []
+      end
 
     line_items =
       variant_ids
@@ -125,7 +122,7 @@ defmodule Snitch.Schema.OrderTest do
         %{variant_id: variant_id, quantity: 2}
       end)
 
-    Map.put(context, :line_items, line_items)
+    [line_items: line_items]
   end
 
   defp order_changeset(context) do
@@ -139,26 +136,26 @@ defmodule Snitch.Schema.OrderTest do
       shipping_address_id: a.id,
       line_items: Model.LineItem.update_price_and_totals(line_items)
     }
-
-    Map.put(context, :order, Schema.Order.changeset(order, params, :create))
+    [order: Order.changeset(order, params, :create)]
   end
 
-  defp persist(%{order: order} = context) do
-    Map.put(context, :persisted, Snitch.Repo.insert!(order))
+  defp persist(%{order: order}) do
+    [persisted: Core.Repo.insert!(order)]
   end
 end
 
-defmodule Snitch.OrderDocTest do
+defmodule Snitch.Data.Schema.OrderDocTest do
   use ExUnit.Case, async: true
-  alias Snitch.Data.Schema
-  import Snitch.Factory
+  use Snitch.DataCase
 
-  setup :checkout_repo
+  alias Snitch.Data.Schema
+
+  import Snitch.Factory
 
   setup do
     insert(:variant)
     :ok
   end
 
-  doctest Schema.Order
+  doctest Snitch.Data.Schema.Order
 end
