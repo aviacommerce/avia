@@ -1,4 +1,4 @@
-defmodule Core.Seed.PaymentMethods do
+defmodule Snitch.Seed.PaymentMethods do
   @moduledoc """
   Seeds supported PaymentMethods.
 
@@ -20,7 +20,7 @@ defmodule Core.Seed.PaymentMethods do
 
   Snitch will support "Store Credits", which act like e-wallets for users.
   """
-  use Core.Snitch.Data.Schema
+  use Snitch.Data.Schema
 
   def seed!() do
     methods = [
@@ -40,6 +40,6 @@ defmodule Core.Seed.PaymentMethods do
       }
     ]
 
-    Core.Repo.insert_all(PaymentMethod, methods, on_conflict: :nothing, conflict_target: :code)
+    Snitch.Repo.insert_all(PaymentMethod, methods, on_conflict: :nothing, conflict_target: :code)
   end
 end

@@ -1,4 +1,4 @@
-defmodule Core.Snitch.Data.Model.Payment do
+defmodule Snitch.Data.Model.Payment do
   @moduledoc """
   Payment API and utilities.
 
@@ -10,14 +10,16 @@ defmodule Core.Snitch.Data.Model.Payment do
   `to_subtype/1`
 
   > For a list of supported payment sources, see
-    `Core.Snitch.Data.Schema.Payment.PaymentMethod`
+    `Snitch.Data.Schema.Payment.PaymentMethod`
   """
-  use Core.Snitch.Data.Model
+  use Snitch.Data.Model
+
+  alias Snitch.Data.{Schema, Model}
 
   @doc """
   Updates an existing `Payment`
 
-  See `Core.Snitch.Data.Schema.Payment.changeset/3` with the `:update` action.
+  See `Snitch.Data.Schema.Payment.changeset/3` with the `:update` action.
   """
   def update(id_or_instance, params) do
     QH.update(Schema.Payment, params, id_or_instance, Repo)
