@@ -1,7 +1,7 @@
 defmodule Snitch.Data.Model.LineItemTest do
   use ExUnit.Case, async: true
-  import Snitch.Factory
   alias Snitch.Data.Model
+  import Snitch.Factory
 
   setup :checkout_repo
 

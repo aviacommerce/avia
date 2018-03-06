@@ -8,6 +8,8 @@ defmodule Snitch.Data.Schema.Stock do
       alias Snitch.Data.Schema.{
         StockItem,
         StockLocation
+        # StockTransfer,
+        # StockMovement
       }
     end
   end

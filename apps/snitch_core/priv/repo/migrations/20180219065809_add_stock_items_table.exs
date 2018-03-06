@@ -6,6 +6,7 @@ defmodule Core.Repo.Migrations.AddStockItemsTable do
       add :count_on_hand, :integer, default: 0, null: false
       add :stock_location_id, references(:snitch_stock_locations, on_delete: :delete_all)
       add :variant_id, references(:snitch_variants, on_delete: :delete_all)
+      add :backorderable, :boolean, default: false
 
       timestamps()
     end
