@@ -35,8 +35,8 @@ defmodule Snitch.Data.Schema.StockLocation do
     timestamps()
   end
 
-  @create_fields ~w(name address_line_1)a
-  @update_fields ~w(name address_line_1)a
+  @create_fields ~w(name address_line_1 state_id country_id)a
+  @update_fields ~w(name address_line_1 state_id country_id)a
   @opt_update_fields ~w(admin_name default address_line_2 city zip_code phone propagate_all_variants backorderable_default active)a
 
   def create_fields, do: @create_fields
@@ -53,7 +53,8 @@ defmodule Snitch.Data.Schema.StockLocation do
     instance
     |> cast(params, fields ++ optional)
     |> validate_required(fields)
-    |> validate_length(:address_line_1, min: 10)
-    |> foreign_key_constraint(:address_id)
+    |> validate_length(:address_line_1, min: 6)
+    |> foreign_key_constraint(:state_id)
+    |> foreign_key_constraint(:country_id)
   end
 end

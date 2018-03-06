@@ -1,13 +1,16 @@
 defmodule Snitch.Data.Model.StockItem do
   @moduledoc """
-
+    This module provides methods or utils for
+    Stock Item (alias Inventory at a location)
+    by interacting with DB.
   """
+
   use Snitch.Data.Model
   alias Snitch.Data.Schema.StockItem, as: StockItemSchema
   alias Snitch.Data.Schema.StockLocation, as: StockLocationSchema
 
-  @spec create(non_neg_integer(), non_neg_integer(), non_neg_integer(), boolean()) ::
-          TH.commit_response_type()
+  @spec create(non_neg_integer, non_neg_integer, non_neg_integer, boolean()) ::
+          {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
   def create(variant_id, stock_location_id, count_on_hand, backorderable) do
     QH.create(
       StockItemSchema,
@@ -21,23 +24,25 @@ defmodule Snitch.Data.Model.StockItem do
     )
   end
 
-  @spec update(integer() | map, StockItemSchema.t() | nil) :: TH.commit_response_type()
+  @spec update(non_neg_integer | map, StockItemSchema.t() | nil) ::
+          {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
   def update(query_fields, instance \\ nil) do
     QH.update(StockItemSchema, query_fields, instance, Repo)
   end
 
-  @spec delete(integer() | StockItemSchema.t()) :: TH.commit_response_type()
+  @spec delete(non_neg_integer | StockItemSchema.t()) ::
+          {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
   def delete(id_or_instance) do
     QH.delete(StockItemSchema, id_or_instance, Repo)
   end
 
-  @spec get(integer() | map) :: StockItemSchema.t()
+  @spec get(non_neg_integer | map) :: StockItemSchema.t()
   def get(query_fields) do
     QH.get(StockItemSchema, query_fields, Repo)
   end
 
   @doc """
-    Fetches all the stock items
+    Fetches all the stock items present in the DB
   """
   @spec get_all :: list(StockItemSchema.t())
   def get_all, do: StockItemSchema |> Repo.all()
@@ -47,21 +52,35 @@ defmodule Snitch.Data.Model.StockItem do
     that belong to an active stock location
     for a variant
   """
-  @spec stock_items(integer()) :: list(StockItemSchema.t())
+  @spec stock_items(non_neg_integer) :: list(StockItemSchema.t())
   def stock_items(variant_id) do
     variant_id
     |> stock_items_query()
     |> Repo.all()
   end
 
-  @spec total_on_hand(integer()) :: integer()
+  @doc """
+    Returns a `total available inventory count` for stock items
+    present in all active stock locations only.
+
+    The total count can also be negetive based on backorderable.
+  """
+  @spec total_on_hand(non_neg_integer) :: integer
   def total_on_hand(variant_id) do
     stock_items = stock_items_query(variant_id)
     Repo.one(from(st in stock_items, select: sum(st.count_on_hand)))
   end
 
-  @spec stock_items_query(integer) :: TH.query_type()
-  defp stock_items_query(variant_id) do
+  @doc """
+    A query to fetch stock items belonging
+    to active stock locations in the DB.
+
+    This can also be used as a subquery.
+    ex: stock_items = stock_items_query(variant_id)
+        Repo.one(from(st in stock_items, select: sum(st.count_on_hand)))
+  """
+  @spec stock_items_query(integer) :: Ecto.Query.t()
+  def stock_items_query(variant_id) do
     from(
       st in StockItemSchema,
       where: st.variant_id == ^variant_id,

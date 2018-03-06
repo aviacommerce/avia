@@ -2,10 +2,8 @@ defmodule Snitch.Tools.QueryHelper do
   @moduledoc """
 
   """
-  alias Core.Tools.Helpers.TypeHelper, as: TH
 
-  @spec get(module(), map() | non_neg_integer(), TH.repo_type()) ::
-          TH.schema_type() | nil | no_return()
+  @spec get(module, map | non_neg_integer, Ecto.Repo.t()) :: Ecto.Schema.t() | nil | no_return
   def get(schema, id, repo) when is_integer(id) do
     repo.get(schema, id)
   end
@@ -14,14 +12,16 @@ defmodule Snitch.Tools.QueryHelper do
     repo.get_by(schema, query_fields)
   end
 
-  @spec create(module(), map(), TH.repo_type()) :: TH.commit_response_type()
+  @spec create(module, map, Ecto.Repo.t()) ::
+          {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
   def create(schema, query_fields, repo) when is_map(query_fields) do
     schema.__struct__
     |> schema.changeset(query_fields, :create)
     |> commit_if_valid(:create, repo)
   end
 
-  @spec update(module(), map(), nil | struct(), TH.repo_type()) :: TH.commit_response_type()
+  @spec update(module, map, nil | struct(), Ecto.Repo.t()) ::
+          {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
   def update(schema, query_fields, instance \\ nil, repo)
 
   def update(schema, query_fields, nil, repo) when is_map(query_fields) do
@@ -38,13 +38,12 @@ defmodule Snitch.Tools.QueryHelper do
     |> commit_if_valid(:update, repo)
   end
 
-  @spec delete(module(), non_neg_integer() | struct(), TH.repo_type()) ::
-          TH.commit_response_type()
+  @spec delete(module, non_neg_integer | struct(), Ecto.Repo.t()) ::
+          {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
   def delete(schema, id, repo) when is_integer(id) do
-    with {:ok, instance} <- repo.get(schema, id) do
-      delete(schema, instance, repo)
-    else
-      _ -> {:error, :not_found}
+    case repo.get(schema, id) do
+      nil -> {:error, :not_found}
+      instance -> delete(schema, instance, repo)
     end
   end
 
@@ -52,7 +51,8 @@ defmodule Snitch.Tools.QueryHelper do
     repo.delete(instance)
   end
 
-  @spec commit_if_valid(TH.changeset_type(), atom(), TH.repo_type()) :: TH.commit_response_type()
+  @spec commit_if_valid(Ecto.Changeset.t(), atom(), Ecto.Repo.t()) ::
+          {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
   defp commit_if_valid(changeset, action, repo) do
     if changeset.valid? do
       case action do
