@@ -1,9 +1,11 @@
-defmodule Core.Snitch.Data.Schema.Payment do
+defmodule Snitch.Data.Schema.Payment do
   @moduledoc """
   Models a Payment
   """
 
-  use Core.Snitch.Data.Schema
+  use Snitch.Data.Schema
+
+  alias Snitch.Data.Schema.{Order, PaymentMethod}
 
   @type t :: %__MODULE__{}
 

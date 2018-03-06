@@ -1,4 +1,4 @@
-defmodule Core.Snitch.Data.Model.PaymentMethod do
+defmodule Snitch.Data.Model.PaymentMethod do
   @moduledoc """
   PaymentMethod API and utilities.
 
@@ -6,15 +6,17 @@ defmodule Core.Snitch.Data.Model.PaymentMethod do
 
   ## Debit and Credit cards
 
-  See `Core.Snitch.Data.Model.CardPayment`. Such payments are backed by the
+  See `Snitch.Data.Model.CardPayment`. Such payments are backed by the
   "`snitch_card_payments"` table that references the `Card` used for payment.
 
   ## Check or Cash (and cash-on-delivery)
 
   There's no separate schema for such payments as they are completely expressed
-  by the fields in `Core.Snitch.Data.Model.Payment`.
+  by the fields in `Snitch.Data.Model.Payment`.
   """
-  use Core.Snitch.Data.Model
+  use Snitch.Data.Model
+
+  alias Snitch.Data.Schema
 
   @spec create(String.t(), String.t(), boolean()) ::
           {:ok, Schema.PaymentMethod.t()} | {:error, Ecto.Changeset.t()}

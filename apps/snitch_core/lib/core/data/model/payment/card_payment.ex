@@ -1,4 +1,4 @@
-defmodule Core.Snitch.Data.Model.CardPayment do
+defmodule Snitch.Data.Model.CardPayment do
   @moduledoc """
   CardPayment API and utilities.
 
@@ -7,20 +7,22 @@ defmodule Core.Snitch.Data.Model.CardPayment do
   transaction.
 
   > For other supported payment sources, see
-    `Core.Snitch.Data.Schema.PaymentMethod`
+    `Snitch.Data.Schema.PaymentMethod`
   """
-  use Core.Snitch.Data.Model
+  use Snitch.Data.Model
+
+  alias Snitch.Data.{Schema, Model}
 
   @doc """
   Creates both `Payment` and `CardPayment` records in a transaction for Order
   represented by `order_id`.
 
   * `payment_params` are validated using
-    `Core.Snitch.Data.Schema.Payment.changeset/3` with the `:create` action and
+    `Snitch.Data.Schema.Payment.changeset/3` with the `:create` action and
     because `slug` and `order_id` are passed explicitly to this function,
     they'll be ignored if present in `payment_params`.
   * `card_params` are validated using
-  `Core.Snitch.Data.Schema.CardPayment.changeset/3` with the `:create` action.
+  `Snitch.Data.Schema.CardPayment.changeset/3` with the `:create` action.
   """
   @spec create(String.t(), non_neg_integer(), map, map) ::
           {:ok, %{card_payment: Schema.CardPayment.t(), payment: Schema.Payment.t()}}
@@ -44,7 +46,7 @@ defmodule Core.Snitch.Data.Model.CardPayment do
       all_card_params = Map.put(card_params, :payment_id, payment.id)
       QH.create(Schema.CardPayment, all_card_params, Repo)
     end)
-    |> Core.Repo.transaction()
+    |> Repo.transaction()
   end
 
   @doc """
@@ -69,7 +71,7 @@ defmodule Core.Snitch.Data.Model.CardPayment do
     |> Ecto.Multi.run(:payment, fn _ ->
       Model.Payment.update(nil, Map.put(payment_params, :id, card_payment.payment_id))
     end)
-    |> Core.Repo.transaction()
+    |> Repo.transaction()
   end
 
   @doc """

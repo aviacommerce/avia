@@ -20,7 +20,7 @@ defmodule Snitch.Schema.OrderTest do
     assert Map.has_key?(changes, :item_total)
     assert Enum.all?(changes.line_items, fn %{action: action} -> action == :insert end)
     # check DB level constraints too
-    assert {:ok, _} = Core.Repo.insert(order)
+    assert {:ok, _} = Repo.insert(order)
   end
 
   @tag line_item_type: :duplicate
@@ -52,7 +52,7 @@ defmodule Snitch.Schema.OrderTest do
       %{valid?: validity, changes: changes} = new_order
 
       assert validity
-      assert {:ok, _} = Snitch.Repo.update(new_order)
+      assert {:ok, _} = Repo.update(new_order)
       assert Enum.all?(changes.line_items, fn x -> x.action in [:insert, :replace] end)
     end
 
@@ -80,7 +80,7 @@ defmodule Snitch.Schema.OrderTest do
       %{valid?: validity, changes: changes} = new_order
 
       assert validity
-      assert {:ok, _} = Snitch.Repo.update(new_order)
+      assert {:ok, _} = Repo.update(new_order)
       assert Map.fetch!(changes, :item_total) == Money.reduce(total)
       assert Enum.all?(changes.line_items, fn x -> x.action == :update end)
     end
@@ -95,7 +95,7 @@ defmodule Snitch.Schema.OrderTest do
       %{valid?: validity, changes: changes} = new_order
 
       assert validity
-      assert {:ok, _} = Snitch.Repo.update(new_order)
+      assert {:ok, _} = Repo.update(new_order)
       assert changes == %{}
     end
   end
@@ -136,19 +136,18 @@ defmodule Snitch.Schema.OrderTest do
       shipping_address_id: a.id,
       line_items: Model.LineItem.update_price_and_totals(line_items)
     }
-    [order: Order.changeset(order, params, :create)]
+
+    [order: Schema.Order.changeset(order, params, :create)]
   end
 
   defp persist(%{order: order}) do
-    [persisted: Core.Repo.insert!(order)]
+    [persisted: Repo.insert!(order)]
   end
 end
 
 defmodule Snitch.Data.Schema.OrderDocTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
-
-  alias Snitch.Data.Schema
 
   import Snitch.Factory
 
