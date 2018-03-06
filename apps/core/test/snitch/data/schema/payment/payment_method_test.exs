@@ -1,10 +1,8 @@
 defmodule Core.Snitch.Data.Schema.PaymentMethodTest do
   use ExUnit.Case, async: true
-  use Core.Snitch.Data.Schema
+  use Core.DataCase
 
-  import Core.Snitch.Factory
-
-  setup :checkout_repo
+  alias Core.Snitch.Data.Schema.PaymentMethod
 
   test "PaymentMethods must have unique code" do
     params = %{name: "card-payments", code: "ccd"}

@@ -1,9 +1,10 @@
 defmodule Snitch.Schema.VariantTest do
   use ExUnit.Case, async: true
-  alias Snitch.Data.Schema
+  use Snitch.DataCase
+
   import Snitch.Factory
 
-  setup :checkout_repo
+  alias Snitch.Data.Schema
 
   describe "(in one query) fetch selling prices" do
     setup :three_variants
