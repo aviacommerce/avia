@@ -29,8 +29,8 @@ defmodule Snitch.Data.Schema.StockLocation do
     field(:active, :boolean, default: true)
 
     has_many(:stock_items, StockItem)
-    belongs_to(:state, Core.Snitch.State)
-    belongs_to(:country, Core.Snitch.Country)
+    belongs_to(:state, Snitch.Data.Schema.State)
+    belongs_to(:country, Snitch.Data.Schema.Country)
 
     timestamps()
   end

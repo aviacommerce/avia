@@ -1,8 +1,7 @@
 defmodule Snitch.Factory do
   @moduledoc false
-  use ExMachina.Ecto, repo: Core.Repo
-  alias Core.Snitch.{User, Address, Variant}
-  alias Core.Snitch.Data.Schema.{Order}
+  use ExMachina.Ecto, repo: Snitch.Repo
+  alias Snitch.Data.Schema.{User, Address, Variant, Order}
 
   use Snitch.{
     AddressFactory,
@@ -59,7 +58,7 @@ defmodule Snitch.Factory do
   end
 
   def checkout_repo(context) do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Core.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Snitch.Repo)
     context
   end
 

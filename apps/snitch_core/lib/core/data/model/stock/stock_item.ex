@@ -3,6 +3,8 @@ defmodule Snitch.Data.Model.StockItem do
 
   """
   use Snitch.Data.Model
+  alias Snitch.Data.Schema.StockItem, as: StockItemSchema
+  alias Snitch.Data.Schema.StockLocation, as: StockLocationSchema
 
   @spec create(non_neg_integer(), non_neg_integer(), non_neg_integer(), boolean()) ::
           TH.commit_response_type()

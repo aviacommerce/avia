@@ -1,8 +1,9 @@
-defmodule Snitch.Schema.OrderTest do
+defmodule Snitch.OrderTest do
   use ExUnit.Case, async: true
-  alias Snitch.Data.Schema
-  import Snitch.Factory
+  alias Snitch.Data.Schema.Order
   alias Snitch.Data.Model
+  import Snitch.Factory
+  alias Snitch.Repo
 
   setup :checkout_repo
   setup :three_variants
@@ -18,7 +19,7 @@ defmodule Snitch.Schema.OrderTest do
       assert Map.has_key?(changes, :item_total)
       assert Enum.all?(changes.line_items, fn %{action: action} -> action == :insert end)
       # check DB level constraints too
-      assert {:ok, _} = Snitch.Repo.insert(order)
+      assert {:ok, _} = Repo.insert(order)
     end
   end
 
@@ -52,11 +53,11 @@ defmodule Snitch.Schema.OrderTest do
     test "unassociated line_items", context do
       %{persisted: persisted, line_items: line_items} = context
       params = %{line_items: Model.LineItem.update_price_and_totals(line_items)}
-      new_order = Schema.Order.changeset(persisted, params, :update)
+      new_order = Order.changeset(persisted, params, :update)
       %{valid?: validity, changes: changes} = new_order
 
       assert validity
-      assert {:ok, _} = Snitch.Repo.update(new_order)
+      assert {:ok, _} = Repo.update(new_order)
       assert Enum.all?(changes.line_items, fn x -> x.action in [:insert, :replace] end)
     end
 
@@ -79,11 +80,11 @@ defmodule Snitch.Schema.OrderTest do
       total = Enum.reduce(totals, &Money.add!/2)
       params = %{line_items: Model.LineItem.update_price_and_totals(new_line_items)}
 
-      new_order = Schema.Order.changeset(persisted, params, :update)
+      new_order = Order.changeset(persisted, params, :update)
       %{valid?: validity, changes: changes} = new_order
 
       assert validity
-      assert {:ok, _} = Snitch.Repo.update(new_order)
+      assert {:ok, _} = Repo.update(new_order)
       assert Map.fetch!(changes, :item_total) == Money.reduce(total)
       assert Enum.all?(changes.line_items, fn x -> x.action == :update end)
     end
@@ -93,11 +94,11 @@ defmodule Snitch.Schema.OrderTest do
       [one, two, three] = persisted.line_items
       new_line_items = [%{id: one.id}, %{id: two.id}, %{id: three.id}]
       params = %{line_items: Model.LineItem.update_price_and_totals(new_line_items)}
-      new_order = Schema.Order.changeset(persisted, params, :update)
+      new_order = Order.changeset(persisted, params, :update)
       %{valid?: validity, changes: changes} = new_order
 
       assert validity
-      assert {:ok, _} = Snitch.Repo.update(new_order)
+      assert {:ok, _} = Repo.update(new_order)
       assert changes == %{}
     end
   end
@@ -140,17 +141,17 @@ defmodule Snitch.Schema.OrderTest do
       line_items: Model.LineItem.update_price_and_totals(line_items)
     }
 
-    Map.put(context, :order, Schema.Order.changeset(order, params, :create))
+    Map.put(context, :order, Order.changeset(order, params, :create))
   end
 
   defp persist(%{order: order} = context) do
-    Map.put(context, :persisted, Snitch.Repo.insert!(order))
+    Map.put(context, :persisted, Repo.insert!(order))
   end
 end
 
 defmodule Snitch.OrderDocTest do
   use ExUnit.Case, async: true
-  alias Snitch.Data.Schema
+  alias Snitch.Data.Schema.Order
   import Snitch.Factory
 
   setup :checkout_repo
@@ -160,5 +161,5 @@ defmodule Snitch.OrderDocTest do
     :ok
   end
 
-  doctest Schema.Order
+  doctest Order
 end

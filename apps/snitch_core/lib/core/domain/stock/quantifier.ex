@@ -1,9 +1,9 @@
-defmodule Core.Snitch.Domain.Stock.Quantifier do
+defmodule Snitch.Domain.Stock.Quantifier do
   @moduledoc """
     Interface for handling inventory related business logic
   """
 
-  use Core.Snitch.Domain
+  use Snitch.Domain
 
   @doc """
     Returns a `total available inventory count` for stockt items
@@ -13,6 +13,6 @@ defmodule Core.Snitch.Domain.Stock.Quantifier do
   def total_on_hand(variant) when is_map(variant), do: total_on_hand(variant.id)
   @spec total_on_hand(non_neg_integer()) :: non_neg_integer()
   def total_on_hand(variant_id) when is_integer(variant_id) do
-    Model.Stock.StockItem.total_on_hand(variant_id)
+    Model.StockItem.total_on_hand(variant_id)
   end
 end

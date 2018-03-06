@@ -3,7 +3,7 @@ defmodule Snitch.StockFactory do
 
   defmacro __using__(_opts) do
     quote do
-      alias Core.Snitch.Data.Schema.Stock.{StockItem, StockLocation}
+      alias Snitch.Data.Schema.{StockItem, StockLocation}
 
       def stock_location_factory do
         %StockLocation{
