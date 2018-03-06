@@ -1,7 +1,7 @@
 # Snitch
 
 [![Build Status](https://travis-ci.org/aviabird/snitch.svg?branch=develop)](https://travis-ci.org/aviabird/snitch)
-[![Coverage Status](https://coveralls.io/repos/github/aviabird/snitch/badge.svg?branch=travis%2Finit)](https://coveralls.io/github/aviabird/snitch?branch=travis%2Finit)
+[![codecov](https://codecov.io/gh/aviabird/snitch/branch/develop/graph/badge.svg)](https://codecov.io/gh/aviabird/snitch)
 [![Inline docs](http://inch-ci.org/github/aviabird/snitch.svg)](http://inch-ci.org/github/aviabird/snitch)
 
 An umbrella application
