@@ -65,7 +65,7 @@ end
 defmodule Snitch.Data.Model.LineItemDocTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
-  
+
   import Snitch.Factory
 
   alias Snitch.Data.Model

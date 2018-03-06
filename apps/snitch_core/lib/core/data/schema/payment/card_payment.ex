@@ -1,4 +1,4 @@
-defmodule Core.Snitch.Data.Schema.CardPayment do
+defmodule Snitch.Data.Schema.CardPayment do
   @moduledoc """
   Models a Payment by credit or debit cards.
 
@@ -9,7 +9,9 @@ defmodule Core.Snitch.Data.Schema.CardPayment do
     deleting it's supertype `Payment` record.
   """
 
-  use Core.Snitch.Data.Schema
+  use Snitch.Data.Schema
+
+  alias Snitch.Data.Schema.Payment
 
   @type t :: %__MODULE__{}
 

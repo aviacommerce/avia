@@ -1,10 +1,10 @@
-defmodule Core.Snitch.Data.Model.CardPaymentMethodTest do
+defmodule Snitch.Data.Model.CardPaymentMethodTest do
   use ExUnit.Case, async: true
-  use Core.DataCase
+  use Snitch.DataCase
 
-  alias Core.Snitch.Data.Model
+  alias Snitch.Data.Model
 
-  import Core.Snitch.Factory
+  import Snitch.Factory
 
   setup :user_with_address
   setup :an_order
