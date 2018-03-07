@@ -6,6 +6,7 @@ defmodule Snitch.Data.Schema.Variant do
   use Snitch.Data.Schema
   use Snitch.Data.Schema.Stock
   import Ecto.Query
+  alias {Snitch.Repo, Money.Ecto.Composite.Type}
 
   @type t :: %__MODULE__{}
   schema "snitch_variants" do
@@ -49,9 +50,9 @@ defmodule Snitch.Data.Schema.Variant do
       from(v in "snitch_variants", select: [v.id, v.cost_price], where: v.id in ^variant_ids)
 
     query
-    |> Snitch.Repo.all()
+    |> Repo.all()
     |> Enum.reduce(%{}, fn [v_id, cp], acc ->
-      {:ok, cost} = Money.Ecto.Composite.Type.load(cp)
+      {:ok, cost} = Type.load(cp)
       Map.put(acc, v_id, cost)
     end)
   end

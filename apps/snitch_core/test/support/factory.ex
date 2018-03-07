@@ -5,7 +5,7 @@ defmodule Snitch.Factory do
 
   alias Snitch.Data.Schema.{Variant, Address, User, Order, Payment, PaymentMethod, CardPayment}
 
-  def user_factory() do
+  def user_factory do
     %User{
       first_name: sequence(:first_name, &"Tony-#{&1}"),
       last_name: sequence(:last_name, &"Stark-#{&1}"),
@@ -13,7 +13,7 @@ defmodule Snitch.Factory do
     }
   end
 
-  def address_factory() do
+  def address_factory do
     %Address{
       first_name: sequence(:first_name, &"Tony-#{&1}"),
       last_name: sequence(:last_name, &"Stark-#{&1}"),
@@ -26,7 +26,7 @@ defmodule Snitch.Factory do
     }
   end
 
-  def random_variant_factory() do
+  def random_variant_factory do
     %Variant{
       sku: sequence(:sku, &"shoes-nike-#{&1}"),
       weight: Decimal.new("0.45"),
@@ -38,7 +38,7 @@ defmodule Snitch.Factory do
     }
   end
 
-  def variant_factory() do
+  def variant_factory do
     %Variant{
       sku: sequence(:sku, &"shoes-nike-#{&1}"),
       weight: Decimal.new("0.45"),

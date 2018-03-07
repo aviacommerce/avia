@@ -5,10 +5,11 @@ defmodule Snitch.Data.Model.Order do
   use Snitch.Data.Model
   alias Snitch.Data.Schema
   alias Snitch.Data.Model
+  alias Model.LineItem
 
   @spec create(map, [map]) :: {:ok, Schema.Order.t()} | {:error, Ecto.Changeset.t()}
   def create(params, line_items) do
-    priced_items = Model.LineItem.update_price_and_totals(line_items)
+    priced_items = LineItem.update_price_and_totals(line_items)
 
     QH.create(Schema.Order, Map.put(params, :line_items, priced_items), Repo)
   end
@@ -16,7 +17,7 @@ defmodule Snitch.Data.Model.Order do
   @spec update(map) :: {:ok, Schema.Order.t()} | {:error, Ecto.Changeset.t()}
   def update(params) do
     line_items = Map.get(params, :line_items, [])
-    priced_items = Model.LineItem.update_price_and_totals(line_items)
+    priced_items = LineItem.update_price_and_totals(line_items)
 
     QH.update(Schema.Order, Map.put(params, :line_items, priced_items), Repo)
   end

@@ -27,11 +27,15 @@ defmodule Snitch.Data.Schema.LineItem do
   Do not persist this to DB since price fields and order are not set! To set
   prices see `update_totals/1` and `create_changeset/2`.
   """
+<<<<<<< 5cdf462a7096a1259bbb4fb5989b4d94c5863e9b
 <<<<<<< c70be3f0b33793758c47dbd3aa4644f6f6106372
   @spec changeset(__MODULE__.t(), map) :: Ecto.Changeset.t()
 =======
   @spec changeset(__MODULE__.t, map()) :: Ecto.Changeset.t()
 >>>>>>> Fixed credo issue
+=======
+  @spec changeset(__MODULE__.t(), map()) :: Ecto.Changeset.t()
+>>>>>>> Credo issue of aliasing nested module resolved.
   def changeset(line_item, params) do
     line_item
     |> cast(params, @required_fields ++ @optional_fields)

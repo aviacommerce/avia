@@ -3,7 +3,7 @@ defmodule Snitch.Data.Model.LineItem do
   LineItem API and utilities.
   """
   use Snitch.Data.Model
-  alias Snitch.Data.Schema
+  alias {Snitch.Data.Schema, Schema.Variant}
 
   @spec get(map) :: Schema.LineItem.t() | nil
   def get(query_fields) do
@@ -50,7 +50,7 @@ defmodule Snitch.Data.Model.LineItem do
       line_items
       |> Stream.map(&Map.get(&1, :variant_id))
       |> Enum.reject(fn x -> is_nil(x) end)
-      |> Schema.Variant.get_selling_prices()
+      |> Variant.get_selling_prices()
 
     line_items
     |> Enum.map(&set_price_and_total(&1, unit_selling_prices))

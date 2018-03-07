@@ -17,7 +17,7 @@ defmodule Snitch.Schema.VariantTest do
 
       computed_prices =
         variant_ids
-        |> Schema.Variant.get_selling_prices()
+        |> Variant.get_selling_prices()
         |> Enum.reduce(%{}, fn {id, x}, acc -> Map.put(acc, id, Money.reduce(x)) end)
 
       assert computed_prices == selling_prices
@@ -28,7 +28,7 @@ defmodule Snitch.Schema.VariantTest do
 
       computed_prices =
         variant_ids
-        |> Schema.Variant.get_selling_prices()
+        |> Variant.get_selling_prices()
         |> Enum.reduce(%{}, fn {id, x}, acc -> Map.put(acc, id, Money.reduce(x)) end)
 
       assert :error = Map.fetch(computed_prices, -1)

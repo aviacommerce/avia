@@ -13,10 +13,11 @@ defmodule Snitch.DataCase do
   """
 
   use ExUnit.CaseTemplate
+  alias Ecto.Changeset
 
   using do
     quote do
-      alias Snitch.Repo
+      alias {Snitch.Repo, Ecto.Adapters.SQL.Sandbox}
 
       import Ecto
       import Ecto.Changeset
@@ -26,10 +27,10 @@ defmodule Snitch.DataCase do
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Snitch.Repo)
+    :ok = Sandbox.checkout(Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Snitch.Repo, {:shared, self()})
+      Sandbox.mode(Repo, {:shared, self()})
     end
 
     :ok
@@ -44,7 +45,7 @@ defmodule Snitch.DataCase do
 
   """
   def errors_on(changeset) do
-    Ecto.Changeset.traverse_errors(changeset, fn {message, opts} ->
+    Changeset.traverse_errors(changeset, fn {message, opts} ->
       Enum.reduce(opts, message, fn {key, value}, acc ->
         String.replace(acc, "%{#{key}}", to_string(value))
       end)

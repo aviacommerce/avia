@@ -11,7 +11,7 @@ defmodule Snitch.Data.Model.LineItemTest do
 
     test "", context do
       %{line_items: line_items, totals: totals} = context
-      priced_items = Model.LineItem.update_price_and_totals(line_items)
+      priced_items = LineItem.update_price_and_totals(line_items)
 
       assert Enum.all?(priced_items, fn x -> totals[x.variant_id] == Money.reduce(x.total) end)
     end
