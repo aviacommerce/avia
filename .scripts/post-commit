@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# Runs credo and the formatter on the staged files, after the commit is made
+# This is purely for notification and will not halt/change your commit.
+
+RED='\033[1;31m'
+LGRAY='\033[1;30m'
+NC='\033[0m' # No Color
+
+printf "${RED}Running 'mix credo --strict --format=oneline' on project...${NC}\n"
+mix credo --strict --format=oneline
+echo

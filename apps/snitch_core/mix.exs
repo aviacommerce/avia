@@ -42,7 +42,8 @@ defmodule Snitch.Core.Mixfile do
       {:ecto, "~> 2.1"},
       {:poison, "~> 3.1", override: true},
       {:ex_money, "~> 2.2.0"},
-      {:credo, "~> 0.8.10", only: :dev, runtime: false},
+      {:credo, "~> 0.9.0-rc", only: :dev, runtime: false},
+      {:credo_contrib, "~> 0.1.0-rc", only: :dev, runtime: false},
 
       # auth
       {:comeonin, "~> 4.0"},
