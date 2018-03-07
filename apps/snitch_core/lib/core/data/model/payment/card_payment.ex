@@ -77,7 +77,7 @@ defmodule Snitch.Data.Model.CardPayment do
   @doc """
   Fetches the struct but does not preload `:payment` association.
   """
-  @spec get(map | non_neg_integer) :: Schema.CardPayment.t() | nil | no_return
+  @spec get(map | non_neg_integer) :: Schema.CardPayment.t() | nil
   def get(query_fields_or_primary_key) do
     QH.get(Schema.CardPayment, query_fields_or_primary_key, Repo)
   end
