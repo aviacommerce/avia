@@ -27,7 +27,7 @@ defmodule Snitch.Data.Model.Order do
     QH.delete(Schema.Order, id_or_instance, Repo)
   end
 
-  @spec get(map | non_neg_integer) :: Schema.Order.t() | nil | no_return
+  @spec get(map | non_neg_integer) :: Schema.Order.t() | nil
   def get(query_fields_or_primary_key) do
     QH.get(Schema.Order, query_fields_or_primary_key, Repo)
   end
