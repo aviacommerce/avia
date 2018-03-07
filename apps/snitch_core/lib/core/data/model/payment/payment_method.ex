@@ -40,17 +40,17 @@ defmodule Snitch.Data.Model.PaymentMethod do
     QH.delete(Schema.PaymentMethod, id_or_instance, Repo)
   end
 
-  @spec get(map | non_neg_integer) :: Schema.PaymentMethod.t() | nil | no_return
+  @spec get(map | non_neg_integer) :: Schema.PaymentMethod.t() | nil
   def get(query_fields_or_primary_key) do
     QH.get(Schema.PaymentMethod, query_fields_or_primary_key, Repo)
   end
 
-  @spec get_card() :: Schema.PaymentMethod.t() | nil | no_return
+  @spec get_card() :: Schema.PaymentMethod.t() | nil
   def get_card() do
     get(%{code: "ccd"})
   end
 
-  @spec get_check() :: Schema.PaymentMethod.t() | nil | no_return
+  @spec get_check() :: Schema.PaymentMethod.t() | nil
   def get_check() do
     get(%{code: "chk"})
   end

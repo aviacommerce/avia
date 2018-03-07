@@ -5,7 +5,7 @@ defmodule Snitch.Data.Model.LineItem do
   use Snitch.Data.Model
   alias Snitch.Data.Schema
 
-  @spec get(map) :: Schema.LineItem.t() | nil | no_return
+  @spec get(map) :: Schema.LineItem.t() | nil
   def get(query_fields) do
     QH.get(Schema.LineItem, query_fields, Repo)
   end

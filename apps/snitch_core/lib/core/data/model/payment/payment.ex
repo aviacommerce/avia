@@ -25,7 +25,7 @@ defmodule Snitch.Data.Model.Payment do
     QH.update(Schema.Payment, params, id_or_instance, Repo)
   end
 
-  @spec get(map | non_neg_integer) :: Schema.Payment.t() | nil | no_return
+  @spec get(map | non_neg_integer) :: Schema.Payment.t() | nil
   def get(query_fields_or_primary_key) do
     QH.get(Schema.Payment, query_fields_or_primary_key, Repo)
   end
@@ -38,7 +38,7 @@ defmodule Snitch.Data.Model.Payment do
 
   > Note that the `:payment` association is not loaded.
   """
-  @spec to_subtype(non_neg_integer | Schema.Payment.t()) :: struct() | nil
+  @spec to_subtype(non_neg_integer | Schema.Payment.t()) :: struct | nil
   def to_subtype(id_or_instance)
 
   def to_subtype(payment_id) when is_integer(payment_id) do
@@ -48,11 +48,9 @@ defmodule Snitch.Data.Model.Payment do
   end
 
   def to_subtype(payment) when is_nil(payment), do: nil
+  def to_subtype(%Schema.Payment{payment_type: "chk"} = payment), do: payment
 
-  def to_subtype(%Schema.Payment{} = payment) do
-    case payment.payment_type do
-      "ccd" -> Model.CardPayment.from_payment(payment.id)
-      "chk" -> payment
-    end
+  def to_subtype(%Schema.Payment{payment_type: "ccd"} = payment) do
+    Model.CardPayment.from_payment(payment.id)
   end
 end
