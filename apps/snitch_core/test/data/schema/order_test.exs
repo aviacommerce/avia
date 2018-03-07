@@ -117,8 +117,7 @@ defmodule Snitch.Schema.OrderTest do
       end
 
     line_items =
-      variant_ids
-      |> Enum.into([], fn variant_id ->
+      Enum.into(variant_ids, [], fn variant_id ->
         %{variant_id: variant_id, quantity: 2}
       end)
 

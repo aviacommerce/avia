@@ -52,8 +52,7 @@ defmodule Snitch.Data.Model.LineItem do
       |> Enum.reject(fn x -> is_nil(x) end)
       |> Variant.get_selling_prices()
 
-    line_items
-    |> Enum.map(&set_price_and_total(&1, unit_selling_prices))
+    Enum.map(line_items, &set_price_and_total(&1, unit_selling_prices))
   end
 
   @spec set_price_and_total(map, %{non_neg_integer: Money.t()}) :: map

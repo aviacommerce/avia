@@ -109,8 +109,7 @@ defmodule Snitch.Data.Schema.Order do
     line_item_changesets = get_field(order_changeset, :line_items)
 
     items_are_unique? =
-      line_item_changesets
-      |> Enum.reduce_while(MapSet.new(), fn item, map_set ->
+      Enum.reduce_while(line_item_changesets, MapSet.new(), fn item, map_set ->
         v_id = item.variant_id
 
         if MapSet.member?(map_set, v_id) do
