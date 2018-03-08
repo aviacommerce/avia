@@ -5,8 +5,9 @@ defmodule Snitch.Data.Schema.Variant do
 
   use Snitch.Data.Schema
   use Snitch.Data.Schema.Stock
+
   import Ecto.Query
-  alias Snitch.Repo
+
   alias Money.Ecto.Composite.Type, as: MoneyType
 
   @type t :: %__MODULE__{}

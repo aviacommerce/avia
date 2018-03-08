@@ -66,7 +66,7 @@ defmodule Snitch.Core.Mixfile do
 
   defp docs do
     [
-      main: Snitch.Core.Data.Schema.Order,
+      main: Snitch.Data.Schema.Order,
       source_url: "https://github.com/aviabird/snitch",
       groups_for_modules: groups_for_modules()
     ]
@@ -74,9 +74,9 @@ defmodule Snitch.Core.Mixfile do
 
   defp groups_for_modules do
     [
-      Schema: ~r/^Snitch.Core.Data.Schema.?/,
-      Models: ~r/^Snitch.Core.Data.Model.?/,
-      Domain: ~r/^Snitch.Core.Domain.?/
+      Schema: ~r/^Snitch.Data.Schema.?/,
+      Models: ~r/^Snitch.Data.Model.?/,
+      Domain: ~r/^Snitch.Domain.?/
     ]
   end
 

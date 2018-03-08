@@ -2,7 +2,7 @@ defmodule Snitch.Data.Model.CardPayment do
   @moduledoc """
   CardPayment API and utilities.
 
-  `CardPayment` is a concrete payment subtype in Snitch. By `create/2`ing a
+  `CardPayment` is a concrete payment subtype in Snitch. By `create/4`ing a
   CardPayment, the supertype Payment is automatically created in the same
   transaction.
 
@@ -11,9 +11,9 @@ defmodule Snitch.Data.Model.CardPayment do
   """
   use Snitch.Data.Model
 
-  alias Snitch.Data.{Schema, Model}
-  alias Schema.CardPayment
-  alias Model.PaymentMethod
+  alias Snitch.Data.Schema.{CardPayment, Payment}
+  alias Snitch.Data.Model.Payment, as: PaymentModel
+  alias Snitch.Data.Model.PaymentMethod, as: PaymentMethodModel
   alias Ecto.Multi
 
   @doc """
@@ -28,11 +28,11 @@ defmodule Snitch.Data.Model.CardPayment do
   `Snitch.Data.Schema.CardPayment.changeset/3` with the `:create` action.
   """
   @spec create(String.t(), non_neg_integer(), map, map) ::
-          {:ok, %{card_payment: CardPayment.t(), payment: Schema.Payment.t()}}
+          {:ok, %{card_payment: CardPayment.t(), payment: Payment.t()}}
           | {:error, Ecto.Changeset.t()}
   def create(slug, order_id, payment_params, card_params) do
-    payment = struct(Schema.Payment, payment_params)
-    card_method = PaymentMethod.get_card()
+    payment = struct(Payment, payment_params)
+    card_method = PaymentMethodModel.get_card()
 
     more_payment_params = %{
       order_id: order_id,
@@ -41,7 +41,7 @@ defmodule Snitch.Data.Model.CardPayment do
       slug: slug
     }
 
-    payment_changeset = Schema.Payment.changeset(payment, more_payment_params, :create)
+    payment_changeset = Payment.changeset(payment, more_payment_params, :create)
 
     Multi.new()
     |> Multi.insert(:payment, payment_changeset)
@@ -58,13 +58,13 @@ defmodule Snitch.Data.Model.CardPayment do
   Everything except the `:payment_type` and `amount` can be changed, because by
   changing the type, `CardPayment` will have to be deleted.
 
-  * `card_params` are validated using `Schema.CardPayment.changeset/3` with the
+  * `card_params` are validated using `CardPayment.changeset/3` with the
     `:update` action.
   * `payment_params` are validated using `Schema.Payment.changeset/3` with the
     `:update` action.
   """
   @spec update(CardPayment.t(), map, map) ::
-          {:ok, %{card_payment: CardPayment.t(), payment: Schema.Payment.t()}}
+          {:ok, %{card_payment: CardPayment.t(), payment: Payment.t()}}
           | {:error, Ecto.Changeset.t()}
   def update(card_payment, card_params, payment_params) do
     card_payment_changeset = CardPayment.changeset(card_payment, card_params, :update)
@@ -72,7 +72,7 @@ defmodule Snitch.Data.Model.CardPayment do
     Multi.new()
     |> Multi.update(:card_payment, card_payment_changeset)
     |> Multi.run(:payment, fn _ ->
-      Model.Payment.update(nil, Map.put(payment_params, :id, card_payment.payment_id))
+      PaymentModel.update(nil, Map.put(payment_params, :id, card_payment.payment_id))
     end)
     |> Repo.transaction()
   end

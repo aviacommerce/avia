@@ -3,15 +3,15 @@ defmodule Snitch.Data.Model.LineItem do
   LineItem API and utilities.
   """
   use Snitch.Data.Model
-  alias Snitch.Data.{Schema, Schema.Variant}
+  alias Snitch.Data.Schema.{Variant, LineItem}
 
-  @spec get(map) :: Schema.LineItem.t() | nil
+  @spec get(map) :: LineItem.t() | nil
   def get(query_fields) do
-    QH.get(Schema.LineItem, query_fields, Repo)
+    QH.get(LineItem, query_fields, Repo)
   end
 
-  @spec get_all() :: [Schema.LineItem.t()]
-  def get_all, do: Repo.all(Schema.LineItem)
+  @spec get_all() :: [LineItem.t()]
+  def get_all, do: Repo.all(LineItem)
 
   @doc """
   Set `:unit_price` and `:total` for many `LineItem` `params`.
