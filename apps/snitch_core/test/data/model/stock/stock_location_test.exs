@@ -18,14 +18,14 @@ defmodule Snitch.Data.Model.StockLocationTest do
 
     test "Fails for invalid associations" do
       assert {:error, changeset} =
-               Model.StockLocation.create("Digon Alley", "Street 10 London", 1, 1)
+               Model.StockLocation.create("Diagon Alley", "Street 10 London", -1, -1)
 
       assert %{state_id: ["does not exist"]} = errors_on(changeset)
 
       state = insert(:state)
 
       assert {:error, changeset} =
-               Model.StockLocation.create("Digon Alley", "Street 10 London", state.id, 1)
+               Model.StockLocation.create("Diagon Alley", "Street 10 London", state.id, -1)
 
       assert %{country_id: ["does not exist"]} = errors_on(changeset)
     end
@@ -33,7 +33,7 @@ defmodule Snitch.Data.Model.StockLocationTest do
     test "Inserts with valid attributes" do
       assert {:ok, _stock_location} =
                Model.StockLocation.create(
-                 "Digon Alley",
+                 "Diagon Alley",
                  "Street 10 London",
                  insert(:state).id,
                  insert(:country).id
@@ -43,7 +43,7 @@ defmodule Snitch.Data.Model.StockLocationTest do
 
   describe "get/1" do
     test "Fails with invalid id" do
-      stock_location = Model.StockLocation.get(1)
+      stock_location = Model.StockLocation.get(-1)
       assert nil == stock_location
     end
 
@@ -107,7 +107,7 @@ defmodule Snitch.Data.Model.StockLocationTest do
 
   describe "delete/1" do
     test "Fails to delete if invalid id" do
-      assert {:error, :not_found} = Model.StockLocation.delete(1_234_567_890)
+      assert {:error, :not_found} = Model.StockLocation.delete(-1)
     end
 
     test "Deletes for valid id" do

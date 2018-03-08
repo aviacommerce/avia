@@ -1,4 +1,4 @@
-defmodule Snitch.StockFactory do
+defmodule Snitch.Factory.Stock do
   @moduledoc false
 
   defmacro __using__(_opts) do
