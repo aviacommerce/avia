@@ -7,6 +7,6 @@ RED='\033[1;31m'
 LGRAY='\033[1;30m'
 NC='\033[0m' # No Color
 
-printf "${RED}Running 'mix credo --strict --format=oneline' on project...${NC}\n"
-mix credo --strict --format=oneline
+printf "${RED}Running 'mix credo --strict' on project...${NC}\n"
+mix credo --strict
 echo

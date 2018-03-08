@@ -6,14 +6,14 @@ defmodule Snitch.Data.Model.StockItemTest do
 
   describe "create/4" do
     test "Fails for INVALID attributes" do
-      assert {:error, changeset} = Model.StockItem.create(1, 1, 1, true)
+      assert {:error, changeset} = Model.StockItem.create(-1, -1, 1, true)
       refute changeset.valid?
       assert %{stock_location_id: ["does not exist"]} = errors_on(changeset)
     end
 
     test "Fails with ONLY valid Stock Location" do
       stock_location = insert(:stock_location)
-      assert {:error, changeset} = Model.StockItem.create(1, stock_location.id, 1, true)
+      assert {:error, changeset} = Model.StockItem.create(-1, stock_location.id, 1, true)
       refute changeset.valid?
       assert %{variant_id: ["does not exist"]} = errors_on(changeset)
     end
@@ -36,7 +36,7 @@ defmodule Snitch.Data.Model.StockItemTest do
 
   describe "get/1" do
     test "Fails with invalid id" do
-      stock_item = Model.StockItem.get(1)
+      stock_item = Model.StockItem.get(-1)
       assert nil == stock_item
     end
 
@@ -94,7 +94,7 @@ defmodule Snitch.Data.Model.StockItemTest do
 
   describe "delete/1" do
     test "Fails to delete if invalid id" do
-      assert {:error, :not_found} = Model.StockItem.delete(1_234_567_890)
+      assert {:error, :not_found} = Model.StockItem.delete(-1)
     end
 
     test "Deletes for valid id" do
@@ -124,7 +124,7 @@ defmodule Snitch.Data.Model.StockItemTest do
 
   describe "with_active_stock_location/1" do
     test "returns empty list for invalid variant id" do
-      stock_items = Model.StockItem.with_active_stock_location(1_234_567_890)
+      stock_items = Model.StockItem.with_active_stock_location(-1)
       assert 0 = Enum.count(stock_items)
     end
 
@@ -149,7 +149,7 @@ defmodule Snitch.Data.Model.StockItemTest do
 
   describe "total_on_hand/1" do
     test "return nil for invalid variant id" do
-      assert nil == Model.StockItem.total_on_hand(1_234_567_890)
+      assert nil == Model.StockItem.total_on_hand(-1)
     end
 
     test "return total count on hand in all stock items for a variant at active locations" do
@@ -160,7 +160,7 @@ defmodule Snitch.Data.Model.StockItemTest do
 
       total_count_on_hand =
         stock_items
-        |> Enum.map(& &1.count_on_hand)
+        |> Stream.map(& &1.count_on_hand)
         |> Enum.reduce(0, &Kernel.+/2)
 
       assert total_count_on_hand == Model.StockItem.total_on_hand(variant.id)
