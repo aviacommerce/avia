@@ -1,4 +1,4 @@
-defmodule Snitch.AddressFactory do
+defmodule Snitch.Factory.Address do
   @moduledoc false
 
   defmacro __using__(_opts) do
@@ -7,34 +7,44 @@ defmodule Snitch.AddressFactory do
 
       def state_factory do
         %State{
-          name: "London",
-          abbr: "LDN",
+          name: "California",
+          abbr: "CA",
           country: build(:country)
         }
       end
 
       def country_factory do
         %Country{
-          iso_name: "LDN",
-          iso: "+45",
-          iso3: "+45",
-          name: "United Kingdom",
-          numcode: "+45",
-          states_required: false
+          iso_name: sequence("UNITED STATES"),
+          iso: sequence("U"),
+          iso3: sequence("US"),
+          name: "United States",
+          numcode: "840",
+          states_required: true
         }
       end
 
       def address_factory do
         %Address{
-          first_name: sequence(:first_name, &"Diagon-#{&1}"),
-          last_name: sequence(:last_name, &"Alley-#{&1}"),
-          address_line_1: "Near",
-          address_line_2: "Gringotts",
-          city: "London",
-          zip_code: "123456",
-          phone: "987654321",
-          alternate_phone: "0987654321"
+          first_name: "Tony",
+          last_name: "Stark",
+          address_line_1: "10-8-80 Malibu Point",
+          zip_code: "90265",
+          city: "Malibu",
+          phone: "1234567890"
+          # state_id: State.get_id("California"),
+          # country_id: Country.get_id("USA"),
         }
+      end
+
+      def states(context) do
+        count = Map.get(context, :state_count, 1)
+        [states: insert_list(count, :state)]
+      end
+
+      def countries(context) do
+        count = Map.get(context, :country_count, 1)
+        [countries: insert_list(count, :country)]
       end
     end
   end

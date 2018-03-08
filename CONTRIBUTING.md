@@ -9,8 +9,9 @@ The repo includes some handy `git` hooks under `.scripts/`:
 
 We strongly recommend that you set up these git hooks on your machine by:
 ```sh
-ln -s .scripts/pre-commit .git/hooks/pre-commit
-ln -s .scripts/post-commit .git/hooks/post-commit
+# in the project root!
+ln -sf ../../.scripts/pre-commit .git/hooks/pre-commit
+ln -sf ../../.scripts/post-commit .git/hooks/post-commit
 ```
 
 > Note that our CI will fail your PR if you dont run `mix format` in the project
