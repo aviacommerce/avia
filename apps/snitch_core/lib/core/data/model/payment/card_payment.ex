@@ -12,6 +12,9 @@ defmodule Snitch.Data.Model.CardPayment do
   use Snitch.Data.Model
 
   alias Snitch.Data.{Schema, Model}
+  alias Schema.CardPayment
+  alias Model.PaymentMethod
+  alias Ecto.Multi
 
   @doc """
   Creates both `Payment` and `CardPayment` records in a transaction for Order
@@ -25,11 +28,11 @@ defmodule Snitch.Data.Model.CardPayment do
   `Snitch.Data.Schema.CardPayment.changeset/3` with the `:create` action.
   """
   @spec create(String.t(), non_neg_integer(), map, map) ::
-          {:ok, %{card_payment: Schema.CardPayment.t(), payment: Schema.Payment.t()}}
+          {:ok, %{card_payment: CardPayment.t(), payment: Schema.Payment.t()}}
           | {:error, Ecto.Changeset.t()}
   def create(slug, order_id, payment_params, card_params) do
     payment = struct(Schema.Payment, payment_params)
-    card_method = Model.PaymentMethod.get_card()
+    card_method = PaymentMethod.get_card()
 
     more_payment_params = %{
       order_id: order_id,
@@ -40,11 +43,11 @@ defmodule Snitch.Data.Model.CardPayment do
 
     payment_changeset = Schema.Payment.changeset(payment, more_payment_params, :create)
 
-    Ecto.Multi.new()
-    |> Ecto.Multi.insert(:payment, payment_changeset)
-    |> Ecto.Multi.run(:card_payment, fn %{payment: payment} ->
+    Multi.new()
+    |> Multi.insert(:payment, payment_changeset)
+    |> Multi.run(:card_payment, fn %{payment: payment} ->
       all_card_params = Map.put(card_params, :payment_id, payment.id)
-      QH.create(Schema.CardPayment, all_card_params, Repo)
+      QH.create(CardPayment, all_card_params, Repo)
     end)
     |> Repo.transaction()
   end
@@ -60,15 +63,15 @@ defmodule Snitch.Data.Model.CardPayment do
   * `payment_params` are validated using `Schema.Payment.changeset/3` with the
     `:update` action.
   """
-  @spec update(Schema.CardPayment.t(), map, map) ::
-          {:ok, %{card_payment: Schema.CardPayment.t(), payment: Schema.Payment.t()}}
+  @spec update(CardPayment.t(), map, map) ::
+          {:ok, %{card_payment: CardPayment.t(), payment: Schema.Payment.t()}}
           | {:error, Ecto.Changeset.t()}
   def update(card_payment, card_params, payment_params) do
-    card_payment_changeset = Schema.CardPayment.changeset(card_payment, card_params, :update)
+    card_payment_changeset = CardPayment.changeset(card_payment, card_params, :update)
 
-    Ecto.Multi.new()
-    |> Ecto.Multi.update(:card_payment, card_payment_changeset)
-    |> Ecto.Multi.run(:payment, fn _ ->
+    Multi.new()
+    |> Multi.update(:card_payment, card_payment_changeset)
+    |> Multi.run(:payment, fn _ ->
       Model.Payment.update(nil, Map.put(payment_params, :id, card_payment.payment_id))
     end)
     |> Repo.transaction()
@@ -77,20 +80,20 @@ defmodule Snitch.Data.Model.CardPayment do
   @doc """
   Fetches the struct but does not preload `:payment` association.
   """
-  @spec get(map | non_neg_integer) :: Schema.CardPayment.t() | nil
+  @spec get(map | non_neg_integer) :: CardPayment.t() | nil
   def get(query_fields_or_primary_key) do
-    QH.get(Schema.CardPayment, query_fields_or_primary_key, Repo)
+    QH.get(CardPayment, query_fields_or_primary_key, Repo)
   end
 
-  @spec get_all() :: [Schema.CardPayment.t()]
-  def get_all, do: Repo.all(Schema.CardPayment)
+  @spec get_all() :: [CardPayment.t()]
+  def get_all, do: Repo.all(CardPayment)
 
   @doc """
   Fetch the CardPayment identified by the `payment_id`.
 
   > Note that the `:payment` association is not loaded.
   """
-  @spec from_payment(non_neg_integer) :: Schema.CardPayment.t()
+  @spec from_payment(non_neg_integer) :: CardPayment.t()
   def from_payment(payment_id) do
     get(%{payment_id: payment_id})
   end

@@ -46,12 +46,12 @@ defmodule Snitch.Data.Model.PaymentMethod do
   end
 
   @spec get_card() :: Schema.PaymentMethod.t() | nil
-  def get_card() do
+  def get_card do
     get(%{code: "ccd"})
   end
 
   @spec get_check() :: Schema.PaymentMethod.t() | nil
-  def get_check() do
+  def get_check do
     get(%{code: "chk"})
   end
 

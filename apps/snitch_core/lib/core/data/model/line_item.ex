@@ -3,7 +3,7 @@ defmodule Snitch.Data.Model.LineItem do
   LineItem API and utilities.
   """
   use Snitch.Data.Model
-  alias {Snitch.Data.Schema, Schema.Variant}
+  alias Snitch.Data.{Schema, Schema.Variant}
 
   @spec get(map) :: Schema.LineItem.t() | nil
   def get(query_fields) do

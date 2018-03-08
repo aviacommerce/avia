@@ -5,7 +5,7 @@ defmodule Snitch.Data.Schema.State do
 
   use Snitch.Data.Schema
   alias Snitch.Data.Schema.Country
-  alias __MODULE__, as: Module
+  alias Snitch.Data.Schema.State
 
   schema "snitch_states" do
     field(:name, :string)

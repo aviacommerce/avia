@@ -13,11 +13,15 @@ defmodule Snitch.DataCase do
   """
 
   use ExUnit.CaseTemplate
+
+  alias Snitch.Repo
+  alias Ecto.Adapters.SQL.Sandbox
   alias Ecto.Changeset
 
   using do
     quote do
-      alias {Snitch.Repo, Ecto.Adapters.SQL.Sandbox}
+      alias Snitch.Repo
+      alias Ecto.Adapters.SQL.Sandbox
 
       import Ecto
       import Ecto.Changeset
@@ -42,7 +46,6 @@ defmodule Snitch.DataCase do
       assert {:error, changeset} = Accounts.create_user(%{password: "short"})
       assert "password is too short" in errors_on(changeset).password
       assert %{password: ["password is too short"]} = errors_on(changeset)
-
   """
   def errors_on(changeset) do
     Changeset.traverse_errors(changeset, fn {message, opts} ->

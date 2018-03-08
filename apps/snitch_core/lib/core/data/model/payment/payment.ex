@@ -15,6 +15,7 @@ defmodule Snitch.Data.Model.Payment do
   use Snitch.Data.Model
 
   alias Snitch.Data.{Schema, Model}
+  alias Model.CardPayment
 
   @doc """
   Updates an existing `Payment`
@@ -51,6 +52,6 @@ defmodule Snitch.Data.Model.Payment do
   def to_subtype(%Schema.Payment{payment_type: "chk"} = payment), do: payment
 
   def to_subtype(%Schema.Payment{payment_type: "ccd"} = payment) do
-    Model.CardPayment.from_payment(payment.id)
+    CardPayment.from_payment(payment.id)
   end
 end

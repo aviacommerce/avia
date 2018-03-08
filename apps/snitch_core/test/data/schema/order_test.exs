@@ -1,11 +1,11 @@
-defmodule Snitch.Schema.OrderTest do
+defmodule Snitch.Data.Schema.OrderTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
   import Snitch.Factory
 
-  alias Snitch.Data.Schema
-  alias Snitch.Data.Model
+  alias Snitch.Data.Schema.Order
+  alias Snitch.Data.Model.LineItem
 
   setup :three_variants
   setup :user_with_address
@@ -136,7 +136,7 @@ defmodule Snitch.Schema.OrderTest do
       line_items: LineItem.update_price_and_totals(line_items)
     }
 
-    [order: Schema.Order.changeset(order, params, :create)]
+    [order: Order.changeset(order, params, :create)]
   end
 
   defp persist(%{order: order}) do
