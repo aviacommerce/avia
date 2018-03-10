@@ -1,9 +1,10 @@
 defmodule Snitch.Data.Model.LineItemTest do
   use ExUnit.Case, async: true
-  alias Snitch.Data.Model
+  use Snitch.DataCase
+
   import Snitch.Factory
 
-  setup :checkout_repo
+  alias Snitch.Data.Model
 
   describe "line_item update_price_and_totals with valid params" do
     setup [:three_variants, :good_line_items]
@@ -20,7 +21,7 @@ defmodule Snitch.Data.Model.LineItemTest do
     setup [:three_variants, :bad_line_items]
 
     test "", context do
-      %{line_items: line_items, totals: totals} = context
+      %{line_items: line_items} = context
       priced_items = Model.LineItem.update_price_and_totals(line_items)
 
       assert Enum.all?(priced_items, &(not Map.has_key?(&1, :total)))
@@ -42,9 +43,7 @@ defmodule Snitch.Data.Model.LineItemTest do
         }
       end)
 
-    context
-    |> Map.put(:line_items, line_items)
-    |> Map.put(:totals, totals)
+    [line_items: line_items, totals: totals]
   end
 
   defp bad_line_items(context) do
@@ -59,23 +58,22 @@ defmodule Snitch.Data.Model.LineItemTest do
         %{variant_id: variant.id, quantity: quantity}
       end)
 
-    context
-    |> Map.put(:line_items, line_items)
-    |> Map.put(:totals, [nil, nil, nil])
+    [line_items: line_items, totals: [nil, nil, nil]]
   end
 end
 
 defmodule Snitch.Data.Model.LineItemDocTest do
   use ExUnit.Case, async: true
-  alias Snitch.Data.Model
+  use Snitch.DataCase
+
   import Snitch.Factory
 
-  setup :checkout_repo
+  alias Snitch.Data.Model
 
   setup do
     insert(:variant)
     :ok
   end
 
-  doctest Model.LineItem
+  doctest Snitch.Data.Model.LineItem
 end

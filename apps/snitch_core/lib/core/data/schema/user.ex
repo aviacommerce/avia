@@ -52,7 +52,7 @@ defmodule Snitch.Data.Schema.User do
   @required_fields ~w(first_name last_name email is_admin?)a
   @password_fields ~w(password password_confirmation)a
 
-  @spec registration_changeset(__MODULE__.t(), map()) :: Ecto.Changeset.t()
+  @spec registration_changeset(__MODULE__.t(), map) :: Ecto.Changeset.t()
   @doc """
   Returns a changeset to register a new user
   """
@@ -65,7 +65,7 @@ defmodule Snitch.Data.Schema.User do
     |> put_pass_hash()
   end
 
-  @spec changeset(__MODULE__.t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(__MODULE__.t(), map) :: Ecto.Changeset.t()
   def changeset(user, params) do
     user
     |> cast(params, @required_fields)

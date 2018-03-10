@@ -23,7 +23,7 @@ defmodule Snitch.Data.Schema.Order do
     # field :shipping
     # field :payment
 
-    field(:completed_at, :naive_datetime)
+    # field(:completed_at, :naive_datetime)
 
     # associations
     belongs_to(:user, User)
@@ -53,7 +53,7 @@ defmodule Snitch.Data.Schema.Order do
   ## Note
   The changeset `action` is not set.
   """
-  @spec changeset(__MODULE__.t(), map(), :create | :update) :: Ecto.Changeset.t()
+  @spec changeset(__MODULE__.t(), map, :create | :update) :: Ecto.Changeset.t()
   def changeset(order, params, action) do
     order
     |> cast(params, @required_fields ++ @optional_fields)

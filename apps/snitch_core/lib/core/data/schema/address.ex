@@ -30,7 +30,7 @@ defmodule Snitch.Data.Schema.Address do
   @required_fields ~w(first_name last_name address_line_1 city zip_code)a
   @optional_fields ~w(phone alternate_phone)a
 
-  @spec changeset(__MODULE__.t(), map()) :: Ecto.Changeset.t()
+  @spec changeset(__MODULE__.t(), map) :: Ecto.Changeset.t()
   def changeset(address, params \\ %{}) do
     address
     |> cast(params, @required_fields ++ @optional_fields)
