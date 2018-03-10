@@ -17,7 +17,9 @@ defmodule Snitch.Data.Model.StockLocationTest do
     end
 
     test "Fails for invalid associations" do
-      assert {:error, changeset} = Model.StockLocation.create("Digon Alley", "Street 10 London", 1, 1)
+      assert {:error, changeset} =
+               Model.StockLocation.create("Digon Alley", "Street 10 London", 1, 1)
+
       assert %{state_id: ["does not exist"]} = errors_on(changeset)
 
       state = insert(:state)
