@@ -142,9 +142,9 @@ defmodule Snitch.Data.Model.StockItemTest do
     end
   end
 
-  describe "stock_items/1" do
+  describe "at_active_stock_locations/1" do
     test "returns empty list for invalid variant id" do
-      stock_items = Model.StockItem.stock_items(1_234_567_890)
+      stock_items = Model.StockItem.at_active_stock_locations(1_234_567_890)
       assert 0 = Enum.count(stock_items)
     end
 
@@ -154,16 +154,16 @@ defmodule Snitch.Data.Model.StockItemTest do
       variant3 = insert(:variant)
 
       insert_list(2, :stock_item, variant: variant1)
-      assert 2 = Enum.count(Model.StockItem.stock_items(variant1.id))
+      assert 2 = Enum.count(Model.StockItem.at_active_stock_locations(variant1.id))
 
       insert_list(5, :stock_item, variant: variant2)
-      assert 5 = Enum.count(Model.StockItem.stock_items(variant2.id))
+      assert 5 = Enum.count(Model.StockItem.at_active_stock_locations(variant2.id))
 
       # Test for inactive stock locationlocation
       inactive_stock_location = insert(:stock_location, active: false)
       insert(:stock_item, variant: variant3, stock_location: inactive_stock_location)
       insert_list(2, :stock_item, variant: variant3)
-      assert 2 = Enum.count(Model.StockItem.stock_items(variant3.id))
+      assert 2 = Enum.count(Model.StockItem.at_active_stock_locations(variant3.id))
     end
   end
 

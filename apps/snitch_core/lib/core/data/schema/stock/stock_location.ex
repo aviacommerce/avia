@@ -53,7 +53,7 @@ defmodule Snitch.Data.Schema.StockLocation do
     instance
     |> cast(params, fields ++ optional)
     |> validate_required(fields)
-    |> validate_length(:address_line_1, min: 6)
+    |> validate_length(:address_line_1, min: 10)
     |> foreign_key_constraint(:state_id)
     |> foreign_key_constraint(:country_id)
   end

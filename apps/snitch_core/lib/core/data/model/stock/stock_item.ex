@@ -52,10 +52,10 @@ defmodule Snitch.Data.Model.StockItem do
     that belong to an active stock location
     for a variant
   """
-  @spec stock_items(non_neg_integer) :: list(StockItemSchema.t())
-  def stock_items(variant_id) do
+  @spec at_active_stock_locations(non_neg_integer) :: list(StockItemSchema.t())
+  def at_active_stock_locations(variant_id) do
     variant_id
-    |> stock_items_query()
+    |> at_active_stock_locations_query()
     |> Repo.all()
   end
 
@@ -67,7 +67,7 @@ defmodule Snitch.Data.Model.StockItem do
   """
   @spec total_on_hand(non_neg_integer) :: integer
   def total_on_hand(variant_id) do
-    stock_items = stock_items_query(variant_id)
+    stock_items = at_active_stock_locations_query(variant_id)
     Repo.one(from(st in stock_items, select: sum(st.count_on_hand)))
   end
 
@@ -76,11 +76,11 @@ defmodule Snitch.Data.Model.StockItem do
     to active stock locations in the DB.
 
     This can also be used as a subquery.
-    ex: stock_items = stock_items_query(variant_id)
+    ex: stock_items = at_active_stock_locations_query(variant_id)
         Repo.one(from(st in stock_items, select: sum(st.count_on_hand)))
   """
-  @spec stock_items_query(integer) :: Ecto.Query.t()
-  def stock_items_query(variant_id) do
+  @spec at_active_stock_locations_query(integer) :: Ecto.Query.t()
+  def at_active_stock_locations_query(variant_id) do
     from(
       st in StockItemSchema,
       where: st.variant_id == ^variant_id,

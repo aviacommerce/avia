@@ -17,13 +17,13 @@ defmodule Snitch.Data.Model.StockLocationTest do
     end
 
     test "Fails for invalid associations" do
-      assert {:error, changeset} = Model.StockLocation.create("London", "Digon Alley", 1, 1)
+      assert {:error, changeset} = Model.StockLocation.create("Digon Alley", "Street 10 London", 1, 1)
       assert %{state_id: ["does not exist"]} = errors_on(changeset)
 
       state = insert(:state)
 
       assert {:error, changeset} =
-               Model.StockLocation.create("London", "Digon Alley", state.id, 1)
+               Model.StockLocation.create("Digon Alley", "Street 10 London", state.id, 1)
 
       assert %{country_id: ["does not exist"]} = errors_on(changeset)
     end
@@ -31,8 +31,8 @@ defmodule Snitch.Data.Model.StockLocationTest do
     test "Inserts with valid attributes" do
       assert {:ok, stock_location} =
                Model.StockLocation.create(
-                 "London",
                  "Digon Alley",
+                 "Street 10 London",
                  insert(:state).id,
                  insert(:country).id
                )
@@ -123,7 +123,7 @@ defmodule Snitch.Data.Model.StockLocationTest do
   end
 
   describe "get_all/0" do
-    test "fetches all the stock locations" do
+    test "fetch all stock locations" do
       stock_locations = Model.StockLocation.get_all()
       assert 0 = Enum.count(stock_locations)
 
@@ -133,13 +133,11 @@ defmodule Snitch.Data.Model.StockLocationTest do
       stock_locations = Model.StockLocation.get_all()
       assert 3 = Enum.count(stock_locations)
     end
-  end
 
-  describe "stock_locations/0" do
     test "fetch all active stock locations" do
       insert_list(2, :stock_location)
       insert(:stock_location, active: false)
-      assert 2 = Enum.count(Model.StockLocation.stock_locations())
+      assert 2 = Enum.count(Model.StockLocation.get_all(is_active: true))
     end
   end
 end

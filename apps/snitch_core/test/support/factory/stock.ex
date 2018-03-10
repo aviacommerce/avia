@@ -10,7 +10,7 @@ defmodule Snitch.StockFactory do
           name: "Diagon Alley",
           admin_name: "diag-1234",
           default: false,
-          address_line_1: "Daigon Alley",
+          address_line_1: "Street 10 London",
           address_line_2: "Gringotts Bank",
           city: "London",
           zip_code: "123456",

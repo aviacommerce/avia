@@ -1,6 +1,6 @@
 defmodule Snitch.Data.Model.StockLocation do
   @moduledoc """
-    This module provides methods or utils for
+    This module provides methods and utils for
     Stock Locations by interacting with DB.
   """
   use Snitch.Data.Model
@@ -8,12 +8,12 @@ defmodule Snitch.Data.Model.StockLocation do
 
   @spec create(charlist, charlist, non_neg_integer, non_neg_integer) ::
           {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
-  def create(address, name, state_id, country_id) do
+  def create(name, address, state_id, country_id) do
     QH.create(
       StockLocationSchema,
       %{
-        address_line_1: address,
         name: name,
+        address_line_1: address,
         state_id: state_id,
         country_id: country_id
       },
@@ -39,16 +39,14 @@ defmodule Snitch.Data.Model.StockLocation do
   end
 
   @doc """
-  Fetches all the stock locations present in the DB
+    Fetches stock locations present in the DB.
+    with opetion `only_active: true` we can fetch active locations
   """
-  @spec get_all :: list(StockLocationSchema.t())
-  def get_all, do: StockLocationSchema |> Repo.all()
+  @spec get_all(list) :: list(StockLocationSchema.t())
+  def get_all(opts \\ [is_active?: false])
 
-  @doc """
-  Fetches all the `active` stock locations present in the DB
-  """
-  @spec stock_locations :: list(StockLocationSchema.t())
-  def stock_locations do
-    Repo.all(from(sl in StockLocationSchema, where: sl.active == true))
-  end
+  def get_all(is_active: true),
+    do: Repo.all(from(sl in StockLocationSchema, where: sl.active == true))
+
+  def get_all(_), do: StockLocationSchema |> Repo.all()
 end
