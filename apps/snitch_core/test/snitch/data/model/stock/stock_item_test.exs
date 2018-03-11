@@ -64,8 +64,8 @@ defmodule Snitch.Data.Model.StockItemTest do
     end
   end
 
-  describe "update/1" do
-    test "Fails for INVALID attributes" do
+  describe "update/2" do
+    test "without stock instance : Fails for INVALID attributes" do
       stock_item = insert(:stock_item)
 
       assert {:error, changeset} = Model.StockItem.update(%{count_on_hand: -1, id: stock_item.id})
@@ -78,7 +78,7 @@ defmodule Snitch.Data.Model.StockItemTest do
              ] = changeset
     end
 
-    test "updates for VALID attributes" do
+    test "without stock instance : updates for VALID attributes" do
       stock_item = insert(:stock_item)
 
       assert {:ok, updated_stock_item} =
@@ -87,10 +87,8 @@ defmodule Snitch.Data.Model.StockItemTest do
       assert stock_item.count_on_hand != updated_stock_item.count_on_hand
       assert 20 = updated_stock_item.count_on_hand
     end
-  end
 
-  describe "update/2" do
-    test "Fails for INVALID attributes" do
+    test "with stock instance : Fails for INVALID attributes" do
       stock_item = insert(:stock_item)
       assert {:error, changeset} = Model.StockItem.update(%{count_on_hand: -1}, stock_item)
 
@@ -102,7 +100,7 @@ defmodule Snitch.Data.Model.StockItemTest do
              ] = changeset
     end
 
-    test "updates for VALID attributes" do
+    test "with stock instance : updates for VALID attributes" do
       stock_item = insert(:stock_item)
 
       assert {:ok, updated_stock_item} = Model.StockItem.update(%{count_on_hand: 20}, stock_item)

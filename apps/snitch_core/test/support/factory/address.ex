@@ -26,7 +26,7 @@ defmodule Snitch.AddressFactory do
 
       def address_factory do
         %Address{
-          first_name: sequence(:first_name, &"Daigon-#{&1}"),
+          first_name: sequence(:first_name, &"Diagon-#{&1}"),
           last_name: sequence(:last_name, &"Alley-#{&1}"),
           address_line_1: "Near",
           address_line_2: "Gringotts",

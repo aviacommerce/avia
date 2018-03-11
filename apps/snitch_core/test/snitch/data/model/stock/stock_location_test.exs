@@ -62,8 +62,8 @@ defmodule Snitch.Data.Model.StockLocationTest do
     end
   end
 
-  describe "update/1" do
-    test "Fails for INVALID attributes" do
+  describe "update/2" do
+    test "without instance object params : Fails for INVALID attributes" do
       stock_location = insert(:stock_location)
 
       assert {:error, changeset} =
@@ -75,7 +75,7 @@ defmodule Snitch.Data.Model.StockLocationTest do
              ] = changeset
     end
 
-    test "updates for VALID attributes" do
+    test "without instance object params : updates for VALID attributes" do
       stock_location = insert(:stock_location)
 
       assert {:ok, updated_stock_location} =
@@ -83,10 +83,8 @@ defmodule Snitch.Data.Model.StockLocationTest do
 
       assert stock_location.name != updated_stock_location.name
     end
-  end
 
-  describe "update/2" do
-    test "Fails for INVALID attributes" do
+    test "with instance object params : Fails for INVALID attributes" do
       stock_location = insert(:stock_location)
 
       assert {:error, changeset} =
@@ -98,7 +96,7 @@ defmodule Snitch.Data.Model.StockLocationTest do
              ] = changeset
     end
 
-    test "updates for VALID attributes" do
+    test "with instance object params : updates for VALID attributes" do
       stock_location = insert(:stock_location)
 
       assert {:ok, updated_stock_location} =
