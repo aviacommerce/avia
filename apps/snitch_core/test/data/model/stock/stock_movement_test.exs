@@ -20,6 +20,7 @@ defmodule Snitch.Data.Model.StockMovementTest do
     test "Fails with invalid quantity", context do
       %{stock_item: stock_item} = context
       assert {:error, changeset} = StockMovementModel.create("abc", stock_item.id)
+      refute changeset.valid?
       assert %{quantity: ["is invalid"]} = errors_on(changeset)
     end
 
@@ -62,7 +63,7 @@ defmodule Snitch.Data.Model.StockMovementTest do
   describe "get_all/0" do
     test "fetches all the stock items" do
       stock_movements = StockMovementModel.get_all()
-      assert [] = stock_movements
+      assert 0 = Enum.count(stock_movements)
 
       # add for multiple random stock items
       insert_list(1, :stock_movement)
