@@ -64,8 +64,7 @@ defmodule Snitch.Data.Schema.Payment do
     if discriminator in permitted do
       changeset
     else
-      changeset
-      |> add_error(:payment_type, "'#{discriminator}' is invalid", validation: :inclusion)
+      add_error(changeset, :payment_type, "'#{discriminator}' is invalid", validation: :inclusion)
     end
   end
 
@@ -77,8 +76,7 @@ defmodule Snitch.Data.Schema.Payment do
     if Decimal.cmp(amount.amount, Decimal.new(0)) != :lt do
       changeset
     else
-      changeset
-      |> add_error(:amount, "must be greater than 0", validation: :amount)
+      add_error(changeset, :amount, "must be greater than 0", validation: :amount)
     end
   end
 

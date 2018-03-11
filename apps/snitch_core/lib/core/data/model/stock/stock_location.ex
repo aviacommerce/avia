@@ -28,5 +28,5 @@ defmodule Snitch.Data.Model.StockLocation do
     QH.get(StockLocation, query_fields, Repo)
   end
 
-  def get_all, do: StockLocation |> Repo.all()
+  def get_all, do: Repo.all(StockLocation)
 end

@@ -3,15 +3,15 @@ defmodule Snitch.Data.Model.LineItem do
   LineItem API and utilities.
   """
   use Snitch.Data.Model
-  alias Snitch.Data.Schema
+  alias Snitch.Data.Schema.{Variant, LineItem}
 
-  @spec get(map) :: Schema.LineItem.t() | nil
+  @spec get(map) :: LineItem.t() | nil
   def get(query_fields) do
-    QH.get(Schema.LineItem, query_fields, Repo)
+    QH.get(LineItem, query_fields, Repo)
   end
 
-  @spec get_all() :: [Schema.LineItem.t()]
-  def get_all, do: Repo.all(Schema.LineItem)
+  @spec get_all() :: [LineItem.t()]
+  def get_all, do: Repo.all(LineItem)
 
   @doc """
   Set `:unit_price` and `:total` for many `LineItem` `params`.
@@ -50,10 +50,9 @@ defmodule Snitch.Data.Model.LineItem do
       line_items
       |> Stream.map(&Map.get(&1, :variant_id))
       |> Enum.reject(fn x -> is_nil(x) end)
-      |> Schema.Variant.get_selling_prices()
+      |> Variant.get_selling_prices()
 
-    line_items
-    |> Enum.map(&set_price_and_total(&1, unit_selling_prices))
+    Enum.map(line_items, &set_price_and_total(&1, unit_selling_prices))
   end
 
   @spec set_price_and_total(map, %{non_neg_integer: Money.t()}) :: map

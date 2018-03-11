@@ -8,5 +8,3 @@ config :snitch_core, Snitch.Repo,
   database: "snitch_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
-
-config :logger, level: :info

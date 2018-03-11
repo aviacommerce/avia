@@ -2,9 +2,9 @@ defmodule Snitch.Data.Model.PaymentMethodTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
-  alias Snitch.Data.{Schema, Model}
-
   import Snitch.Factory
+
+  alias Snitch.Data.{Schema, Model}
 
   test "successful create" do
     assert {:ok, ccd} = Model.PaymentMethod.create("card-payments", "ccd")

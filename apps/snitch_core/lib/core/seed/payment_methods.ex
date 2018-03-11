@@ -22,6 +22,8 @@ defmodule Snitch.Seed.PaymentMethods do
   """
   use Snitch.Data.Schema
 
+  alias Snitch.Repo
+
   def seed!() do
     methods = [
       %{
@@ -40,6 +42,6 @@ defmodule Snitch.Seed.PaymentMethods do
       }
     ]
 
-    Snitch.Repo.insert_all(PaymentMethod, methods, on_conflict: :nothing, conflict_target: :code)
+    Repo.insert_all(PaymentMethod, methods, on_conflict: :nothing, conflict_target: :code)
   end
 end

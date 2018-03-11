@@ -28,5 +28,5 @@ defmodule Snitch.Data.Model.StockItem do
     QH.get(Schema.Stock.StockItem, query_fields, Repo)
   end
 
-  def get_all, do: Schema.Stock.StockItem |> Repo.all()
+  def get_all, do: Repo.all(Schema.Stock.StockItem)
 end

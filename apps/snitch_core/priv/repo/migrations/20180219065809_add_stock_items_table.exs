@@ -11,6 +11,10 @@ defmodule Core.Repo.Migrations.AddStockItemsTable do
     end
 
     create index(:snitch_stock_items, [:stock_location_id])
-    create unique_index(:snitch_stock_items, [:stock_location_id, :variant_id], name: :snitch_stock_item_by_loc_and_var_id)
+    create unique_index(
+      :snitch_stock_items,
+      [:stock_location_id, :variant_id],
+      name: :snitch_stock_item_by_loc_and_var_id
+    )
   end
 end
