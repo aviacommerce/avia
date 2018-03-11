@@ -10,7 +10,6 @@ defmodule Help do
 
       iex> Help.hello
       :world
-
   """
   def hello do
     :world

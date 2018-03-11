@@ -5,7 +5,11 @@ defmodule Snitch.Data.Schema.Variant do
 
   use Snitch.Data.Schema
   use Snitch.Data.Schema.Stock
+
   import Ecto.Query
+
+  alias Snitch.Repo
+  alias Money.Ecto.Composite.Type, as: MoneyType
 
   @type t :: %__MODULE__{}
   schema "snitch_variants" do
@@ -15,7 +19,7 @@ defmodule Snitch.Data.Schema.Variant do
     field(:width, :decimal)
     field(:depth, :decimal)
     field(:is_master, :boolean, default: false)
-    field(:cost_price, Money.Ecto.Composite.Type)
+    field(:cost_price, MoneyType)
     field(:position, :integer)
     field(:track_inventory, :boolean, default: true)
     field(:discontinue_on, :naive_datetime)
@@ -25,7 +29,8 @@ defmodule Snitch.Data.Schema.Variant do
     timestamps()
   end
 
-  @permitted_fields ~w(sku weight height width depth is_master cost_price position track_inventory discontinue_on)a
+  @permitted_fields ~w(sku weight height width depth is_master
+  cost_price position track_inventory discontinue_on)a
 
   def changeset(%__MODULE__{} = variant, attrs) do
     variant
@@ -49,9 +54,9 @@ defmodule Snitch.Data.Schema.Variant do
       from(v in "snitch_variants", select: [v.id, v.cost_price], where: v.id in ^variant_ids)
 
     query
-    |> Snitch.Repo.all()
+    |> Repo.all()
     |> Enum.reduce(%{}, fn [v_id, cp], acc ->
-      {:ok, cost} = Money.Ecto.Composite.Type.load(cp)
+      {:ok, cost} = MoneyType.load(cp)
       Map.put(acc, v_id, cost)
     end)
   end

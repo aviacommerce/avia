@@ -3,6 +3,7 @@ defmodule Snitch.Data.Schema.User do
   Models a User
   """
   use Snitch.Data.Schema
+  alias Comeonin.Argon2
 
   @password_min_length 8
   @type t :: %__MODULE__{}
@@ -10,7 +11,7 @@ defmodule Snitch.Data.Schema.User do
   schema "snitch_users" do
     # why do we need these fields?
     field(:first_name, :string)
-    # why do we need these fields?   
+    # why do we need these fields?
     field(:last_name, :string)
     field(:email, :string)
     field(:password, :string, virtual: true)
@@ -93,7 +94,7 @@ defmodule Snitch.Data.Schema.User do
     %Ecto.Changeset{changes: %{password: password}} = changeset
 
     changeset
-    |> change(Comeonin.Argon2.add_hash(password))
+    |> change(Argon2.add_hash(password))
     |> delete_change(:password_confirmation)
   end
 

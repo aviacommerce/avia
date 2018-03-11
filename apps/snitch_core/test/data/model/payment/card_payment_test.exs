@@ -2,9 +2,9 @@ defmodule Snitch.Data.Model.CardPaymentMethodTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
-  alias Snitch.Data.Model
-
   import Snitch.Factory
+
+  alias Snitch.Data.Model.CardPayment
 
   setup :user_with_address
   setup :an_order
@@ -23,7 +23,7 @@ defmodule Snitch.Data.Model.CardPaymentMethodTest do
     payment_params = %{amount: Money.new(0, :USD), state: "complete"}
 
     assert {:ok, %{payment: updated_payment, card_payment: updated_card_payment}} =
-             Model.CardPayment.update(card_payment, card_params, payment_params)
+             CardPayment.update(card_payment, card_params, payment_params)
 
     assert updated_payment.state == payment_params.state
     assert Money.reduce(updated_payment.amount) == payment.amount
@@ -36,7 +36,7 @@ defmodule Snitch.Data.Model.CardPaymentMethodTest do
     params = %{amount: order.total, state: "some-state"}
 
     {:ok, %{payment: payment, card_payment: card_payment}} =
-      Model.CardPayment.create("card-payment", order.id, params, %{})
+      CardPayment.create("card-payment", order.id, params, %{})
 
     [payment: payment, card_payment: card_payment]
   end

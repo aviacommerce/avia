@@ -1,11 +1,11 @@
-defmodule Snitch.Schema.OrderTest do
+defmodule Snitch.Data.Schema.OrderTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
   import Snitch.Factory
 
-  alias Snitch.Data.Schema
-  alias Snitch.Data.Model
+  alias Snitch.Data.Schema.Order
+  alias Snitch.Data.Model.LineItem
 
   setup :three_variants
   setup :user_with_address
@@ -47,8 +47,8 @@ defmodule Snitch.Schema.OrderTest do
     @tag line_item_type: :valid
     test "unassociated line_items", context do
       %{persisted: persisted, line_items: line_items} = context
-      params = %{line_items: Model.LineItem.update_price_and_totals(line_items)}
-      new_order = Schema.Order.changeset(persisted, params, :update)
+      params = %{line_items: LineItem.update_price_and_totals(line_items)}
+      new_order = Order.changeset(persisted, params, :update)
       %{valid?: validity, changes: changes} = new_order
 
       assert validity
@@ -74,9 +74,9 @@ defmodule Snitch.Schema.OrderTest do
       ]
 
       total = Enum.reduce(totals, &Money.add!/2)
-      params = %{line_items: Model.LineItem.update_price_and_totals(new_line_items)}
+      params = %{line_items: LineItem.update_price_and_totals(new_line_items)}
 
-      new_order = Schema.Order.changeset(persisted, params, :update)
+      new_order = Order.changeset(persisted, params, :update)
       %{valid?: validity, changes: changes} = new_order
 
       assert validity
@@ -90,8 +90,8 @@ defmodule Snitch.Schema.OrderTest do
       %{persisted: persisted} = context
       [one, two, three] = persisted.line_items
       new_line_items = [%{id: one.id}, %{id: two.id}, %{id: three.id}]
-      params = %{line_items: Model.LineItem.update_price_and_totals(new_line_items)}
-      new_order = Schema.Order.changeset(persisted, params, :update)
+      params = %{line_items: LineItem.update_price_and_totals(new_line_items)}
+      new_order = Order.changeset(persisted, params, :update)
       %{valid?: validity, changes: changes} = new_order
 
       assert validity
@@ -117,8 +117,7 @@ defmodule Snitch.Schema.OrderTest do
       end
 
     line_items =
-      variant_ids
-      |> Enum.into([], fn variant_id ->
+      Enum.into(variant_ids, [], fn variant_id ->
         %{variant_id: variant_id, quantity: 2}
       end)
 
@@ -134,10 +133,10 @@ defmodule Snitch.Schema.OrderTest do
       user_id: u.id,
       billing_address_id: a.id,
       shipping_address_id: a.id,
-      line_items: Model.LineItem.update_price_and_totals(line_items)
+      line_items: LineItem.update_price_and_totals(line_items)
     }
 
-    [order: Schema.Order.changeset(order, params, :create)]
+    [order: Order.changeset(order, params, :create)]
   end
 
   defp persist(%{order: order}) do

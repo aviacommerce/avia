@@ -9,7 +9,7 @@ defmodule Core.Repo.Migrations.CreateSnitchCountries do
       add :name, :string
       add :numcode, :string
       add :states_required, :boolean, default: false
-      
+
       timestamps()
     end
   end

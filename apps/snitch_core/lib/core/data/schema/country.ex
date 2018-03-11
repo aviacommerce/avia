@@ -5,7 +5,6 @@ defmodule Snitch.Data.Schema.Country do
 
   use Snitch.Data.Schema
   alias Snitch.Data.Schema.State
-  alias __MODULE__
 
   schema "snitch_countries" do
     field(:iso_name, :string)
@@ -19,7 +18,7 @@ defmodule Snitch.Data.Schema.Country do
     timestamps()
   end
 
-  def changeset(%Country{} = country, attrs \\ %{}) do
+  def changeset(%__MODULE__{} = country, attrs \\ %{}) do
     country
     |> cast(attrs, [:iso, :iso3, :iso_name, :name, :numcode, :states_required])
     |> validate_required([:iso, :iso3, :iso_name, :name, :numcode])

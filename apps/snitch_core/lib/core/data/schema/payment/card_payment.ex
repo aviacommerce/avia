@@ -53,7 +53,6 @@ defmodule Snitch.Data.Schema.CardPayment do
   end
 
   def changeset(payment, params, :update) do
-    payment
-    |> cast(params, @update_fields)
+    cast(payment, params, @update_fields)
   end
 end
