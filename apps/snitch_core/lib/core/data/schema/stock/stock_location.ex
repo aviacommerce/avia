@@ -32,25 +32,26 @@ defmodule Snitch.Data.Schema.StockLocation do
     field(:active, :boolean, default: true)
 
     has_many(:stock_items, StockItem)
+    has_many(:stock_movements, through: [:stock_items, :stock_movements])
+
     belongs_to(:state, Snitch.Data.Schema.State)
     belongs_to(:country, Snitch.Data.Schema.Country)
 
     timestamps()
   end
 
-  @create_fields ~w(name address_line_1 state_id country_id)a
-  @update_fields ~w(name address_line_1 state_id country_id)a
-  @opt_update_fields ~w(admin_name default address_line_2 city zip_code phone propagate_all_variants backorderable_default active)a
+  @required_fields ~w(name address_line_1 state_id country_id)a
+  @opt_update_fields ~w(
+      admin_name default address_line_2 city zip_code phone propagate_all_variants
+      backorderable_default active
+    )a
 
   def create_fields, do: @create_fields
   def update_fields, do: @update_fields
 
   @spec changeset(__MODULE__.t(), map, atom) :: Ecto.Changeset.t()
-  def changeset(instance, params, operation \\ :create)
-  def changeset(instance, params, :create), do: do_changeset(instance, params, @create_fields)
-
-  def changeset(instance, params, :update),
-    do: do_changeset(instance, params, @update_fields, @opt_update_fields)
+  def changeset(instance, params, _),
+    do: do_changeset(instance, params, @required_fields, @opt_update_fields)
 
   defp do_changeset(instance, params, fields, optional \\ []) do
     instance

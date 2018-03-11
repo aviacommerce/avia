@@ -41,12 +41,12 @@ defmodule Snitch.Data.Model.StockLocation do
   @doc """
   Fetches stock locations present in the DB.
   """
-  @spec get_all() :: list(StockLocationSchema.t())
-  def get_all(), do: Repo.all(StockLocationSchema)
+  @spec get_all :: list(StockLocationSchema.t())
+  def get_all, do: Repo.all(StockLocationSchema)
 
   @doc """
   Fetch all `active` stock locations
   """
-  @spec active() :: list(StockLocationSchema.t())
+  @spec active :: list(StockLocationSchema.t())
   def active, do: Repo.all(from(sl in StockLocationSchema, where: sl.active == true))
 end
