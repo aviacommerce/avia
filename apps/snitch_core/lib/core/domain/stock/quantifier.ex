@@ -4,6 +4,7 @@ defmodule Snitch.Domain.Stock.Quantifier do
   """
 
   use Snitch.Domain
+  alias Model.StockItem, as: StockItemModel
 
   @doc """
   Returns a `total available inventory count` for stock items
@@ -13,6 +14,6 @@ defmodule Snitch.Domain.Stock.Quantifier do
   def total_on_hand(variant) when is_map(variant), do: total_on_hand(variant.id)
 
   def total_on_hand(variant_id) when is_integer(variant_id) do
-    Model.StockItem.total_on_hand(variant_id)
+    StockItemModel.total_on_hand(variant_id)
   end
 end

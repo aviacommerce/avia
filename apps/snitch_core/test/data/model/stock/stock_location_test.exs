@@ -2,11 +2,11 @@ defmodule Snitch.Data.Model.StockLocationTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
   import Snitch.Factory
-  alias Snitch.Data.Model
+  alias Snitch.Data.Model.StockLocation, as: StockLocationModel
 
   describe "create/4" do
     test "Fails for blank attributes" do
-      assert {:error, changeset} = Model.StockLocation.create("", "", nil, nil)
+      assert {:error, changeset} = StockLocationModel.create("", "", nil, nil)
 
       assert %{
                address_line_1: ["can't be blank"],
@@ -18,21 +18,21 @@ defmodule Snitch.Data.Model.StockLocationTest do
 
     test "Fails for invalid associations" do
       assert {:error, changeset} =
-               Model.StockLocation.create("Diagon Alley", "Street 10 London", -1, -1)
+               StockLocationModel.create("Diagon Alley", "Street 10 London", -1, -1)
 
       assert %{state_id: ["does not exist"]} = errors_on(changeset)
 
       state = insert(:state)
 
       assert {:error, changeset} =
-               Model.StockLocation.create("Diagon Alley", "Street 10 London", state.id, -1)
+               StockLocationModel.create("Diagon Alley", "Street 10 London", state.id, -1)
 
       assert %{country_id: ["does not exist"]} = errors_on(changeset)
     end
 
     test "Inserts with valid attributes" do
       assert {:ok, _stock_location} =
-               Model.StockLocation.create(
+               StockLocationModel.create(
                  "Diagon Alley",
                  "Street 10 London",
                  insert(:state).id,
@@ -43,19 +43,19 @@ defmodule Snitch.Data.Model.StockLocationTest do
 
   describe "get/1" do
     test "Fails with invalid id" do
-      stock_location = Model.StockLocation.get(-1)
+      stock_location = StockLocationModel.get(-1)
       assert nil == stock_location
     end
 
     test "gets with valid id" do
       insert_stock_location = insert(:stock_location)
 
-      get_stock_location = Model.StockLocation.get(insert_stock_location.id)
+      get_stock_location = StockLocationModel.get(insert_stock_location.id)
       assert insert_stock_location.id == get_stock_location.id
       assert insert_stock_location.name == get_stock_location.name
 
       # with stock location map
-      get_stock_location_with_map = Model.StockLocation.get(%{id: insert_stock_location.id})
+      get_stock_location_with_map = StockLocationModel.get(%{id: insert_stock_location.id})
       assert insert_stock_location.id == get_stock_location_with_map.id
       assert insert_stock_location.name == get_stock_location_with_map.name
     end
@@ -66,7 +66,7 @@ defmodule Snitch.Data.Model.StockLocationTest do
       stock_location = insert(:stock_location)
 
       assert {:error, changeset} =
-               Model.StockLocation.update(%{name: "", address_line_1: "", id: stock_location.id})
+               StockLocationModel.update(%{name: "", address_line_1: "", id: stock_location.id})
 
       assert %{
                name: ["can't be blank"],
@@ -78,7 +78,7 @@ defmodule Snitch.Data.Model.StockLocationTest do
       stock_location = insert(:stock_location)
 
       assert {:ok, updated_stock_location} =
-               Model.StockLocation.update(%{name: "Updated New", id: stock_location.id})
+               StockLocationModel.update(%{name: "Updated New", id: stock_location.id})
 
       assert stock_location.name != updated_stock_location.name
     end
@@ -87,7 +87,7 @@ defmodule Snitch.Data.Model.StockLocationTest do
       stock_location = insert(:stock_location)
 
       assert {:error, changeset} =
-               Model.StockLocation.update(%{name: "", address_line_1: ""}, stock_location)
+               StockLocationModel.update(%{name: "", address_line_1: ""}, stock_location)
 
       assert %{
                name: ["can't be blank"],
@@ -99,7 +99,7 @@ defmodule Snitch.Data.Model.StockLocationTest do
       stock_location = insert(:stock_location)
 
       assert {:ok, updated_stock_location} =
-               Model.StockLocation.update(%{name: "Updated New"}, stock_location)
+               StockLocationModel.update(%{name: "Updated New"}, stock_location)
 
       assert stock_location.name != updated_stock_location.name
     end
@@ -107,27 +107,17 @@ defmodule Snitch.Data.Model.StockLocationTest do
 
   describe "delete/1" do
     test "Fails to delete if invalid id" do
-      assert {:error, :not_found} = Model.StockLocation.delete(-1)
+      assert {:error, :not_found} = StockLocationModel.delete(-1)
     end
 
     test "Deletes for valid id" do
       stock_location = insert(:stock_location)
-      assert {:ok, _} = Model.StockLocation.delete(stock_location.id)
+      assert {:ok, _} = StockLocationModel.delete(stock_location.id)
     end
 
     test "Deletes for valid stock location" do
       stock_location = insert(:stock_location)
-      assert {:ok, _} = Model.StockLocation.delete(stock_location)
-    end
-  end
-
-  describe "get_all/0" do
-    test "fetch all stock locations" do
-      insert_list(1, :stock_location, active: false)
-      insert_list(2, :stock_location)
-
-      stock_locations = Model.StockLocation.get_all()
-      assert 3 = Enum.count(stock_locations)
+      assert {:ok, _} = StockLocationModel.delete(stock_location)
     end
   end
 
@@ -135,7 +125,7 @@ defmodule Snitch.Data.Model.StockLocationTest do
     test "fetch all active stock locations" do
       insert_list(2, :stock_location)
       insert(:stock_location, active: false)
-      assert 2 = Enum.count(Model.StockLocation.active())
+      assert 2 = Enum.count(StockLocationModel.active())
     end
   end
 end
