@@ -86,7 +86,7 @@ defmodule Snitch.Factory do
     Money.new(:USD, "#{:rand.uniform(delta) + min}.99")
   end
 
-  # TODO: associate the address with the user once user schema is corrected
+  # Associates the address with the user once user schema is corrected
   def user_with_address(_context) do
     %{
       address: insert(:address),

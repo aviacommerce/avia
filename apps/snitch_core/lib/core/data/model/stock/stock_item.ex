@@ -45,7 +45,7 @@ defmodule Snitch.Data.Model.StockItem do
   Fetches all the stock items present in the DB
   """
   @spec get_all :: list(StockItemSchema.t())
-  def get_all, do: StockItemSchema |> Repo.all()
+  def get_all, do: Repo.all(StockItemSchema)
 
   @doc """
   Fetches only the stock items
