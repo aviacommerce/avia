@@ -56,11 +56,11 @@ defmodule Snitch.Data.Model.StockItemTest do
       assert insert_stock_item.count_on_hand == get_stock_item.count_on_hand
 
       # with stock item map
-      get_stock_item = Model.StockItem.get(%{id: insert_stock_item.id})
-      assert insert_stock_item.id == get_stock_item.id
-      assert insert_stock_item.stock_location_id == get_stock_item.stock_location_id
-      assert insert_stock_item.variant_id == get_stock_item.variant_id
-      assert insert_stock_item.count_on_hand == get_stock_item.count_on_hand
+      get_stock_item_with_map = Model.StockItem.get(%{id: insert_stock_item.id})
+      assert insert_stock_item.id == get_stock_item_with_map.id
+      assert insert_stock_item.stock_location_id == get_stock_item_with_map.stock_location_id
+      assert insert_stock_item.variant_id == get_stock_item_with_map.variant_id
+      assert insert_stock_item.count_on_hand == get_stock_item_with_map.count_on_hand
     end
   end
 
@@ -137,14 +137,14 @@ defmodule Snitch.Data.Model.StockItemTest do
       insert_list(1, :stock_item)
       insert_list(2, :stock_item)
 
-      stock_items = Model.StockItem.get_all()
-      assert 3 = Enum.count(stock_items)
+      stock_items_new = Model.StockItem.get_all()
+      assert 3 = Enum.count(stock_items_new)
     end
   end
 
-  describe "at_active_stock_locations/1" do
+  describe "with_active_stock_location/1" do
     test "returns empty list for invalid variant id" do
-      stock_items = Model.StockItem.at_active_stock_locations(1_234_567_890)
+      stock_items = Model.StockItem.with_active_stock_location(1_234_567_890)
       assert 0 = Enum.count(stock_items)
     end
 
@@ -154,16 +154,16 @@ defmodule Snitch.Data.Model.StockItemTest do
       variant3 = insert(:variant)
 
       insert_list(2, :stock_item, variant: variant1)
-      assert 2 = Enum.count(Model.StockItem.at_active_stock_locations(variant1.id))
+      assert 2 = Enum.count(Model.StockItem.with_active_stock_location(variant1.id))
 
       insert_list(5, :stock_item, variant: variant2)
-      assert 5 = Enum.count(Model.StockItem.at_active_stock_locations(variant2.id))
+      assert 5 = Enum.count(Model.StockItem.with_active_stock_location(variant2.id))
 
       # Test for inactive stock locationlocation
       inactive_stock_location = insert(:stock_location, active: false)
       insert(:stock_item, variant: variant3, stock_location: inactive_stock_location)
       insert_list(2, :stock_item, variant: variant3)
-      assert 2 = Enum.count(Model.StockItem.at_active_stock_locations(variant3.id))
+      assert 2 = Enum.count(Model.StockItem.with_active_stock_location(variant3.id))
     end
   end
 

@@ -55,10 +55,10 @@ defmodule Snitch.Data.Model.StockLocationTest do
       assert insert_stock_location.name == get_stock_location.name
 
       # with stock location map
-      get_stock_location = Model.StockLocation.get(%{id: insert_stock_location.id})
-      assert insert_stock_location.id == get_stock_location.id
-      assert insert_stock_location.id == get_stock_location.id
-      assert insert_stock_location.name == get_stock_location.name
+      get_stock_location_with_map = Model.StockLocation.get(%{id: insert_stock_location.id})
+      assert insert_stock_location.id == get_stock_location_with_map.id
+      assert insert_stock_location.id == get_stock_location_with_map.id
+      assert insert_stock_location.name == get_stock_location_with_map.name
     end
   end
 
@@ -126,20 +126,19 @@ defmodule Snitch.Data.Model.StockLocationTest do
 
   describe "get_all/0" do
     test "fetch all stock locations" do
-      stock_locations = Model.StockLocation.get_all()
-      assert 0 = Enum.count(stock_locations)
-
       insert_list(1, :stock_location, active: false)
       insert_list(2, :stock_location)
 
       stock_locations = Model.StockLocation.get_all()
       assert 3 = Enum.count(stock_locations)
     end
+  end
 
+  describe "active/0" do
     test "fetch all active stock locations" do
       insert_list(2, :stock_location)
       insert(:stock_location, active: false)
-      assert 2 = Enum.count(Model.StockLocation.get_all(is_active: true))
+      assert 2 = Enum.count(Model.StockLocation.active())
     end
   end
 end

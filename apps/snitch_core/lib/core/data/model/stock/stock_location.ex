@@ -1,7 +1,7 @@
 defmodule Snitch.Data.Model.StockLocation do
   @moduledoc """
-    This module provides methods and utils for
-    Stock Locations by interacting with DB.
+  This module provides methods and utils for
+  Stock Locations by interacting with DB.
   """
   use Snitch.Data.Model
   alias Snitch.Data.Schema.StockLocation, as: StockLocationSchema
@@ -39,14 +39,14 @@ defmodule Snitch.Data.Model.StockLocation do
   end
 
   @doc """
-    Fetches stock locations present in the DB.
-    with opetion `only_active: true` we can fetch active locations
+  Fetches stock locations present in the DB.
   """
-  @spec get_all(list) :: list(StockLocationSchema.t())
-  def get_all(opts \\ [is_active?: false])
+  @spec get_all() :: list(StockLocationSchema.t())
+  def get_all(), do: Repo.all(StockLocationSchema)
 
-  def get_all(is_active: true),
-    do: Repo.all(from(sl in StockLocationSchema, where: sl.active == true))
-
-  def get_all(_), do: StockLocationSchema |> Repo.all()
+  @doc """
+  Fetch all `active` stock locations
+  """
+  @spec active() :: list(StockLocationSchema.t())
+  def active, do: Repo.all(from(sl in StockLocationSchema, where: sl.active == true))
 end

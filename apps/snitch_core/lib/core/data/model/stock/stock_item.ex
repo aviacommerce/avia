@@ -1,8 +1,8 @@
 defmodule Snitch.Data.Model.StockItem do
   @moduledoc """
-    This module provides methods or utils for
-    Stock Item (alias Inventory at a location)
-    by interacting with DB.
+  This module provides methods or utils for
+  Stock Item (alias Inventory at a location)
+  by interacting with DB.
   """
 
   use Snitch.Data.Model
@@ -42,45 +42,45 @@ defmodule Snitch.Data.Model.StockItem do
   end
 
   @doc """
-    Fetches all the stock items present in the DB
+  Fetches all the stock items present in the DB
   """
   @spec get_all :: list(StockItemSchema.t())
   def get_all, do: StockItemSchema |> Repo.all()
 
   @doc """
-    Fetches only the stock items
-    that belong to an active stock location
-    for a variant
+  Fetches only the stock items
+  that belong to an active stock location
+  for a variant
   """
-  @spec at_active_stock_locations(non_neg_integer) :: list(StockItemSchema.t())
-  def at_active_stock_locations(variant_id) do
+  @spec with_active_stock_location(non_neg_integer) :: list(StockItemSchema.t())
+  def with_active_stock_location(variant_id) do
     variant_id
-    |> at_active_stock_locations_query()
+    |> with_active_stock_location_query()
     |> Repo.all()
   end
 
   @doc """
-    Returns a `total available inventory count` for stock items
-    present in all active stock locations only.
+  Returns a `total available inventory count` for stock items
+  present in all active stock locations only.
 
-    The total count can also be negetive based on backorderable.
+  The total count can also be negetive based on backorderable.
   """
   @spec total_on_hand(non_neg_integer) :: integer
   def total_on_hand(variant_id) do
-    stock_items = at_active_stock_locations_query(variant_id)
+    stock_items = with_active_stock_location_query(variant_id)
     Repo.one(from(st in stock_items, select: sum(st.count_on_hand)))
   end
 
   @doc """
-    A query to fetch stock items belonging
-    to active stock locations in the DB.
+  A query to fetch stock items belonging
+  to active stock locations in the DB.
 
-    This can also be used as a subquery.
-    ex: stock_items = at_active_stock_locations_query(variant_id)
-        Repo.one(from(st in stock_items, select: sum(st.count_on_hand)))
+  This can also be used as a subquery.
+  ex: stock_items = with_active_stock_location_query(variant_id)
+      Repo.one(from(st in stock_items, select: sum(st.count_on_hand)))
   """
-  @spec at_active_stock_locations_query(integer) :: Ecto.Query.t()
-  def at_active_stock_locations_query(variant_id) do
+  @spec with_active_stock_location_query(integer) :: Ecto.Query.t()
+  def with_active_stock_location_query(variant_id) do
     from(
       st in StockItemSchema,
       where: st.variant_id == ^variant_id,
