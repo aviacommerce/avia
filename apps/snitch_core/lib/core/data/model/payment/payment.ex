@@ -14,7 +14,8 @@ defmodule Snitch.Data.Model.Payment do
   """
   use Snitch.Data.Model
 
-  alias Snitch.Data.{Schema, Model}
+  alias Snitch.Data.Schema.Payment
+  alias Snitch.Data.Model.CardPayment, as: CardPaymentModel
 
   @doc """
   Updates an existing `Payment`
@@ -22,23 +23,23 @@ defmodule Snitch.Data.Model.Payment do
   See `Snitch.Data.Schema.Payment.changeset/3` with the `:update` action.
   """
   def update(id_or_instance, params) do
-    QH.update(Schema.Payment, params, id_or_instance, Repo)
+    QH.update(Payment, params, id_or_instance, Repo)
   end
 
-  @spec get(map | non_neg_integer) :: Schema.Payment.t() | nil
+  @spec get(map | non_neg_integer) :: Payment.t() | nil
   def get(query_fields_or_primary_key) do
-    QH.get(Schema.Payment, query_fields_or_primary_key, Repo)
+    QH.get(Payment, query_fields_or_primary_key, Repo)
   end
 
-  @spec get_all() :: [Schema.Payment.t()]
-  def get_all, do: Repo.all(Schema.Payment)
+  @spec get_all() :: [Payment.t()]
+  def get_all, do: Repo.all(Payment)
 
   @doc """
   Fetch the (associated) concrete Payment subtype.
 
   > Note that the `:payment` association is not loaded.
   """
-  @spec to_subtype(non_neg_integer | Schema.Payment.t()) :: struct | nil
+  @spec to_subtype(non_neg_integer | Payment.t()) :: struct | nil
   def to_subtype(id_or_instance)
 
   def to_subtype(payment_id) when is_integer(payment_id) do
@@ -48,9 +49,9 @@ defmodule Snitch.Data.Model.Payment do
   end
 
   def to_subtype(payment) when is_nil(payment), do: nil
-  def to_subtype(%Schema.Payment{payment_type: "chk"} = payment), do: payment
+  def to_subtype(%Payment{payment_type: "chk"} = payment), do: payment
 
-  def to_subtype(%Schema.Payment{payment_type: "ccd"} = payment) do
-    Model.CardPayment.from_payment(payment.id)
+  def to_subtype(%Payment{payment_type: "ccd"} = payment) do
+    CardPaymentModel.from_payment(payment.id)
   end
 end

@@ -4,14 +4,14 @@ defmodule Snitch.Data.Model.LineItemTest do
 
   import Snitch.Factory
 
-  alias Snitch.Data.Model
+  alias Snitch.Data.Model.LineItem
 
   describe "line_item update_price_and_totals with valid params" do
     setup [:three_variants, :good_line_items]
 
     test "", context do
       %{line_items: line_items, totals: totals} = context
-      priced_items = Model.LineItem.update_price_and_totals(line_items)
+      priced_items = LineItem.update_price_and_totals(line_items)
 
       assert Enum.all?(priced_items, fn x -> totals[x.variant_id] == Money.reduce(x.total) end)
     end
@@ -22,7 +22,7 @@ defmodule Snitch.Data.Model.LineItemTest do
 
     test "", context do
       %{line_items: line_items} = context
-      priced_items = Model.LineItem.update_price_and_totals(line_items)
+      priced_items = LineItem.update_price_and_totals(line_items)
 
       assert Enum.all?(priced_items, &(not Map.has_key?(&1, :total)))
       assert Enum.all?(priced_items, &(not Map.has_key?(&1, :unit_price)))

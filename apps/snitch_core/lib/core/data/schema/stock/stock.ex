@@ -1,6 +1,6 @@
 defmodule Snitch.Data.Schema.Stock do
   @moduledoc """
-    Interface for DB tables with rules.
+  Interface for DB tables with rules.
   """
 
   defmacro __using__(_) do

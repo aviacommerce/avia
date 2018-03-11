@@ -1,7 +1,7 @@
 defmodule Snitch.Domain do
   @moduledoc """
-    Interface for handling Business related logics.
-    Uses Models for DB related queries.
+  Interface for handling Business related logics.
+  Uses Models for DB related queries.
   """
 
   defmacro __using__(_) do

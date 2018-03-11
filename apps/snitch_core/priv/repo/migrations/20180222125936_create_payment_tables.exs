@@ -17,7 +17,7 @@ defmodule Core.Repo.Migrations.CreatePaymentTables do
   $$
   language sql;
   """
-  
+
   def change do
     create table("snitch_payment_methods") do
       add :name, :string, null: :false

@@ -1,6 +1,6 @@
 defmodule Snitch.Data.Model do
   @moduledoc """
-    Interface for handling DB related changes
+  Interface for handling DB related changes
   """
 
   defmacro __using__(_) do

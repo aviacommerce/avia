@@ -6,7 +6,7 @@ defmodule Snitch.Factory do
 
   alias Snitch.Data.Schema.{Variant, Address, User, Order, Payment, PaymentMethod, CardPayment}
 
-  def user_factory() do
+  def user_factory do
     %User{
       first_name: sequence(:first_name, &"Tony-#{&1}"),
       last_name: sequence(:last_name, &"Stark-#{&1}"),
@@ -26,7 +26,7 @@ defmodule Snitch.Factory do
     }
   end
 
-  def variant_factory() do
+  def variant_factory do
     %Variant{
       sku: sequence(:sku, &"shoes-nike-#{&1}"),
       weight: Decimal.new("0.45"),
@@ -38,14 +38,14 @@ defmodule Snitch.Factory do
     }
   end
 
-  def order_factory() do
+  def order_factory do
     %Order{
       slug: sequence("order"),
       state: "cart"
     }
   end
 
-  def payment_method_card_factory() do
+  def payment_method_card_factory do
     %PaymentMethod{
       name: "card",
       code: "ccd",
@@ -53,7 +53,7 @@ defmodule Snitch.Factory do
     }
   end
 
-  def payment_method_check_factory() do
+  def payment_method_check_factory do
     %PaymentMethod{
       name: "check",
       code: "chk",
@@ -61,21 +61,21 @@ defmodule Snitch.Factory do
     }
   end
 
-  def payment_ccd_factory() do
+  def payment_ccd_factory do
     %Payment{
       slug: sequence("card-payment"),
       payment_type: "ccd"
     }
   end
 
-  def payment_chk_factory() do
+  def payment_chk_factory do
     %Payment{
       slug: sequence("check-payment"),
       payment_type: "chk"
     }
   end
 
-  def card_payment_factory() do
+  def card_payment_factory do
     %CardPayment{
       cvv_response: "V",
       avs_response: "Z"

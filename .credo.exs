@@ -140,7 +140,7 @@
 
         # CredoContrib checks
         #
-        {CredoContrib.Check.FunctionBlockSyntax},
+        {CredoContrib.Check.FunctionBlockSyntax, false},
         {CredoContrib.Check.DocWhitespace},
         {CredoContrib.Check.ModuleAlias},
         {CredoContrib.Check.ModuleDirectivesOrder},
