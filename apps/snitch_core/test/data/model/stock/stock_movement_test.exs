@@ -20,7 +20,8 @@ defmodule Snitch.Data.Model.StockMovementTest do
     test "Fails with invalid quantity", context do
       %{stock_item: stock_item} = context
       assert {:error, changeset} = StockMovementModel.create("abc", stock_item.id)
-      assert [quantity: {"is invalid", [type: :integer, validation: :cast]}] = changeset
+      refute changeset.valid?
+      assert %{quantity: ["is invalid"]} = errors_on(changeset)
     end
 
     test "Inserts with valid attributes", context do
