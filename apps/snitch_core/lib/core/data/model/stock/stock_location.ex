@@ -6,7 +6,7 @@ defmodule Snitch.Data.Model.StockLocation do
   use Snitch.Data.Model
   alias Snitch.Data.Schema.StockLocation, as: StockLocationSchema
 
-  @spec create(charlist, charlist, non_neg_integer, non_neg_integer) ::
+  @spec create(String.t(), String.t(), non_neg_integer, non_neg_integer) ::
           {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
   def create(name, address, state_id, country_id) do
     QH.create(

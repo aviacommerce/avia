@@ -5,6 +5,13 @@ defmodule Snitch.Data.Schema.StockLocation do
   use Snitch.Data.Schema
   use Snitch.Data.Schema.Stock
 
+  @typedoc """
+  ## Field  :propagate_all_variants
+  Checking this option when you create a new stock location will
+  loop through all of the products you already have in your store,
+  and create an entry for each one at your new location, with a
+  starting inventory amount of 0.
+  """
   @type t :: %__MODULE__{}
 
   schema "snitch_stock_locations" do
@@ -19,10 +26,6 @@ defmodule Snitch.Data.Schema.StockLocation do
     field(:zip_code, :string)
     field(:phone, :string)
 
-    # Checking this option when you create a new stock location will
-    # loop through all of the products you already have in your store,
-    # and create an entry for each one at your new location, with a
-    # starting inventory amount of 0.
     field(:propagate_all_variants, :boolean, default: true)
     field(:backorderable_default, :boolean, default: false)
 
