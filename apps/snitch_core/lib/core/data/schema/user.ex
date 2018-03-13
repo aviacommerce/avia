@@ -50,30 +50,52 @@ defmodule Snitch.Data.Schema.User do
     timestamps()
   end
 
-  @required_fields ~w(first_name last_name email is_admin?)a
-  @password_fields ~w(password password_confirmation)a
+  @create_fields ~w(first_name last_name email is_admin?)a
+  @update_fields ~w(password password_confirmation)a
 
-  @spec registration_changeset(__MODULE__.t(), map) :: Ecto.Changeset.t()
+  # @spec registration_changeset(__MODULE__.t(), map) :: Ecto.Changeset.t()
   @doc """
   Returns a changeset to register a new user
   """
-  def registration_changeset(user, params) do
+  # def registration_changeset(user, params) do
+  #   user
+  #   |> changeset(params)
+  #   |> validate_required(@update_fields)
+  #   |> validate_confirmation(:password)
+  #   |> validate_password(:password)
+  #   |> put_pass_hash()
+  # end
+
+  # @spec changeset(__MODULE__.t(), map, :create | :update) :: Ecto.Changeset.t()
+  # def changeset(user, params, action) do
+  #   user
+  #   |> cast(params, @create_fields ++ @update_fields)
+  #   |> validate_required(@update_fields)
+  #   |> validate_format(:email, ~r/@/)
+  #   |> unique_constraint(:email)
+  # end
+
+  @spec changeset(__MODULE__.t(), map, :create | :update) :: Ecto.Changeset.t()
+  def changeset(user, params, action) do
     user
-    |> changeset(params)
-    |> validate_required(@password_fields)
+    |> cast(params, @create_fields ++ @update_fields)
     |> validate_confirmation(:password)
     |> validate_password(:password)
-    |> put_pass_hash()
+    |> validate_format(:email, ~r/@/)
+    |> do_changeset(action)
   end
 
-  @spec changeset(__MODULE__.t(), map) :: Ecto.Changeset.t()
-  def changeset(user, params) do
-    user
-    |> cast(params, @required_fields)
-    |> validate_required(@required_fields)
-    |> validate_format(:email, ~r/@/)
-    |> unique_constraint(:email)
+  defp create_changeset(user_changeset) do
+    user_changeset
+    |> validate_required(@create_fields ++ @update_fields)
   end
+
+  defp update_changeset(user_changeset) do
+    user_changeset
+  end
+
+  defp do_changeset(changeset, :create), do: create_changeset(changeset)
+  defp do_changeset(changeset, :update), do: update_changeset(changeset)
 
   defp validate_password(changeset, field) do
     validate_change(changeset, field, fn _, password ->
@@ -84,9 +106,13 @@ defmodule Snitch.Data.Schema.User do
     end)
   end
 
-  defp valid_password?(password) when byte_size(password) >= @password_min_length, do: :ok
+  defp valid_password?(password) when byte_size(password) >= @password_min_length do
+    IO.puts "PASSWORD VALID"
+    :ok
+  end
 
   defp valid_password?(_) do
+    IO.puts "PASSWORD INVALID"
     {:error, "The password must be #{@password_min_length} characters long."}
   end
 
