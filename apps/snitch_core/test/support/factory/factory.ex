@@ -2,6 +2,7 @@ defmodule Snitch.Factory do
   @moduledoc false
 
   use ExMachina.Ecto, repo: Snitch.Repo
+  use Snitch.{AddressFactory, StockFactory}
 
   alias Snitch.Data.Schema.{Variant, Address, User, Order, Payment, PaymentMethod, CardPayment}
 
@@ -13,20 +14,7 @@ defmodule Snitch.Factory do
     }
   end
 
-  def address_factory do
-    %Address{
-      first_name: sequence(:first_name, &"Tony-#{&1}"),
-      last_name: sequence(:last_name, &"Stark-#{&1}"),
-      address_line_1: "10-8-80 Malibu Point",
-      zip_code: "90265",
-      city: "Malibu",
-      phone: "1234567890"
-      # state_id: State.get_id("California"),
-      # country_id: Country.get_id("USA"),
-    }
-  end
-
-  def random_variant_factory do
+  def random_variant_factory() do
     %Variant{
       sku: sequence(:sku, &"shoes-nike-#{&1}"),
       weight: Decimal.new("0.45"),
@@ -98,7 +86,7 @@ defmodule Snitch.Factory do
     Money.new(:USD, "#{:rand.uniform(delta) + min}.99")
   end
 
-  # TODO: associate the address with the user once user schema is corrected
+  # Associates the address with the user once user schema is corrected
   def user_with_address(_context) do
     %{
       address: insert(:address),
