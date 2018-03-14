@@ -24,6 +24,8 @@ defmodule Snitch.Seed.PaymentMethods do
 
   alias Snitch.Repo
 
+  alias Snitch.Data.Schema.PaymentMethod
+
   def seed!() do
     methods = [
       %{
