@@ -10,6 +10,7 @@ defmodule Snitch.Data.Schema.StockItem do
 
   schema "snitch_stock_items" do
     field(:count_on_hand, :integer, default: 0)
+    field(:backorderable, :boolean, default: false)
 
     belongs_to(:variant, Variant)
     belongs_to(:stock_location, StockLocation)
@@ -35,8 +36,8 @@ defmodule Snitch.Data.Schema.StockItem do
     instance
     |> cast(params, fields ++ optional)
     |> validate_required(fields)
+    |> validate_number(:count_on_hand, greater_than: -1)
     |> foreign_key_constraint(:variant_id)
     |> foreign_key_constraint(:stock_location_id)
-    |> validate_number(:count_on_hand, greater_than: -1)
   end
 end
