@@ -17,7 +17,7 @@ defmodule Snitch.Data.Schema.User do
     field(:password, :string, virtual: true)
     field(:password_confirmation, :string, virtual: true)
     field(:password_hash, :string)
-    field(:is_admin?, :boolean, default: false)
+    field(:is_admin, :boolean, default: false)
 
     field(:sign_in_count, :integer, default: 0)
     field(:failed_attempts, :integer, default: 0)
@@ -50,12 +50,23 @@ defmodule Snitch.Data.Schema.User do
     timestamps()
   end
 
-  @create_fields ~w(first_name last_name email is_admin?)a
-  @update_fields ~w(password password_confirmation)a
+  @create_fields ~w(first_name last_name email password password_confirmation is_admin)a
+  @update_fields ~w(sign_in_count failed_attempts)a ++ @create_fields
 
-  # @spec registration_changeset(__MODULE__.t(), map) :: Ecto.Changeset.t()
+
   @doc """
-  Returns a changeset to register a new user
+  Returns a complete changeset with totals.
+
+  The `action` field can be either `:create` or `:update`.
+
+  * `:create`
+    - A map with fields first_name, last_name, email, password,
+      and password_confirmation are expected.
+  * `:update`
+    - No required fields.
+
+  ## Note
+  The changeset `action` is not set.
   """
 
   @spec changeset(__MODULE__.t(), map, :create | :update) :: Ecto.Changeset.t()
@@ -71,7 +82,7 @@ defmodule Snitch.Data.Schema.User do
   @spec create_changeset(Ecto.Changeset.t()) :: Ecto.Changeset.t()
   defp create_changeset(user_changeset) do
     user_changeset
-    |> validate_required(@create_fields ++ @update_fields)
+    |> validate_required(@create_fields)
     |> put_pass_hash
   end
 
