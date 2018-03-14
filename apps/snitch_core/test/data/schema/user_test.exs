@@ -73,13 +73,6 @@ defmodule Snitch.Data.Schema.UserTest do
       assert error == {:last_name, {"can't be blank", [validation: :required]}}
     end
 
-    # test "is_admin is not required" do
-    #   params = Map.delete(@valid_attrs, :is_admin)
-    #   IO.inspect params
-    #   %{valid?: validity} = User.changeset(%User{}, params, :create)
-    #   assert validity
-    # end
-
   end
 
   describe "Update User" do
