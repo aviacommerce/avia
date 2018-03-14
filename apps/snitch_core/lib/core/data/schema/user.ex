@@ -17,7 +17,7 @@ defmodule Snitch.Data.Schema.User do
     field(:password, :string, virtual: true)
     field(:password_confirmation, :string, virtual: true)
     field(:password_hash, :string)
-    field(:is_admin?, :boolean, default: false)
+    field(:is_admin, :boolean, default: false)
 
     field(:sign_in_count, :integer, default: 0)
     field(:failed_attempts, :integer, default: 0)
@@ -50,30 +50,50 @@ defmodule Snitch.Data.Schema.User do
     timestamps()
   end
 
-  @required_fields ~w(first_name last_name email is_admin?)a
-  @password_fields ~w(password password_confirmation)a
+  @create_fields ~w(first_name last_name email password password_confirmation is_admin)a
+  @update_fields ~w(sign_in_count failed_attempts)a ++ @create_fields
 
-  @spec registration_changeset(__MODULE__.t(), map) :: Ecto.Changeset.t()
+
   @doc """
-  Returns a changeset to register a new user
+  Returns a complete changeset with totals.
+
+  The `action` field can be either `:create` or `:update`.
+
+  * `:create`
+    - A map with fields first_name, last_name, email, password,
+      and password_confirmation is expected.
+  * `:update`
+    - No required fields.
+
+  ## Note
+  The changeset `action` is not set.
   """
-  def registration_changeset(user, params) do
+
+  @spec changeset(__MODULE__.t(), map, :create | :update) :: Ecto.Changeset.t()
+  def changeset(user, params, action) do
     user
-    |> changeset(params)
-    |> validate_required(@password_fields)
+    |> cast(params, @create_fields ++ @update_fields)
     |> validate_confirmation(:password)
     |> validate_password(:password)
-    |> put_pass_hash()
+    |> validate_format(:email, ~r/@/)
+    |> do_changeset(action)
   end
 
-  @spec changeset(__MODULE__.t(), map) :: Ecto.Changeset.t()
-  def changeset(user, params) do
-    user
-    |> cast(params, @required_fields)
-    |> validate_required(@required_fields)
-    |> validate_format(:email, ~r/@/)
-    |> unique_constraint(:email)
+  @spec create_changeset(Ecto.Changeset.t()) :: Ecto.Changeset.t()
+  defp create_changeset(user_changeset) do
+    user_changeset
+    |> validate_required(@create_fields)
+    |> put_pass_hash
   end
+
+  @spec update_changeset(Ecto.Changeset.t()) :: Ecto.Changeset.t()
+  defp update_changeset(user_changeset) do
+    user_changeset
+    |> put_pass_hash
+  end
+
+  defp do_changeset(changeset, :create), do: create_changeset(changeset)
+  defp do_changeset(changeset, :update), do: update_changeset(changeset)
 
   defp validate_password(changeset, field) do
     validate_change(changeset, field, fn _, password ->
