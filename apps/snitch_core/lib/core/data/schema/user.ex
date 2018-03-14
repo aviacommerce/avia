@@ -61,7 +61,7 @@ defmodule Snitch.Data.Schema.User do
 
   * `:create`
     - A map with fields first_name, last_name, email, password,
-      and password_confirmation are expected.
+      and password_confirmation is expected.
   * `:update`
     - No required fields.
 
