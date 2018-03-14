@@ -48,7 +48,6 @@ defmodule Snitch.Data.Schema.UserTest do
 
     test "password cannot be blank" do
       params = Map.update!(@valid_attrs, :password, fn _ -> "" end)
-               |> Map.update!(:password_confirmation, fn _ -> "" end)
       %{valid?: validity, errors: errs} = User.changeset(%User{}, params, :create)
       refute validity
       assert Keyword.get(errs, :password) == {"can't be blank", validation: :required}
