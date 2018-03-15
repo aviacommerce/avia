@@ -17,9 +17,8 @@ defmodule Snitch.Data.Model.PaymentMethodTest do
   end
 
   test "create with bad code fails" do
-    assert {:error,
-            [code: {"should be %{count} character(s)", [count: 3, validation: :length, is: 3]}]} =
-             Model.PaymentMethod.create("card-payments", "not-a-code")
+    assert {:error, changeset} = Model.PaymentMethod.create("card-payments", "not-a-code")
+    assert %{code: ["should be 3 character(s)"]} = errors_on(changeset)
   end
 
   describe "with existing" do

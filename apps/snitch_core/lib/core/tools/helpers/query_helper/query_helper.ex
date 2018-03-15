@@ -60,7 +60,7 @@ defmodule Snitch.Tools.QueryHelper do
         :update -> repo.update(changeset)
       end
     else
-      {:error, changeset.errors}
+      {:error, changeset}
     end
   end
 end
