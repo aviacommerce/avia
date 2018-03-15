@@ -10,11 +10,12 @@ defmodule Snitch.Factory do
     %User{
       first_name: sequence(:first_name, &"Tony-#{&1}"),
       last_name: sequence(:last_name, &"Stark-#{&1}"),
-      email: sequence(:email, &"ceo-#{&1}@stark.com")
+      email: sequence(:email, &"ceo-#{&1}@stark.com"),
+      password_hash: "NOTASECRET"
     }
   end
 
-  def random_variant_factory() do
+  def random_variant_factory do
     %Variant{
       sku: sequence(:sku, &"shoes-nike-#{&1}"),
       weight: Decimal.new("0.45"),

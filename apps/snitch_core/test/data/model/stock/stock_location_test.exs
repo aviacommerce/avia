@@ -8,12 +8,12 @@ defmodule Snitch.Data.Model.StockLocationTest do
     test "Fails for blank attributes" do
       assert {:error, changeset} = Model.StockLocation.create("", "", nil, nil)
 
-      assert [
-               name: {"can't be blank", [validation: :required]},
-               address_line_1: {"can't be blank", [validation: :required]},
-               state_id: {"can't be blank", [validation: :required]},
-               country_id: {"can't be blank", [validation: :required]}
-             ] = changeset
+      assert %{
+               address_line_1: ["can't be blank"],
+               country_id: ["can't be blank"],
+               name: ["can't be blank"],
+               state_id: ["can't be blank"]
+             } = errors_on(changeset)
     end
 
     test "Fails for invalid associations" do
@@ -31,7 +31,7 @@ defmodule Snitch.Data.Model.StockLocationTest do
     end
 
     test "Inserts with valid attributes" do
-      assert {:ok, stock_location} =
+      assert {:ok, _stock_location} =
                Model.StockLocation.create(
                  "Digon Alley",
                  "Street 10 London",
@@ -57,7 +57,6 @@ defmodule Snitch.Data.Model.StockLocationTest do
       # with stock location map
       get_stock_location_with_map = Model.StockLocation.get(%{id: insert_stock_location.id})
       assert insert_stock_location.id == get_stock_location_with_map.id
-      assert insert_stock_location.id == get_stock_location_with_map.id
       assert insert_stock_location.name == get_stock_location_with_map.name
     end
   end
@@ -69,10 +68,10 @@ defmodule Snitch.Data.Model.StockLocationTest do
       assert {:error, changeset} =
                Model.StockLocation.update(%{name: "", address_line_1: "", id: stock_location.id})
 
-      assert [
-               name: {"can't be blank", [validation: :required]},
-               address_line_1: {"can't be blank", [validation: :required]}
-             ] = changeset
+      assert %{
+               name: ["can't be blank"],
+               address_line_1: ["can't be blank"]
+             } = errors_on(changeset)
     end
 
     test "without instance object params : updates for VALID attributes" do
@@ -90,10 +89,10 @@ defmodule Snitch.Data.Model.StockLocationTest do
       assert {:error, changeset} =
                Model.StockLocation.update(%{name: "", address_line_1: ""}, stock_location)
 
-      assert [
-               name: {"can't be blank", [validation: :required]},
-               address_line_1: {"can't be blank", [validation: :required]}
-             ] = changeset
+      assert %{
+               name: ["can't be blank"],
+               address_line_1: ["can't be blank"]
+             } = errors_on(changeset)
     end
 
     test "with instance object params : updates for VALID attributes" do
@@ -113,12 +112,12 @@ defmodule Snitch.Data.Model.StockLocationTest do
 
     test "Deletes for valid id" do
       stock_location = insert(:stock_location)
-      assert stock_location = Model.StockLocation.delete(stock_location.id)
+      assert {:ok, _} = Model.StockLocation.delete(stock_location.id)
     end
 
     test "Deletes for valid stock location" do
       stock_location = insert(:stock_location)
-      assert stock_location = Model.StockLocation.delete(stock_location)
+      assert {:ok, _} = Model.StockLocation.delete(stock_location)
     end
   end
 

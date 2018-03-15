@@ -23,20 +23,14 @@ defmodule Snitch.Data.Model.StockItemTest do
       variant = insert(:variant)
 
       assert {:error, changeset} = Model.StockItem.create(variant.id, stock_location.id, -1, true)
-
-      assert [
-               count_on_hand: {
-                 "must be greater than %{number}",
-                 [validation: :number, number: -1]
-               }
-             ] = changeset
+      assert %{count_on_hand: ["must be greater than -1"]} = errors_on(changeset)
     end
 
     test "Inserts with valid attributes" do
       stock_location = insert(:stock_location)
       variant = insert(:variant)
 
-      assert {:ok, stock_item} = Model.StockItem.create(variant.id, stock_location.id, 1, true)
+      assert {:ok, _stock_item} = Model.StockItem.create(variant.id, stock_location.id, 1, true)
     end
   end
 
@@ -69,13 +63,7 @@ defmodule Snitch.Data.Model.StockItemTest do
       stock_item = insert(:stock_item)
 
       assert {:error, changeset} = Model.StockItem.update(%{count_on_hand: -1, id: stock_item.id})
-
-      assert [
-               count_on_hand: {
-                 "must be greater than %{number}",
-                 [validation: :number, number: -1]
-               }
-             ] = changeset
+      assert %{count_on_hand: ["must be greater than -1"]} = errors_on(changeset)
     end
 
     test "without stock instance : updates for VALID attributes" do
@@ -91,13 +79,7 @@ defmodule Snitch.Data.Model.StockItemTest do
     test "with stock instance : Fails for INVALID attributes" do
       stock_item = insert(:stock_item)
       assert {:error, changeset} = Model.StockItem.update(%{count_on_hand: -1}, stock_item)
-
-      assert [
-               count_on_hand: {
-                 "must be greater than %{number}",
-                 [validation: :number, number: -1]
-               }
-             ] = changeset
+      assert %{count_on_hand: ["must be greater than -1"]} = errors_on(changeset)
     end
 
     test "with stock instance : updates for VALID attributes" do
@@ -117,12 +99,12 @@ defmodule Snitch.Data.Model.StockItemTest do
 
     test "Deletes for valid id" do
       stock_item = insert(:stock_item)
-      assert stock_item = Model.StockItem.delete(stock_item.id)
+      assert {:ok, _} = Model.StockItem.delete(stock_item.id)
     end
 
     test "Deletes for valid stock item" do
       stock_item = insert(:stock_item)
-      assert stock_item = Model.StockItem.delete(stock_item)
+      assert {:ok, _} = Model.StockItem.delete(stock_item)
     end
   end
 
