@@ -19,6 +19,6 @@ defmodule Snitch.Data.Schema.State do
     |> cast(attrs, [:abbr, :name, :country_id])
     |> validate_required([:abbr, :name, :country_id])
     |> foreign_key_constraint(:country_id)
-    |> unique_constraint(:abbr, name: :index_states_on_abbr_and_country_id)
+    |> unique_constraint(:abbr, message: "(:country_id, :abbr) is already taken")
   end
 end

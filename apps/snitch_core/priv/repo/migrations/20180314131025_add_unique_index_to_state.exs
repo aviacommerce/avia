@@ -3,6 +3,6 @@ defmodule Snitch.Repo.Migrations.AddUniqueIndexToState do
 
   def change do
     create unique_index(:snitch_states, [:abbr, :country_id], 
-    name: :index_states_on_abbr_and_country_id)
+    message: "(:country_id, :abbr) is already taken")
   end
 end
