@@ -89,7 +89,8 @@ defmodule Snitch.Data.Schema.User do
   defp update_changeset(%{changes: changes} = user_changeset) do
     cond do
       Map.has_key?(changes, :password) ->
-        user_changeset |> put_pass_hash
+        user_changeset
+        |> put_pass_hash
 
       true ->
         user_changeset
