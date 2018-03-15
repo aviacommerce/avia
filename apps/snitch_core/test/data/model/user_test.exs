@@ -2,7 +2,6 @@ defmodule Snitch.Data.Model.UserTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
-
   alias Snitch.Data.Model.User
   alias Snitch.Data.Schema.User, as: UserSchema
 
@@ -14,11 +13,11 @@ defmodule Snitch.Data.Model.UserTest do
       password: "password123",
       password_confirmation: "password123"
     }
+
     [valid_attrs: valid_attrs]
   end
 
   describe "create/1" do
-
     test "inserts with valid attributes", %{valid_attrs: va} do
       assert {:ok, %UserSchema{}} = User.create(va)
     end
@@ -66,6 +65,5 @@ defmodule Snitch.Data.Model.UserTest do
       assert {:ok, %{id: received_id} = %UserSchema{}} = User.delete(uid)
       assert received_id == uid
     end
-
   end
 end

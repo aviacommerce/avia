@@ -53,7 +53,6 @@ defmodule Snitch.Data.Schema.User do
   @create_fields ~w(first_name last_name email password password_confirmation is_admin)a
   @update_fields ~w(sign_in_count failed_attempts)a ++ @create_fields
 
-
   @doc """
   Returns a complete changeset depending on action.
 
@@ -92,7 +91,8 @@ defmodule Snitch.Data.Schema.User do
       Map.has_key?(changes, :password) ->
         user_changeset |> put_pass_hash
 
-      true -> user_changeset
+      true ->
+        user_changeset
     end
   end
 

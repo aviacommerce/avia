@@ -71,12 +71,12 @@ defmodule Snitch.Data.Schema.UserTest do
       refute validity
       assert %{last_name: ["can't be blank"]} = errors_on(cs)
     end
-
   end
 
   describe "Update User" do
-    setup  do
-      user = User.changeset(%User{}, @valid_attrs, :create)
+    setup do
+      user =
+        User.changeset(%User{}, @valid_attrs, :create)
         |> Ecto.Changeset.apply_changes()
 
       [user: user]
@@ -117,5 +117,4 @@ defmodule Snitch.Data.Schema.UserTest do
       assert %{password_confirmation: ["does not match confirmation"]} = errors_on(cs)
     end
   end
-
 end
