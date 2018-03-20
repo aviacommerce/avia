@@ -8,8 +8,6 @@ defmodule Snitch.Data.Schema.StockTransfer do
   use Snitch.Data.Schema
   use Snitch.Data.Schema.Stock
 
-  @type t :: %__MODULE__{}
-
   @typedoc """
   ### `:reference`
   This could correlate to a PO number, a transfer request number, a tracking
@@ -18,6 +16,7 @@ defmodule Snitch.Data.Schema.StockTransfer do
   ### `:number`
   A unique human readable identifier for the transfer.
   """
+  @type t :: %__MODULE__{}
 
   schema "snitch_stock_transfers" do
     field(:type, :string)

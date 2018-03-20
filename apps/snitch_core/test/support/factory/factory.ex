@@ -8,6 +8,7 @@ defmodule Snitch.Factory do
     Variant,
     Address,
     User,
+    LineItem,
     Order,
     Payment,
     PaymentMethod,
@@ -115,8 +116,31 @@ defmodule Snitch.Factory do
     }
   end
 
-  def three_variants(_context) do
-    [variants: insert_list(3, :random_variant)]
+  def three_variants(context) do
+    count = Map.get(context, :variant_count, 3)
+    [variants: insert_list(count, :random_variant)]
+  end
+
+  def line_items(context) do
+    %{variants: vs, order: order} = context
+    count = Map.get(context, :line_item_count, min(1, length(vs)))
+
+    line_items =
+      vs
+      |> Stream.map(fn v ->
+        struct(
+          LineItem,
+          order_id: order.id,
+          variant_id: v.id,
+          quantity: 1,
+          unit_price: v.cost_price,
+          total: v.cost_price
+        )
+      end)
+      |> Enum.take(count)
+      |> Enum.map(&Snitch.Repo.insert!/1)
+
+    [line_items: line_items]
   end
 
   def an_order(context) do
