@@ -3,13 +3,22 @@ defmodule Snitch.Factory.Shipping do
 
   defmacro __using__(_opts) do
     quote do
-      alias Snitch.Data.Schema.{ShippingMethod}
+      alias Snitch.Data.Schema.{ShippingMethod, ShipmentUnit}
 
       def shipping_method_factory do
         %ShippingMethod{
           slug: sequence("shipping_method"),
           name: sequence("hyperloop"),
           description: "Brought to you by spacex!"
+        }
+      end
+
+      def shipment_unit_factory do
+        %ShipmentUnit{
+          quantity: 1,
+          state: "pending",
+          variant: build(:variant),
+          line_item: build(:line_item)
         }
       end
 

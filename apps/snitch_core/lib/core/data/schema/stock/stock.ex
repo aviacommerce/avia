@@ -9,7 +9,8 @@ defmodule Snitch.Data.Schema.Stock do
         StockItem,
         StockLocation,
         StockMovement,
-        StockTransfer
+        StockTransfer,
+        ShipmentUnit
       }
     end
   end

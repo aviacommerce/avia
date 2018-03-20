@@ -46,14 +46,11 @@ defmodule Snitch.Data.Schema.StockLocation do
       backorderable_default active
     )a
 
-  def create_fields, do: @create_fields
-  def update_fields, do: @update_fields
-
   @spec changeset(__MODULE__.t(), map, atom) :: Ecto.Changeset.t()
   def changeset(instance, params, _),
     do: do_changeset(instance, params, @required_fields, @opt_update_fields)
 
-  defp do_changeset(instance, params, fields, optional \\ []) do
+  defp do_changeset(instance, params, fields, optional) do
     instance
     |> cast(params, fields ++ optional)
     |> validate_required(fields)

@@ -3,7 +3,6 @@ defmodule Snitch.Data.Model.StockMovement do
   """
 
   use Snitch.Data.Model
-  alias Snitch.Data.Schema.StockItem, as: StockItemSchema
   alias Snitch.Data.Schema.StockMovement, as: StockMovementSchema
 
   @spec create(integer, String.t()) :: {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
