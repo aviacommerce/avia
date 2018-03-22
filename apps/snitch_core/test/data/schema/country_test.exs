@@ -13,6 +13,14 @@ defmodule Snitch.Data.Schema.CountryTest do
     numcode: "356"
   }
 
+  @db_attrs %Country{
+    iso_name: "INDIA",
+    iso: "IN",
+    iso3: "IND",
+    name: "India",
+    numcode: "356"
+  }
+
   describe "Countries" do
     test "with valid attributes" do
       %{valid?: validity} = Country.changeset(%Country{}, @valid_attrs)
@@ -40,13 +48,7 @@ defmodule Snitch.Data.Schema.CountryTest do
     end
 
     test "with dupilicate iso" do
-      Repo.insert!(%Country{
-        name: "India",
-        iso_name: "INDIA",
-        iso: "IN",
-        iso3: "IND",
-        numcode: "356"
-      })
+      Repo.insert!(@db_attrs)
 
       changeset = Country.changeset(%Country{}, @valid_attrs)
 
@@ -54,9 +56,56 @@ defmodule Snitch.Data.Schema.CountryTest do
       assert [iso: {"has already been taken", []}] = changeset.errors
     end
 
-    test "with some blank value" do
-      param = Map.delete(@valid_attrs, :name)
-      c_changeset = %{valid?: validity} = Country.changeset(%Country{}, param)
+    test "with dupilicate iso3" do
+      Repo.insert!(@db_attrs)
+
+      changeset =
+        Country.changeset(%Country{}, %{
+          iso_name: "JAPAN",
+          iso: "JP",
+          iso3: "IND",
+          name: "Japan",
+          numcode: "392"
+        })
+
+      {:error, changeset} = Repo.insert(changeset)
+      assert [iso3: {"has already been taken", []}] = changeset.errors
+    end
+
+    test "with dupilicate name" do
+      Repo.insert!(@db_attrs)
+
+      changeset =
+        Country.changeset(%Country{}, %{
+          iso_name: "JAPAN",
+          iso: "JP",
+          iso3: "JPN",
+          name: "India",
+          numcode: "392"
+        })
+
+      {:error, changeset} = Repo.insert(changeset)
+      assert [name: {"has already been taken", []}] = changeset.errors
+    end
+
+    test "with dupilicate numcode" do
+      Repo.insert!(@db_attrs)
+
+      changeset =
+        Country.changeset(%Country{}, %{
+          iso_name: "JAPAN",
+          iso: "JP",
+          iso3: "JPN",
+          name: "Japan",
+          numcode: "356"
+        })
+
+      {:error, changeset} = Repo.insert(changeset)
+      assert [numcode: {"has already been taken", []}] = changeset.errors
+    end
+
+    test "with all empty" do
+      c_changeset = %{valid?: validity} = Country.changeset(%Country{}, %{})
       refute validity
       assert %{name: ["can't be blank"]} = errors_on(c_changeset)
     end
