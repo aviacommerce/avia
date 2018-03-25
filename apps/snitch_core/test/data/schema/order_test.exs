@@ -126,13 +126,11 @@ defmodule Snitch.Data.Schema.OrderTest do
 
   defp order_changeset(context) do
     order = build(:order)
-    %{user: u, address: a} = context
+    %{user: u} = context
     line_items = Map.get(context, :line_items, [])
 
     params = %{
       user_id: u.id,
-      billing_address_id: a.id,
-      shipping_address_id: a.id,
       line_items: LineItem.update_price_and_totals(line_items)
     }
 
