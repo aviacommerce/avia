@@ -34,8 +34,8 @@ defmodule Snitch.Data.Schema.Order do
     timestamps()
   end
 
-  @required_fields ~w(slug state user_id billing_address_id shipping_address_id)a
-  @optional_fields ~w()a
+  @required_fields ~w(slug state user_id)a
+  @optional_fields ~w(billing_address_id shipping_address_id)a
 
   @doc """
   Returns a complete changeset with totals.
