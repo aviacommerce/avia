@@ -126,7 +126,7 @@
         #
         {Credo.Check.Refactor.ABCSize},
         {Credo.Check.Refactor.AppendSingleItem, priority: :high},
-        {Credo.Check.Refactor.VariableRebinding, priority: :normal},
+        {Credo.Check.Refactor.VariableRebinding, false},
         {Credo.Check.Warning.MapGetUnsafePass, priority: :high},
         {Credo.Check.Consistency.MultiAliasImportRequireUse, false},
 
