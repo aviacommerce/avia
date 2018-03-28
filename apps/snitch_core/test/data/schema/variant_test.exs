@@ -7,7 +7,7 @@ defmodule Snitch.Data.Schema.VariantTest do
   alias Snitch.Data.Schema.Variant
 
   describe "(in one query) fetch selling prices" do
-    setup :three_variants
+    setup :variants
 
     test "of valid variants", context do
       %{variants: vs} = context

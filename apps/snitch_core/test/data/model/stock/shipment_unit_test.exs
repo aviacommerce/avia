@@ -8,7 +8,7 @@ defmodule Snitch.Data.Model.ShipmentUnitModelTest do
 
   setup :user_with_address
   setup :an_order
-  setup :three_variants
+  setup :variants
   setup :line_items
 
   describe "create/4" do
