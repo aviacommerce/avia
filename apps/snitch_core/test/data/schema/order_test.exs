@@ -7,7 +7,7 @@ defmodule Snitch.Data.Schema.OrderTest do
   alias Snitch.Data.Schema.Order
   alias Snitch.Data.Model.LineItem
 
-  setup :three_variants
+  setup :variants
   setup :user_with_address
   setup :some_line_items
   setup :order_changeset

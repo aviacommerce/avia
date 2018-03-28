@@ -7,7 +7,7 @@ defmodule Snitch.Data.Model.LineItemTest do
   alias Snitch.Data.Model.LineItem
 
   describe "line_item update_price_and_totals with valid params" do
-    setup [:three_variants, :good_line_items]
+    setup [:variants, :good_line_items]
 
     test "", context do
       %{line_items: line_items, totals: totals} = context
@@ -18,7 +18,7 @@ defmodule Snitch.Data.Model.LineItemTest do
   end
 
   describe "line_item update_price_and_totals with invalid params" do
-    setup [:three_variants, :bad_line_items]
+    setup [:variants, :bad_line_items]
 
     test "", context do
       %{line_items: line_items} = context
