@@ -22,7 +22,7 @@ defmodule Snitch.Data.Schema.State do
     |> unique_constraint(
       :abbr,
       name: :snitch_state_abbr_and_country_id,
-      message: "(:country_id, :abbr)has already been taken"
+      message: "(:country_id, :abbr) has already been taken"
     )
   end
 end

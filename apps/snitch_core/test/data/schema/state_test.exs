@@ -38,7 +38,7 @@ defmodule Snitch.Data.Schema.StateTest do
       change = State.changeset(%State{}, param)
       {:error, error} = Repo.insert(change)
 
-      assert %{abbr: ["(:country_id, :abbr)has already been taken"]} = errors_on(error)
+      assert %{abbr: ["(:country_id, :abbr) has already been taken"]} = errors_on(error)
     end
   end
 end
