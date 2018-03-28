@@ -116,11 +116,6 @@ defmodule Snitch.Factory do
     }
   end
 
-  def three_variants(context) do
-    count = Map.get(context, :variant_count, 3)
-    [variants: insert_list(count, :random_variant)]
-  end
-
   def line_items(context) do
     %{variants: vs, order: order} = context
     count = Map.get(context, :line_item_count, min(1, length(vs)))
@@ -141,6 +136,11 @@ defmodule Snitch.Factory do
       |> Enum.map(&Snitch.Repo.insert!/1)
 
     [line_items: line_items]
+  end
+  
+  def variants(context) do
+    count = Map.get(context, :variant_count, 3)
+    [variants: insert_list(count, :random_variant)]
   end
 
   def an_order(context) do
