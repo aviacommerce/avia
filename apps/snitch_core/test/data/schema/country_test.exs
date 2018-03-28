@@ -47,7 +47,7 @@ defmodule Snitch.Data.Schema.CountryTest do
       assert %{iso3: ["should be 3 character(s)"]} = errors_on(c_changeset)
     end
 
-    test "with dupilicate iso" do
+    test "with duplicate iso" do
       Repo.insert!(@db_attrs)
 
       changeset = Country.changeset(%Country{}, @valid_attrs)
@@ -56,7 +56,7 @@ defmodule Snitch.Data.Schema.CountryTest do
       assert [iso: {"has already been taken", []}] = changeset.errors
     end
 
-    test "with dupilicate iso3" do
+    test "with duplicate iso3" do
       Repo.insert!(@db_attrs)
 
       changeset =
@@ -72,7 +72,7 @@ defmodule Snitch.Data.Schema.CountryTest do
       assert [iso3: {"has already been taken", []}] = changeset.errors
     end
 
-    test "with dupilicate name" do
+    test "with duplicate name" do
       Repo.insert!(@db_attrs)
 
       changeset =
