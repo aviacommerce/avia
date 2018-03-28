@@ -34,14 +34,14 @@ defmodule Snitch.Data.Schema.CountryTest do
     end
 
     test "with invalid iso" do
-      params = Map.update!(@valid_attrs, :iso, fn _ -> "IND" end)
+      params = Map.put(@valid_attrs, :iso, "IND")
       c_changeset = %{valid?: validity} = Country.changeset(%Country{}, params)
       refute validity
       assert %{iso: ["should be 2 character(s)"]} = errors_on(c_changeset)
     end
 
     test "with invalid iso3" do
-      params = Map.update!(@valid_attrs, :iso3, fn _ -> "INDI" end)
+      params = Map.put(@valid_attrs, :iso3, "INDI")
       c_changeset = %{valid?: validity} = Country.changeset(%Country{}, params)
       refute validity
       assert %{iso3: ["should be 3 character(s)"]} = errors_on(c_changeset)
@@ -88,7 +88,7 @@ defmodule Snitch.Data.Schema.CountryTest do
       assert [name: {"has already been taken", []}] = changeset.errors
     end
 
-    test "with dupilicate numcode" do
+    test "with duplicate numcode" do
       Repo.insert!(@db_attrs)
 
       changeset =

@@ -14,7 +14,6 @@ defmodule Snitch.Data.Schema.StateTest do
     abbr: "MH",
     country_id: 105
   }
-
   describe "States " do
     test "with valid attributes" do
       %{valid?: validity} = State.changeset(%State{}, @valid_attrs)
@@ -39,7 +38,7 @@ defmodule Snitch.Data.Schema.StateTest do
       change = State.changeset(%State{}, param)
       {:error, error} = Repo.insert(change)
 
-      assert %{abbr: ["has already been taken"]} = errors_on(error)
+      assert %{abbr: ["(:country_id, :abbr)has already been taken"]} = errors_on(error)
     end
   end
 end
