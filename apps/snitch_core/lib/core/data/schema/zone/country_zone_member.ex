@@ -24,11 +24,11 @@ defmodule Snitch.Data.Schema.CountryZoneMember do
   @create_fields [:zone_id | @update_fields]
 
   @doc """
-  Returns a `Zone` changeset.
+  Returns a `CountryZoneMember` changeset to create a new `country_zone_member`.
   """
-  @spec changeset(t, map, :create | :update) :: Ecto.Changeset.t()
-  def changeset(country_zone, params, :create) do
-    country_zone
+  @spec create_changeset(t, map) :: Ecto.Changeset.t()
+  def create_changeset(country_zone_member, params) do
+    country_zone_member
     |> cast(params, @create_fields)
     |> validate_required(@create_fields)
     |> foreign_key_constraint(:zone_id)
@@ -41,8 +41,12 @@ defmodule Snitch.Data.Schema.CountryZoneMember do
     )
   end
 
-  def changeset(country_zone, params, :update) do
-    country_zone
+  @doc """
+  Returns a `CountryZoneMember` changeset to update the `country_zone_member`.
+  """
+  @spec update_changeset(t, map) :: Ecto.Changeset.t()
+  def update_changeset(country_zone_member, params) do
+    country_zone_member
     |> cast(params, @update_fields)
     |> foreign_key_constraint(:country_id)
     |> unique_constraint(:country_id, name: :snitch_country_zone_members_zone_id_country_id_index)

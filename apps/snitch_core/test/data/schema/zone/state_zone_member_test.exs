@@ -13,11 +13,9 @@ defmodule Snitch.Data.Schema.StateZoneMemberTest do
       state_zone = insert(:zone, zone_type: "S")
 
       new_state_zone =
-        StateZoneMember.changeset(
-          %StateZoneMember{state_id: state.id},
-          %{zone_id: state_zone.id},
-          :create
-        )
+        StateZoneMember.create_changeset(%StateZoneMember{state_id: state.id}, %{
+          zone_id: state_zone.id
+        })
 
       assert {:ok, _} = Repo.insert(new_state_zone)
     end
@@ -26,11 +24,9 @@ defmodule Snitch.Data.Schema.StateZoneMemberTest do
       country_zone = insert(:zone, zone_type: "C")
 
       new_state_zone =
-        StateZoneMember.changeset(
-          %StateZoneMember{state_id: state.id},
-          %{zone_id: country_zone.id},
-          :create
-        )
+        StateZoneMember.create_changeset(%StateZoneMember{state_id: state.id}, %{
+          zone_id: country_zone.id
+        })
 
       assert {:error, %Ecto.Changeset{errors: errors}} = Repo.insert(new_state_zone)
       assert errors == [zone_id: {"does not refer a state zone", []}]

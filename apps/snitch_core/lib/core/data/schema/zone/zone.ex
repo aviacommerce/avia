@@ -35,17 +35,21 @@ defmodule Snitch.Data.Schema.Zone do
   @create_fields [:zone_type | @update_fields]
 
   @doc """
-  Returns a `Zone` changeset.
+  Returns a `Zone` changeset to create a new `zone`.
   """
-  @spec changeset(t, map, :create | :update) :: Ecto.Changeset.t()
-  def changeset(zone, params, :create) do
+  @spec create_changeset(t, map) :: Ecto.Changeset.t()
+  def create_changeset(zone, params) do
     zone
     |> cast(params, @create_fields)
     |> validate_required(@create_fields)
     |> validate_inclusion(:zone_type, @valid_zone_types)
   end
 
-  def changeset(zone, params, :update) do
+  @doc """
+  Returns a `Zone` changeset to update the `zone`.
+  """
+  @spec update_changeset(t, map) :: Ecto.Changeset.t()
+  def update_changeset(zone, params) do
     cast(zone, params, @update_fields)
   end
 end
