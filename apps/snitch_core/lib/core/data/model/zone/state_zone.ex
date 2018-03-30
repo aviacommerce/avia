@@ -5,8 +5,8 @@ defmodule Snitch.Data.Model.StateZone do
   use Snitch.Data.Model
 
   import Ecto.Query
+  import Snitch.Tools.Helper.Zone
 
-  alias Ecto.Multi
   alias Snitch.Data.Schema.{StateZoneMember, Zone, State}
 
   @doc """
@@ -18,13 +18,10 @@ defmodule Snitch.Data.Model.StateZone do
   @spec create(String.t(), String.t(), [non_neg_integer]) :: term
   def create(name, description, state_ids) do
     zone_params = %{name: name, description: description, zone_type: "S"}
-    zone_changeset = Zone.changeset(%Zone{}, zone_params, :create)
+    zone_changeset = Zone.create_changeset(%Zone{}, zone_params)
+    multi = creation_multi(zone_changeset, state_ids)
 
-    Multi.new()
-    |> Multi.insert(:zone, zone_changeset)
-    |> Multi.run(:members, fn %{zone: zone} -> insert_members(state_ids, zone) end)
-    |> Repo.transaction()
-    |> case do
+    case Repo.transaction(multi) do
       {:ok, %{zone: zone}} -> {:ok, zone}
       error -> error
     end
@@ -78,54 +75,31 @@ defmodule Snitch.Data.Model.StateZone do
   @spec update(String.t(), String.t(), [non_neg_integer]) ::
           {:ok, Zone.t()} | {:error, Ecto.Changeset.t()}
   def update(zone, zone_params, new_state_ids) do
-    zone_changeset = Zone.changeset(zone, zone_params, :update)
+    zone_changeset = Zone.update_changeset(zone, zone_params)
+    multi = update_multi(zone, zone_changeset, new_state_ids)
 
-    old_members = MapSet.new(member_ids(zone.id))
-    new_members = MapSet.new(new_state_ids)
-    added = set_difference(new_members, old_members)
-    removed = set_difference(old_members, new_members)
-
-    delete_query =
-      from(m in StateZoneMember, where: m.state_id in ^removed and m.zone_id == ^zone.id)
-
-    deletions_multi =
-      if length(removed) > 0 do
-        Multi.delete_all(%Multi{}, :removed, delete_query)
-      else
-        Multi.new()
-      end
-
-    Multi.new()
-    |> Multi.update(:zone, zone_changeset)
-    |> Multi.run(:added, fn _ -> insert_members(added, zone) end)
-    |> Multi.append(deletions_multi)
-    |> Repo.transaction()
-    |> case do
+    case Repo.transaction(multi) do
       {:ok, %{zone: zone}} -> {:ok, zone}
       error -> error
     end
   end
 
-  defp insert_members(state_ids, zone) do
+  def remove_members_query(to_be_removed, zone) do
+    from(m in StateZoneMember, where: m.state_id in ^to_be_removed and m.zone_id == ^zone.id)
+  end
+
+  @doc """
+  Returns `StateZoneMember` changesets for given `state_ids` for `state_zone` as a stream.
+  """
+  @spec member_changesets([non_neg_integer], Zone.t()) :: Enumerable.t()
+  def member_changesets(state_ids, state_zone) do
     state_ids
     |> Stream.uniq()
     |> Stream.map(
-      &StateZoneMember.changeset(
-        %StateZoneMember{},
-        %{state_id: &1, zone_id: zone.id},
-        :create
-      )
+      &StateZoneMember.create_changeset(%StateZoneMember{}, %{
+        state_id: &1,
+        zone_id: state_zone.id
+      })
     )
-    |> Stream.map(&Repo.insert/1)
-    |> Enum.reduce_while({:ok, []}, fn
-      {:ok, member}, {:ok, acc} -> {:cont, {:ok, [member | acc]}}
-      changeset, _acc -> {:halt, changeset}
-    end)
-  end
-
-  defp set_difference(a, b) do
-    a
-    |> MapSet.difference(b)
-    |> MapSet.to_list()
   end
 end

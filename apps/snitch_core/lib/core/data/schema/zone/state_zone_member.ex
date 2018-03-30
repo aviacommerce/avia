@@ -24,11 +24,11 @@ defmodule Snitch.Data.Schema.StateZoneMember do
   @create_fields [:zone_id | @update_fields]
 
   @doc """
-  Returns a `Zone` changeset.
+  Returns a `StateZoneMember` changeset to create a new `state_zone_member`.
   """
-  @spec changeset(t, map, :create | :update) :: Ecto.Changeset.t()
-  def changeset(state_zone, params, :create) do
-    state_zone
+  @spec create_changeset(t, map) :: Ecto.Changeset.t()
+  def create_changeset(state_zone_member, params) do
+    state_zone_member
     |> cast(params, @create_fields)
     |> validate_required(@create_fields)
     |> foreign_key_constraint(:zone_id)
@@ -41,8 +41,12 @@ defmodule Snitch.Data.Schema.StateZoneMember do
     )
   end
 
-  def changeset(state_zone, params, :update) do
-    state_zone
+  @doc """
+  Returns a `StateZoneMember` changeset to update the `state_zone_member`.
+  """
+  @spec update_changeset(t, map) :: Ecto.Changeset.t()
+  def update_changeset(state_zone_member, params) do
+    state_zone_member
     |> cast(params, @update_fields)
     |> foreign_key_constraint(:state_id)
     |> unique_constraint(:state_id, name: :snitch_state_zone_members_zone_id_state_id_index)
