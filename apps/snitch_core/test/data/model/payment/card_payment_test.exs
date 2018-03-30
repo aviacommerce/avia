@@ -6,17 +6,10 @@ defmodule Snitch.Data.Model.CardPaymentMethodTest do
 
   alias Snitch.Data.Model.CardPayment
 
-  @card %{
-    last_digits: "0821",
-    month: 12,
-    year: 2050,
-    name_on_card: "Gopal B Shimpi",
-    brand: "VISA"
-  }
-
   setup :user_with_address
   setup :an_order
   setup :payment_methods
+  setup :card
   setup :card_payment
 
   test "create", context do
@@ -44,9 +37,7 @@ defmodule Snitch.Data.Model.CardPaymentMethodTest do
     params = %{amount: order.total, state: "some-state"}
 
     {:ok, %{payment: payment, card_payment: card_payment}} =
-      CardPayment.create("card-payment", order.id, params, %{
-        card: Map.put(@card, :user_id, user.id)
-      })
+      CardPayment.create("card-payment", order.id, params, %{card: Map.from_struct(context.card)})
 
     [payment: payment, card_payment: card_payment]
   end
