@@ -6,6 +6,14 @@ defmodule Snitch.Data.Schema.CardPaymentTest do
 
   alias Snitch.Data.Schema.CardPayment
 
+  @card %{
+    last_digits: "0821",
+    month: 12,
+    year: 2050,
+    name_on_card: "Gopal B Shimpi",
+    brand: "VISA"
+  }
+
   setup :user_with_address
   setup :an_order
   setup :payment_methods
@@ -13,16 +21,29 @@ defmodule Snitch.Data.Schema.CardPaymentTest do
 
   describe "CardPayment records" do
     test "refer card type Payments (uniquely)", context do
-      %{ccd: card} = context
-      card_payment = CardPayment.changeset(%CardPayment{}, %{payment_id: card.id}, :create)
+      %{ccd: card_payment, user: user} = context
+
+      card_payment =
+        CardPayment.changeset(
+          %CardPayment{},
+          %{payment_id: card_payment.id, card: Map.put(@card, :user_id, user.id)},
+          :create
+        )
+
       assert {:error, %{errors: errors}} = Repo.insert(card_payment)
       assert errors == [payment_id: {"has already been taken", []}]
     end
 
     test "DON'T refer other Payments", context do
-      %{chk: check} = context
-      card_payment = CardPayment.changeset(%CardPayment{}, %{payment_id: check.id}, :create)
-      Repo.insert(card_payment)
+      %{chk: check, user: user} = context
+
+      card_payment =
+        CardPayment.changeset(
+          %CardPayment{},
+          %{payment_id: check.id, card: Map.put(@card, :user_id, user.id)},
+          :create
+        )
+
       assert {:error, %Ecto.Changeset{errors: errors}} = Repo.insert(card_payment)
       assert errors == [payment_id: {"does not refer a card payment", []}]
     end

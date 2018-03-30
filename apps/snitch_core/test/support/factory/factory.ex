@@ -4,7 +4,16 @@ defmodule Snitch.Factory do
   use ExMachina.Ecto, repo: Snitch.Repo
   use Snitch.Factory.{Address, Stock, Zone, Shipping}
 
-  alias Snitch.Data.Schema.{Variant, Address, User, Order, Payment, PaymentMethod, CardPayment}
+  alias Snitch.Data.Schema.{
+    Variant,
+    Address,
+    User,
+    Order,
+    Payment,
+    PaymentMethod,
+    CardPayment,
+    Card
+  }
 
   def user_factory do
     %User{
@@ -83,6 +92,16 @@ defmodule Snitch.Factory do
     }
   end
 
+  def credit_card_factory do
+    %Card{
+      last_digits: "0821",
+      month: 12,
+      year: 2050,
+      name_on_card: "Gopal B Shimpi",
+      brand: "VISA"
+    }
+  end
+
   defp random_price(min, delta) do
     Money.new(:USD, "#{:rand.uniform(delta) + min}.99")
   end
@@ -119,7 +138,12 @@ defmodule Snitch.Factory do
     [
       ccd: ccd,
       chk: chk,
-      card: insert(:card_payment, payment_id: ccd.id)
+      card_payment: insert(:card_payment, payment_id: ccd.id)
     ]
+  end
+
+  def card(context) do
+    %{user: user} = context
+    [card: insert(:credit_card, user_id: user.id)]
   end
 end
