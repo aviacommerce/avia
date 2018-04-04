@@ -33,7 +33,7 @@ defmodule Snitch.Data.Model.CardPaymentMethodTest do
   end
 
   defp card_payment(context) do
-    %{order: order, user: user} = context
+    %{order: order} = context
     params = %{amount: order.total, state: "some-state"}
 
     {:ok, %{payment: payment, card_payment: card_payment}} =

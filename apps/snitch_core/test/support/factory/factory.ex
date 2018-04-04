@@ -97,7 +97,7 @@ defmodule Snitch.Factory do
       last_digits: "0821",
       month: 12,
       year: 2050,
-      name_on_card: "Gopal B Shimpi",
+      name_on_card: "Harry Potter",
       brand: "VISA"
     }
   end

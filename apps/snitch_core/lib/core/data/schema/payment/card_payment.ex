@@ -63,8 +63,6 @@ defmodule Snitch.Data.Schema.CardPayment do
       payment
       |> cast_assoc(:card, with: &Card.changeset(&1, &2, :create), required: true)
       |> foreign_key_constraint(:card_id)
-    else
-      payment
     end
   end
 end
