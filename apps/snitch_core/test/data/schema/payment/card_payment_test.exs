@@ -4,7 +4,7 @@ defmodule Snitch.Data.Schema.CardPaymentTest do
 
   import Snitch.Factory
 
-  alias Snitch.Data.Schema.CardPayment
+  alias Snitch.Data.Schema.{CardPayment, Payment, Order}
 
   @card %{
     last_digits: "0821",
@@ -12,6 +12,11 @@ defmodule Snitch.Data.Schema.CardPaymentTest do
     year: 2050,
     name_on_card: "Harry Potter",
     brand: "VISA"
+  }
+
+  @payment %Payment{
+    slug: "card-payment",
+    payment_type: "ccd"
   }
 
   setup :user_with_address
@@ -46,6 +51,75 @@ defmodule Snitch.Data.Schema.CardPaymentTest do
 
       assert {:error, %Ecto.Changeset{errors: errors}} = Repo.insert(card_payment)
       assert errors == [payment_id: {"does not refer a card payment", []}]
+    end
+
+    test "with all good", context do
+      %{user: user, card_method: card_m, order: order} = context
+
+      payment_struct = %Payment{@payment | payment_method_id: card_m.id, order_id: order.id}
+
+      payment = insert(payment_struct)
+
+      card_payment =
+        CardPayment.changeset(
+          %CardPayment{},
+          %{payment_id: payment.id, card: Map.put(@card, :user_id, user.id)},
+          :create
+        )
+
+      %{valid?: validity} = card_payment
+
+      assert validity
+      assert {:ok, _} = Repo.insert(card_payment)
+    end
+
+    test "with already having card_id", context do
+      %{user: user, card_method: card_m, order: order} = context
+
+      payment_struct = %Payment{@payment | payment_method_id: card_m.id, order_id: order.id}
+
+      payment = insert(payment_struct)
+
+      card_payment =
+        CardPayment.changeset(
+          %CardPayment{},
+          %{payment_id: payment.id, card: Map.put(@card, :user_id, user.id)},
+          :create
+        )
+
+      {:ok, c_payment} = Repo.insert(card_payment)
+
+      rand = :rand.uniform(9999)
+
+      order_struct = %Order{
+        slug: "order" <> to_string(rand),
+        state: "cart",
+        user_id: user.id
+      }
+
+      order = insert(order_struct)
+
+      payment_struct = %Payment{
+        @payment
+        | payment_method_id: card_m.id,
+          order_id: order.id,
+          slug: "card-payment" <> to_string(rand)
+      }
+
+      payment = insert(payment_struct)
+
+      card_payment =
+        CardPayment.changeset(
+          %CardPayment{},
+          %{
+            payment_id: payment.id,
+            card_id: c_payment.card_id,
+            card: Map.put(@card, :user_id, user.id)
+          },
+          :create
+        )
+
+      assert {:ok, _} = Repo.insert(card_payment)
     end
   end
 end

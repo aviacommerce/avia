@@ -59,10 +59,12 @@ defmodule Snitch.Data.Schema.CardPayment do
   end
 
   def is_card_id_present(payment) do
-    if Map.get(payment, :card_id) == nil do
+    if payment.params["card_id"] == nil do
       payment
       |> cast_assoc(:card, with: &Card.changeset(&1, &2, :create), required: true)
       |> foreign_key_constraint(:card_id)
+    else
+      payment
     end
   end
 end
