@@ -7,7 +7,6 @@ defmodule Snitch.Data.Schema.ShippingMethod do
     > A particular Zone may have none or many ShippingMethods -- a classic
       many-to-many relation.
   * can have both Country and State Zones.
-
   """
 
   use Snitch.Data.Schema
