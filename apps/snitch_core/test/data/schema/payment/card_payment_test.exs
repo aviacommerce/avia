@@ -53,7 +53,7 @@ defmodule Snitch.Data.Schema.CardPaymentTest do
       assert errors == [payment_id: {"does not refer a card payment", []}]
     end
 
-    test "with all good", context do
+    test "when added new card", context do
       %{user: user, card_method: card_m, order: order} = context
 
       payment_struct = %Payment{@payment | payment_method_id: card_m.id, order_id: order.id}
@@ -89,10 +89,8 @@ defmodule Snitch.Data.Schema.CardPaymentTest do
 
       {:ok, c_payment} = Repo.insert(card_payment)
 
-      rand = :rand.uniform(9999)
-
       order_struct = %Order{
-        slug: "order" <> to_string(rand),
+        slug: "order_test",
         state: "cart",
         user_id: user.id
       }
@@ -103,7 +101,7 @@ defmodule Snitch.Data.Schema.CardPaymentTest do
         @payment
         | payment_method_id: card_m.id,
           order_id: order.id,
-          slug: "card-payment" <> to_string(rand)
+          slug: "card-payment_test"
       }
 
       payment = insert(payment_struct)

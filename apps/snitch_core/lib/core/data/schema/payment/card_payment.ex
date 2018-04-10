@@ -27,9 +27,9 @@ defmodule Snitch.Data.Schema.CardPayment do
     timestamps()
   end
 
-  @update_fields ~w(response_code response_message avs_response cvv_response)a
+  @update_fields ~w(response_code response_message avs_response cvv_response card_id)a
   @create_fields [:payment_id | @update_fields]
-  @temp ~w(card_id)a
+
   @doc """
   Returns a `CardPayment` changeset.
 
@@ -43,8 +43,8 @@ defmodule Snitch.Data.Schema.CardPayment do
 
   def changeset(payment, params, :create) do
     payment
-    |> cast(params, @create_fields ++ @temp)
-    |> is_card_id_present
+    |> cast(params, @create_fields)
+    |> assoc_card
     |> unique_constraint(:payment_id)
     |> foreign_key_constraint(:payment_id)
     |> check_constraint(
@@ -58,13 +58,14 @@ defmodule Snitch.Data.Schema.CardPayment do
     cast(payment, params, @update_fields)
   end
 
-  def is_card_id_present(payment) do
+  def assoc_card(payment) do
     if payment.params["card_id"] == nil do
       payment
       |> cast_assoc(:card, with: &Card.changeset(&1, &2, :create), required: true)
       |> foreign_key_constraint(:card_id)
     else
       payment
+      |> foreign_key_constraint(:card_id)
     end
   end
 end

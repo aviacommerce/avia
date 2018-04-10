@@ -92,7 +92,7 @@ defmodule Snitch.Factory do
     }
   end
 
-  def credit_card_factory do
+  def card_factory do
     %Card{
       last_digits: "0821",
       month: 12,
@@ -144,6 +144,6 @@ defmodule Snitch.Factory do
 
   def card(context) do
     %{user: user} = context
-    [card: insert(:credit_card, user_id: user.id)]
+    [card: insert(:card, user_id: user.id)]
   end
 end
