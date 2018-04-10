@@ -14,7 +14,7 @@ defmodule Snitch.Data.Model.PaymentTest do
 
   test "to_subtype", context do
     %{ccd: card, chk: check} = context
-
+    insert(:card_payment, payment_id: card.id)
     assert %Schema.CardPayment{} = Model.Payment.to_subtype(card.id)
     assert %Schema.Payment{} = Model.Payment.to_subtype(check.id)
   end

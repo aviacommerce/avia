@@ -132,13 +132,10 @@ defmodule Snitch.Factory do
 
   def payments(context) do
     %{card_method: card_m, check_method: check_m, order: order} = context
-    ccd = insert(:payment_ccd, payment_method_id: card_m.id, order_id: order.id)
-    chk = insert(:payment_chk, payment_method_id: check_m.id, order_id: order.id)
 
     [
-      ccd: ccd,
-      chk: chk,
-      card_payment: insert(:card_payment, payment_id: ccd.id)
+      ccd: insert(:payment_ccd, payment_method_id: card_m.id, order_id: order.id),
+      chk: insert(:payment_chk, payment_method_id: check_m.id, order_id: order.id)
     ]
   end
 

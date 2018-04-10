@@ -29,15 +29,17 @@ defmodule Snitch.Data.Schema.Card do
   def changeset(card, params, action)
 
   def changeset(card, params, :create) do
+    %{year: current_year, month: current_month} = DateTime.utc_now()
+
     card
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> validate_number(
       :month,
       less_than_or_equal_to: 12,
-      greater_than_or_equal_to: DateTime.utc_now() |> Map.fetch!(:month)
+      greater_than_or_equal_to: current_month
     )
-    |> validate_number(:year, greater_than_or_equal_to: DateTime.utc_now() |> Map.fetch!(:year))
+    |> validate_number(:year, greater_than_or_equal_to: current_year)
     |> validate_format(:last_digits, ~r/^\d{4}$/)
     |> foreign_key_constraint(:address_id)
     |> foreign_key_constraint(:user_id)
