@@ -47,7 +47,7 @@ defmodule Snitch.Data.Schema.ShippingMethodTest do
     @tag state_zone_count: 1, country_zone_count: 1
     test "allow zones of different types", %{zones: zones} do
       %{valid?: validity} =
-        changeset = ShippingMethod.changeset(%ShippingMethod{}, @valid_params, zones, :create)
+        ShippingMethod.changeset(%ShippingMethod{}, @valid_params, zones, :create)
 
       assert validity
     end
