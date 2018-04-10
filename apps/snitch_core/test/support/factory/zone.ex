@@ -7,7 +7,7 @@ defmodule Snitch.Factory.Zone do
 
       def zone_factory do
         %Zone{
-          name: sequence(:area, fn area_code -> "area-#{area_code + 50}" end),
+          name: sequence(:area, fn area_code -> "area-#{area_code + 51}" end),
           description: "Does area-51 exist?"
         }
       end
