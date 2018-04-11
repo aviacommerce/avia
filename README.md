@@ -1,11 +1,11 @@
-# Snitch
+
 
 <p align="center">
     <img alt="AngualreSpree Logo" title="Snitch Logo" src="https://res.cloudinary.com/ashish173/image/upload/c_scale,w_492/v1523451848/snitch_logo_o8xxon.jpg" width="200">
 </p>
 
 <p align="center">
-  Snitch: E-Commerce Framework in Elixir
+    <b>Snitch: E-Commerce Framework in Elixir</b>
 </p>
 
 [![Build Status](https://travis-ci.org/aviabird/snitch.svg?branch=develop)](https://travis-ci.org/aviabird/snitch)
