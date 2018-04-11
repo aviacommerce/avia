@@ -1,4 +1,4 @@
-defmodule Snitch.Tools.QueryHelper do
+defmodule Snitch.Tools.Helper.Query do
   @moduledoc """
 
   """
