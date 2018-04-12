@@ -32,8 +32,8 @@ defmodule Snitch.Data.Model.ShipmentUnitModelTest do
 
   describe "get/1" do
     test "Fails with invalid id" do
-      stock_item = ShipmentUnitModel.get(1)
-      assert nil == stock_item
+      shipment_unit = ShipmentUnitModel.get(1)
+      assert nil == shipment_unit
     end
 
     test "gets with valid id", context do
