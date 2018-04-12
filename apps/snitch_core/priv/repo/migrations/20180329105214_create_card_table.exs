@@ -7,11 +7,9 @@ defmodule Snitch.Repo.Migrations.CreateCardTable do
       add(:brand, :string, null: false)
       add(:month, :integer, null: false)
       add(:year, :integer, null: false)
-      add(:last_digits, :string, size: 4, null: false)
+      add(:number, :string, size: 16, null: false) 
       add(:name_on_card, :string, null: false)
-      add(:card_name, :string)
-      add(:address_id, references(:snitch_addresses))
-
+      add(:is_disabled, :boolean, default: false)
       timestamps()
     end
   end

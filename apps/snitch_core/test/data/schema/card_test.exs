@@ -7,14 +7,16 @@ defmodule Snitch.Data.Schema.CardTest do
   alias Snitch.Data.Schema.Card
 
   @card %{
-    last_digits: "0821",
     month: 12,
     year: 2050,
     name_on_card: "Harry Potter",
-    brand: "VISA"
+    brand: "VISA",
+    number: "4111111111111111",
+    is_disabled: false
   }
 
   setup :user_with_address
+  setup :card
 
   describe "Cards" do
     test "with valid attributes", context do
@@ -22,17 +24,6 @@ defmodule Snitch.Data.Schema.CardTest do
         Card.changeset(%Card{}, Map.put(@card, :user_id, context.user.id), :create)
 
       assert validity
-    end
-
-    test "with invalid last_digits", context do
-      card = Map.put(@card, :last_digits, "1F44")
-
-      changeset =
-        %{valid?: validity} =
-        Card.changeset(%Card{}, Map.put(card, :user_id, context.user.id), :create)
-
-      refute validity
-      assert %{last_digits: ["has invalid format"]} = errors_on(changeset)
     end
 
     test "without name of user", context do
@@ -75,6 +66,17 @@ defmodule Snitch.Data.Schema.CardTest do
       assert %{month: ["must be less than or equal to 12"]} = errors_on(changeset)
     end
 
+    test "with invalid number", context do
+      card = Map.put(@card, :number, "5431111111111")
+
+      changeset =
+        %{valid?: validity} =
+        Card.changeset(%Card{}, Map.put(card, :user_id, context.user.id), :create)
+
+      refute validity
+      assert %{number: ["has invalid format"]} = errors_on(changeset)
+    end
+
     test "with invalid year", context do
       current_year = DateTime.utc_now() |> Map.fetch!(:year)
       card = Map.put(@card, :year, current_year - 1)
@@ -85,6 +87,11 @@ defmodule Snitch.Data.Schema.CardTest do
 
       refute validity
       assert %{year: ["must be greater than or equal to #{current_year}"]} == errors_on(changeset)
+    end
+
+    test "is deleted", context do
+      changeset = Card.changeset(context.card, %{is_disabled: true}, :update)
+      assert {:ok, _} = Repo.update(changeset)
     end
   end
 end

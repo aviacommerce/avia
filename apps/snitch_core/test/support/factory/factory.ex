@@ -94,11 +94,11 @@ defmodule Snitch.Factory do
 
   def card_factory do
     %Card{
-      last_digits: "0821",
       month: 12,
       year: 2050,
       name_on_card: "Harry Potter",
-      brand: "VISA"
+      brand: "VISA",
+      number: "4111111111111111"
     }
   end
 
