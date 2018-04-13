@@ -21,11 +21,11 @@ defmodule Snitch.Data.Model.ShipmentUnit do
     )
   end
 
-  @spec get(non_neg_integer | map) :: ShipmentUnit.t()
+  @spec get(non_neg_integer | map) :: ShipmentUnitSchema.t()
   def get(query_fields) do
-    QH.get(ShipmentUnit, query_fields, Repo)
+    QH.get(ShipmentUnitSchema, query_fields, Repo)
   end
 
-  @spec get_all :: list(ShipmentUnit.t())
-  def get_all, do: Repo.all(ShipmentUnit)
+  @spec get_all :: list(ShipmentUnitSchema.t())
+  def get_all, do: Repo.all(ShipmentUnitSchema)
 end

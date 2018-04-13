@@ -7,26 +7,47 @@ defmodule Snitch.Data.Model.ShipmentUnitModelTest do
   alias Snitch.Data.Model.ShipmentUnit, as: ShipmentUnitModel
 
   setup do
-    [variant: insert(:variant)]
+    [
+      variant: insert(:variant),
+      line_item: insert(:line_item)
+    ]
   end
 
   describe "create/4" do
-    test "Fails for INVALID stock item id" do
-      assert {:error, changeset} = ShipmentUnitModel.create(1, 1)
+    test "Fails with invalid attributes", context do
+      %{variant: variant, line_item: line_item} = context
+      assert {:error, changeset} = ShipmentUnitModel.create("pending", true, 1, -1, variant.id)
       refute changeset.valid?
-      assert %{stock_item_id: ["does not exist"]} = errors_on(changeset)
-    end
+      assert %{line_item_id: ["does not exist"]} = errors_on(changeset)
 
-    test "Fails with invalid quantity", context do
-      %{stock_item: stock_item} = context
-      assert {:error, changeset} = ShipmentUnitModel.create("abc", stock_item.id)
-      assert [quantity: {"is invalid", [type: :integer, validation: :cast]}] = changeset
+      assert {:error, changeset} = ShipmentUnitModel.create("pending", true, 1, line_item.id, -1)
+      refute changeset.valid?
+      assert %{variant_id: ["does not exist"]} = errors_on(changeset)
+
+      assert {:error, changeset} =
+               ShipmentUnitModel.create(nil, true, 1, line_item.id, variant.id)
+
+      refute changeset.valid?
+      assert %{state: ["can't be blank"]} = errors_on(changeset)
+
+      assert {:error, changeset} =
+               ShipmentUnitModel.create("pending", true, -1, line_item.id, variant.id)
+
+      refute changeset.valid?
+      %{quantity: ["must be greater than -1"]} = errors_on(changeset)
     end
 
     test "Inserts with valid attributes", context do
-      %{stock_item: stock_item} = context
-      assert {:ok, stock_movement} = ShipmentUnitModel.create(1, stock_item.id)
-      assert stock_movement.stock_item_id == stock_item.id
+      %{variant: variant, line_item: line_item} = context
+
+      assert {:ok, shipment_unit} =
+               ShipmentUnitModel.create("pending", true, 1, line_item.id, variant.id)
+
+      assert shipment_unit.variant_id == variant.id
+      assert shipment_unit.line_item_id == line_item.id
+      assert shipment_unit.state == "pending"
+      assert shipment_unit.pending == true
+      assert shipment_unit.quantity == 1
     end
   end
 
@@ -37,39 +58,37 @@ defmodule Snitch.Data.Model.ShipmentUnitModelTest do
     end
 
     test "gets with valid id", context do
-      %{stock_item: stock_item} = context
-      insert_stock_movement = insert(:stock_movement, stock_item: stock_item)
+      %{variant: variant, line_item: line_item} = context
+      insert_shipment_unit = insert(:shipment_unit, variant: variant, line_item: line_item)
 
-      get_stock_movement = ShipmentUnitModel.get(insert_stock_movement.id)
-      assert insert_stock_movement.id == get_stock_movement.id
-      assert insert_stock_movement.stock_item_id == stock_item.id
-      assert insert_stock_movement.quantity == get_stock_movement.quantity
-      assert insert_stock_movement.action == get_stock_movement.action
-      assert insert_stock_movement.originator_type == get_stock_movement.originator_type
-      assert insert_stock_movement.originator_id == get_stock_movement.originator_id
+      get_shipment_unit = ShipmentUnitModel.get(insert_shipment_unit.id)
+      assert insert_shipment_unit.id == get_shipment_unit.id
+      assert insert_shipment_unit.line_item_id == line_item.id
+      assert insert_shipment_unit.quantity == get_shipment_unit.quantity
+      assert insert_shipment_unit.state == get_shipment_unit.state
+      assert insert_shipment_unit.variant_id == get_shipment_unit.variant_id
 
       # with stock item map
-      get_stock_movement_with_map = ShipmentUnitModel.get(%{id: insert_stock_movement.id})
-      assert insert_stock_movement.id == get_stock_movement_with_map.id
-      assert insert_stock_movement.stock_item_id == stock_item.id
-      assert insert_stock_movement.quantity == get_stock_movement_with_map.quantity
-      assert insert_stock_movement.action == get_stock_movement_with_map.action
-      assert insert_stock_movement.originator_type == get_stock_movement_with_map.originator_type
-      assert insert_stock_movement.originator_id == get_stock_movement_with_map.originator_id
+      get_shipment_unit_with_map = ShipmentUnitModel.get(%{id: insert_shipment_unit.id})
+      assert insert_shipment_unit.id == get_shipment_unit_with_map.id
+      assert insert_shipment_unit.line_item_id == line_item.id
+      assert insert_shipment_unit.quantity == get_shipment_unit_with_map.quantity
+      assert insert_shipment_unit.state == get_shipment_unit_with_map.state
+      assert insert_shipment_unit.variant_id == get_shipment_unit_with_map.variant_id
     end
   end
 
   describe "get_all/0" do
-    test "fetches all the stock items" do
-      stock_movements = ShipmentUnitModel.get_all()
-      assert 0 = Enum.count(stock_movements)
+    test "fetches all the shipment unit" do
+      shipment_units = ShipmentUnitModel.get_all()
+      assert 0 = Enum.count(shipment_units)
 
       # add for multiple random stock items
-      insert_list(1, :stock_movement)
-      insert_list(2, :stock_movement)
+      insert_list(1, :shipment_unit)
+      insert_list(2, :shipment_unit)
 
-      stock_movements_new = ShipmentUnitModel.get_all()
-      assert 3 = Enum.count(stock_movements_new)
+      shipment_units_new = ShipmentUnitModel.get_all()
+      assert 3 = Enum.count(shipment_units_new)
     end
   end
 end

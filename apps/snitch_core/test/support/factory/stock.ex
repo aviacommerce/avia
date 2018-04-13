@@ -3,7 +3,7 @@ defmodule Snitch.Factory.Stock do
 
   defmacro __using__(_opts) do
     quote do
-      alias Snitch.Data.Schema.{StockItem, StockLocation, StockMovement}
+      alias Snitch.Data.Schema.{StockItem, StockLocation, StockMovement, ShipmentUnit}
 
       def stock_location_factory do
         %StockLocation{
@@ -39,6 +39,16 @@ defmodule Snitch.Factory.Stock do
           originator_type: "",
           originator_id: nil,
           stock_item: build(:stock_item)
+        }
+      end
+
+      def shipment_unit_factory do
+        %ShipmentUnit{
+          quantity: 1,
+          state: "pending",
+          pending: true,
+          variant: insert(:variant),
+          line_item: insert(:line_item)
         }
       end
     end
