@@ -12,7 +12,8 @@ defmodule Snitch.Data.Schema.CardTest do
     name_on_card: "Harry Potter",
     brand: "VISA",
     number: "4111111111111111",
-    is_disabled: false
+    is_disabled: false,
+    card_name: "VISA Credit Card"
   }
 
   setup :user_with_address

@@ -98,7 +98,8 @@ defmodule Snitch.Factory do
       year: 2050,
       name_on_card: "Harry Potter",
       brand: "VISA",
-      number: "4111111111111111"
+      number: "4111111111111111",
+      card_name: "VISA Credit Card"
     }
   end
 

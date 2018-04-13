@@ -27,7 +27,7 @@ defmodule Snitch.Data.Schema.CardPayment do
     timestamps()
   end
 
-  @update_fields ~w(response_code response_message avs_response cvv_response card_id)a
+  @update_fields ~w(response_code response_message avs_response cvv_response)a
   @create_fields [:payment_id | @update_fields]
 
   @doc """
@@ -62,7 +62,6 @@ defmodule Snitch.Data.Schema.CardPayment do
     if payment.params["card_id"] == nil do
       payment
       |> cast_assoc(:card, with: &Card.changeset(&1, &2, :create), required: true)
-      |> foreign_key_constraint(:card_id)
     else
       payment
       |> foreign_key_constraint(:card_id)
