@@ -12,7 +12,7 @@ defmodule Snitch.Data.Model.StockMovementTest do
 
   describe "create/4" do
     test "Fails for INVALID stock item id" do
-      assert {:error, changeset} = StockMovementModel.create(1, 1)
+      assert {:error, changeset} = StockMovementModel.create(1, -1)
       refute changeset.valid?
       assert %{stock_item_id: ["does not exist"]} = errors_on(changeset)
     end
