@@ -95,11 +95,11 @@ defmodule Snitch.Factory do
   def card_factory do
     %Card{
       month: 12,
-      year: 2050,
-      name_on_card: "Harry Potter",
+      year: 2099,
+      name_on_card: "Tony Stark",
       brand: "VISA",
       number: "4111111111111111",
-      card_name: "VISA Credit Card"
+      card_name: "My VISA card"
     }
   end
 
@@ -140,8 +140,9 @@ defmodule Snitch.Factory do
     ]
   end
 
-  def card(context) do
+  def cards(context) do
     %{user: user} = context
-    [card: insert(:card, user_id: user.id)]
+    card_count = Map.get(context, :card_count, 1)
+    [cards: insert_list(card_count, :card, user_id: user.id)]
   end
 end

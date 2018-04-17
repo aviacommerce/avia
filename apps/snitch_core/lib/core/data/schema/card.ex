@@ -1,4 +1,7 @@
 defmodule Snitch.Data.Schema.Card do
+  @moduledoc """
+  """
+
   use Snitch.Data.Schema
 
   alias Snitch.Data.Schema.{CardPayment, User}
@@ -15,7 +18,7 @@ defmodule Snitch.Data.Schema.Card do
     field(:card_name, :string)
 
     field(:last_digits, :string, virtual: true)
-    field(:first_six_digits, :string, virtual: true)
+    field(:first_digits, :string, virtual: true)
 
     belongs_to(:user, User)
 
@@ -24,17 +27,23 @@ defmodule Snitch.Data.Schema.Card do
   end
 
   @required_fields ~w(name_on_card brand user_id month year number)a
-  @optional_fields ~w(card_name)a
   @update_fields ~w(is_disabled card_name)a
+  @cast_fields @required_fields ++ @update_fields
 
-  @cast_fields @required_fields ++ @optional_fields ++ @update_fields
+  @doc """
+  Returns a `Card` changeset.
+
+  The `card_number` should be a string of digits whose length is between 8 to 19
+  digits (inclusive), according to [ISO/IEC
+  7812](https://www.iso.org/obp/ui/#iso:std:iso-iec:7812:-1:ed-5:v1:en)
+  """
   @spec changeset(__MODULE__.t(), map, :create | :update) :: Ecto.Changeset.t()
-  def changeset(card_changeset, params, action)
+  def changeset(card, params, action)
 
-  def changeset(card_changeset, params, :create) do
+  def changeset(%__MODULE__{} = card, params, :create) do
     %{year: current_year, month: current_month} = DateTime.utc_now()
 
-    card_changeset
+    card
     |> cast(params, @cast_fields)
     |> validate_required(@required_fields)
     |> validate_number(
@@ -43,22 +52,21 @@ defmodule Snitch.Data.Schema.Card do
       greater_than_or_equal_to: current_month
     )
     |> validate_number(:year, greater_than_or_equal_to: current_year)
-    |> validate_format(:number, ~r/^\d{16}$/)
+    |> validate_format(:number, ~r/^\d+$/)
+    |> validate_length(:number, max: 19, min: 8)
     |> foreign_key_constraint(:user_id)
     |> mask_card
   end
 
-  def changeset(card_changeset, params, :update) do
-    cast(card_changeset, params, @update_fields)
+  def changeset(%__MODULE__{} = card, params, :update) do
+    cast(card, params, @update_fields)
   end
 
-  def mask_card(card_changeset) do
-    if Map.has_key?(card_changeset.changes, :card_number) do
-      card_changeset
-      |> put_change(:last_digits, String.slice(card_changeset.changes.card_number, -4..-1))
-      |> put_change(:first_six_digits, String.slice(card_changeset.changes.card_number, 0..5))
-    else
-      card_changeset
-    end
+  defp mask_card(%Ecto.Changeset{} = card_changeset) do
+    {:ok, number} = fetch_change(card_changeset, :number)
+
+    card_changeset
+    |> put_change(:last_digits, String.slice(number, -4..-1))
+    |> put_change(:first_digits, String.slice(number, 0..5))
   end
 end

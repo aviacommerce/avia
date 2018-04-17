@@ -3,47 +3,62 @@ defmodule Snitch.Data.Schema.CardTest do
   use Snitch.DataCase
 
   import Snitch.Factory
+  import Ecto.Changeset, only: [apply_changes: 1]
 
   alias Snitch.Data.Schema.Card
 
   @card %{
     month: 12,
-    year: 2050,
-    name_on_card: "Harry Potter",
+    year: 2099,
+    name_on_card: "Tony Stark",
     brand: "VISA",
     number: "4111111111111111",
+    card_name: "My VISA card"
+  }
+
+  @expected %{
+    brand: "VISA",
+    card_name: "My VISA card",
+    first_digits: "411111",
+    last_digits: "1111",
+    month: 12,
+    name_on_card: "Tony Stark",
+    number: "4111111111111111",
     is_disabled: false,
-    card_name: "VISA Credit Card"
+    year: 2099
   }
 
   setup :user_with_address
-  setup :card
 
-  describe "Cards" do
-    test "with valid attributes", context do
-      %{valid?: validity} =
-        Card.changeset(%Card{}, Map.put(@card, :user_id, context.user.id), :create)
+  describe "card" do
+    setup %{user: user} do
+      [card: Map.put(@card, :user_id, user.id)]
+    end
 
+    test "with valid attributes", %{card: card} do
+      %{valid?: validity} = changeset = Card.changeset(%Card{}, card, :create)
+      assert validity
+      assert @expected = apply_changes(changeset)
+    end
+
+    test "without card_name", %{card: card} do
+      %{valid?: validity} = Card.changeset(%Card{}, card, :create)
       assert validity
     end
 
-    test "without name of user", context do
-      card = Map.delete(@card, :name_on_card)
+    test "without name of user", %{card: card} do
+      card = Map.delete(card, :name_on_card)
 
-      changeset =
-        %{valid?: validity} =
-        Card.changeset(%Card{}, Map.put(card, :user_id, context.user.id), :create)
+      changeset = %{valid?: validity} = Card.changeset(%Card{}, card, :create)
 
       refute validity
       assert %{name_on_card: ["can't be blank"]} = errors_on(changeset)
     end
 
-    test "without brand", context do
-      card = Map.delete(@card, :brand)
+    test "without brand", %{card: card} do
+      card = Map.delete(card, :brand)
 
-      changeset =
-        %{valid?: validity} =
-        Card.changeset(%Card{}, Map.put(card, :user_id, context.user.id), :create)
+      changeset = %{valid?: validity} = Card.changeset(%Card{}, card, :create)
 
       refute validity
       assert %{brand: ["can't be blank"]} = errors_on(changeset)
@@ -56,43 +71,57 @@ defmodule Snitch.Data.Schema.CardTest do
       assert %{user_id: ["can't be blank"]} = errors_on(changeset)
     end
 
-    test "with invalid month", context do
-      card = Map.put(@card, :month, 13)
-
-      changeset =
-        %{valid?: validity} =
-        Card.changeset(%Card{}, Map.put(card, :user_id, context.user.id), :create)
+    test "with invalid month", %{card: card} do
+      changeset = %{valid?: validity} = Card.changeset(%Card{}, %{card | month: 13}, :create)
 
       refute validity
       assert %{month: ["must be less than or equal to 12"]} = errors_on(changeset)
     end
 
-    test "with invalid number", context do
-      card = Map.put(@card, :number, "5431111111111")
+    test "with short card number", %{card: card} do
+      changeset =
+        %{valid?: validity} = Card.changeset(%Card{}, %{card | number: "123456"}, :create)
 
+      refute validity
+      assert %{number: ["should be at least 8 character(s)"]} = errors_on(changeset)
+    end
+
+    test "with long card number", %{card: card} do
       changeset =
         %{valid?: validity} =
-        Card.changeset(%Card{}, Map.put(card, :user_id, context.user.id), :create)
+        Card.changeset(%Card{}, %{card | number: "12345678901234567890"}, :create)
+
+      refute validity
+      assert %{number: ["should be at most 19 character(s)"]} = errors_on(changeset)
+    end
+
+    test "with invalid card number", %{card: card} do
+      changeset =
+        %{valid?: validity} = Card.changeset(%Card{}, %{card | number: "1234AB!56"}, :create)
 
       refute validity
       assert %{number: ["has invalid format"]} = errors_on(changeset)
     end
 
-    test "with invalid year", context do
+    test "with invalid year", %{card: card} do
       current_year = DateTime.utc_now() |> Map.fetch!(:year)
-      card = Map.put(@card, :year, current_year - 1)
 
       changeset =
-        %{valid?: validity} =
-        Card.changeset(%Card{}, Map.put(card, :user_id, context.user.id), :create)
+        %{valid?: validity} = Card.changeset(%Card{}, %{card | year: current_year - 1}, :create)
 
       refute validity
       assert %{year: ["must be greater than or equal to #{current_year}"]} == errors_on(changeset)
     end
 
-    test "is deleted", context do
-      changeset = Card.changeset(context.card, %{is_disabled: true}, :update)
-      assert {:ok, _} = Repo.update(changeset)
+    test "can be disabled", %{card: card} do
+      old_card = Card.changeset(%Card{}, card, :create)
+
+      assert %{
+               valid?: true,
+               changes: %{
+                 is_disabled: true
+               }
+             } = Card.changeset(apply_changes(old_card), %{is_disabled: true}, :update)
     end
   end
 end
