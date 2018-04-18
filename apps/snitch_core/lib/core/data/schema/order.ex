@@ -5,6 +5,7 @@ defmodule Snitch.Data.Schema.Order do
 
   use Snitch.Data.Schema
   alias Snitch.Data.Schema.{Address, User, LineItem}
+  alias Snitch.Data.Model.LineItem, as: LineItemModel
 
   @type t :: %__MODULE__{}
 
@@ -80,17 +81,12 @@ defmodule Snitch.Data.Schema.Order do
     |> compute_totals()
   end
 
-  @doc """
-  Computes the order totals and puts those changes in to the changeset.
-  """
   @spec compute_totals(Ecto.Changeset.t()) :: Ecto.Changeset.t()
-  def compute_totals(%Ecto.Changeset{valid?: true} = order_changeset) do
+  defp compute_totals(%Ecto.Changeset{valid?: true} = order_changeset) do
     item_total =
       order_changeset
-      |> get_field(:line_items, [])
-      |> Stream.map(&Map.fetch!(&1, :total))
-      |> Enum.reduce(&Money.add!/2)
-      |> Money.reduce()
+      |> get_field(:line_items)
+      |> LineItemModel.compute_total()
 
     total = Enum.reduce([item_total], &Money.add!/2)
 
@@ -99,7 +95,7 @@ defmodule Snitch.Data.Schema.Order do
     |> put_change(:total, total)
   end
 
-  def compute_totals(order_changeset), do: order_changeset
+  defp compute_totals(order_changeset), do: order_changeset
 
   defp do_changeset(changeset, :create), do: create_changeset(changeset)
   defp do_changeset(changeset, :update), do: update_changeset(changeset)

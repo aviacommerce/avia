@@ -6,26 +6,52 @@ defmodule Snitch.Data.Model.LineItemTest do
 
   alias Snitch.Data.Model.LineItem
 
-  describe "line_item update_price_and_totals with valid params" do
+  @msg_no_default "default currency not set"
+  @inr Money.new(0, :INR)
+
+  describe "with valid params" do
     setup [:variants, :good_line_items]
 
-    test "", context do
+    test "update_price_and_totals/1", context do
       %{line_items: line_items, totals: totals} = context
       priced_items = LineItem.update_price_and_totals(line_items)
 
       assert Enum.all?(priced_items, fn x -> totals[x.variant_id] == Money.reduce(x.total) end)
     end
+
+    test "compute_totals/1", context do
+      %{line_items: line_items} = context
+      priced_items = LineItem.update_price_and_totals(line_items)
+      assert %Money{} = LineItem.compute_total(priced_items)
+    end
   end
 
-  describe "line_item update_price_and_totals with invalid params" do
+  describe "with invalid params" do
     setup [:variants, :bad_line_items]
 
-    test "", context do
+    test "update_price_and_totals/1", context do
       %{line_items: line_items} = context
       priced_items = LineItem.update_price_and_totals(line_items)
 
       assert Enum.all?(priced_items, &(not Map.has_key?(&1, :total)))
       assert Enum.all?(priced_items, &(not Map.has_key?(&1, :unit_price)))
+    end
+  end
+
+  describe "compute_total/1 with empty list" do
+    setup do: Application.put_env(:snitch_core, :core_config_app, :snitch)
+
+    test "when default currency is set" do
+      Application.put_env(:snitch, :defaults, currency: :INR)
+      assert @inr = LineItem.compute_total([])
+    end
+
+    test "when default currency is not set" do
+      Application.put_env(:snitch, :defaults, [])
+
+      assert_raise RuntimeError, @msg_no_default, fn ->
+        LineItem.compute_total([])
+      end
     end
   end
 

@@ -6,6 +6,13 @@ defmodule Snitch.Data.Model.OrderTest do
 
   alias Snitch.Data.Model.Order
 
+  @zero_inr Money.new(0, :INR)
+
+  setup_all do
+    Application.put_env(:snitch_core, :core_config_app, :snitch)
+    Application.put_env(:snitch, :defaults, currency: :INR)
+  end
+
   setup :variants
   setup :user_with_address
 
@@ -56,7 +63,11 @@ defmodule Snitch.Data.Model.OrderTest do
     end
 
     test "remove all line_items", %{order: order} do
-      assert_raise Enum.EmptyError, fn -> Order.update(%{line_items: []}, order) end
+      assert {:ok,
+              %{
+                item_total: @zero_inr,
+                total: @zero_inr
+              }} = Order.update(%{line_items: []}, order)
     end
 
     test "update few items", %{order: order} do
