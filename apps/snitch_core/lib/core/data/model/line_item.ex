@@ -4,6 +4,7 @@ defmodule Snitch.Data.Model.LineItem do
   """
   use Snitch.Data.Model
   alias Snitch.Data.Schema.{Variant, LineItem}
+  alias Snitch.Tools.Money, as: MoneyTools
 
   @spec get(map) :: LineItem.t() | nil
   def get(query_fields) do
@@ -53,6 +54,21 @@ defmodule Snitch.Data.Model.LineItem do
       |> Variant.get_selling_prices()
 
     Enum.map(line_items, &set_price_and_total(&1, unit_selling_prices))
+  end
+
+  @doc """
+  Returns the item total for given `line_items`.
+
+  If the list is empty, the call is delegated to `MoneyTools.zero/1`.
+  """
+  @spec compute_total([LineItem.t()]) :: Money.t()
+  def compute_total([]), do: MoneyTools.zero!()
+
+  def compute_total(line_items) when is_list(line_items) do
+    line_items
+    |> Stream.map(&Map.fetch!(&1, :total))
+    |> Enum.reduce(&Money.add!/2)
+    |> Money.reduce()
   end
 
   @spec set_price_and_total(map, %{non_neg_integer: Money.t()}) :: map
