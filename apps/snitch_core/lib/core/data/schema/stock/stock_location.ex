@@ -1,16 +1,19 @@
 defmodule Snitch.Data.Schema.StockLocation do
   @moduledoc """
-  Model to track inventory
+  Models a store location or a warehouse where stock is stored, ready to be
+  shipped.
   """
   use Snitch.Data.Schema
-  use Snitch.Data.Schema.Stock
+  alias Snitch.Data.Schema.{StockItem, State, Country}
 
   @typedoc """
-  ## Field  :propagate_all_variants
-  Checking this option when you create a new stock location will
-  loop through all of the products you already have in your store,
-  and create an entry for each one at your new location, with a
-  starting inventory amount of 0.
+  ## Fields
+
+  1. `:propagate_all_variants`
+
+  If this is set to `true` when creating a new `StockLocation`, then a
+  `StockItem` entry with `0` `:count_on_hand` and this `StockLocation` is
+  created for _all currently existing variants_.
   """
   @type t :: %__MODULE__{}
 
@@ -19,9 +22,9 @@ defmodule Snitch.Data.Schema.StockLocation do
     # Internal system name
     field(:admin_name, :string)
     field(:default, :boolean, default: false)
+
     field(:address_line_1, :string)
     field(:address_line_2, :string)
-
     field(:city, :string)
     field(:zip_code, :string)
     field(:phone, :string)
@@ -34,27 +37,30 @@ defmodule Snitch.Data.Schema.StockLocation do
     has_many(:stock_items, StockItem)
     has_many(:stock_movements, through: [:stock_items, :stock_movements])
 
-    belongs_to(:state, Snitch.Data.Schema.State)
-    belongs_to(:country, Snitch.Data.Schema.Country)
+    belongs_to(:state, State)
+    belongs_to(:country, Country)
 
     timestamps()
   end
 
   @required_fields ~w(name address_line_1 state_id country_id)a
-  @opt_update_fields ~w(
-      admin_name default address_line_2 city zip_code phone propagate_all_variants
-      backorderable_default active
-    )a
+  @cast_fields ~w(admin_name address_line_2 city zip_code phone propagate_all_variants)a ++
+                 ~w(backorderable_default active)a ++ @required_fields
 
-  @spec changeset(__MODULE__.t(), map, atom) :: Ecto.Changeset.t()
-  def changeset(instance, params, _),
-    do: do_changeset(instance, params, @required_fields, @opt_update_fields)
+  @spec create_changeset(t, map) :: Ecto.Changeset.t()
+  def create_changeset(%__MODULE__{} = stock_location, params),
+    do: changeset(stock_location, params)
 
-  defp do_changeset(instance, params, fields, optional) do
-    instance
-    |> cast(params, fields ++ optional)
-    |> validate_required(fields)
+  @spec update_changeset(t, map) :: Ecto.Changeset.t()
+  def update_changeset(%__MODULE__{} = stock_location, params),
+    do: changeset(stock_location, params)
+
+  defp changeset(stock_location, params) do
+    stock_location
+    |> cast(params, @cast_fields)
+    |> validate_required(@required_fields)
     |> validate_length(:address_line_1, min: 10)
+    |> validate_format(:phone, ~r/^\d{10}$/)
     |> foreign_key_constraint(:state_id)
     |> foreign_key_constraint(:country_id)
   end

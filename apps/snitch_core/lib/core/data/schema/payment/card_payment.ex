@@ -31,18 +31,13 @@ defmodule Snitch.Data.Schema.CardPayment do
   @create_fields ~w(payment_id card_id)a ++ @update_fields
 
   @doc """
-  Returns a `CardPayment` changeset.
+  Returns a `CardPayment` changeset for a new `card_payment`.
 
-  `:payment_id` is required when `action` is `:create`. When `action` is
-  `:update`, the `:payment_id` if provided, is simply ignored.
-
-  Consider deleting the payment if you wish to "change" the payment type.
+  `:payment_id` is required!
   """
-  @spec changeset(__MODULE__.t(), map, :create | :update) :: Ecto.Changeset.t()
-  def changeset(payment, params, action)
-
-  def changeset(payment, params, :create) do
-    payment
+  @spec create_changeset(t, map) :: Ecto.Changeset.t()
+  def create_changeset(%__MODULE__{} = card_payment, params) do
+    card_payment
     |> cast(params, @create_fields)
     |> assoc_card()
     |> unique_constraint(:payment_id)
@@ -54,8 +49,16 @@ defmodule Snitch.Data.Schema.CardPayment do
     )
   end
 
-  def changeset(payment, params, :update) do
-    cast(payment, params, @update_fields)
+  @doc """
+  Returns a `CardPayment` changeset to update a `card_payment`.
+
+  Note that `:payment_id` cannot be changed, consider deleting this
+  `card_payment` instead and creating a new `Snitch.Data.Schema.Payment` as well
+  as `Snitch.Data.Schema.CardPayment`.
+  """
+  @spec create_changeset(t, map) :: Ecto.Changeset.t()
+  def update_changeset(%__MODULE__{} = card_payment, params) do
+    cast(card_payment, params, @update_fields)
   end
 
   def assoc_card(payment_changeset) do

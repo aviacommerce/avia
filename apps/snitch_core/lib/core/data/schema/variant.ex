@@ -4,14 +4,15 @@ defmodule Snitch.Data.Schema.Variant do
   """
 
   use Snitch.Data.Schema
-  use Snitch.Data.Schema.Stock
 
   import Ecto.Query
 
+  alias Snitch.Data.Schema.StockItem
   alias Snitch.Repo
   alias Money.Ecto.Composite.Type, as: MoneyType
 
   @type t :: %__MODULE__{}
+
   schema "snitch_variants" do
     field(:sku, :string, default: "")
     field(:weight, :decimal, default: Decimal.new(0))
@@ -29,8 +30,8 @@ defmodule Snitch.Data.Schema.Variant do
     timestamps()
   end
 
-  @permitted_fields ~w(sku weight height width depth is_master
-  cost_price position track_inventory discontinue_on)a
+  @permitted_fields ~w(sku weight height width depth is_master)a ++
+                      ~w(cost_price position track_inventory discontinue_on)a
 
   def changeset(%__MODULE__{} = variant, attrs) do
     variant
@@ -49,7 +50,7 @@ defmodule Snitch.Data.Schema.Variant do
   """
   @spec get_selling_prices([non_neg_integer]) :: %{non_neg_integer: Money.t()}
   def get_selling_prices(variant_ids) do
-    # change the table to snitch_prices when it becomes available
+    # TODO: change the table to snitch_prices when it becomes available
     query =
       from(v in "snitch_variants", select: [v.id, v.cost_price], where: v.id in ^variant_ids)
 

@@ -37,48 +37,50 @@ defmodule Snitch.Data.Schema.Order do
 
   @required_fields ~w(slug state user_id)a
   @optional_fields ~w(billing_address_id shipping_address_id)a
+  @create_fields @required_fields
+  @update_fields ~w(slug state)a ++ @optional_fields
 
   @doc """
-  Returns a complete changeset with totals.
+  Returns a Order changeset with totals for a "new" order.
 
-  The `action` field can be either `:create` or `:update`.
-
-  * `:create`
-    - A list of `LineItem` params are expected under the `:line_items` key, and
-      each of those must include price fields, use
-      `Snitch.Data.Model.LineItem.update_price_and_totals/1` if
-      needed. Note that `variant_id`s must be unique in each line item.
-  * `:update`
-    - `LineItem` params (if any) must include price fields.
-
-  ## Note
-  The changeset `action` is not set.
+  A list of `LineItem` params are expected under the `:line_items` key, and each
+  of those must include price fields, use
+  `Snitch.Data.Model.LineItem.update_price_and_totals/1` if needed.
+  > Note that `variant_id`s must be unique in each line item.
   """
-  @spec changeset(__MODULE__.t(), map, :create | :update) :: Ecto.Changeset.t()
-  def changeset(order, params, action) do
+  @spec create_changeset(t, map) :: Ecto.Changeset.t()
+  def create_changeset(%__MODULE__{} = order, params) do
     order
-    |> cast(params, @required_fields ++ @optional_fields)
+    |> cast(params, @create_fields)
     |> validate_required(@required_fields)
+    |> common_changeset()
     |> foreign_key_constraint(:user_id)
-    |> foreign_key_constraint(:billing_address_id)
-    |> foreign_key_constraint(:shipping_address_id)
-    |> do_changeset(action)
-  end
-
-  @spec create_changeset(Ecto.Changeset.t()) :: Ecto.Changeset.t()
-  defp create_changeset(order_changeset) do
-    order_changeset
     |> cast_assoc(:line_items, with: &LineItem.create_changeset/2, required: true)
     |> ensure_unique_line_items()
     |> compute_totals()
   end
 
-  @spec update_changeset(Ecto.Changeset.t()) :: Ecto.Changeset.t()
-  defp update_changeset(order_changeset) do
-    order_changeset
+  @doc """
+  Returns a Order changeset with totals to update `order`.
+
+  `LineItem` params (if any) must include price fields.
+  > Note that `variant_id`s must be unique in each line item.
+  """
+  @spec update_changeset(t, map) :: Ecto.Changeset.t()
+  def update_changeset(%__MODULE__{} = order, params) do
+    order
+    |> cast(params, @update_fields)
+    |> common_changeset()
     |> cast_assoc(:line_items, with: &LineItem.create_changeset/2)
     |> ensure_unique_line_items()
     |> compute_totals()
+  end
+
+  @spec common_changeset(Ecto.Changeset.t()) :: Ecto.Changeset.t()
+  defp common_changeset(order_changeset) do
+    order_changeset
+    |> foreign_key_constraint(:billing_address_id)
+    |> foreign_key_constraint(:shipping_address_id)
   end
 
   @spec compute_totals(Ecto.Changeset.t()) :: Ecto.Changeset.t()
@@ -99,9 +101,6 @@ defmodule Snitch.Data.Schema.Order do
   end
 
   defp compute_totals(order_changeset), do: order_changeset
-
-  defp do_changeset(changeset, :create), do: create_changeset(changeset)
-  defp do_changeset(changeset, :update), do: update_changeset(changeset)
 
   @spec ensure_unique_line_items(Ecto.Changeset.t()) :: Ecto.Changeset.t()
   defp ensure_unique_line_items(%Ecto.Changeset{valid?: true} = order_changeset) do

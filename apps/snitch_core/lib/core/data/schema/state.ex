@@ -2,9 +2,10 @@ defmodule Snitch.Data.Schema.State do
   @moduledoc """
   Models a State
   """
-
   use Snitch.Data.Schema
   alias Snitch.Data.Schema.Country
+
+  @type t :: %__MODULE__{}
 
   schema "snitch_states" do
     field(:name, :string)
@@ -14,9 +15,10 @@ defmodule Snitch.Data.Schema.State do
     timestamps()
   end
 
-  def changeset(%__MODULE__{} = state, attrs \\ %{}) do
+  @spec changeset(t, map) :: Ecto.Changeset.t()
+  def changeset(%__MODULE__{} = state, params) do
     state
-    |> cast(attrs, [:abbr, :name, :country_id])
+    |> cast(params, [:abbr, :name, :country_id])
     |> validate_required([:abbr, :name, :country_id])
     |> foreign_key_constraint(:country_id)
     |> unique_constraint(

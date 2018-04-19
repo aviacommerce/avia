@@ -16,6 +16,8 @@ defmodule Snitch.Factory do
     Card
   }
 
+  alias Snitch.Repo
+
   def user_factory do
     %User{
       first_name: sequence(:first_name, &"Tony-#{&1}"),
@@ -137,7 +139,7 @@ defmodule Snitch.Factory do
         )
       end)
       |> Enum.take(count)
-      |> Enum.map(&Snitch.Repo.insert!/1)
+      |> Enum.map(&Repo.insert!/1)
 
     [line_items: line_items]
   end

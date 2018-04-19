@@ -1,9 +1,9 @@
 defmodule Snitch.Tools.MoneyTest do
   use ExUnit.Case, async: true
 
-  alias Snitch.Tools.Money, as: MoneyTools
-
   import Mox
+
+  alias Snitch.Tools.Money, as: MoneyTools
 
   @msg_no_default "default 'currency' not set"
   @error_no_default {:error, @msg_no_default}

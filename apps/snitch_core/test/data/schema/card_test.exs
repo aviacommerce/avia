@@ -104,7 +104,7 @@ defmodule Snitch.Data.Schema.CardTest do
     end
 
     test "with invalid year", %{card: card} do
-      current_year = DateTime.utc_now() |> Map.fetch!(:year)
+      %{year: current_year} = DateTime.utc_now()
 
       changeset =
         %{valid?: validity} = Card.changeset(%Card{}, %{card | year: current_year - 1}, :create)
