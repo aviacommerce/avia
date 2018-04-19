@@ -20,7 +20,7 @@ defmodule Snitch.Seed.PaymentMethods do
 
   Snitch will support "Store Credits", which act like e-wallets for users.
   """
-  use Snitch.Data.Schema
+  alias Snitch.Data.Schema.PaymentMethod
 
   alias Snitch.Repo
 
