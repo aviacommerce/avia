@@ -35,30 +35,35 @@ defmodule Snitch.Data.Schema.ShippingMethod do
   @required_fields @create_fields
 
   @doc """
-  Returns a ShippingMethod changeset depending on `action`
+  Returns a `ShippingMethod` changeset for a new `shipping_method`.
 
-  If the `action` is `:create`, `[#{
+  The `zones` must be `Snitch.Data.Schema.Zone.t` structs.
+  The following fields must be present in `params`: `[#{
     @required_fields
     |> Enum.map(fn x -> ":#{x}" end)
     |> Enum.intersperse(", ")
   }]`
-  are required.
-
-  The `zones` must be `Snitch.Data.Schema.Zone.t` structs. Even if `action` is
-  `:update` a full list of the desired zone structs is expected.
   """
-  @spec changeset(t, %{}, [Zone], :create | :update) :: Ecto.Changeset.t()
-  def changeset(%__MODULE__{} = shipping_method, params, zones, :create) do
+  @spec create_changeset(t, map, [Zone]) :: Ecto.Changeset.t()
+  def create_changeset(%__MODULE__{} = shipping_method, params, zones) do
     shipping_method
-    |> common_changeset(params, zones)
+    |> changeset(params, zones)
     |> validate_required(@required_fields)
   end
 
-  def changeset(%__MODULE__{} = shipping_method, params, zones, :update) do
-    common_changeset(shipping_method, params, zones)
+  @doc """
+  Returns a `ShippingMethod` changeset for a new `shipping_method`.
+
+  The `zones` must be `Snitch.Data.Schema.Zone.t` structs, and a full list of
+  the desired zone structs is expected.
+  """
+  @spec update_changeset(t, map, [Zone]) :: Ecto.Changeset.t()
+  def update_changeset(%__MODULE__{} = shipping_method, params, zones) do
+    changeset(shipping_method, params, zones)
   end
 
-  defp common_changeset(%__MODULE__{} = shipping_method, params, zones) do
+  @spec update_changeset(t, map, [Zone]) :: Ecto.Changeset.t()
+  defp changeset(%__MODULE__{} = shipping_method, params, zones) do
     shipping_method
     |> cast(params, @create_fields)
     |> unique_constraint(:slug)

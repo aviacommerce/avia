@@ -131,8 +131,7 @@ defmodule Snitch.Data.Model.OrderTest do
   # `key` in `others`.
   defp extract_ids(items, others \\ []) do
     transforms =
-      others
-      |> Enum.map(fn key ->
+      Enum.map(others, fn key ->
         fn acc, struct ->
           value = Map.fetch!(struct, key)
           Map.put(acc, key, value)

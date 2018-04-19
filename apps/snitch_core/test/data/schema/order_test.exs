@@ -48,7 +48,7 @@ defmodule Snitch.Data.Schema.OrderTest do
     test "unassociated line_items", context do
       %{persisted: persisted, line_items: line_items} = context
       params = %{line_items: LineItem.update_price_and_totals(line_items)}
-      new_order = Order.changeset(persisted, params, :update)
+      new_order = Order.update_changeset(persisted, params)
       %{valid?: validity, changes: changes} = new_order
 
       assert validity
@@ -76,7 +76,7 @@ defmodule Snitch.Data.Schema.OrderTest do
       total = Enum.reduce(totals, &Money.add!/2)
       params = %{line_items: LineItem.update_price_and_totals(new_line_items)}
 
-      new_order = Order.changeset(persisted, params, :update)
+      new_order = Order.update_changeset(persisted, params)
       %{valid?: validity, changes: changes} = new_order
 
       assert validity
@@ -91,7 +91,7 @@ defmodule Snitch.Data.Schema.OrderTest do
       [one, two, three] = persisted.line_items
       new_line_items = [%{id: one.id}, %{id: two.id}, %{id: three.id}]
       params = %{line_items: LineItem.update_price_and_totals(new_line_items)}
-      new_order = Order.changeset(persisted, params, :update)
+      new_order = Order.update_changeset(persisted, params)
       %{valid?: validity, changes: changes} = new_order
 
       assert validity
@@ -134,7 +134,7 @@ defmodule Snitch.Data.Schema.OrderTest do
       line_items: LineItem.update_price_and_totals(line_items)
     }
 
-    [order: Order.changeset(order, params, :create)]
+    [order: Order.create_changeset(order, params)]
   end
 
   defp persist(%{order: order}) do

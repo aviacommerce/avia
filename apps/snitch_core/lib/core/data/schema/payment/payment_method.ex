@@ -23,10 +23,10 @@ defmodule Snitch.Data.Schema.PaymentMethod do
   @create_fields [:code | @update_fields]
 
   @doc """
-  Returns a `PaymentMethod` changeset.
+  Returns a `PaymentMethod` changeset for a new `payment_method`.
   """
-  @spec changeset(__MODULE__.t(), map, :create | :update) :: Ecto.Changeset.t()
-  def changeset(payment_method, params, :create) do
+  @spec create_changeset(t, map) :: Ecto.Changeset.t()
+  def create_changeset(%__MODULE__{} = payment_method, params) do
     payment_method
     |> cast(params, @create_fields)
     |> validate_required(@create_fields)
@@ -34,7 +34,11 @@ defmodule Snitch.Data.Schema.PaymentMethod do
     |> unique_constraint(:code)
   end
 
-  def changeset(payment_method, params, :update) do
+  @doc """
+  Returns a `PaymentMethod` changeset to update `payment_method`.
+  """
+  @spec update_changeset(t, map) :: Ecto.Changeset.t()
+  def update_changeset(%__MODULE__{} = payment_method, params) do
     cast(payment_method, params, @update_fields)
   end
 end

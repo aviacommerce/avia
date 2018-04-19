@@ -20,7 +20,7 @@ matrix:
   - elixir: "1.5.3"
     script:
       - mix coveralls.json --umbrella
-  - elixir: "1.6.2"
+  - elixir: "1.6.4"
 
 notifications:
   email:

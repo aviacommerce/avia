@@ -1,5 +1,6 @@
 defmodule Snitch.Data.Model.ShipmentUnit do
   @moduledoc """
+  `ShipmentUnit` CRUD API (ironic as there is only `create` :P).
   """
 
   use Snitch.Data.Model

@@ -6,6 +6,8 @@ defmodule Snitch.Data.Schema.Country do
   use Snitch.Data.Schema
   alias Snitch.Data.Schema.State
 
+  @type t :: %__MODULE__{}
+
   schema "snitch_countries" do
     field(:iso_name, :string)
     field(:iso, :string)
@@ -18,9 +20,10 @@ defmodule Snitch.Data.Schema.Country do
     timestamps()
   end
 
-  def changeset(%__MODULE__{} = country, attrs \\ %{}) do
+  @spec changeset(t, map) :: Ecto.Changeset.t()
+  def changeset(%__MODULE__{} = country, params) do
     country
-    |> cast(attrs, [:iso, :iso3, :iso_name, :name, :numcode, :states_required])
+    |> cast(params, [:iso, :iso3, :iso_name, :name, :numcode, :states_required])
     |> validate_required([:iso, :iso3, :iso_name, :name, :numcode])
     |> validate_length(:iso, is: 2)
     |> validate_length(:iso3, is: 3)
@@ -31,6 +34,7 @@ defmodule Snitch.Data.Schema.Country do
     |> build_iso_name
   end
 
+  @spec build_iso_name(Ecto.Changeset.t()) :: Ecto.Changeset.t()
   defp build_iso_name(changeset) do
     name = get_change(changeset, :name)
 

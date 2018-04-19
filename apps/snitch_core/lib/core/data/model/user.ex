@@ -27,5 +27,5 @@ defmodule Snitch.Data.Model.User do
   end
 
   @spec get_all() :: [UserSchema.t()]
-  def get_all(), do: Repo.all(UserSchema)
+  def get_all, do: Repo.all(UserSchema)
 end

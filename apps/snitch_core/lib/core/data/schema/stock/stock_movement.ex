@@ -1,9 +1,12 @@
 defmodule Snitch.Data.Schema.StockMovement do
   @moduledoc """
-  Model to track inventory movement in between locations
+  Records movement of stock (aka. `StockItem`) in between `StockLocation`s.
+
+  `StockMovement`s cannot be updated, though the effect of an existing stock
+  movement can be negated by creating its inverse.
   """
   use Snitch.Data.Schema
-  use Snitch.Data.Schema.Stock
+  alias Snitch.Data.Schema.{StockItem}
 
   @type t :: %__MODULE__{}
 
@@ -18,24 +21,25 @@ defmodule Snitch.Data.Schema.StockMovement do
     timestamps()
   end
 
-  @quantity_limits %{min: round(:math.pow(-2, 31)), max: round(:math.pow(2, 31) - 1)}
-  @create_fields ~w(quantity stock_item_id)a
+  @max_abs_quantity round(:math.pow(2, 31))
+  @min_limit @max_abs_quantity * -1
+  @max_limit @max_abs_quantity - 1
+
+  @required_fields ~w(quantity stock_item_id)a
+  @create_fields @required_fields ++ ~w(originator_type originator_type)a
 
   @doc """
-  Stock Movements and Stock Transfers are only created.
-  Inorder to update them we can create another stock movement to reverse its effects.
+  Returns a `StockMovement` changeset to create a new `stock_movement`.
   """
-  @spec changeset(__MODULE__.t(), map, atom) :: Ecto.Changeset.t()
-  def changeset(instance, params, :create), do: do_changeset(instance, params, @create_fields)
-
-  defp do_changeset(instance, params, fields, optional \\ []) do
-    instance
-    |> cast(params, fields ++ optional)
-    |> validate_required(fields)
+  @spec create_changeset(t, map) :: Ecto.Changeset.t()
+  def create_changeset(stock_movement, params) do
+    stock_movement
+    |> cast(params, @create_fields)
+    |> validate_required(@required_fields)
     |> validate_number(
       :quantity,
-      greater_than_or_equal_to: @quantity_limits.min,
-      less_than_or_equal_to: @quantity_limits.max
+      greater_than_or_equal_to: @min_limit,
+      less_than_or_equal_to: @max_limit
     )
     |> foreign_key_constraint(:stock_item_id)
   end

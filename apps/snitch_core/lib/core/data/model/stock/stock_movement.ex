@@ -1,5 +1,6 @@
 defmodule Snitch.Data.Model.StockMovement do
   @moduledoc """
+  `StockMovement` API
   """
 
   use Snitch.Data.Model
