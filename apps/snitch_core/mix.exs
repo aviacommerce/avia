@@ -9,7 +9,7 @@ defmodule Snitch.Core.Mixfile do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.5",
+      elixir: ">= 1.5.3",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -39,14 +39,14 @@ defmodule Snitch.Core.Mixfile do
   defp deps do
     [
       {:postgrex, "~> 0.13.5"},
-      {:ecto, "~> 2.1"},
+      {:ecto, "~> 2.2"},
       {:poison, "~> 3.1", override: true},
       {:ex_money, "~> 2.5.0"},
-      {:credo, "~> 0.9.0-rc", only: :dev, runtime: false},
-      {:credo_contrib, "~> 0.1.0-rc", only: :dev, runtime: false},
+      {:credo, "~> 0.9.1", only: :dev, runtime: false},
+      {:credo_contrib, "~> 0.1.0-rc3", only: :dev, runtime: false},
 
       # auth
-      {:comeonin, "~> 4.0"},
+      {:comeonin, "~> 4.1.1"},
       {:argon2_elixir, "~> 1.2"},
 
       # countries etc
@@ -57,7 +57,6 @@ defmodule Snitch.Core.Mixfile do
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
       {:mox, "~> 0.3", only: :test},
-      {:ex_machina, "~> 2.1", only: :test},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
       {:inch_ex, "~> 0.5.6", only: [:docs, :dev]}
     ]
