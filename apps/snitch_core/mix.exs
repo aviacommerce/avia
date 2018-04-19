@@ -25,13 +25,13 @@ defmodule Snitch.Core.Mixfile do
   def application do
     [
       mod: {Snitch.Application, []},
-      extra_applications: [:logger, :runtime_tools, :yamerl, :worldly]
+      extra_applications: [:logger, :runtime_tools]
     ]
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
+  defp elixirc_paths(:test), do: ["lib", "test/support", "priv/repo/seed"]
+  defp elixirc_paths(_), do: ["lib", "priv/repo/seed"]
 
   # Specifies your project dependencies.
   #
@@ -50,10 +50,8 @@ defmodule Snitch.Core.Mixfile do
       {:argon2_elixir, "~> 1.2"},
 
       # countries etc
-      {:excountries, "~> 0.0.1"},
       {:yamerl, github: "yakaz/yamerl", override: true},
       {:worldly, github: "martide/worldly"},
-      {:uuid, "~> 1.1"},
 
       # docs and tests
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
@@ -89,7 +87,7 @@ defmodule Snitch.Core.Mixfile do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seed/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate", "test"]
     ]

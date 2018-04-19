@@ -14,4 +14,4 @@
 Snitch.Seed.CountryState.seed_countries_and_states!()
 
 # seed payment methods
-Core.Seed.PaymentMethods.seed!()
+Snitch.Seed.PaymentMethods.seed!()
