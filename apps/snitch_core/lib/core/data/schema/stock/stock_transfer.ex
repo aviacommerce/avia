@@ -6,7 +6,7 @@ defmodule Snitch.Data.Schema.StockTransfer do
   * Both source and destination locations must be set.
   """
   use Snitch.Data.Schema
-  use Snitch.Data.Schema.Stock
+  alias Snitch.Data.Schema.StockLocation
 
   @typedoc """
   ### `:reference`
@@ -36,12 +36,9 @@ defmodule Snitch.Data.Schema.StockTransfer do
   Stock Transfers cannot be updated, to reverse/change the effect of a transfer,
   a new one needs to be created.
   """
-  @spec changeset(__MODULE__.t(), map, atom) :: Ecto.Changeset.t()
-  def changeset(instance, params, operation \\ :create)
-  def changeset(instance, params, :create), do: do_changeset(instance, params)
-
-  defp do_changeset(instance, params) do
-    instance
+  @spec create_changeset(t, map) :: Ecto.Changeset.t()
+  def create_changeset(%__MODULE__{} = stock_transfer, params) do
+    stock_transfer
     |> cast(params, @create_fields)
     |> validate_required(@required_fields)
     |> foreign_key_constraint(:destination_id)

@@ -1,10 +1,9 @@
 defmodule Snitch.Data.Schema.StockItem do
   @moduledoc """
-  Model to track inventory
+  StockItem tracks the store's inventory.
   """
   use Snitch.Data.Schema
-  use Snitch.Data.Schema.Stock
-  alias Snitch.Data.Schema.Variant
+  alias Snitch.Data.Schema.{Variant, StockLocation}
 
   @type t :: %__MODULE__{}
 
@@ -20,22 +19,30 @@ defmodule Snitch.Data.Schema.StockItem do
 
   @create_fields ~w(variant_id stock_location_id count_on_hand)a
   @update_fields ~w(count_on_hand)a
-  @opt_update_fields []
 
-  def create_fields, do: @create_fields
-  def update_fields, do: @update_fields
+  @doc """
+  Returns a `StockItem` changeset to create a new `stock_item`.
+  """
+  @spec create_changeset(t, map) :: Ecto.Changeset.t()
+  def create_changeset(%__MODULE__{} = stock_item, params) do
+    stock_item
+    |> cast(params, @create_fields)
+    |> validate_required(@create_fields)
+    |> common_changeset()
+  end
 
-  @spec changeset(__MODULE__.t(), map, atom) :: Ecto.Changeset.t()
-  def changeset(instance, params, operation \\ :create)
-  def changeset(instance, params, :create), do: do_changeset(instance, params, @create_fields)
+  @doc """
+  Returns a `StockItem` changeset to update `stock_item`.
+  """
+  @spec update_changeset(t, map) :: Ecto.Changeset.t()
+  def update_changeset(%__MODULE__{} = stock_item, params) do
+    stock_item
+    |> cast(params, @update_fields)
+    |> common_changeset()
+  end
 
-  def changeset(instance, params, :update),
-    do: do_changeset(instance, params, @update_fields, @opt_update_fields)
-
-  defp do_changeset(instance, params, fields, optional \\ []) do
-    instance
-    |> cast(params, fields ++ optional)
-    |> validate_required(fields)
+  defp common_changeset(stock_item_changeset) do
+    stock_item_changeset
     |> validate_number(:count_on_hand, greater_than: -1)
     |> foreign_key_constraint(:variant_id)
     |> foreign_key_constraint(:stock_location_id)

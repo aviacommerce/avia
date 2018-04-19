@@ -27,8 +27,8 @@ defmodule Snitch.Data.Schema.LineItem do
   Do not persist this to DB since price fields and order are not set! To set
   prices see `update_totals/1` and `create_changeset/2`.
   """
-  @spec changeset(__MODULE__.t(), map) :: Ecto.Changeset.t()
-  def changeset(line_item, params) do
+  @spec changeset(t, map) :: Ecto.Changeset.t()
+  def changeset(%__MODULE__{} = line_item, params) do
     line_item
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
@@ -40,8 +40,8 @@ defmodule Snitch.Data.Schema.LineItem do
   @doc """
   Returns a `LineItem` changeset that can be used for `insert`/`update`.
   """
-  @spec create_changeset(__MODULE__.t(), map) :: Ecto.Changeset.t()
-  def create_changeset(line_item, params) do
+  @spec create_changeset(t, map) :: Ecto.Changeset.t()
+  def create_changeset(%__MODULE__{} = line_item, params) do
     line_item
     |> changeset(params)
     |> validate_required(@optional_fields)

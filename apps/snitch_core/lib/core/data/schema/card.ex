@@ -1,11 +1,29 @@
 defmodule Snitch.Data.Schema.Card do
   @moduledoc """
+  Models Credit and Debit cards.
+
+  A `User` can save cards by setting the `:card_name`, even if the card is not
+  saved, it is associated with the user.
   """
 
   use Snitch.Data.Schema
 
   alias Snitch.Data.Schema.{CardPayment, User}
 
+  @typedoc """
+  ## `:is_disabled` and `:card_name`
+
+  These fields together decide if the card is listed as a "saved card" to the user.
+
+  | `:is_disabled` | `:card_name`        | Listed as a saved card? |
+  |----------------|---------------------|-------------------------|
+  | `false`        | **not `nil` or `""` | yes                     |
+  | `false`        | `nil` or `""`       | no                      |
+  | `true`         | `any`               | no                      |
+
+  ## Note
+  A `Card` is never deleted, because `CardPayments` are never deleted.
+  """
   @type t :: %__MODULE__{}
 
   schema "snitch_cards" do
@@ -37,7 +55,7 @@ defmodule Snitch.Data.Schema.Card do
   digits (inclusive), according to [ISO/IEC
   7812](https://www.iso.org/obp/ui/#iso:std:iso-iec:7812:-1:ed-5:v1:en)
   """
-  @spec changeset(__MODULE__.t(), map, :create | :update) :: Ecto.Changeset.t()
+  @spec changeset(t, map, :create | :update) :: Ecto.Changeset.t()
   def changeset(card, params, action)
 
   def changeset(%__MODULE__{} = card, params, :create) do

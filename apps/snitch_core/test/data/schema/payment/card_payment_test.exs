@@ -27,11 +27,10 @@ defmodule Snitch.Data.Schema.CardPaymentTest do
       insert(:card_payment, payment_id: card_payment.id)
 
       card_payment =
-        CardPayment.changeset(
-          %CardPayment{},
-          %{payment_id: card_payment.id, card: %{@card | user_id: user.id}},
-          :create
-        )
+        CardPayment.create_changeset(%CardPayment{}, %{
+          payment_id: card_payment.id,
+          card: %{@card | user_id: user.id}
+        })
 
       assert {:error, cs} = Repo.insert(card_payment)
       assert %{payment_id: ["has already been taken"]} = errors_on(cs)
@@ -41,11 +40,10 @@ defmodule Snitch.Data.Schema.CardPaymentTest do
       %{chk: check, user: user} = context
 
       card_payment =
-        CardPayment.changeset(
-          %CardPayment{},
-          %{payment_id: check.id, card: %{@card | user_id: user.id}},
-          :create
-        )
+        CardPayment.create_changeset(%CardPayment{}, %{
+          payment_id: check.id,
+          card: %{@card | user_id: user.id}
+        })
 
       assert {:error, cs} = Repo.insert(card_payment)
       assert %{payment_id: ["does not refer a card payment"]} = errors_on(cs)
@@ -57,14 +55,10 @@ defmodule Snitch.Data.Schema.CardPaymentTest do
 
     test "with existing card", %{cards: [card | _], ccd: ccd} do
       card_payment =
-        CardPayment.changeset(
-          %CardPayment{},
-          %{
-            payment_id: ccd.id,
-            card_id: card.id
-          },
-          :create
-        )
+        CardPayment.create_changeset(%CardPayment{}, %{
+          payment_id: ccd.id,
+          card_id: card.id
+        })
 
       assert {:ok, _} = Repo.insert(card_payment)
     end

@@ -13,7 +13,7 @@ defmodule Snitch.Data.Model.ShippingMethod do
   """
   @spec create(map, [Zone.t()]) :: {:ok, SMSchema.t()} | {:error, Ecto.Changeset.t()}
   def create(params, zone_structs) do
-    cs = SMSchema.changeset(%SMSchema{}, params, zone_structs, :create)
+    cs = SMSchema.create_changeset(%SMSchema{}, params, zone_structs)
     Repo.insert(cs)
   end
 
@@ -41,7 +41,7 @@ defmodule Snitch.Data.Model.ShippingMethod do
   @spec update(SMSchema.t(), map, [Zone.t()]) ::
           {:ok, SMSchema.t()} | {:error, Ecto.Changeset.t()}
   def update(shipping_method, params, zone_structs) do
-    cs = SMSchema.changeset(shipping_method, params, zone_structs, :update)
+    cs = SMSchema.update_changeset(shipping_method, params, zone_structs)
     Repo.update(cs)
   end
 

@@ -41,7 +41,7 @@ defmodule Snitch.Data.Model.CardPayment do
       slug: slug
     }
 
-    payment_changeset = Payment.changeset(payment, more_payment_params, :create)
+    payment_changeset = Payment.create_changeset(payment, more_payment_params)
 
     Multi.new()
     |> Multi.insert(:payment, payment_changeset)
@@ -67,7 +67,7 @@ defmodule Snitch.Data.Model.CardPayment do
           {:ok, %{card_payment: CardPayment.t(), payment: Payment.t()}}
           | {:error, Ecto.Changeset.t()}
   def update(card_payment, card_params, payment_params) do
-    card_payment_changeset = CardPayment.changeset(card_payment, card_params, :update)
+    card_payment_changeset = CardPayment.update_changeset(card_payment, card_params)
 
     Multi.new()
     |> Multi.update(:card_payment, card_payment_changeset)
