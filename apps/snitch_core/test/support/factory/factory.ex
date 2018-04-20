@@ -52,7 +52,11 @@ defmodule Snitch.Factory do
   def order_factory do
     %Order{
       slug: sequence("order"),
-      state: "cart"
+      state: "cart",
+      adjustment_total: Money.new(0, :USD),
+      promo_total: Money.new(0, :USD),
+      item_total: Money.new(0, :USD),
+      total: Money.new(0, :USD)
     }
   end
 
