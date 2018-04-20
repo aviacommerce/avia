@@ -4,7 +4,16 @@ defmodule Snitch.Factory do
   use ExMachina.Ecto, repo: Snitch.Repo
   use Snitch.Factory.{Address, Stock, Zone, Shipping}
 
-  alias Snitch.Data.Schema.{Variant, Address, User, Order, Payment, PaymentMethod, CardPayment}
+  alias Snitch.Data.Schema.{
+    Variant,
+    Address,
+    User,
+    Order,
+    Payment,
+    PaymentMethod,
+    CardPayment,
+    LineItem
+  }
 
   def user_factory do
     %User{
@@ -36,6 +45,16 @@ defmodule Snitch.Factory do
       width: Decimal.new("0.4"),
       is_master: true,
       cost_price: Money.new("9.99", :USD)
+    }
+  end
+
+  def line_item_factory do
+    %LineItem{
+      quantity: 1,
+      total: Money.new("10.00", :USD),
+      unit_price: Money.new("9.99", :USD),
+      variant: insert(:variant),
+      order: insert(:order, user: insert(:user))
     }
   end
 
