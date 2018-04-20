@@ -1,5 +1,5 @@
 defmodule Snitch.Tools.MoneyTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   alias Snitch.Tools.Money, as: MoneyTools
 
@@ -12,11 +12,19 @@ defmodule Snitch.Tools.MoneyTest do
 
   setup_all do
     Application.put_env(:snitch_core, :core_config_app, :snitch)
+
+    on_exit(fn ->
+      Application.delete_env(:snitch_core, :core_config_app)
+    end)
   end
 
   describe "when configured all right" do
     setup do
       Application.put_env(:snitch, :defaults, currency: :USD)
+
+      on_exit(fn ->
+        Application.delete_env(:snitch, :defaults)
+      end)
     end
 
     test "zero/1" do
@@ -38,6 +46,10 @@ defmodule Snitch.Tools.MoneyTest do
   describe "when no default currency" do
     setup do
       Application.put_env(:snitch, :defaults, [])
+
+      on_exit(fn ->
+        Application.delete_env(:snitch, :defaults)
+      end)
     end
 
     test "zero/1" do

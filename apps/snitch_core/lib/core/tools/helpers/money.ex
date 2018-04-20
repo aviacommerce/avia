@@ -47,12 +47,12 @@ defmodule Snitch.Tools.Money do
   def zero!(currency \\ nil)
 
   def zero!(nil) do
-    {:ok, config_app} = Application.fetch_env(:snitch_core, :core_config_app)
-    {:ok, defaults} = Application.fetch_env(config_app, :defaults)
-
-    case Keyword.fetch(defaults, :currency) do
+    with {:ok, config_app} <- Application.fetch_env(:snitch_core, :core_config_app),
+         {:ok, defaults} <- Application.fetch_env(config_app, :defaults),
+         {:ok, default_currency} <- Keyword.fetch(defaults, :currency) do
+      Money.new!(0, default_currency)
+    else
       :error -> raise(RuntimeError, @error_msg)
-      {:ok, default_currency} -> Money.new!(0, default_currency)
     end
   end
 
