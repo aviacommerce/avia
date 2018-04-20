@@ -6,15 +6,10 @@ defmodule Snitch.Data.Model.OrderTest do
 
   alias Snitch.Data.Model.Order
 
-  @zero_inr Money.new(0, :INR)
-
-  setup_all do
-    Application.put_env(:snitch_core, :core_config_app, :snitch)
-    Application.put_env(:snitch, :defaults, currency: :INR)
-  end
-
   setup :variants
   setup :user_with_address
+
+  @zero_inr Money.new(0, :INR)
 
   describe "create/3" do
     setup :line_items_from_variants
@@ -63,11 +58,22 @@ defmodule Snitch.Data.Model.OrderTest do
     end
 
     test "remove all line_items", %{order: order} do
+      assert_raise RuntimeError, "default currency not set", fn ->
+        Order.update(%{line_items: []}, order)
+      end
+
+      # TODO: Mock the Application config!
+      Application.put_env(:snitch_core, :core_config_app, :snitch)
+      Application.put_env(:snitch, :defaults, currency: :INR)
+
       assert {:ok,
               %{
                 item_total: @zero_inr,
                 total: @zero_inr
               }} = Order.update(%{line_items: []}, order)
+
+      Application.delete_env(:snitch_core, :core_config_app)
+      Application.delete_env(:snitch, :defaults)
     end
 
     test "update few items", %{order: order} do

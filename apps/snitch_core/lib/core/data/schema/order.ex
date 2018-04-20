@@ -16,10 +16,10 @@ defmodule Snitch.Data.Schema.Order do
     field(:confirmed?, :boolean, default: false)
 
     # various prices and totals
-    field(:total, Money.Ecto.Composite.Type, default: Money.new(0, :USD))
-    field(:item_total, Money.Ecto.Composite.Type, default: Money.new(0, :USD))
-    field(:adjustment_total, Money.Ecto.Composite.Type, default: Money.new(0, :USD))
-    field(:promo_total, Money.Ecto.Composite.Type, default: Money.new(0, :USD))
+    field(:total, Money.Ecto.Composite.Type)
+    field(:item_total, Money.Ecto.Composite.Type)
+    field(:adjustment_total, Money.Ecto.Composite.Type)
+    field(:promo_total, Money.Ecto.Composite.Type)
 
     # field :shipping
     # field :payment
@@ -90,9 +90,12 @@ defmodule Snitch.Data.Schema.Order do
 
     total = Enum.reduce([item_total], &Money.add!/2)
 
+    # TODO: This is only till we have adjustment and promo calculators ready.
     order_changeset
     |> put_change(:item_total, item_total)
     |> put_change(:total, total)
+    |> put_change(:adjustment_total, Money.new(0, :USD))
+    |> put_change(:promo_total, Money.new(0, :USD))
   end
 
   defp compute_totals(order_changeset), do: order_changeset
