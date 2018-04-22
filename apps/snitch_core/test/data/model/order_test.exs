@@ -3,6 +3,7 @@ defmodule Snitch.Data.Model.OrderTest do
   use Snitch.DataCase
 
   import Snitch.Factory
+  import Mox
 
   alias Snitch.Data.Model.Order
 
@@ -58,13 +59,7 @@ defmodule Snitch.Data.Model.OrderTest do
     end
 
     test "remove all line_items", %{order: order} do
-      assert_raise RuntimeError, "default currency not set", fn ->
-        Order.update(%{line_items: []}, order)
-      end
-
-      # TODO: Mock the Application config!
-      Application.put_env(:snitch_core, :core_config_app, :snitch)
-      Application.put_env(:snitch, :defaults, currency: :INR)
+      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :INR} end)
 
       assert {:ok,
               %{
@@ -72,8 +67,17 @@ defmodule Snitch.Data.Model.OrderTest do
                 total: @zero_inr
               }} = Order.update(%{line_items: []}, order)
 
-      Application.delete_env(:snitch_core, :core_config_app)
-      Application.delete_env(:snitch, :defaults)
+      verify!()
+
+      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency ->
+        {:error, "default 'currency' not set"}
+      end)
+
+      assert_raise RuntimeError, "default 'currency' not set", fn ->
+        Order.update(%{line_items: []}, order)
+      end
+
+      verify!()
     end
 
     test "update few items", %{order: order} do

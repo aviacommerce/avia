@@ -41,7 +41,7 @@ defmodule Snitch.Core.Mixfile do
       {:postgrex, "~> 0.13.5"},
       {:ecto, "~> 2.1"},
       {:poison, "~> 3.1", override: true},
-      {:ex_money, "~> 2.2.0"},
+      {:ex_money, "~> 2.5.0"},
       {:credo, "~> 0.9.0-rc", only: :dev, runtime: false},
       {:credo_contrib, "~> 0.1.0-rc", only: :dev, runtime: false},
 
@@ -58,6 +58,7 @@ defmodule Snitch.Core.Mixfile do
       # docs and tests
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
+      {:mox, "~> 0.3", only: :test},
       {:ex_machina, "~> 2.1", only: :test},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
       {:inch_ex, "~> 0.5.6", only: [:docs, :dev]}
