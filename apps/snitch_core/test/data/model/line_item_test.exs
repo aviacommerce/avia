@@ -3,11 +3,9 @@ defmodule Snitch.Data.Model.LineItemTest do
   use Snitch.DataCase
 
   import Snitch.Factory
+  import Mox
 
   alias Snitch.Data.Model.LineItem
-
-  @msg_no_default "default currency not set"
-  @inr Money.new(0, :INR)
 
   describe "with valid params" do
     setup [:variants, :good_line_items]
@@ -39,17 +37,17 @@ defmodule Snitch.Data.Model.LineItemTest do
   end
 
   describe "compute_total/1 with empty list" do
-    setup do: Application.put_env(:snitch_core, :core_config_app, :snitch)
+    setup :verify_on_exit!
 
     test "when default currency is set" do
-      Application.put_env(:snitch, :defaults, currency: :INR)
-      assert @inr = LineItem.compute_total([])
+      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :INR} end)
+      assert Money.zero(:INR) == LineItem.compute_total([])
     end
 
     test "when default currency is not set" do
-      Application.put_env(:snitch, :defaults, [])
+      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:error, "whatever"} end)
 
-      assert_raise RuntimeError, @msg_no_default, fn ->
+      assert_raise RuntimeError, "whatever", fn ->
         LineItem.compute_total([])
       end
     end

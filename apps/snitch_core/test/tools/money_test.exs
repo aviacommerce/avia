@@ -1,73 +1,40 @@
 defmodule Snitch.Tools.MoneyTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   alias Snitch.Tools.Money, as: MoneyTools
 
-  @usd Money.new(0, :USD)
-  @inr Money.new(0, :INR)
-  @msg_currency "The currency :AAA is invalid"
-  @msg_no_default "default currency not set"
-  @error_currency {:error, {Money.UnknownCurrencyError, @msg_currency}}
-  @error_no_default {:error, {RuntimeError, @msg_no_default}}
+  import Mox
 
-  setup_all do
-    Application.put_env(:snitch_core, :core_config_app, :snitch)
+  @msg_no_default "default 'currency' not set"
+  @error_no_default {:error, @msg_no_default}
 
-    on_exit(fn ->
-      Application.delete_env(:snitch_core, :core_config_app)
-    end)
+  setup :verify_on_exit!
+
+  test "when configured all right zero/0, zero!/0" do
+    expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :INR} end)
+
+    assert Money.zero(:INR) == MoneyTools.zero()
+    assert Money.zero(:INR) == MoneyTools.zero!()
   end
 
-  describe "when configured all right" do
-    setup do
-      Application.put_env(:snitch, :defaults, currency: :USD)
+  test "when no default currency zero/0, zero!/0" do
+    expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> @error_no_default end)
 
-      on_exit(fn ->
-        Application.delete_env(:snitch, :defaults)
-      end)
-    end
+    assert @error_no_default = MoneyTools.zero()
 
-    test "zero/1" do
-      assert @usd == MoneyTools.zero()
-      assert @inr == MoneyTools.zero(:INR)
-      assert @error_currency = MoneyTools.zero(:AAA)
-    end
-
-    test "zero!/1" do
-      assert @usd == MoneyTools.zero!()
-      assert @inr == MoneyTools.zero!(:INR)
-
-      assert_raise Money.UnknownCurrencyError, @msg_currency, fn ->
-        MoneyTools.zero!(:AAA)
-      end
+    assert_raise RuntimeError, @msg_no_default, fn ->
+      MoneyTools.zero!()
     end
   end
 
-  describe "when no default currency" do
-    setup do
-      Application.put_env(:snitch, :defaults, [])
+  test "zero/1, and zero!/1" do
+    assert MoneyTools.zero(:USD) == Money.zero(:USD)
+    assert MoneyTools.zero(:ZZZ) == Money.zero(:ZZZ)
 
-      on_exit(fn ->
-        Application.delete_env(:snitch, :defaults)
-      end)
-    end
+    assert MoneyTools.zero!(:USD) == Money.zero(:USD)
 
-    test "zero/1" do
-      assert @inr == MoneyTools.zero(:INR)
-      assert @error_no_default = MoneyTools.zero()
-      assert @error_currency = MoneyTools.zero(:AAA)
-    end
-
-    test "zero!/1" do
-      assert @inr == MoneyTools.zero!(:INR)
-
-      assert_raise RuntimeError, @msg_no_default, fn ->
-        MoneyTools.zero!()
-      end
-
-      assert_raise Money.UnknownCurrencyError, @msg_currency, fn ->
-        MoneyTools.zero!(:AAA)
-      end
+    assert_raise Money.UnknownCurrencyError, "The currency :ZZZ is invalid", fn ->
+      MoneyTools.zero!(:ZZZ)
     end
   end
 end

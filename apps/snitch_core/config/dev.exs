@@ -8,3 +8,5 @@ config :snitch_core, Snitch.Repo,
   database: "snitch_dev",
   hostname: "localhost",
   pool_size: 10
+
+config :snitch_core, :defaults_module, Snitch.Tools.Defaults
