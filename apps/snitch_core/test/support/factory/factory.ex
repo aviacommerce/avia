@@ -141,7 +141,7 @@ defmodule Snitch.Factory do
 
     [line_items: line_items]
   end
-  
+
   def variants(context) do
     count = Map.get(context, :variant_count, 3)
     [variants: insert_list(count, :random_variant)]

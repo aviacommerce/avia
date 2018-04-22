@@ -9,4 +9,6 @@ config :snitch_core, Snitch.Repo,
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
 
+config :snitch_core, :defaults_module, Snitch.Tools.DefaultsMock
+
 config :logger, level: :warn
