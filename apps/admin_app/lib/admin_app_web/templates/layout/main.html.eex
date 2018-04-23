@@ -1,0 +1,8 @@
+<main role="main" class="row">
+  <div class="col-2">
+    <%= render "sidebar.html" %>
+  </div>
+  <div class="col">
+    <%= render @view_module, @view_template, assigns %>
+  </div>
+</main>

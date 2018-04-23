@@ -1,0 +1,28 @@
+{
+  "repository": {},
+  "license": "MIT",
+  "scripts": {
+    "deploy": "brunch build --production",
+    "watch": "brunch watch --stdin"
+  },
+  "dependencies": {
+    "bootstrap": "^4.1.0",
+    "font-awesome": "^4.7.0",
+    "jquery": "^3.3.1",
+    "phoenix": "file:../../../deps/phoenix",
+    "phoenix_html": "file:../../../deps/phoenix_html",
+    "sass-brunch": "^2.10.4",
+    "tether": "^1.4.4"
+  },
+  "devDependencies": {
+    "babel-brunch": "6.1.1",
+    "brunch": "2.10.9",
+    "clean-css-brunch": "2.10.0",
+    "popper.js": "^1.14.3",
+    "uglify-js-brunch": "2.10.0"
+  },
+  "name": "assets",
+  "version": "0.1.0",
+  "description": "Admin interface for snitch",
+  "main": "index.js"
+}
