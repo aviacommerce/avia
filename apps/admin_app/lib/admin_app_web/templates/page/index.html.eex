@@ -1,0 +1,4 @@
+<div class="jumbotron">
+  <h2><%= gettext "Welcome to %{name}!", name: "Snitch" %></h2>
+  <p class="lead">A productive web ecommerce solution that<br />does not compromise speed and maintainability.</p>
+</div>
