@@ -18,6 +18,7 @@ defmodule AdminAppWeb.Router do
     pipe_through(:browser)
 
     get("/", PageController, :index)
+    get("/stock_locations", StockLocationsController, :index)
   end
 
   # Other scopes may use custom stacks.
