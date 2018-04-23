@@ -21,3 +21,6 @@ import "phoenix_html"
 // import socket from "./socket"
 
 import "bootstrap";
+
+const elmDiv = document.getElementById("elm-main");
+Elm.Main.embed(elmDiv);
