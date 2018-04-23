@@ -4,7 +4,16 @@ defmodule Snitch.Factory do
   use ExMachina.Ecto, repo: Snitch.Repo
   use Snitch.Factory.{Address, Stock, Zone, Shipping}
 
-  alias Snitch.Data.Schema.{Variant, Address, User, Order, Payment, PaymentMethod, CardPayment}
+  alias Snitch.Data.Schema.{
+    Variant,
+    Address,
+    User,
+    Order,
+    Payment,
+    PaymentMethod,
+    CardPayment,
+    Card
+  }
 
   def user_factory do
     %User{
@@ -83,6 +92,17 @@ defmodule Snitch.Factory do
     }
   end
 
+  def card_factory do
+    %Card{
+      month: 12,
+      year: 2099,
+      name_on_card: "Tony Stark",
+      brand: "VISA",
+      number: "4111111111111111",
+      card_name: "My VISA card"
+    }
+  end
+
   defp random_price(min, delta) do
     Money.new(:USD, "#{:rand.uniform(delta) + min}.99")
   end
@@ -113,13 +133,16 @@ defmodule Snitch.Factory do
 
   def payments(context) do
     %{card_method: card_m, check_method: check_m, order: order} = context
-    ccd = insert(:payment_ccd, payment_method_id: card_m.id, order_id: order.id)
-    chk = insert(:payment_chk, payment_method_id: check_m.id, order_id: order.id)
 
     [
-      ccd: ccd,
-      chk: chk,
-      card: insert(:card_payment, payment_id: ccd.id)
+      ccd: insert(:payment_ccd, payment_method_id: card_m.id, order_id: order.id),
+      chk: insert(:payment_chk, payment_method_id: check_m.id, order_id: order.id)
     ]
+  end
+
+  def cards(context) do
+    %{user: user} = context
+    card_count = Map.get(context, :card_count, 1)
+    [cards: insert_list(card_count, :card, user_id: user.id)]
   end
 end
