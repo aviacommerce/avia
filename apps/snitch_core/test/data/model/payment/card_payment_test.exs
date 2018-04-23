@@ -1,4 +1,4 @@
-defmodule Snitch.Data.Model.CardPaymentMethodTest do
+defmodule Snitch.Data.Model.CardPaymentTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
@@ -9,16 +9,15 @@ defmodule Snitch.Data.Model.CardPaymentMethodTest do
   setup :user_with_address
   setup :an_order
   setup :payment_methods
+  setup :cards
   setup :card_payment
 
-  test "create", context do
-    %{payment: payment, order: order} = context
+  test "create", %{payment: payment, order: order} do
     assert payment.state == "some-state"
     assert payment.amount == order.total
   end
 
-  test "update", context do
-    %{card_payment: card_payment, payment: payment} = context
+  test "update", %{card_payment: card_payment, payment: payment} do
     card_params = %{cvv_response: "Z", avs_response: "V"}
     payment_params = %{amount: Money.new(0, :USD), state: "complete"}
 
@@ -32,11 +31,11 @@ defmodule Snitch.Data.Model.CardPaymentMethodTest do
   end
 
   defp card_payment(context) do
-    %{order: order} = context
+    %{order: order, cards: [card | _]} = context
     params = %{amount: order.total, state: "some-state"}
 
     {:ok, %{payment: payment, card_payment: card_payment}} =
-      CardPayment.create("card-payment", order.id, params, %{})
+      CardPayment.create("card-payment", order.id, params, %{card: Map.from_struct(card)})
 
     [payment: payment, card_payment: card_payment]
   end
