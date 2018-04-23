@@ -1,0 +1,6 @@
+<nav class="nav flex-column nav-pills">
+  <a class="nav-link" href="#">Orders</a>
+  <a class="nav-link" href="#">Returns</a>
+  <a class="nav-link" href="#">Products</a>
+  <a class="nav-link" href="#">Reports</a>
+</nav>
