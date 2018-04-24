@@ -1,0 +1,4 @@
+<div>
+  <h2>Order Edit</h2>
+  <p><%= inspect(assigns) %></p>
+</div>

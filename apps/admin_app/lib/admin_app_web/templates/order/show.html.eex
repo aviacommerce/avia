@@ -1,0 +1,4 @@
+<div>
+  <h2>Order #<%= @order.id %></h2>
+  <code><%= inspect(@order) %></code>
+</div>

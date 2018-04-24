@@ -1,7 +1,7 @@
 <div class="container">
   <div class="row">
     <ul id="drilldown" class="nav nav-pills nav-stacked col-3">
-        <li><a class="nav-link" href="#">Orders</a></li>
+        <li><a class="nav-link" href="/orders">Orders</a></li>
         <li><a class="nav-link" href="#">Returns</a></li>
         <li><a class="nav-link" href="#">Products</a></li>
         <li><a class="nav-link" href="#">Reports</a></li>
