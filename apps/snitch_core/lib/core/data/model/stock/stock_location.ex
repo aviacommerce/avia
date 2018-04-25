@@ -51,6 +51,8 @@ defmodule Snitch.Data.Model.StockLocation do
       + `Variant` struct and its `ShippingCategory`
   """
   @spec get_all_with_items_for_variants([non_neg_integer]) :: [StockLocationSchema.t()]
+  def get_all_with_items_for_variants([]), do: []
+
   def get_all_with_items_for_variants(variant_ids) when is_list(variant_ids) do
     # It is unclear if there will be any gains by splitting this into a compound
     # query:

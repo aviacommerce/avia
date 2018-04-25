@@ -33,10 +33,8 @@ defmodule Snitch.Data.Schema.PackageItemTest do
       assert cs = %{valid?: false} = PackageItem.create_changeset(%PackageItem{}, %{})
 
       assert %{
-               line_item_id: ["can't be blank"],
                number: ["can't be blank"],
-               package_id: ["can't be blank"],
-               quantity: ["can't be blank"],
+               line_item_id: ["can't be blank"],
                state: ["can't be blank"],
                variant_id: ["can't be blank"]
              } = errors_on(cs)
