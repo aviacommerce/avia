@@ -1,0 +1,5 @@
+{
+  "skip_files": [
+    "priv/repo/seed/"
+  ]
+}
