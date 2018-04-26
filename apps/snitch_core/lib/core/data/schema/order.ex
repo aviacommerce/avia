@@ -79,6 +79,7 @@ defmodule Snitch.Data.Schema.Order do
   @spec common_changeset(Ecto.Changeset.t()) :: Ecto.Changeset.t()
   defp common_changeset(order_changeset) do
     order_changeset
+    |> unique_constraint(:slug)
     |> foreign_key_constraint(:billing_address_id)
     |> foreign_key_constraint(:shipping_address_id)
   end
