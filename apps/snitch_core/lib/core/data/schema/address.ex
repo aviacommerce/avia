@@ -21,6 +21,7 @@ defmodule Snitch.Data.Schema.Address do
     field(:phone, :string)
     field(:alternate_phone, :string)
 
+    # TODO: associate address with state and country
     # has_one :state, State
     # has_one :country, Country
     timestamps()
