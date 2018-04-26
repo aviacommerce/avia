@@ -5,7 +5,8 @@
 </p>
 
 <p align="center">
-    <b>Snitch: E-Commerce Framework in Elixir</b>
+  <b>Snitch: E-Commerce Framework in Elixir</b>
+  <a href="https://www.pivotaltracker.com/n/projects/2149807" target='_blank'><img alt="Pivotal Project page" src="http://res.cloudinary.com/zeus999/image/upload/c_limit,h_1041,w_1487/v1486457388/Yatrum%20Logo/pt-badge_ss3dyt.svg"></a>
 </p>
 
 [![Build Status](https://travis-ci.org/aviabird/snitch.svg?branch=develop)](https://travis-ci.org/aviabird/snitch)
