@@ -36,13 +36,13 @@ defmodule Snitch.Data.Model.LineItem do
   When both `variant_id` and `quantity` are valid, update is made.
   ```
   iex> variant = Snitch.Repo.one(Snitch.Data.Schema.Variant)
-  iex> variant.cost_price
-  #Money<:USD, 9.99000000>
+  iex> variant.selling_price
+  #Money<:USD, 14.99000000>
   iex> [priced_item] = Model.LineItem.update_price_and_totals(
   ...>   [%{variant_id: variant.id, quantity: 2}]
   ...> )
   iex> priced_item.total
-  #Money<:USD, 19.98000000>
+  #Money<:USD, 29.98000000>
   ```
   """
   @spec update_price_and_totals([map]) :: [map]

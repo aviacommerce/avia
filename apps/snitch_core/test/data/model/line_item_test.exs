@@ -13,7 +13,6 @@ defmodule Snitch.Data.Model.LineItemTest do
     test "update_price_and_totals/1", context do
       %{line_items: line_items, totals: totals} = context
       priced_items = LineItem.update_price_and_totals(line_items)
-
       assert Enum.all?(priced_items, fn x -> totals[x.variant_id] == Money.reduce(x.total) end)
     end
 
@@ -63,7 +62,7 @@ defmodule Snitch.Data.Model.LineItemTest do
       |> Enum.reduce({[], %{}}, fn {variant, quantity}, {ls, ts} ->
         {
           [%{variant_id: variant.id, quantity: quantity} | ls],
-          Map.put(ts, variant.id, Money.mult!(variant.cost_price, quantity))
+          Map.put(ts, variant.id, Money.mult!(variant.selling_price, quantity))
         }
       end)
 

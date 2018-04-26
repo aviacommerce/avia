@@ -13,7 +13,7 @@ defmodule Core.Repo.Migrations.CreateVariantTable do
       add :position, :integer
       add :cost_currency, :string
       add :track_inventory, :boolean, default: true
-      add :discontinue_on, :naive_datetime
+      add :discontinue_on, :utc_datetime
 
       # Not adding any association ids
       timestamps()
