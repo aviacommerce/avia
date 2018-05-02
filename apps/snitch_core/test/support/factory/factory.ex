@@ -13,7 +13,8 @@ defmodule Snitch.Factory do
     Payment,
     PaymentMethod,
     CardPayment,
-    Card
+    Card,
+    TaxCategory
   }
 
   alias Snitch.Repo
@@ -110,6 +111,16 @@ defmodule Snitch.Factory do
     }
   end
 
+  def tax_category_factory do
+    %TaxCategory{
+      name: sequence(:name, ["CE_VAT", "GST", "CGST", "AU_VAT"]),
+      description: "tax applied",
+      is_default?: false,
+      tax_code: sequence(:tax_code, ["CE_1", "GST", "CGST", "AU_VAT"]),
+      deleted_at: nil
+    }
+  end
+
   defp random_price(min, delta) do
     Money.new(:USD, "#{:rand.uniform(delta) + min}.99")
   end
@@ -184,5 +195,10 @@ defmodule Snitch.Factory do
       |> DateTime.from_unix()
 
     time
+  end
+
+  def tax_categories(context) do
+    count = Map.get(context, :tax_category_count, 3)
+    [tax_categories: insert_list(count, :tax_category)]
   end
 end
