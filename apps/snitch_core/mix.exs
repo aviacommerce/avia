@@ -44,6 +44,7 @@ defmodule Snitch.Core.Mixfile do
       {:ex_money, "~> 2.5.0"},
       {:credo, "~> 0.9.1", only: :dev, runtime: false},
       {:credo_contrib, "~> 0.1.0-rc3", only: :dev, runtime: false},
+      {:as_nested_set, git: "https://github.com/SagarKarwande/as_nested_set.git"},
 
       # auth
       {:comeonin, "~> 4.1.1"},
