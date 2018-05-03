@@ -4,11 +4,16 @@ defmodule AdminAppWeb.OrderController do
   alias Snitch.Repo
 
   def index(conn, _params) do
-    render(conn, "index.html", %{orders: Order.get_all() |> Repo.preload(:user)})
+    render(conn, "index.html", %{orders: Repo.preload(Order.get_all(), :user)})
   end
 
-  def show(conn, %{"slug" => slug} = params) do
-    render(conn, "show.html", %{order: Order.get(%{slug: slug})})
+  def show(conn, %{"slug" => slug} = _params) do
+    order =
+      %{slug: slug}
+      |> Order.get()
+      |> Repo.preload(line_items: [:variant], billing_address: [], shipping_address: [])
+
+    render(conn, "show.html", %{order: order})
   end
 
   def edit(conn, params) do

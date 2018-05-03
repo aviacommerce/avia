@@ -40,7 +40,12 @@ defmodule Snitch.Seed.Orders do
     digest = %{
       cart: [user_id: user.id],
       address: [user_id: user.id, address_id: address.id],
-      payment: [user_id: user.id, address_id: address.id]
+      payment: [user_id: user.id, address_id: address.id],
+      processing: [user_id: user.id, address_id: address.id],
+      shipping: [user_id: user.id, address_id: address.id],
+      shipped: [user_id: user.id, address_id: address.id],
+      cancelled: [user_id: user.id, address_id: address.id],
+      completed: [user_id: user.id, address_id: address.id]
     }
 
     {orders, line_items} = make_orders(digest, variants)
