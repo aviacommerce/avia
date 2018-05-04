@@ -22,7 +22,9 @@ defmodule Snitch.Data.Model.StateZone do
 
     Multi.new()
     |> Multi.insert(:zone, zone_changeset)
-    |> Multi.run(:members, fn %{zone: zone} -> insert_members(state_ids, zone) end)
+    |> Multi.run(:members, fn %{zone: zone} ->
+      multi_run_insert_members(state_ids, zone)
+    end)
     |> Repo.transaction()
     |> case do
       {:ok, %{zone: zone}} -> {:ok, zone}
@@ -79,26 +81,14 @@ defmodule Snitch.Data.Model.StateZone do
           {:ok, Zone.t()} | {:error, Ecto.Changeset.t()}
   def update(zone, zone_params, new_state_ids) do
     zone_changeset = Zone.changeset(zone, zone_params, :update)
-
-    old_members = MapSet.new(member_ids(zone.id))
-    new_members = MapSet.new(new_state_ids)
-    added = set_difference(new_members, old_members)
-    removed = set_difference(old_members, new_members)
-
-    delete_query =
-      from(m in StateZoneMember, where: m.state_id in ^removed and m.zone_id == ^zone.id)
-
-    deletions_multi =
-      if length(removed) > 0 do
-        Multi.delete_all(%Multi{}, :removed, delete_query)
-      else
-        Multi.new()
-      end
+    %{added: added, removed: removed} = update_diff(new_state_ids, zone)
 
     Multi.new()
     |> Multi.update(:zone, zone_changeset)
-    |> Multi.run(:added, fn _ -> insert_members(added, zone) end)
-    |> Multi.append(deletions_multi)
+    |> Multi.run(:added, fn _ ->
+      multi_run_insert_members(added, zone)
+    end)
+    |> Multi.append(remove_members_multi(removed, zone))
     |> Repo.transaction()
     |> case do
       {:ok, %{zone: zone}} -> {:ok, zone}
@@ -106,7 +96,37 @@ defmodule Snitch.Data.Model.StateZone do
     end
   end
 
+  defp update_diff(new_state_ids, curr_zone) do
+    old_members = MapSet.new(member_ids(curr_zone.id))
+    new_members = MapSet.new(new_state_ids)
+    added = set_difference(new_members, old_members)
+    removed = set_difference(old_members, new_members)
+    %{added: added, removed: removed}
+  end
+
+  defp remove_members_multi([], _), do: Multi.new()
+
+  defp remove_members_multi(to_be_removed, zone) do
+    delete_query =
+      from(m in StateZoneMember, where: m.state_id in ^to_be_removed and m.zone_id == ^zone.id)
+
+    Multi.delete_all(%Multi{}, :removed, delete_query)
+  end
+
+  defp multi_run_insert_members(state_ids, zone) do
+    insert_members(state_ids, zone)
+    |> Enum.reduce_while({:ok, []}, fn
+      {:ok, member}, {:ok, acc} -> {:cont, {:ok, [member | acc]}}
+      changeset, _acc -> {:halt, changeset}
+    end)
+  end
+
   defp insert_members(state_ids, zone) do
+    member_changesets(state_ids, zone)
+    |> Stream.map(&Repo.insert/1)
+  end
+
+  defp member_changesets(state_ids, zone) do
     state_ids
     |> Stream.uniq()
     |> Stream.map(
@@ -116,11 +136,6 @@ defmodule Snitch.Data.Model.StateZone do
         :create
       )
     )
-    |> Stream.map(&Repo.insert/1)
-    |> Enum.reduce_while({:ok, []}, fn
-      {:ok, member}, {:ok, acc} -> {:cont, {:ok, [member | acc]}}
-      changeset, _acc -> {:halt, changeset}
-    end)
   end
 
   defp set_difference(a, b) do
