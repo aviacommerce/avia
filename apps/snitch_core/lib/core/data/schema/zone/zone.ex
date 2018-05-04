@@ -42,22 +42,10 @@ defmodule Snitch.Data.Schema.Zone do
     zone
     |> cast(params, @create_fields)
     |> validate_required(@create_fields)
-    |> validate_discriminator(:zone_type, @valid_zone_types)
+    |> validate_inclusion(:zone_type, @valid_zone_types)
   end
 
   def changeset(zone, params, :update) do
     cast(zone, params, @update_fields)
-  end
-
-  defp validate_discriminator(%{valid?: false} = changeset, _, _), do: changeset
-
-  defp validate_discriminator(%{valid?: true} = changeset, key, permitted) do
-    {_, discriminator} = fetch_field(changeset, key)
-
-    if discriminator in permitted do
-      changeset
-    else
-      add_error(changeset, :zone_type, "'#{discriminator}' is invalid", validation: :inclusion)
-    end
   end
 end

@@ -7,6 +7,7 @@ defmodule Snitch.Data.Schema do
     quote do
       use Ecto.Schema
       import Ecto.Changeset
+      import Snitch.Tools.Validations
     end
   end
 end

@@ -4,60 +4,58 @@ defmodule Snitch.Data.Schema.Variant do
   """
 
   use Snitch.Data.Schema
-
   import Ecto.Query
 
   alias Snitch.Data.Schema.StockItem
-  alias Snitch.Repo
   alias Money.Ecto.Composite.Type, as: MoneyType
+  alias Snitch.Repo
 
   @type t :: %__MODULE__{}
 
   schema "snitch_variants" do
-    field(:sku, :string, default: "")
+    field(:sku, :string)
     field(:weight, :decimal, default: Decimal.new(0))
-    field(:height, :decimal)
-    field(:width, :decimal)
-    field(:depth, :decimal)
-    field(:is_master, :boolean, default: false)
+    field(:height, :decimal, default: Decimal.new(0))
+    field(:width, :decimal, default: Decimal.new(0))
+    field(:depth, :decimal, default: Decimal.new(0))
+    field(:selling_price, MoneyType)
     field(:cost_price, MoneyType)
     field(:position, :integer)
     field(:track_inventory, :boolean, default: true)
-    field(:discontinue_on, :naive_datetime)
+    field(:discontinue_on, :utc_datetime)
 
     has_many(:stock_items, StockItem)
 
     timestamps()
   end
 
-  @permitted_fields ~w(sku weight height width depth is_master)a ++
-                      ~w(cost_price position track_inventory discontinue_on)a
-
-  def changeset(%__MODULE__{} = variant, attrs) do
-    variant
-    |> cast(attrs, @permitted_fields)
-    |> unique_constraint(:sku)
-
-    # Ensures a new variant takes the product master price when price is not supplied
-    # Ensure variants? are not soft deleted
-  end
+  @cast_fields ~w(sku weight height width depth selling_price)a ++
+                 ~w(cost_price position track_inventory discontinue_on)a
+  @required_fields ~w(sku cost_price selling_price)a
 
   @doc """
-  Returns the selling prices of a list of `Variant`s.
-
-  ## Note
-  **The function currently returns the cost price (as there's no price table)**.
+  Returns a `Variant` changeset to create a new `variant`.
   """
-  @spec get_selling_prices([non_neg_integer]) :: %{non_neg_integer: Money.t()}
+  @spec create_changeset(__MODULE__.t(), map) :: Ecto.Changeset.t()
+  def create_changeset(%__MODULE__{} = variant, params) do
+    variant
+    |> cast(params, @cast_fields)
+    |> validate_required(@required_fields)
+    |> unique_constraint(:sku)
+    |> validate_amount(:selling_price)
+    |> validate_amount(:cost_price)
+    |> validate_future_date(:discontinue_on)
+  end
+
   def get_selling_prices(variant_ids) do
-    # TODO: change the table to snitch_prices when it becomes available
+    # TODO: move the function to variant model
     query =
-      from(v in "snitch_variants", select: [v.id, v.cost_price], where: v.id in ^variant_ids)
+      from(v in "snitch_variants", select: [v.id, v.selling_price], where: v.id in ^variant_ids)
 
     query
     |> Repo.all()
-    |> Enum.reduce(%{}, fn [v_id, cp], acc ->
-      {:ok, cost} = MoneyType.load(cp)
+    |> Enum.reduce(%{}, fn [v_id, sp], acc ->
+      {:ok, cost} = MoneyType.load(sp)
       Map.put(acc, v_id, cost)
     end)
   end

@@ -35,7 +35,7 @@ defmodule Snitch.Data.Schema.Payment do
     payment
     |> cast(params, @create_fields)
     |> validate_required(@create_fields)
-    |> validate_discriminator(:payment_type, @payment_types)
+    |> validate_inclusion(:payment_type, @payment_types)
     |> foreign_key_constraint(:payment_method_id)
     |> common_changeset()
   end
@@ -62,30 +62,4 @@ defmodule Snitch.Data.Schema.Payment do
     |> validate_amount(:amount)
     |> unique_constraint(:slug)
   end
-
-  @spec validate_discriminator(Ecto.Changeset.t(), atom, list) :: Ecto.Changeset.t()
-  defp validate_discriminator(%Ecto.Changeset{valid?: true} = changeset, key, permitted) do
-    {_, discriminator} = fetch_field(changeset, key)
-
-    if discriminator in permitted do
-      changeset
-    else
-      add_error(changeset, :payment_type, "'#{discriminator}' is invalid", validation: :inclusion)
-    end
-  end
-
-  defp validate_discriminator(changeset, _, _), do: changeset
-
-  @spec validate_amount(Ecto.Changeset.t(), atom) :: Ecto.Changeset.t()
-  defp validate_amount(%Ecto.Changeset{valid?: true} = changeset, key) do
-    {_, amount} = fetch_field(changeset, key)
-
-    if Decimal.cmp(amount.amount, Decimal.new(0)) != :lt do
-      changeset
-    else
-      add_error(changeset, :amount, "must be greater than 0", validation: :amount)
-    end
-  end
-
-  defp validate_amount(changeset, _), do: changeset
 end

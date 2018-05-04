@@ -15,11 +15,11 @@ defmodule Snitch.Data.Schema.PaymentTest do
 
     check_payment =
       :payment_chk
-      |> build(payment_type: "abc", payment_method_id: method.id, order_id: order.id)
-      |> Payment.create_changeset(%{})
+      |> build(payment_method_id: method.id, order_id: order.id)
+      |> Payment.create_changeset(%{payment_type: "abc"})
 
     assert %Ecto.Changeset{errors: errors} = check_payment
-    assert errors == [payment_type: {"'abc' is invalid", [validation: :inclusion]}]
+    assert errors == [payment_type: {"is invalid", [validation: :inclusion]}]
   end
 
   test "Payments cannot have negative amount", context do
@@ -31,6 +31,6 @@ defmodule Snitch.Data.Schema.PaymentTest do
       |> Payment.create_changeset(%{amount: Money.new("-0.0001", :USD)})
 
     assert %Ecto.Changeset{errors: errors} = check_payment
-    assert errors == [amount: {"must be greater than 0", [validation: :amount]}]
+    assert errors == [amount: {"must be greater than 0", [validation: :number]}]
   end
 end
