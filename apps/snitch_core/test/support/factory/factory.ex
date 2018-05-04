@@ -34,8 +34,8 @@ defmodule Snitch.Factory do
       height: Decimal.new("0.15"),
       depth: Decimal.new("0.1"),
       width: Decimal.new("0.4"),
-      is_master: true,
-      cost_price: random_price(9, 9)
+      cost_price: Money.new("9.99", :USD),
+      selling_price: random_price(14, 4)
     }
   end
 
@@ -46,8 +46,8 @@ defmodule Snitch.Factory do
       height: Decimal.new("0.15"),
       depth: Decimal.new("0.1"),
       width: Decimal.new("0.4"),
-      is_master: true,
-      cost_price: Money.new("9.99", :USD)
+      cost_price: Money.new("9.99", :USD),
+      selling_price: Money.new("14.99", :USD)
     }
   end
 
@@ -174,5 +174,15 @@ defmodule Snitch.Factory do
     %{user: user} = context
     card_count = Map.get(context, :card_count, 1)
     [cards: insert_list(card_count, :card, user_id: user.id)]
+  end
+
+  def offset_date_by(date, offset_days) do
+    {:ok, time} =
+      date
+      |> DateTime.to_unix()
+      |> (&(&1 + offset_days * 60 * 60 * 24)).()
+      |> DateTime.from_unix()
+
+    time
   end
 end

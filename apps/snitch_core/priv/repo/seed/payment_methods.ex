@@ -2,26 +2,20 @@ defmodule Snitch.Seed.PaymentMethods do
   @moduledoc """
   Seeds supported PaymentMethods.
 
-  Snitch comes with two payment methods built-in:
-  1. check or cash
-  2. credit or debit cards
-
-  ## Check or Cash
-
-  This payment method is backed only by the `Core.Snitch.Data.Schema.Payments`
-  schema.
+  Snitch comes with some payment methods built-in:
+  1. credit or debit cards
 
   ## Cards
 
-  This payment method is backed by the `Core.Snitch.Data.Schema.CardPayments`
+  This payment method is backed by the `Snitch.Data.Schema.CardPayments`
   schema and table.
 
   ## Roadmap
 
   Snitch will support "Store Credits", which act like e-wallets for users.
   """
-  alias Snitch.Data.Schema.PaymentMethod
 
+  alias Snitch.Data.Schema.PaymentMethod
   alias Snitch.Repo
 
   def seed!() do
