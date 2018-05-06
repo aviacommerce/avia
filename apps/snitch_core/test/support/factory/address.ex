@@ -8,7 +8,7 @@ defmodule Snitch.Factory.Address do
       def state_factory do
         %State{
           name: "California",
-          abbr: sequence("CA"),
+          code: sequence("US-CA"),
           country: build(:country)
         }
       end
