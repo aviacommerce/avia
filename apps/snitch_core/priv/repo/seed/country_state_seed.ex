@@ -1,53 +1,79 @@
 defmodule Snitch.Seed.CountryState do
-  @moduledoc """
-  This module has functions to create and insert seed data for the state and the country
-  entitites.
-  """
+  @moduledoc false
 
-  alias Worldly.Country, as: WorldCountry
-  alias Worldly.Region, as: WorldRegion
-  alias Snitch.Data.Schema.Country
+  import Ecto.Query
+
   alias Snitch.Repo
+  alias Snitch.Data.Schema.Country, as: CountrySchema
+  alias Snitch.Data.Schema.State, as: StateSchema
+  alias ExRegion.{Country, Subdivision}
 
-  def seed_countries_and_states! do
-    Enum.each(WorldCountry.all(), fn country -> seed_country_data(country) end)
+  require Logger
+
+  def seed_countries! do
+    countries = Enum.map(Country.fetch_all(), &to_country_params/1)
+    {count, _} = Repo.insert_all(CountrySchema, countries, on_conflict: :nothing)
+    Logger.info("Inserted #{count} countries.")
   end
 
-  def seed_country_data(country) do
-    change = Country.changeset(%Country{}, to_param(country))
-    inserted_country = Repo.insert!(change)
+  def seed_states! do
+    query = from(CountrySchema, select: [:id, :iso])
 
-    if country.has_regions do
-      Enum.each(WorldRegion.regions_for(country), fn region ->
-        seed_state_data(inserted_country, region)
+    countries =
+      query
+      |> Repo.all()
+      |> Enum.reduce(%{}, fn %{id: id, iso: iso}, acc ->
+        Map.put(acc, iso, id)
       end)
-    end
+
+    iso_subdivs = Subdivision.fetch_all()
+
+    subdivs =
+      iso_subdivs
+      |> Stream.map(fn sub ->
+        id = Map.fetch!(countries, sub.country)
+        Map.put(sub, :country_id, id)
+      end)
+      |> Enum.map(&to_state_params/1)
+
+    {count, _} = Repo.insert_all(StateSchema, subdivs, on_conflict: :nothing)
+    Logger.info("Inserted #{count} subdivisions.")
+
+    countries_with_subdivs =
+      iso_subdivs
+      |> Subdivision.group_by_country()
+      |> Map.keys()
+      |> Enum.map(&Map.fetch!(countries, &1))
+
+    query = from(c in CountrySchema, where: c.id in ^countries_with_subdivs)
+    {count, _} = Repo.update_all(query, set: [states_required: true])
+
+    Logger.info("#{count} countries have subdivisions.")
   end
 
-  def seed_state_data(country, state) do
-    country
-    |> Ecto.build_assoc(:states, to_param(state))
-    |> Repo.insert!()
-  end
-
-  defp to_param(%WorldCountry{
-         name: name,
-         alpha_2_code: iso,
-         alpha_3_code: iso3,
-         numeric_code: numcode,
-         has_regions: has_regions
-       }) do
+  def to_country_params(country) do
     %{
-      name: name,
-      iso: iso,
-      iso3: iso3,
-      numcode: numcode,
-      states_required: has_regions,
-      iso_name: String.upcase(name)
+      iso_name: country.name,
+      iso: country.alpha_2,
+      iso3: country.alpha_3,
+      name: country.name,
+      numcode: country.numeric,
+      inserted_at: Ecto.DateTime.utc(),
+      updated_at: Ecto.DateTime.utc()
     }
   end
 
-  defp to_param(%WorldRegion{code: abbr, name: name}) do
-    %{abbr: to_string(abbr), name: to_string(name)}
+  def to_state_params(%{
+        name: name,
+        code: code,
+        country_id: country_id
+      }) do
+    %{
+      name: name,
+      code: code,
+      country_id: country_id,
+      inserted_at: Ecto.DateTime.utc(),
+      updated_at: Ecto.DateTime.utc()
+    }
   end
 end
