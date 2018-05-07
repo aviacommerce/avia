@@ -11,7 +11,7 @@
 # and so on) as they will fail if something goes wrong.
 
 alias Snitch.Repo
-alias Snitch.Seed.{CountryState, PaymentMethods, Orders, Users}
+alias Snitch.Seed.{CountryState, PaymentMethods, Orders, Users, Stocks}
 
 variant_count = 9
 
@@ -31,3 +31,5 @@ Repo.transaction(fn ->
   Orders.seed_variants!(variant_count)
   Orders.seed_orders!()
 end)
+
+Stocks.seed_stock_locations!()
