@@ -10,3 +10,4 @@ config :snitch_core, Snitch.Repo,
   pool_size: 10
 
 config :snitch_core, :defaults_module, Snitch.Tools.Defaults
+config :snitch_core, :user_config_module, Snitch.Tools.UserConfig
