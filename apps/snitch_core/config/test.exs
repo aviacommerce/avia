@@ -10,5 +10,6 @@ config :snitch_core, Snitch.Repo,
   pool: Ecto.Adapters.SQL.Sandbox
 
 config :snitch_core, :defaults_module, Snitch.Tools.DefaultsMock
+config :snitch_core, :user_config_module, Snitch.Tools.UserConfigMock
 
 config :logger, level: :info
