@@ -32,7 +32,7 @@
    - We share this goal with [Nectar Commerce][nectar]
 3. Superb tooling
    - Managing, importing, exporting and maintaing a store in production is quite
-     cumbersome. Great tooling is the way to go.
+     cumbersome. Great tooling is the only solution.
 
 ## Contributing
 
