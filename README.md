@@ -33,6 +33,9 @@
 3. Superb tooling
    - Managing, importing, exporting and maintaing a store in production is quite
      cumbersome. Great tooling is the only solution.
+4. First class support for multi-seller/vendor platform.
+
+_You can share feedback and requests [here][feedback]_
 
 ## Contributing
 
@@ -46,6 +49,7 @@ on our [pivotal project][pivotal]!
 [pivotal]: https://www.pivotaltracker.com/n/projects/2149807
 [mom]: https://docs.google.com/document/d/15aNtYfPDKtdctC6KPLgW1BNN8I6EoBA-Q9KYqymt7gA/edit?usp=sharing
 [elixir]: http://elixir-lang.org/
+[feedback]: https://github.com/aviabird/snitch/issues/66
 
 ----
 
