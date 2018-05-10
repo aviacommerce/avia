@@ -4,14 +4,13 @@ defmodule Snitch.Data.Schema.StateTest do
 
   import Snitch.Factory
 
-  alias Snitch.Repo
   alias Snitch.Data.Schema.State
 
   setup :countries
 
   @valid_attrs %{
     name: "Maharashtra",
-    abbr: "MH",
+    code: "IN-MH",
     country_id: 105
   }
   describe "States " do
@@ -21,24 +20,12 @@ defmodule Snitch.Data.Schema.StateTest do
       assert validity
     end
 
-    test "with missing abbr" do
-      param = Map.delete(@valid_attrs, :abbr)
+    test "with missing code" do
+      param = Map.delete(@valid_attrs, :code)
       c = %{valid?: validity} = State.changeset(%State{}, param)
       refute validity
 
-      assert %{abbr: ["can't be blank"]} = errors_on(c)
-    end
-
-    test "with same country_id", %{countries: [country]} do
-      param = Map.put(@valid_attrs, :country_id, country.id)
-      change = State.changeset(%State{}, param)
-      {:ok, changeset} = Repo.insert(change)
-
-      param = Map.put(@valid_attrs, :country_id, changeset.country_id)
-      change = State.changeset(%State{}, param)
-      {:error, error} = Repo.insert(change)
-
-      assert %{abbr: ["(:country_id, :abbr) has already been taken"]} = errors_on(error)
+      assert %{code: ["can't be blank"]} = errors_on(c)
     end
   end
 end

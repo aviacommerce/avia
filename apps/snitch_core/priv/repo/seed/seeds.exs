@@ -1,5 +1,3 @@
-alias Snitch.Repo
-alias Snitch.Seed.{CountryState, PaymentMethods, Orders, Users}
 # Script for populating the database. You can run it as:
 #
 #     mix run priv/repo/seeds.exs
@@ -12,8 +10,16 @@ alias Snitch.Seed.{CountryState, PaymentMethods, Orders, Users}
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
+alias Snitch.Repo
+alias Snitch.Seed.{CountryState, PaymentMethods, Orders, Users, Stocks}
+
+variant_count = 9
+
 # seeds countries and states entity
-CountryState.seed_countries_and_states!()
+Repo.transaction(fn ->
+  CountryState.seed_countries!()
+  CountryState.seed_states!()
+end)
 
 # seed payment methods
 PaymentMethods.seed!()
@@ -22,6 +28,8 @@ Users.seed_address!()
 Users.seed_users!()
 
 Repo.transaction(fn ->
-  Orders.seed_variants!(11)
+  Orders.seed_variants!(variant_count)
   Orders.seed_orders!()
 end)
+
+Stocks.seed_stock_locations!()

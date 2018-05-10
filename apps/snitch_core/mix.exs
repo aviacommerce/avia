@@ -40,7 +40,7 @@ defmodule Snitch.Core.Mixfile do
     [
       {:postgrex, "~> 0.13.5"},
       {:ecto, "~> 2.2"},
-      {:poison, "~> 3.1", override: true},
+      {:jason, "~> 1.0"},
       {:ex_money, "~> 2.5.0"},
       {:credo, "~> 0.9.1", only: :dev, runtime: false},
       {:credo_contrib, "~> 0.1.0-rc3", only: :dev, runtime: false},
@@ -50,8 +50,7 @@ defmodule Snitch.Core.Mixfile do
       {:argon2_elixir, "~> 1.2"},
 
       # countries etc
-      {:yamerl, github: "yakaz/yamerl", override: true},
-      {:worldly, github: "martide/worldly"},
+      {:ex_region, github: "oyeb/ex_region"},
 
       # docs and tests
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},

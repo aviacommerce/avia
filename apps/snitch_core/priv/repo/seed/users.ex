@@ -6,6 +6,8 @@ defmodule Snitch.Seed.Users do
   alias Snitch.Data.Schema.{User, Address}
   alias Comeonin.Argon2
 
+  require Logger
+
   @user_passwd Argon2.hashpwsalt("avenger")
   @admin_passwd Argon2.hashpwsalt("wizard")
 
@@ -26,6 +28,7 @@ defmodule Snitch.Seed.Users do
     ]
 
     Repo.insert_all(User, users, on_conflict: :nothing, conflict_target: [:email])
+    Logger.info("Inserted #{length(users)} users.")
   end
 
   def user(first_name, last_name, email, pwd_hash, admin \\ false) do

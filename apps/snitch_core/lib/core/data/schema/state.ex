@@ -9,7 +9,7 @@ defmodule Snitch.Data.Schema.State do
 
   schema "snitch_states" do
     field(:name, :string)
-    field(:abbr, :string)
+    field(:code, :string)
     belongs_to(:country, Country)
 
     timestamps()
@@ -18,13 +18,9 @@ defmodule Snitch.Data.Schema.State do
   @spec changeset(t, map) :: Ecto.Changeset.t()
   def changeset(%__MODULE__{} = state, params) do
     state
-    |> cast(params, [:abbr, :name, :country_id])
-    |> validate_required([:abbr, :name, :country_id])
+    |> cast(params, [:code, :name, :country_id])
+    |> validate_required([:code, :name, :country_id])
     |> foreign_key_constraint(:country_id)
-    |> unique_constraint(
-      :abbr,
-      name: :snitch_state_abbr_and_country_id,
-      message: "(:country_id, :abbr) has already been taken"
-    )
+    |> unique_constraint(:code)
   end
 end
