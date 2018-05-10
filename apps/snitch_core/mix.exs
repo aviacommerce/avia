@@ -45,6 +45,9 @@ defmodule Snitch.Core.Mixfile do
       {:credo, "~> 0.9.1", only: :dev, runtime: false},
       {:credo_contrib, "~> 0.1.0-rc3", only: :dev, runtime: false},
 
+      # state machine
+      {:beepbop, github: "oyeb/beepbop", branch: "master"},
+
       # auth
       {:comeonin, "~> 4.1.1"},
       {:argon2_elixir, "~> 1.2"},
