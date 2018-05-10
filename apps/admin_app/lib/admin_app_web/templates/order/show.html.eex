@@ -1,0 +1,31 @@
+<div class="container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/orders">Orders</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><%= @order.slug %></li>
+    </ol>
+  </nav>
+
+  <h2>
+    Order #<%= @order.id %>
+    <%= state_badge(@order.state) %>
+  </h2>
+  <div class="row">
+    <div class="col-8">
+      <!-- The real deal  -->
+      <%= render "line_item.html", %{order: @order} %>
+      <%= render "addresses.html", %{order: @order} %>
+    </div>
+
+    <div class="col-4">
+      <h3>Order Summary</h3>
+      <table class="table table-sm">
+        <caption class="sr-only">order summary</caption>
+        <tbody>
+          <%= summary(@order) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </div>
+</div>
