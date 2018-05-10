@@ -21,7 +21,7 @@ defmodule Snitch.Data.Model.StateZoneTest do
                  from(s in StateZoneMember, where: s.zone_id == ^zone.id, select: s.state_id)
                )
 
-      assert state_ids == StateZone.member_ids(zone.id)
+      assert state_ids == StateZone.member_ids(zone)
     end
 
     test "fails if some states are invalid", %{states: states} do
@@ -42,14 +42,14 @@ defmodule Snitch.Data.Model.StateZoneTest do
 
     test "members/1 returns State schemas", %{zone: zone, states: states} do
       assert states ==
-               zone.id
+               zone
                |> StateZone.members()
                |> Enum.map(&Repo.preload(&1, :country))
     end
 
     test "delete/1 removes all members too", %{zone: zone} do
       {:ok, _} = StateZone.delete(zone)
-      assert [] = StateZone.members(zone.id)
+      assert [] = StateZone.members(zone)
     end
 
     test "update/3 succeeds with valid state_ids", %{zone: zone, states: states} do
@@ -57,7 +57,7 @@ defmodule Snitch.Data.Model.StateZoneTest do
       old_state_ids = Enum.map(states, &Map.get(&1, :id))
       new_state_ids = Enum.drop(old_state_ids, 1) ++ more_state_ids
       assert {:ok, _} = StateZone.update(zone, %{}, new_state_ids)
-      state_ids = MapSet.new(StateZone.member_ids(zone.id))
+      state_ids = MapSet.new(StateZone.member_ids(zone))
 
       assert new_state_ids
              |> MapSet.new()
@@ -66,17 +66,17 @@ defmodule Snitch.Data.Model.StateZoneTest do
 
     test "update/3 succeeds with no states", %{zone: zone} do
       assert {:ok, _} = StateZone.update(zone, %{}, [])
-      assert [] = StateZone.member_ids(zone.id)
+      assert [] = StateZone.member_ids(zone)
     end
 
     test "update/3 fails with invalid states", %{zone: zone} do
-      old_state_ids = StateZone.member_ids(zone.id)
+      old_state_ids = StateZone.member_ids(zone)
 
       assert {:error, :added, %{errors: errors}, %{zone: updated_zone}} =
                StateZone.update(zone, %{}, [-1])
 
       assert errors == [state_id: {"does not exist", []}]
-      assert old_state_ids == StateZone.member_ids(updated_zone.id)
+      assert old_state_ids == StateZone.member_ids(updated_zone)
     end
   end
 
