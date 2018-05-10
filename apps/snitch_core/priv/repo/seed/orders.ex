@@ -5,6 +5,8 @@ defmodule Snitch.Seed.Orders do
   alias Snitch.Repo
   alias Snitch.Data.Schema.{Variant, Order, Address, User, LineItem}
 
+  require Logger
+
   @line_item %{
     variant_id: nil,
     order_id: nil,
@@ -29,9 +31,6 @@ defmodule Snitch.Seed.Orders do
     updated_at: DateTime.utc()
   }
 
-  @variant_count 5
-  @max_line_item_count 3
-
   def seed_orders! do
     variants = Repo.all(Variant)
     [address | _] = Repo.all(Address)
@@ -50,7 +49,7 @@ defmodule Snitch.Seed.Orders do
 
     {orders, line_items} = make_orders(digest, variants)
 
-    {_, order_structs} =
+    {count, order_structs} =
       Repo.insert_all(
         Order,
         orders,
@@ -58,6 +57,8 @@ defmodule Snitch.Seed.Orders do
         conflict_target: [:slug],
         returning: [:id, :slug]
       )
+
+    Logger.info("Inserted #{count} orders.")
 
     filtered_line_items =
       order_structs
@@ -70,7 +71,8 @@ defmodule Snitch.Seed.Orders do
       end)
       |> List.flatten()
 
-    Repo.insert_all(LineItem, filtered_line_items)
+    {count, _} = Repo.insert_all(LineItem, filtered_line_items)
+    Logger.info("Inserted #{count} line-items.")
   end
 
   def make_orders(digest, variants) do
@@ -120,10 +122,10 @@ defmodule Snitch.Seed.Orders do
     end)
   end
 
-  def seed_variants!(count \\ nil) do
+  def seed_variants!(count) do
     Repo.insert_all(
       Variant,
-      Enum.take(variants(), count || @variant_count),
+      Enum.take(variants(), count),
       returning: [:id],
       on_conflict: :nothing
     )
