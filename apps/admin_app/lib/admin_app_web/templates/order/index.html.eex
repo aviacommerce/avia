@@ -1,0 +1,27 @@
+<div>
+  <h2 class="text-center">Listing Orders</h2>
+  <table class="table table-striped">
+    <thead class="thead-light">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Number</th>
+        <th scope="col">Placed on</th>
+        <th scope="col">User</th>
+        <th scope="col">State</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for {order, index} <- Enum.with_index(@orders) do %>
+      <tr class="<%= colorize(order) %>">
+        <th scope="row"><%= index+1 %></th>
+        <td>
+          <a href="orders/<%= order.slug %>" rel="nofollow"><%= order.slug %></a>
+        </td>
+        <td><%= order.inserted_at %></td>
+        <td><%= order.user.email %></td>
+        <td><%= order.state %></td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

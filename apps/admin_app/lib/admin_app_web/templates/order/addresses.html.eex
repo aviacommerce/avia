@@ -1,0 +1,26 @@
+<%= unless @order.billing_address == nil || @order.shipping_address == nil do %>
+<div class="card">
+  <div class="card-header text-center">Addresses</div>
+  <div class="card-body row">
+    <div class="col col-sm text-center">
+      <h5>Billing</h5><hr>
+      <%= render_address(@order.billing_address) %>
+    </div>
+    <div class="col col-sm text-center">
+      <h5>Shipping</h5><hr>
+      <%= render_address(@order.shipping_address) %>
+    </div>
+  </div>
+</div>
+<% else %>
+<div class="card text-center">
+  <div class="card-header text-center">Addresses</div>
+  <p class="card-body">
+    The order is in <%= state_badge(@order.state) %> state and does not have any
+    associated address.
+  </p>
+  <div class="card-footer">
+    <button class="btn btn-primary" onclick="foo()">Add address</button>
+  </div>
+</div>
+<% end %>
