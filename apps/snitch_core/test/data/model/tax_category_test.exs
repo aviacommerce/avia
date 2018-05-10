@@ -47,9 +47,7 @@ defmodule Snitch.Data.Model.TaxCategoryTest do
       assert {:ok, tc} = Model.TaxCategory.create(params)
       assert tc.is_default?
 
-      params =
-        %{@valid_params | name: "US_VAT"}
-        |> Map.put(:is_default?, true)
+      params = Map.put(%{@valid_params | name: "US_VAT"}, :is_default?, true)
 
       assert {:ok, tc_new} = Model.TaxCategory.create(params)
       assert tc_new.is_default?
