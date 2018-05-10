@@ -8,6 +8,7 @@ defmodule Snitch.Data.Schema.Address do
   """
 
   use Snitch.Data.Schema
+  alias Snitch.Data.Schema.{State, Country}
 
   @type t :: %__MODULE__{}
 
@@ -21,24 +22,64 @@ defmodule Snitch.Data.Schema.Address do
     field(:phone, :string)
     field(:alternate_phone, :string)
 
-    # TODO: associate address with state and country
-    # has_one :state, State
-    # has_one :country, Country
+    belongs_to(:state, State)
+    belongs_to(:country, Country)
     timestamps()
   end
 
-  # state_id country_id)a
   @required_fields ~w(first_name last_name address_line_1 city zip_code)a
   @optional_fields ~w(phone alternate_phone)a
 
-  @spec changeset(t, map) :: Ecto.Changeset.t()
-  def changeset(%__MODULE__{} = address, params) do
+  @doc """
+  Returns an `Address` changeset to create a new `address`.
+
+  An address must be associated with a country, and if the country has
+  sub-divisions (aka states) according to ISO 3166-2, then the address must also
+  be associated with a state.
+
+  ## Note
+  * `country` must be a `Country.t` struct.
+  * `state` must be a `State.t` struct.
+  """
+  @spec create_changeset(t, map, Country.t(), State.t()) :: Ecto.Changeset.t()
+  def create_changeset(%__MODULE__{} = address, params, %Country{} = country, state \\ nil) do
     address
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> validate_length(:address_line_1, min: 10)
-
-    # |> foreign_key_constraint(:state_id, Snitch.Data.Schema.State)
-    # |> foreign_key_constraint(:country_id, Snitch.Data.Schema.Country)
+    |> put_assoc(:country, country)
+    |> validate_country_and_state(country, state)
   end
+
+  @spec validate_country_and_state(Ecto.Changeset.t(), Country.t(), State.t() | nil) ::
+          Ecto.Changeset.t()
+  def validate_country_and_state(
+        %Ecto.Changeset{valid?: true} = changeset,
+        %{states_required: true} = country,
+        state
+      )
+      when is_map(state) do
+    if state.country_id == country.id do
+      put_assoc(changeset, :state, state)
+    else
+      add_error(
+        changeset,
+        :state,
+        "state does not belong to country",
+        state_id: state.id,
+        country_id: country.id,
+        validation: :address
+      )
+    end
+  end
+
+  def validate_country_and_state(
+        %Ecto.Changeset{valid?: true} = changeset,
+        %{states_required: true} = country,
+        nil
+      ) do
+    add_error(changeset, :state, "state is required for this country", country_id: country.id)
+  end
+
+  def validate_country_and_state(changeset, _, _), do: changeset
 end
