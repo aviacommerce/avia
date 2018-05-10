@@ -25,15 +25,17 @@ defmodule Snitch.Factory.Address do
       end
 
       def address_factory do
+        state = insert(:state)
+
         %Address{
           first_name: "Tony",
           last_name: "Stark",
           address_line_1: "10-8-80 Malibu Point",
           zip_code: "90265",
           city: "Malibu",
-          phone: "1234567890"
-          # state_id: State.get_id("California"),
-          # country_id: Country.get_id("USA"),
+          phone: "1234567890",
+          state: state,
+          country: state.country
         }
       end
 

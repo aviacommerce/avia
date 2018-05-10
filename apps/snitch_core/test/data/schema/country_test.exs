@@ -2,7 +2,6 @@ defmodule Snitch.Data.Schema.CountryTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
-  alias Snitch.Repo
   alias Snitch.Data.Schema.Country
 
   @valid_attrs %{
