@@ -70,7 +70,7 @@ defmodule Snitch.Data.Schema.CardPayment do
         cast_assoc(
           payment_changeset,
           :card,
-          with: &Card.changeset(&1, &2, :create),
+          with: &Card.create_changeset(&1, &2),
           required: true
         )
     end
