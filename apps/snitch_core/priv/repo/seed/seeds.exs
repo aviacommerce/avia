@@ -1,3 +1,6 @@
+alias Snitch.Repo
+alias Snitch.Seed.{CountryState, PaymentMethods, Orders, Users, Taxonomy}
+
 # Script for populating the database. You can run it as:
 #
 #     mix run priv/repo/seeds.exs
@@ -33,3 +36,6 @@ Repo.transaction(fn ->
 end)
 
 Stocks.seed_stock_locations!()
+
+# seeds the taxonomy
+Taxonomy.seed()
