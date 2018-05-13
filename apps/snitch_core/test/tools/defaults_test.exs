@@ -5,12 +5,10 @@ defmodule Snitch.Tools.DefaultsTest do
 
   describe "when configured all right" do
     setup do
-      Application.put_env(:snitch_core, :config_app, :snitch)
-      Application.put_env(:snitch, :defaults, currency: :USD, foo: :bar)
+      Application.put_env(:snitch_core, :defaults, currency: :USD, foo: :bar)
 
       on_exit(fn ->
-        Application.delete_env(:snitch, :defaults)
-        Application.delete_env(:snitch_core, :config_app)
+        Application.delete_env(:snitch_core, :defaults)
       end)
     end
 
@@ -30,13 +28,8 @@ defmodule Snitch.Tools.DefaultsTest do
 
   describe "fetch" do
     test "when no defaults" do
-      Application.put_env(:snitch_core, :config_app, :snitch)
-      assert {:error, "Could not fetch any 'defaults' from config under ':core_config_app'"}
-      Application.delete_env(:snitch_core, :config_app)
-    end
-
-    test "when no config_app" do
-      assert {:error, "Could not fetch any 'defaults' from config under ':core_config_app'"}
+      Application.delete_env(:snitch_core, :defaults)
+      assert {:error, "Could not fetch any 'defaults'"} = Defaults.fetch(:currency)
     end
   end
 end
