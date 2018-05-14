@@ -36,7 +36,7 @@ defmodule Snitch.Factory do
       depth: Decimal.new("0.1"),
       width: Decimal.new("0.4"),
       cost_price: Money.new("9.99", :USD),
-      selling_price: random_price(14, 4)
+      selling_price: random_price(:USD, 14, 4)
     }
   end
 
@@ -121,8 +121,8 @@ defmodule Snitch.Factory do
     }
   end
 
-  defp random_price(min, delta) do
-    Money.new(:USD, "#{:rand.uniform(delta) + min}.99")
+  def random_price(currency, min, delta) do
+    Money.new(currency, "#{:rand.uniform(delta) + min}.99")
   end
 
   # Associates the address with the user once user schema is corrected

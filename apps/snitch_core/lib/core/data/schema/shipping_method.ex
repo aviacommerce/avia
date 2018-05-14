@@ -10,7 +10,7 @@ defmodule Snitch.Data.Schema.ShippingMethod do
   """
 
   use Snitch.Data.Schema
-  alias Snitch.Data.Schema.{Zone}
+  alias Snitch.Data.Schema.{Zone, ShippingCategory}
 
   @type t :: %__MODULE__{}
 
@@ -23,50 +23,69 @@ defmodule Snitch.Data.Schema.ShippingMethod do
       :zones,
       Zone,
       join_through: "snitch_shipping_methods_zones",
+      on_replace: :delete,
+      # Also set in migrations
       unique: true,
-      on_replace: :delete
+      # Also set in migrations
+      on_delete: :delete_all
     )
 
-    # many_to_many :zones, ShippingCategory, join_through: "snitch_shipping_methods_categories"
+    many_to_many(
+      :shipping_categories,
+      ShippingCategory,
+      join_through: "snitch_shipping_methods_categories",
+      on_replace: :delete,
+      # Also set in migrations
+      unique: true,
+      # Also set in migrations
+      on_delete: :delete_all
+    )
+
     timestamps()
   end
 
-  @create_fields ~w(slug name description)a
-  @required_fields @create_fields
+  @create_fields ~w(slug name)a
+  @cast_fields [:description | @create_fields]
 
   @doc """
   Returns a `ShippingMethod` changeset for a new `shipping_method`.
 
   The `zones` must be `Snitch.Data.Schema.Zone.t` structs.
+  The `categories` must be `Snitch.Data.Schema.ShippingCategory.t` structs.
+
   The following fields must be present in `params`: `[#{
-    @required_fields
+    @create_fields
     |> Enum.map(fn x -> ":#{x}" end)
     |> Enum.intersperse(", ")
   }]`
   """
-  @spec create_changeset(t, map, [Zone]) :: Ecto.Changeset.t()
-  def create_changeset(%__MODULE__{} = shipping_method, params, zones) do
+  @spec create_changeset(t, map, [Zone.t()], [ShippingCategory.t()]) :: Ecto.Changeset.t()
+  def create_changeset(%__MODULE__{} = shipping_method, params, zones, categories) do
     shipping_method
-    |> changeset(params, zones)
-    |> validate_required(@required_fields)
+    |> changeset(params, zones, categories)
+    |> validate_required(@create_fields)
   end
 
   @doc """
-  Returns a `ShippingMethod` changeset for a new `shipping_method`.
+  Returns a `ShippingMethod` changeset to update an existing `shipping_method`.
 
   The `zones` must be `Snitch.Data.Schema.Zone.t` structs, and a full list of
-  the desired zone structs is expected.
+  The `categories` must be `Snitch.Data.Schema.ShippingCategory.t` structs.
+
+  The desired zone and category structs are expected. Also see
+  `Ecto.Changeset.put_assoc/4`.
   """
-  @spec update_changeset(t, map, [Zone]) :: Ecto.Changeset.t()
-  def update_changeset(%__MODULE__{} = shipping_method, params, zones) do
-    changeset(shipping_method, params, zones)
+  @spec update_changeset(t, map, [Zone.t()], [ShippingCategory.t()]) :: Ecto.Changeset.t()
+  def update_changeset(%__MODULE__{} = shipping_method, params, zones, categories) do
+    changeset(shipping_method, params, zones, categories)
   end
 
-  @spec update_changeset(t, map, [Zone]) :: Ecto.Changeset.t()
-  defp changeset(%__MODULE__{} = shipping_method, params, zones) do
+  @spec changeset(t, map, [Zone.t()], [ShippingCategory.t()]) :: Ecto.Changeset.t()
+  defp changeset(%__MODULE__{} = shipping_method, params, zones, categories) do
     shipping_method
-    |> cast(params, @create_fields)
+    |> cast(params, @cast_fields)
     |> unique_constraint(:slug)
     |> put_assoc(:zones, zones)
+    |> put_assoc(:shipping_categories, categories)
   end
 end
