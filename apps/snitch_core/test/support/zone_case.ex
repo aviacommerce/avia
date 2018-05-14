@@ -1,30 +1,18 @@
 defmodule Snitch.ZoneCase do
   @moduledoc """
   Test helpers to insert zones and zone members.
-
-  ## Sample manifests
-  ```
-  stock_item_sample_manifest = %{
-    "default" => [
-      %{count_on_hand: 3, backorderable: true},
-      %{count_on_hand: 3, backorderable: true},
-      %{count_on_hand: 3, backorderable: true}
-    ],
-    "backup" => [
-      %{count_on_hand: 0},
-      %{count_on_hand: 0},
-      %{count_on_hand: 6}
-    ],
-    "origin" => [ # this is the `admin_name` of the `stock_location`
-      %{count_on_hand: 3},
-      %{count_on_hand: 3},
-      %{count_on_hand: 3}
-    ]
-  }
   """
 
   alias Snitch.Repo
-  alias Snitch.Data.Schema.{Country, State, StateZoneMember, CountryZoneMember}
+  alias Snitch.Data.Schema.{Country, State, Zone, StateZoneMember, CountryZoneMember}
+
+  @zone %{
+    name: nil,
+    description: nil,
+    zone_type: nil,
+    inserted_at: Ecto.DateTime.utc(),
+    updated_at: Ecto.DateTime.utc()
+  }
 
   @state %{
     name: nil,
@@ -101,5 +89,25 @@ defmodule Snitch.ZoneCase do
     {_, country_members} = Repo.insert_all(CountryZoneMember, czm, returning: true)
 
     {state_members, country_members}
+  end
+
+  @doc """
+  Creates zones according to the manifest.
+
+  ## Sample manifest
+  ```
+  %{
+    "domestic" => %{zone_type: "S", description: "something"}
+  }
+  ```
+  """
+  def zones_with_manifest(manifest) do
+    zones =
+      Enum.map(manifest, fn {name, params} ->
+        Map.merge(%{@zone | name: name}, params)
+      end)
+
+    {_, zones} = Repo.insert_all(Zone, zones, returning: true)
+    zones
   end
 end

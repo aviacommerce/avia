@@ -53,11 +53,6 @@ defmodule Snitch.StockCase do
   end
 
   def stock_items_with_manifest(manifest, variants, locations) do
-    location_ids =
-      Enum.reduce(locations, %{}, fn %{admin_name: name} = sl, acc ->
-        Map.put(acc, name, sl.id)
-      end)
-
     manifest
     |> Enum.map(fn {name, param_list} ->
       variants
@@ -66,7 +61,7 @@ defmodule Snitch.StockCase do
         %{
           Map.merge(@stock_item, params)
           | variant_id: v.id,
-            stock_location_id: location_ids[name]
+            stock_location_id: locations[name].id
         }
       end)
     end)
