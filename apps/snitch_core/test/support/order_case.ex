@@ -3,6 +3,8 @@ defmodule Snitch.OrderCase do
   Test helpers to insert stock items and locations.
   """
 
+  import Snitch.Factory
+
   @line_item %{
     quantity: nil,
     unit_price: nil,
@@ -12,6 +14,43 @@ defmodule Snitch.OrderCase do
     inserted_at: Ecto.DateTime.utc(),
     updated_at: Ecto.DateTime.utc()
   }
+
+  @variant %{
+    sku: nil,
+    weight: Decimal.new("0.45"),
+    height: Decimal.new("0.15"),
+    depth: Decimal.new("0.1"),
+    width: Decimal.new("0.4"),
+    cost_price: Money.new("9.99", :USD),
+    selling_price: random_price(:USD, 14, 4),
+    shipping_category_id: nil,
+    inserted_at: Ecto.DateTime.utc(),
+    updated_at: Ecto.DateTime.utc()
+  }
+
+  @doc """
+  Returns a list of variant `map`s using the `manifest`.
+
+  ## Manifest schema
+  ```
+  [
+    %{category: %ShippingCategory{}}
+  ]
+  ```
+
+  This result is suitable for a `Ecto.Repo.insert_all/3`
+  """
+  @spec variants_with_manifest([map], map) :: [map]
+  def variants_with_manifest(manifest, context) do
+    variant_count = Map.get(context, :variant_count, 3)
+
+    manifest
+    |> Stream.with_index()
+    |> Stream.map(fn {%{category: sc}, index} ->
+      %{@variant | sku: "shoes-nike-#{index}", shipping_category_id: sc.id}
+    end)
+    |> Enum.take(variant_count)
+  end
 
   @doc """
   Returns a list of line_item `map`s after zipping `variants` and

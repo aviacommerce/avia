@@ -41,17 +41,29 @@ defmodule Snitch.Data.Model.StockLocation do
   def active, do: Repo.all(active_locations())
 
   @doc """
+  Fetches all stock locations with stock items for variants among `variant_ids`.
 
+  The purpose of this function is to preload all the stock information of the
+  variants requested in an order.
+  Returns:
+  * `StockLocation` structs, with
+    - all (relevant) `StockItem` structs, with
+      + `Variant` struct and its `ShippingCategory`
   """
   @spec get_all_with_items_for_variants([non_neg_integer]) :: [StockLocationSchema.t()]
   def get_all_with_items_for_variants(variant_ids) when is_list(variant_ids) do
+    # It is unclear if there will be any gains by splitting this into a compound
+    # query:
+    # subquery = from v in Variant, where v.id in ^variant_ids
+    # query = from slin active_locations(), join: ..., join: subquery(), preload: ...
     Repo.all(
       from(
         sl in active_locations(),
         join: si in assoc(sl, :stock_items),
         join: v in assoc(si, :variant),
+        left_join: sc in assoc(v, :shipping_category),
         where: v.id in ^variant_ids,
-        preload: [stock_items: {si, variant: v}]
+        preload: [stock_items: {si, variant: {v, shipping_category: sc}}]
       )
     )
   end

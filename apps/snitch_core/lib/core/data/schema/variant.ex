@@ -6,7 +6,7 @@ defmodule Snitch.Data.Schema.Variant do
   use Snitch.Data.Schema
   import Ecto.Query
 
-  alias Snitch.Data.Schema.StockItem
+  alias Snitch.Data.Schema.{StockItem, ShippingCategory}
   alias Money.Ecto.Composite.Type, as: MoneyType
   alias Snitch.Repo
 
@@ -25,11 +25,12 @@ defmodule Snitch.Data.Schema.Variant do
     field(:discontinue_on, :utc_datetime)
 
     has_many(:stock_items, StockItem)
+    belongs_to(:shipping_category, ShippingCategory)
 
     timestamps()
   end
 
-  @cast_fields ~w(sku weight height width depth selling_price)a ++
+  @cast_fields ~w(sku weight height width depth selling_price shipping_category_id)a ++
                  ~w(cost_price position track_inventory discontinue_on)a
   @required_fields ~w(sku cost_price selling_price)a
 
@@ -45,6 +46,12 @@ defmodule Snitch.Data.Schema.Variant do
     |> validate_amount(:selling_price)
     |> validate_amount(:cost_price)
     |> validate_future_date(:discontinue_on)
+
+    # |> foreign_key_constraint(:shipping_category)
+    # TODO: Put the FK contraint in Product schema
+    #
+    # Variants has_one shipping category through Products, so we won't be
+    # placing a FK constraint here.
   end
 
   def get_selling_prices(variant_ids) do
