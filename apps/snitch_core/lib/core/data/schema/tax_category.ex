@@ -25,6 +25,14 @@ defmodule Snitch.Data.Schema.TaxCategory do
   @update_fields @optional_fields ++ @required_fields
 
   @doc """
+  Returns a TaxCategory Changeset.
+  """
+
+  def changeset(%__MODULE__{} = tax_category, params \\ %{}) do
+    cast(tax_category, params, @create_fields)
+  end
+
+  @doc """
   Returns a changeset to create a new TaxCategory.
 
   > Note, :name is a required field and it should be unique.

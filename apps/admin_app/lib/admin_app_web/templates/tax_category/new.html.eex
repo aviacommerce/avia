@@ -1,0 +1,32 @@
+<nav aria-label="breadcrumb" role="navigation">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="#">TaxCategory</a></li>
+    <li class="breadcrumb-item active" aria-current="page">New TaxCategory</li>
+  </ol>
+</nav>
+<%= form_for @changeset, tax_category_path(@conn, :create), fn f -> %>
+  <div class="form-group">
+    <label f, :name>
+      Name: <%= text_input f, :name, class: "form-control" %>
+      <%= error_tag f, :name %>
+    </label>
+  </div>
+  <div class="form-group">  
+    <label for="Description">
+      Description <%= text_input f, :description, class: "form-control"%>
+    </label>
+  </div>
+  <div class="form-group">
+    <label for="Tax Code">
+      Tax Code <%= text_input f, :tax_code, class: "form-control" %>
+    </label>
+  </div>
+  <div class="form-group">
+    <%= checkbox(f, :is_default?) %> Default
+  </div>
+  <div class="form-group">
+    <%= submit "Create", class: "btn btn-success"%>
+    <%= link("Cancel", to: tax_category_path(@conn, :index), class: "btn btn-outline-dark")%>
+  </div>
+</div>
+<% end %>
