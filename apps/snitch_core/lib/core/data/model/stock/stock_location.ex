@@ -48,5 +48,29 @@ defmodule Snitch.Data.Model.StockLocation do
   Fetch all `active` stock locations
   """
   @spec active :: list(StockLocationSchema.t())
-  def active, do: Repo.all(from(sl in StockLocationSchema, where: sl.active == true))
+  def active, do: Repo.all(active_locations())
+
+  @doc """
+
+  """
+  @spec get_all_with_items_for_variants([non_neg_integer]) :: [StockLocationSchema.t()]
+  def get_all_with_items_for_variants(variant_ids) when is_list(variant_ids) do
+    Repo.all(
+      from(
+        sl in active_locations(),
+        join: si in assoc(sl, :stock_items),
+        join: v in assoc(si, :variant),
+        where: v.id in ^variant_ids,
+        preload: [stock_items: {si, variant: v}]
+      )
+    )
+  end
+
+  ##############################################################################
+  #                                   QUERIES                                  #
+  ##############################################################################
+
+  defp active_locations do
+    from(sl in StockLocationSchema, where: sl.active == true)
+  end
 end
