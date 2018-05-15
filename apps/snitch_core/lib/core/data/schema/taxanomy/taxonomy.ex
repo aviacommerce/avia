@@ -1,7 +1,5 @@
 defmodule Snitch.Data.Schema.Taxonomy do
-  @moduledoc """
-
-  """
+  @moduledoc false
   use Snitch.Data.Schema
   alias Snitch.Data.Schema.Taxon
 
@@ -17,7 +15,6 @@ defmodule Snitch.Data.Schema.Taxonomy do
   @cast_fields [:name, :root_id]
 
   def changeset(taxonomy, params \\ %{}) do
-    taxonomy
-    |> cast(params, @cast_fields)
+    cast(taxonomy, params, @cast_fields)
   end
 end
