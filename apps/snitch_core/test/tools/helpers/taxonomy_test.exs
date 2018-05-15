@@ -20,7 +20,8 @@ defmodule Snitch.Tools.Helpers.Taxonomy do
   describe "create_taxonomy/1" do
     test "create valid taxonomy" do
       taxonomy =
-        TaxonomyHelper.create_taxonomy(@brands_taxonomy)
+        @brands_taxonomy
+        |> TaxonomyHelper.create_taxonomy()
         |> Repo.preload(:root)
 
       taxonomy = dump_taxonomy(taxonomy.root)
@@ -39,7 +40,8 @@ defmodule Snitch.Tools.Helpers.Taxonomy do
 
     test "create single node taxonomy" do
       taxonomy =
-        TaxonomyHelper.create_taxonomy({"Root", []})
+        {"Root", []}
+        |> TaxonomyHelper.create_taxonomy()
         |> Repo.preload(:root)
 
       taxonomy = dump_taxonomy(taxonomy.root)

@@ -24,15 +24,12 @@ defmodule Snitch.Tools.Helper.Taxonomy do
   """
   @spec create_taxonomy({String.t(), []}) :: Taxonomy.t()
   def create_taxonomy({parent, children}) do
-    changeset =
+    taxonomy =
       %Taxonomy{name: parent}
       |> Taxonomy.changeset()
+      |> Repo.insert!()
 
-    taxonomy = Repo.insert!(changeset)
-
-    taxon =
-      %Taxon{name: parent, taxonomy_id: taxonomy.id}
-      |> Repo.preload(:taxonomy)
+    taxon = Repo.preload(%Taxon{name: parent, taxonomy_id: taxonomy.id}, :taxonomy)
 
     root = TaxonomyDomain.add_root(taxon)
 
@@ -47,8 +44,10 @@ defmodule Snitch.Tools.Helper.Taxonomy do
 
   defp create_taxon({parent, children}, root) do
     child =
-      %Taxon{name: parent, taxonomy_id: root.taxonomy_id, parent_id: root.id}
-      |> Repo.preload([:taxonomy, :parent])
+      Repo.preload(%Taxon{name: parent, taxonomy_id: root.taxonomy_id, parent_id: root.id}, [
+        :taxonomy,
+        :parent
+      ])
 
     root = TaxonomyDomain.add_taxon(root, child, :child)
 
