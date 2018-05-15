@@ -11,20 +11,21 @@ defmodule Snitch.Factory.Stock do
       }
 
       def stock_location_factory do
+        state = insert(:state)
+
         %StockLocation{
-          name: "Diagon Alley",
-          admin_name: "diag-1234",
+          name: sequence("Colosseum"),
+          admin_name: sequence("origin"),
           default: false,
-          address_line_1: "Street 10 London",
-          address_line_2: "Gringotts Bank",
-          city: "London",
-          zip_code: "123456",
-          phone: "1234567890",
+          address_line_1: "Piazza del Colosseo, 1",
+          address_line_2: "",
+          city: "",
+          zip_code: "00184",
+          phone: "+39 06 3996 7700",
           propagate_all_variants: false,
-          backorderable_default: false,
           active: true,
-          state: build(:state),
-          country: build(:country)
+          state: state,
+          country: state.country
         }
       end
 

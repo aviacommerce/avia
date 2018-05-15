@@ -31,7 +31,7 @@ defmodule Snitch.Seed.Orders do
     updated_at: DateTime.utc()
   }
 
-  def seed_orders! do
+  defp build_orders do
     variants = Repo.all(Variant)
     [address | _] = Repo.all(Address)
     [user | _] = Repo.all(User)
@@ -47,7 +47,11 @@ defmodule Snitch.Seed.Orders do
       completed: [user_id: user.id, address_id: address.id]
     }
 
-    {orders, line_items} = make_orders(digest, variants)
+    make_orders(digest, variants)
+  end
+
+  def seed_orders! do
+    {orders, line_items} = build_orders()
 
     {count, order_structs} =
       Repo.insert_all(
