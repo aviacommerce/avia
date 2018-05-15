@@ -11,18 +11,15 @@ defmodule Snitch.Domain.Taxonomy do
   alias Snitch.Data.Schema.Taxon
 
   @doc """
-    Adds child taxon to left, right or child of parent taxon.
+  Adds child taxon to left, right or child of parent taxon.
 
-    Positon can take follwoing values.
-    Position - :left | :right | :child
+  Positon can take follwoing values.
+  Position - :left | :right | :child
   """
   @spec add_taxon(Taxon.t(), Taxon.t(), atom) :: Taxon.t()
   def add_taxon(%Taxon{} = parent, %Taxon{} = child, position) do
-    child =
-      %Taxon{child | taxonomy_id: parent.taxonomy.id}
-      |> Repo.preload(:taxonomy)
-
-    child
+    %Taxon{child | taxonomy_id: parent.taxonomy.id}
+    |> Repo.preload(:taxonomy)
     |> create(parent, position)
     |> AsNestedSet.execute(Repo)
   end
@@ -42,7 +39,8 @@ defmodule Snitch.Domain.Taxonomy do
   """
   @spec get_root(Taxon.t()) :: Taxon.t()
   def get_root(%Taxon{} = taxon) do
-    AsNestedSet.root(Taxon, %{taxonomy_id: taxon.taxonomy_id})
+    Taxon
+    |> AsNestedSet.root(%{taxonomy_id: taxon.taxonomy_id})
     |> AsNestedSet.execute(Repo)
   end
 
@@ -52,8 +50,8 @@ defmodule Snitch.Domain.Taxonomy do
   """
   @spec inorder_list(Taxon.t()) :: {Taxon.t(), [Taxon.t()]}
   def inorder_list(%Taxon{} = root) do
-    AsNestedSet.traverse(
-      Taxon,
+    Taxon
+    |> AsNestedSet.traverse(
       %{taxonomy_id: root.taxonomy_id},
       [],
       fn node, acc -> {node, [node | acc]} end,
@@ -76,7 +74,8 @@ defmodule Snitch.Domain.Taxonomy do
   end
 
   def dump_taxonomy(id) do
-    dump_one(Taxon, %{taxonomy_id: id})
+    Taxon
+    |> dump_one(%{taxonomy_id: id})
     |> AsNestedSet.execute(Repo)
   end
 end

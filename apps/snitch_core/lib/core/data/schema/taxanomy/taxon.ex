@@ -1,7 +1,5 @@
 defmodule Snitch.Data.Schema.Taxon do
-  @moduledoc """
-
-  """
+  @moduledoc false
   use Snitch.Data.Schema
   use AsNestedSet, scope: [:taxonomy_id]
 
@@ -22,7 +20,6 @@ defmodule Snitch.Data.Schema.Taxon do
   @cast_fields ~w(name parent_id taxonomy_id lft rgt)
 
   def changeset(taxon, params) do
-    taxon
-    |> cast(params, @cast_fields)
+    cast(taxon, params, @cast_fields)
   end
 end

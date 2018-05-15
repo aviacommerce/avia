@@ -14,7 +14,7 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
   #   │   └── Table Cover
   #   ├── Mats & Napkin
   #   ├── Home decor
-  defp create_taxonomy() do
+  defp create_taxonomy do
     taxonomy = insert(:taxonomy, name: "Home & Living")
     home_living = insert(:taxon, name: "Home & Living", lft: 0, rgt: 11, taxonomy: taxonomy)
 

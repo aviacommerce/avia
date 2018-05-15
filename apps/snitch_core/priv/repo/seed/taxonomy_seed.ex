@@ -57,7 +57,7 @@ defmodule Snitch.Seed.Taxonomy do
                          ]}
                       ]}
 
-  def seed() do
+  def seed do
     TaxonomyHelper.create_taxonomy(@brands_taxonomy)
     TaxonomyHelper.create_taxonomy(@footwear_taxonomy)
   end
