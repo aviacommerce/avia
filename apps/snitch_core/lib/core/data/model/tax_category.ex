@@ -18,17 +18,17 @@ defmodule Snitch.Data.Model.TaxCategory do
   | field       | type     |
   | ---------   |  ------  |
   | name        | string   |
-  | tax_code    | string   | 
+  | tax_code    | string   |
   | description | string   |
   | is_default? | boolean  |
 
   > Note :name field in the params is a `required` field.
-  > If `:is_default?` field is set to `true` then the current tax_category 
-    is set as default and any previous tax category is unset from default. 
+  > If `:is_default?` field is set to `true` then the current tax_category
+    is set as default and any previous tax category is unset from default.
   ## Example
       params = %{
-        name: "Value Added Tax", 
-        tax_code: "EU_VAT", 
+        name: "Value Added Tax",
+        tax_code: "EU_VAT",
         description: "value added tax"
       }
       {:ok, tax_category} = Snitch.Data.Model.TaxCategory.create(params)
@@ -60,7 +60,7 @@ defmodule Snitch.Data.Model.TaxCategory do
   | field       | type     |
   | ---------   |  ------  |
   | name        | string   |
-  | tax_code    | string   | 
+  | tax_code    | string   |
   | description | string   |
   | is_default  | boolean  |
 
@@ -68,23 +68,23 @@ defmodule Snitch.Data.Model.TaxCategory do
 
   If the `:name` field is passed in `params` then it shouldn't be
   empty.
-  If `:is_default?` field is set to `true` then the current `tax_category` 
+  If `:is_default?` field is set to `true` then the current `tax_category`
   is set as default and any previous tax category is unset from default.
 
-  ## Example 
+  ## Example
       create_params = %{
         name: "Value Added Tax",
-        tax_code: "EU_VAT", 
+        tax_code: "EU_VAT",
         description: "value added tax"
       }
       {:ok, tax_category} = Snitch.Data.Model.TaxCategory.create(create_params)
 
       update_params = %{
-        name: "Value Added Tax", 
-        tax_code: "EU_VAT", 
+        name: "Value Added Tax",
+        tax_code: "EU_VAT",
         description: "value added tax"
       }
-      {:ok, tax_category} = 
+      {:ok, tax_category} =
         Snitch.Data.Model.TaxCategory.update(tax_category, params)
   """
   @spec update(map, TaxCategory.t()) ::
@@ -151,16 +151,17 @@ defmodule Snitch.Data.Model.TaxCategory do
 
   Takes as input the `instance` of the TaxCategory to be deleted.
   """
-  @spec delete(TaxCategory.t()) ::
+  @spec delete(TaxCategory.t() | integer) ::
           {:ok, TaxCategory.t()}
           | {:error, Ecto.Changeset.t()}
+  def delete(id) when is_integer(id) do
+    params = %{deleted_at: DateTime.utc_now(), id: id}
+    QH.update(TaxCategory, params, Repo)
+  end
+
   def delete(instance) do
     params = %{deleted_at: DateTime.utc_now()}
-
-    case QH.update(TaxCategory, params, instance, Repo) do
-      {:ok, changeset} -> {:ok, changeset}
-      {:error, changeset} -> {:error, changeset}
-    end
+    QH.update(TaxCategory, params, instance, Repo)
   end
 
   defp clear_default_multi do

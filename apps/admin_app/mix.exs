@@ -40,6 +40,7 @@ defmodule AdminApp.Mixfile do
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
+      {:phoenix_ecto, "~> 3.0"},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:snitch_core, "~> 0.0.1", in_umbrella: true}

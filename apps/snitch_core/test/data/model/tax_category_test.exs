@@ -103,6 +103,14 @@ defmodule Snitch.Data.Model.TaxCategoryTest do
       tc_deleted = Repo.get(TaxCategory, tc.id)
       refute is_nil(tc_deleted)
     end
+
+    test "tax category successfully by id" do
+      tc = insert(:tax_category)
+      assert {:ok, tc} = Model.TaxCategory.delete(tc.id)
+      refute is_nil(tc.deleted_at)
+      tc_deleted = Repo.get(TaxCategory, tc.id)
+      refute is_nil(tc_deleted)
+    end
   end
 
   describe "get_all" do
