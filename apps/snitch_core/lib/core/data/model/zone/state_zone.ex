@@ -3,26 +3,30 @@ defmodule Snitch.Data.Model.StateZone do
   StateZone API
   """
   use Snitch.Data.Model
+  use Snitch.Tools.Helper.Zone
 
   import Ecto.Query
-  import Snitch.Tools.Helper.Zone
 
+  alias Snitch.Tools.Helper.Zone, as: ZH
   alias Snitch.Data.Schema.{StateZoneMember, Zone, State}
 
   @doc """
   Creates a new state `Zone` whose members are `state_ids`.
 
-  `state_ids` is a list of primary keys of the `Snitch.Data.Schema.State`s that
+  `state_ids` is a list of primary keys of the `Snitch.Data.Schema.StateZoneMember`s that
   make up this zone. Duplicate IDs are ignored.
+
+  ## Note
+  The list of `StateZoneMember.t` is put in `zone.members`.
   """
   @spec create(String.t(), String.t(), [non_neg_integer]) :: term
   def create(name, description, state_ids) do
     zone_params = %{name: name, description: description, zone_type: "S"}
     zone_changeset = Zone.create_changeset(%Zone{}, zone_params)
-    multi = creation_multi(zone_changeset, state_ids)
+    multi = ZH.creation_multi(zone_changeset, state_ids)
 
     case Repo.transaction(multi) do
-      {:ok, %{zone: zone}} -> {:ok, zone}
+      {:ok, %{zone: zone, members: members}} -> {:ok, %{zone | members: members}}
       error -> error
     end
   end
@@ -44,23 +48,23 @@ defmodule Snitch.Data.Model.StateZone do
   @doc """
   Returns the list of `State` IDs that make up this zone.
   """
-  @spec member_ids(non_neg_integer) :: [non_neg_integer]
-  def member_ids(zone_id) do
-    query = from(s in StateZoneMember, where: s.zone_id == ^zone_id, select: s.state_id)
+  @spec member_ids(Zone.t()) :: Zone.t()
+  def member_ids(zone) do
+    query = from(s in StateZoneMember, where: s.zone_id == ^zone.id, select: s.state_id)
     Repo.all(query)
   end
 
   @doc """
-  Returns the list of `State` structs that make up this zone.
+  Returns the list of `State` structs that make up this zone
   """
-  @spec members(non_neg_integer) :: [State.t()]
-  def members(zone_id) do
+  @spec members(Zone.t()) :: Zone.t()
+  def members(zone) do
     query =
       from(
         s in State,
         join: m in StateZoneMember,
         on: m.state_id == s.id,
-        where: m.zone_id == ^zone_id
+        where: m.zone_id == ^zone.id
       )
 
     Repo.all(query)
@@ -71,15 +75,17 @@ defmodule Snitch.Data.Model.StateZone do
 
   This replaces the old members with the new ones. Duplicate IDs in the list are
   ignored.
+
+  ## Note
+  The `zone.members` is set to `nil`!
   """
-  @spec update(String.t(), String.t(), [non_neg_integer]) ::
-          {:ok, Zone.t()} | {:error, Ecto.Changeset.t()}
+  @spec update(Zone.t(), map, [non_neg_integer]) :: {:ok, Zone.t()} | {:error, Ecto.Changeset.t()}
   def update(zone, zone_params, new_state_ids) do
     zone_changeset = Zone.update_changeset(zone, zone_params)
-    multi = update_multi(zone, zone_changeset, new_state_ids)
+    multi = ZH.update_multi(zone, zone_changeset, new_state_ids)
 
     case Repo.transaction(multi) do
-      {:ok, %{zone: zone}} -> {:ok, zone}
+      {:ok, %{zone: zone}} -> {:ok, %{zone | members: nil}}
       error -> error
     end
   end
@@ -100,6 +106,22 @@ defmodule Snitch.Data.Model.StateZone do
         state_id: &1,
         zone_id: state_zone.id
       })
+    )
+  end
+
+  @doc """
+  Returns a query to fetch the state zones shared by (aka. common to) given
+  `state_id`s.
+  """
+  @spec common_zone_query(non_neg_integer, non_neg_integer) :: Ecto.Query.t()
+  def common_zone_query(state_a_id, state_b_id) do
+    from(
+      szm_a in StateZoneMember,
+      join: szm_b in StateZoneMember,
+      join: z in Zone,
+      on: szm_a.zone_id == szm_b.zone_id and szm_a.zone_id == z.id,
+      where: szm_a.state_id == ^state_a_id and szm_b.state_id == ^state_b_id,
+      select: z
     )
   end
 end

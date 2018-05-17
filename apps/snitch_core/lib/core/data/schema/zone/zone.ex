@@ -28,6 +28,7 @@ defmodule Snitch.Data.Schema.Zone do
     field(:name, :string)
     field(:description, :string)
     field(:zone_type, :string)
+    field(:members, :any, virtual: true)
     timestamps()
   end
 
