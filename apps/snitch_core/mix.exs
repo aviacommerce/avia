@@ -51,7 +51,7 @@ defmodule Snitch.Core.Mixfile do
       {:argon2_elixir, "~> 1.2"},
 
       # countries etc
-      {:ex_region, github: "oyeb/ex_region"},
+      {:ex_region, github: "oyeb/ex_region", branch: "embed-json"},
 
       # docs and tests
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
