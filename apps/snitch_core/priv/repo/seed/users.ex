@@ -1,10 +1,11 @@
 defmodule Snitch.Seed.Users do
   @moduledoc false
 
-  alias Snitch.Repo
   alias Ecto.DateTime
-  alias Snitch.Data.Schema.{User, Address}
   alias Comeonin.Argon2
+  alias Snitch.Repo
+  alias Snitch.Data.Schema.{User, Address}
+  alias Snitch.Data.Model.{State, Country}
 
   require Logger
 
@@ -44,6 +45,8 @@ defmodule Snitch.Seed.Users do
   end
 
   def seed_address! do
-    Repo.insert!(@address)
+    california = State.get(%{code: "US-CA"})
+    us = Country.get(%{iso: "US"})
+    Repo.insert!(%{@address | state_id: california.id, country_id: us.id})
   end
 end
