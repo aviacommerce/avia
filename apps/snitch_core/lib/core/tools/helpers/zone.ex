@@ -8,10 +8,28 @@ defmodule Snitch.Tools.Helper.Zone do
   alias Snitch.Data.Schema.Zone
   alias Snitch.Data.Model.{StateZone, CountryZone}
 
-  @doc """
-  Returns a `Multi.t` to bulk insert zone members for `zone_changeset`
+  defmacro __using__(_) do
+    quote do
+      model_name =
+        __MODULE__
+        |> Module.split()
+        |> List.last()
 
-  * `zone_changeset` is the state/country `Snitch.Data.Schema.Zone` changeset.
+      @doc """
+      Updates `zone.members` with the list of
+      `Snitch.Data.Schema.#{model_name}Member.t` structs that make up this zone.
+      """
+      @spec fetch_members(Zone.t()) :: Zone.t()
+      def fetch_members(%Zone{} = zone) do
+        struct(zone, members: members(zone))
+      end
+    end
+  end
+
+  @doc """
+  Returns a `Multi.t` to bulk insert zone members for `zone_changeset`.
+
+  * `zone_changeset` is the state/country `Zone` changeset.
   * `member_ids` is the list of country/state primary keys which are to be inserted.
   """
   @spec creation_multi(Ecto.Changeset.t(), [non_neg_integer]) :: Multi.t()
@@ -23,6 +41,13 @@ defmodule Snitch.Tools.Helper.Zone do
     end)
   end
 
+  @doc """
+  Returns a `Multi.t` to update all zone members for `zone_changeset`.
+
+  * `zone_changeset` is the state/country `Zone` changeset.
+  * `member_ids` is the list of _desired_ country/state primary keys.
+  """
+  @spec update_multi(Zone.t(), Ecto.Changeset.t(), [non_neg_integer]) :: Multi.t()
   def update_multi(zone, zone_changeset, new_member_ids) do
     %{added: added, removed: removed} = update_diff(new_member_ids, zone)
 
@@ -32,13 +57,6 @@ defmodule Snitch.Tools.Helper.Zone do
       multi_run_insert_members(added, zone)
     end)
     |> Multi.append(remove_members_multi(removed, zone))
-  end
-
-  @spec set_difference(MapSet.t(), MapSet.t()) :: list
-  def set_difference(%MapSet{} = a, %MapSet{} = b) do
-    a
-    |> MapSet.difference(b)
-    |> MapSet.to_list()
   end
 
   defp multi_run_insert_members(member_ids, zone) do
@@ -65,7 +83,7 @@ defmodule Snitch.Tools.Helper.Zone do
     zone_module = get_zone_module(current_zone)
 
     old_members =
-      current_zone.id
+      current_zone
       |> zone_module.member_ids()
       |> MapSet.new()
 
@@ -77,4 +95,11 @@ defmodule Snitch.Tools.Helper.Zone do
 
   defp get_zone_module(%Zone{zone_type: "S"}), do: StateZone
   defp get_zone_module(%Zone{zone_type: "C"}), do: CountryZone
+
+  @spec set_difference(MapSet.t(), MapSet.t()) :: list
+  defp set_difference(%MapSet{} = a, %MapSet{} = b) do
+    a
+    |> MapSet.difference(b)
+    |> MapSet.to_list()
+  end
 end

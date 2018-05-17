@@ -21,7 +21,7 @@ defmodule Snitch.Data.Model.CountryZoneTest do
                  from(c in CountryZoneMember, where: c.zone_id == ^zone.id, select: c.country_id)
                )
 
-      assert country_ids == CountryZone.member_ids(zone.id)
+      assert country_ids == CountryZone.member_ids(zone)
     end
 
     test "fails if some states are invalid", %{countries: countries} do
@@ -41,12 +41,12 @@ defmodule Snitch.Data.Model.CountryZoneTest do
     setup :country_zone
 
     test "members/1 returns Country schemas", %{zone: zone, countries: countries} do
-      assert countries == CountryZone.members(zone.id)
+      assert countries == CountryZone.members(zone)
     end
 
     test "delete/1 removes all members too", %{zone: zone} do
       {:ok, _} = CountryZone.delete(zone)
-      assert [] = CountryZone.members(zone.id)
+      assert [] = CountryZone.members(zone)
     end
 
     test "update/3 succeeds with valid country_ids", %{zone: zone, countries: countries} do
@@ -54,7 +54,7 @@ defmodule Snitch.Data.Model.CountryZoneTest do
       old_country_ids = Enum.map(countries, &Map.get(&1, :id))
       new_country_ids = Enum.drop(old_country_ids, 1) ++ more_country_ids
       assert {:ok, _} = CountryZone.update(zone, %{}, new_country_ids)
-      country_ids = MapSet.new(CountryZone.member_ids(zone.id))
+      country_ids = MapSet.new(CountryZone.member_ids(zone))
 
       assert new_country_ids
              |> MapSet.new()
@@ -63,17 +63,17 @@ defmodule Snitch.Data.Model.CountryZoneTest do
 
     test "update/3 succeeds with no states", %{zone: zone} do
       assert {:ok, _} = CountryZone.update(zone, %{}, [])
-      assert [] = CountryZone.member_ids(zone.id)
+      assert [] = CountryZone.member_ids(zone)
     end
 
     test "update/3 fails with invalid states", %{zone: zone} do
-      old_country_ids = CountryZone.member_ids(zone.id)
+      old_country_ids = CountryZone.member_ids(zone)
 
       assert {:error, :added, %{errors: errors}, %{zone: updated_zone}} =
                CountryZone.update(zone, %{}, [-1])
 
       assert errors == [country_id: {"does not exist", []}]
-      assert old_country_ids == CountryZone.member_ids(updated_zone.id)
+      assert old_country_ids == CountryZone.member_ids(updated_zone)
     end
   end
 
