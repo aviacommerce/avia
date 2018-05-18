@@ -4,9 +4,9 @@ defmodule Snitch.Domain.ShippingMethod do
   """
 
   use Snitch.Domain
-  alias Snitch.Data.Model.{ShippingMethod}
+  alias Snitch.Data.Model.ShippingMethod
   alias Snitch.Data.Schema.ShippingMethod, as: SMSchema
-  alias Snitch.Data.Schema.ShippingCategory
+  alias Snitch.Data.Schema.{ShippingCategory, Order}
 
   @doc """
   Returns the `ShippingMethod.t` structs that are applicable for the given
@@ -22,5 +22,13 @@ defmodule Snitch.Domain.ShippingMethod do
   def for_package(zones, %ShippingCategory{} = category)
       when is_list(zones) do
     Repo.all(ShippingMethod.for_package_query(zones, category))
+  end
+
+  @doc """
+  Returns the shipping cost
+  """
+  @spec cost(ShippingMethod.t(), Order.t()) :: Money.t()
+  def cost(%SMSchema{} = _shipping_method, %Order{} = _order) do
+    Money.new(0, :USD)
   end
 end

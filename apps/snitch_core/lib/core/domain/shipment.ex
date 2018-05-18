@@ -18,6 +18,7 @@ defmodule Snitch.Domain.Shipment do
     ],
     zone: %Zone{}
     shipping_methods: [%ShippingMethod{}],
+    shipping_costs: [%Money{}],
     origin: %StockLocation{}, # the `:stock_items` will not be "loaded"
     category: %ShippingCategory{},
     backorders?: true | false,
@@ -48,7 +49,7 @@ defmodule Snitch.Domain.Shipment do
     |> Stream.map(&attach_zones(&1, order.shipping_address))
     |> Enum.map(&split_by_category/1)
     |> List.flatten()
-    |> Stream.map(&attach_shipping_methods/1)
+    |> Stream.map(&attach_shipping_methods(&1, order))
     |> Enum.reject(fn x -> is_nil(x) end)
   end
 
@@ -97,13 +98,20 @@ defmodule Snitch.Domain.Shipment do
     Map.put(package, :zones, Zone.common(package.origin, shipping_address))
   end
 
-  defp attach_shipping_methods(package) do
+  defp attach_shipping_methods(package, order) do
     {sz, cz} = package.zones
     zones = sz ++ cz
 
     case ShippingMethod.for_package(zones, package.category) do
-      [] -> nil
-      methods -> Map.put(package, :shipping_methods, methods)
+      [] ->
+        nil
+
+      methods ->
+        costs = Enum.map(methods, &ShippingMethod.cost(&1, order))
+
+        package
+        |> Map.put(:shipping_methods, methods)
+        |> Map.put(:shipping_costs, costs)
     end
   end
 

@@ -124,7 +124,6 @@ defmodule Snitch.Domain.ShipmentTest do
     # default does not have enough, but is backorderable
     # backup  has none
     # origin  does not have enough
-
     address = %Address{state_id: up.id, country_id: india.id}
     line_items = line_items_with_price(vs, [4])
     order = %Order{id: 42, line_items: line_items, shipping_address: address}
@@ -170,7 +169,6 @@ defmodule Snitch.Domain.ShipmentTest do
     # default has none
     # backup  has none
     # origin  has none
-
     address = %Address{state_id: up.id, country_id: india.id}
     line_items = line_items_with_price(vs, [0, 2])
     order = %Order{id: 42, line_items: line_items, shipping_address: address}
@@ -196,7 +194,6 @@ defmodule Snitch.Domain.ShipmentTest do
     # default does not have enough, but is backorderable
     # backup  has enough
     # origin  does not have enough
-
     address = %Address{state_id: tn.id, country_id: india.id}
     line_items = line_items_with_price(vs, [0, 0, 6])
     order = %Order{id: 42, line_items: line_items, shipping_address: address}
@@ -255,13 +252,6 @@ defmodule Snitch.Domain.ShipmentTest do
 
   @tag variant_count: 3, state_zone_count: 2
   test "package from default gets split (shipping_category)", context do
-    # Line items:
-    # + 4 pieces of variant_1
-    # + 4 pieces of variant_3
-    #
-    # default does not have enough, but is backorderable (for both variants)
-    # backup  has enough of variant_3, none of variant_1
-    # origin  does not have enough
     %{
       variants: [%{id: one_id}, _, %{id: three_id}] = vs,
       stock_locations: stock_locations,
@@ -271,6 +261,13 @@ defmodule Snitch.Domain.ShipmentTest do
       shipping_categories: [light, heavy, _]
     } = context
 
+    # Line items:
+    # + 4 pieces of variant_1
+    # + 4 pieces of variant_3
+    #
+    # default does not have enough, but is backorderable (for both variants)
+    # backup  has enough of variant_3, none of variant_1
+    # origin  does not have enough
     address = %Address{state_id: mh.id, country_id: india.id}
     line_items = line_items_with_price(vs, [4, 0, 4])
     order = %Order{id: 42, line_items: line_items, shipping_address: address}
@@ -373,9 +370,7 @@ defmodule Snitch.Domain.ShipmentTest do
     # default has enough
     # backup  has none
     # origin  has enough
-
     address = %Address{state_id: ka.id, country_id: india.id}
-
     line_items = line_items_with_price(vs, [3])
     order = %Order{id: 42, line_items: line_items, shipping_address: address}
     packages = Shipment.default_packages(order)
