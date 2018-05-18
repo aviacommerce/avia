@@ -13,14 +13,6 @@ defmodule Snitch.ShipmentCase do
     updated_at: Ecto.DateTime.utc()
   }
 
-  @shipping_method %{
-    name: nil,
-    slug: nil,
-    description: nil,
-    inserted_at: Ecto.DateTime.utc(),
-    updated_at: Ecto.DateTime.utc()
-  }
-
   @doc """
   Creates `ShippingCategory`s according to the manifest.
 
