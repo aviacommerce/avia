@@ -1,0 +1,14 @@
+@import 'variables';
+@import "switch";
+
+.form-group.required {
+  label::after {
+    color: #f55753;
+    content: "*";
+    font-family: arial;
+    font-size: 20px;
+    position: relative;
+    margin-left: 4px;
+    top: -5px;
+  }
+}

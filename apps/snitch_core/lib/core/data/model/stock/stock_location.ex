@@ -6,19 +6,9 @@ defmodule Snitch.Data.Model.StockLocation do
   use Snitch.Data.Model
   alias Snitch.Data.Schema.StockLocation, as: StockLocationSchema
 
-  @spec create(String.t(), String.t(), non_neg_integer, non_neg_integer) ::
-          {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
-  def create(name, address, state_id, country_id) do
-    QH.create(
-      StockLocationSchema,
-      %{
-        name: name,
-        address_line_1: address,
-        state_id: state_id,
-        country_id: country_id
-      },
-      Repo
-    )
+  @spec create(map) :: {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
+  def create(query_fields) do
+    QH.create(StockLocationSchema, query_fields, Repo)
   end
 
   @spec update(non_neg_integer | map, StockLocationSchema.t() | nil) ::
@@ -72,5 +62,9 @@ defmodule Snitch.Data.Model.StockLocation do
 
   defp active_locations do
     from(sl in StockLocationSchema, where: sl.active == true)
+  end
+
+  def search(_params) do
+    Repo.all(StockLocationSchema)
   end
 end

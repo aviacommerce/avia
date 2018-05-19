@@ -10,8 +10,8 @@
             Configurations
           </a>
           <ul id="drilldown-1" class="nav nav-pills nav-stacked collapse pl-3">
-            <li><a class="nav-link" href="#">Stock Item</a></li>
-            <li><a class="nav-link" href="#">Stock Location</a></li>
+            <li><a class="nav-link" href="#">Stock Items</a></li>
+            <li><a class="nav-link" href="/stock_locations">Stock Locations</a></li>
             <li><a class="nav-link" href="#">Stock Movements</a></li>
           </ul>
           </div>
