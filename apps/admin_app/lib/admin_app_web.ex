@@ -41,6 +41,8 @@ defmodule AdminAppWeb do
       import AdminAppWeb.Router.Helpers
       import AdminAppWeb.ErrorHelpers
       import AdminAppWeb.Gettext
+      import AdminAppWeb.InputHelpers
+      import AdminAppWeb.DataHelpers
     end
   end
 

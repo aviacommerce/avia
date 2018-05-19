@@ -1,0 +1,5 @@
+<div class="card container text-uppercase">
+    <h4><a href="/stock_locations">Stock Locations</a> / New Stock Location</h4>
+    <hr/>
+    <%= render "_form.html", changeset: @changeset, conn: @conn, action: stock_location_path(@conn, :create) %>
+</div>

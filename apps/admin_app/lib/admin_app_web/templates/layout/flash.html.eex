@@ -1,13 +1,13 @@
 <div class="row">
-  <div class="col-sm-12">
+  <div class="col-sm-12 text-center">
     <%
-      info = get_flash(@conn, :info)
-      error = get_flash(@conn, :error)
+      info = get_flash(@conn, "info")
+      error = get_flash(@conn, "error")
     %>
-    <% if info do %>
+    <%= if info do %>
       <div class="alert alert-info" role="alert"><%= info %></div>
     <% end %>
-    <% if error do %>
+    <%= if error do %>
       <div class="alert alert-danger" role="alert"><%= error %></div>
     <% end %>
   </div>

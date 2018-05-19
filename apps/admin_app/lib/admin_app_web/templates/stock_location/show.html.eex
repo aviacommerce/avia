@@ -1,0 +1,27 @@
+<div class="container text-capitalize">
+  <h4>
+    <a href="/stock_locations">Stock Locations</a> / <%= @stock_location.name %>
+  </h4>
+  <hr/>
+  <ul class="col">
+    <li><strong class="text-danger">Name:</strong> <%= @stock_location.name %></li>
+    <li><strong class="text-danger">Admin Name:</strong> <%= @stock_location.admin_name %></li>
+    <li>
+      <strong class="text-danger">Address:</strong>
+      <ul>
+        <li><strong class="text-danger">Address 1:</strong> <%= @stock_location.address_line_1 %></li>
+        <li><strong class="text-danger">Address 2:</strong> <%= @stock_location.address_line_2 %></li>
+        <li><strong class="text-danger">City:</strong> <%= @stock_location.city %></li>
+        <li><strong class="text-danger">Zipcode:</strong> <%= @stock_location.zip_code %></li>
+      </ul>
+    </li>
+    <li><strong class="text-danger">Phone:</strong> <%= @stock_location.phone %></li>
+    <%= if @stock_location.active do %>
+      <li><strong class="text-danger">Status:</strong> Active</li>
+    <% else %>
+      <li><strong class="text-danger">Status:</strong> Inactive</li>      
+    <% end %>
+    <li><strong class="text-danger">Backorderable Default:</strong> <%= @stock_location.backorderable_default%></li>
+    <li><strong class="text-danger">Propagate All Variants:</strong> <%= @stock_location.propagate_all_variants%></li>
+  </ul>
+</div>
