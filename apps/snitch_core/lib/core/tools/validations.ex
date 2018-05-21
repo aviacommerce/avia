@@ -18,21 +18,19 @@ defmodule Snitch.Tools.Validations do
   is non-negative.
   """
   @spec validate_amount(Ecto.Changeset.t(), atom) :: Ecto.Changeset.t()
-  def validate_amount(%Ecto.Changeset{valid?: true} = changeset, key) when is_atom(key) do
+  def validate_amount(%Ecto.Changeset{} = changeset, key) when is_atom(key) do
     case fetch_change(changeset, key) do
       {:ok, %Money{amount: amount}} ->
-        if Decimal.cmp(amount, Decimal.new(0)) != :lt do
-          changeset
-        else
+        if Decimal.cmp(Decimal.reduce(amount), Decimal.new(0)) == :lt do
           add_error(changeset, key, "must be greater than 0", validation: :number)
+        else
+          changeset
         end
 
       :error ->
         changeset
     end
   end
-
-  def validate_amount(changeset, _), do: changeset
 
   @doc """
   Validates that the given date (of type `DateTime.t`) under the `key` in
