@@ -60,7 +60,10 @@ defmodule Snitch.Core.Mixfile do
       {:mox, "~> 0.3", only: :test},
       {:ex_machina, "~> 2.2", only: :test},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
-      {:inch_ex, "~> 0.5.6", only: [:docs, :dev]}
+      {:inch_ex, "~> 0.5.6", only: [:docs, :dev]},
+
+      # csp
+      {:aruspex, github: "oyeb/aruspex", branch: "tweaks"}
     ]
   end
 
