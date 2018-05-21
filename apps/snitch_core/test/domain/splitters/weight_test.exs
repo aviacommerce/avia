@@ -112,6 +112,20 @@ defmodule Snitch.Domain.Splitter.WeightTest do
   setup :stock_items
 
   describe "split/1" do
+    # Default Packages
+    #
+    # | Package | Item/Variant | Weight | Δ | Quantity |
+    # |---------|--------------|--------|---|----------|
+    # | 1       | 1            | 10     | 0 | 1        |
+    # | 2       | 1            | 10     | 0 | 1        |
+
+    # After Weight Splitting
+    #
+    # | Package | Item/Variant | Weight | Δ | Quantity |
+    # |---------|--------------|--------|---|----------|
+    # | 1       | 1            | 10     | 0 | 1        |
+    # | 2       | 1            | 10     | 0 | 1        |
+
     @tag weights: [10.0], variant_count: 1, state_zone_count: 2
     test "no package with weight over threshold", context do
       %{
@@ -129,16 +143,6 @@ defmodule Snitch.Domain.Splitter.WeightTest do
         |> Shipment.default_packages()
         |> WeightSplitter.split()
 
-      # ┌─────────────────────────────────────────────┬─────────────────────────────────────────────┐
-      # │              Default Packages               │               Weight Splitter               │
-      # ├─────────┬───────┬──────────┬────────┬───────┼─────────┬───────┬──────────┬────────┬───────┤
-      # │ Package │ Items │ Quantity │ Weight │ Delta │ Package │ Items │ Quantity │ Weight │ Delta │
-      # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
-      # │   P1    │  I1   │    1     │   10   │   0   │   P1    │  I1   │    1     │   10   │   0   │
-      # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
-      # │   P2    │  I1   │    1     │   10   │   0   │   P2    │  I1   │    1     │   10   │   0   │
-      # └─────────┴───────┴──────────┴────────┴───────┴─────────┴───────┴──────────┴────────┴───────┘
-
       # Item {delta, quantity}
       packages_to_assert = [
         [{0, 1}],
@@ -152,6 +156,31 @@ defmodule Snitch.Domain.Splitter.WeightTest do
       |> Enum.map(&assert_package/1)
     end
   end
+
+  # Default packages
+  #
+  # | Package | Item/Variant | Weight | Δ | Quantity |
+  # |---------|--------------|--------|---|----------|
+  # | 1       | 1            | 30     | 1 | 2        |
+  # | 2       | 2            | 60     | 0 | 3        |
+  # | 3       | 1            | 30     | 0 | 3        |
+  # | 4       | 2            | 60     | 0 | 3        |
+
+  # After weight splitting
+  #
+  # | Parent Package | Package | Item/Variant | Weight | Δ | Quantity |
+  # +================+=========+==============+========+===+==========+
+  # | 1              | 1       | 1            | 90     | 1 | 2        |
+  # +----------------+---------+--------------+--------+---+----------+
+  # | 2              | 2       | 2            | 60     | 0 | 1        |
+  # |                +---------+--------------+--------+---+----------+
+  # |                | 3       | 2            | 120    | 0 | 2        |
+  # +----------------+---------+--------------+--------+---+----------+
+  # | 3              | 4       | 1            | 90     | 0 | 3        |
+  # +----------------+---------+--------------+--------+---+----------+
+  # | 4              | 5       | 2            | 60     | 0 | 1        |
+  # |                +---------+--------------+--------+---+----------+
+  # |                | 6       | 2            | 120    | 0 | 2        |
 
   @tag weights: [60.0, 30.0], variant_count: 2, state_zone_count: 2
   test "split package with more cumulative weight", context do
@@ -170,24 +199,6 @@ defmodule Snitch.Domain.Splitter.WeightTest do
       |> Shipment.default_packages()
       |> WeightSplitter.split()
 
-    # ┌─────────────────────────────────────────────┬─────────────────────────────────────────────┐
-    # │              Default Packages               │               Weight Splitter               │
-    # ├─────────┬───────┬──────────┬────────┬───────┼─────────┬───────┬──────────┬────────┬───────┤
-    # │ Package │ Items │ Quantity │ Weight │ Delta │ Package │ Items │ Quantity │ Weight │ Delta │
-    # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
-    # │   P1    │  I1   │    2     │   30   │   1   │   P1    │  I1   │    2     │   60   │   1   │
-    # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
-    # │         │       │          │        │       │   P2    │  I1   │    1     │   60   │   0   │
-    # │   P2    │  I1   │    3     │   60   │   0   ├─────────┼───────┼──────────┼────────┼───────┤
-    # │         │       │          │        │       │   P3    │  I1   │    2     │   120  │   0   │
-    # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
-    # │   P3    │  I1   │    3     │   30   │   0   │   P4    │  I1   │    3     │   90   │   0   │
-    # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
-    # │         │       │          │        │       │   P5    │  I1   │    1     │   60   │   0   │
-    # │   P4    │  I1   │    3     │   60   │   0   ├─────────┼───────┼──────────┼────────┼───────┤
-    # │         │       │          │        │       │   P6    │  I1   │    2     │   120  │   0   │
-    # └─────────┴───────┴──────────┴────────┴───────┴─────────┴───────┴──────────┴────────┴───────┘
-
     # Item {delta, quantity}
     packages_to_assert = [
       [{1, 2}],
@@ -205,6 +216,26 @@ defmodule Snitch.Domain.Splitter.WeightTest do
     |> Enum.map(&assert_package/1)
   end
 
+  # Default packages
+  #
+  # | Package | Item/Variant | Weight | Δ | Quantity |
+  # |---------|--------------|--------|---|----------|
+  # | 1       | 2            | 40     | 4 | 2        |
+  # | 2       | 1            | 10     | 0 | 2        |
+  # | 3       | 1            | 10     | 0 | 2        |
+
+  # After weight splitting
+  #
+  # | Parent Package | Package | Item/Variant | Weight | Δ | Quantity |
+  # +================+=========+==============+========+===+==========+
+  # | 1              | 1       | 2            | 120    | 3 | 0        |
+  # |                +---------+--------------+--------+---+----------+
+  # |                | 2       | 2            | 120    | 1 | 2        |
+  # +----------------+---------+--------------+--------+---+----------+
+  # | 2              | 3       | 1            | 20     | 0 | 2        |
+  # +----------------+---------+--------------+--------+---+----------+
+  # | 3              | 4       | 1            | 20     | 0 | 2        |
+
   @tag weights: [10.0, 40.0], variant_count: 2, state_zone_count: 2
   test "split package with uneven weight", context do
     %{
@@ -221,20 +252,6 @@ defmodule Snitch.Domain.Splitter.WeightTest do
       order
       |> Shipment.default_packages()
       |> WeightSplitter.split()
-
-    # ┌─────────────────────────────────────────────┬─────────────────────────────────────────────┐
-    # │              Default packages               │               Weight splitter               │
-    # ├─────────┬───────┬──────────┬────────┬───────┼─────────┬───────┬──────────┬────────┬───────┤
-    # │ Package │ Items │ Quantity │ Weight │ Delta │ Package │ Items │ Quantity │ Weight │ Delta │
-    # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
-    # │         │       │          │        │       │   P1    │  I1   │    0     │   0    │   3   │
-    # │   P1    │  I1   │    2     │   40   │   4   ├─────────┼───────┼──────────┼────────┼───────┤
-    # │         │       │          │        │       │   P2    │  I1   │    2     │   80   │   1   │
-    # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
-    # │   P2    │  I1   │    2     │   10   │   0   │   P3    │  I1   │    2     │   20   │   0   │
-    # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
-    # │   P3    │  I1   │    2     │   10   │   0   │   P4    │  I1   │    2     │   20   │   0   │
-    # └─────────┴───────┴──────────┴────────┴───────┴─────────┴───────┴──────────┴────────┴───────┘
 
     # Item {delta, quantity}
     packages_to_assert = [
@@ -273,7 +290,8 @@ defmodule Snitch.Domain.Splitter.WeightTest do
 
   defp variants_with_categories(manifest, context) do
     variants =
-      variants_with_manifest(manifest, context)
+      manifest
+      |> variants_with_manifest(context)
       |> Enum.zip(context.weights)
       |> Enum.map(fn {variant, weight} -> %{variant | weight: Decimal.new(weight)} end)
 
