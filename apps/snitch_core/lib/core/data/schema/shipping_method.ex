@@ -89,3 +89,36 @@ defmodule Snitch.Data.Schema.ShippingMethod do
     |> put_assoc(:shipping_categories, categories)
   end
 end
+
+defmodule Snitch.Data.Schema.Embedded.ShippingMethod do
+  @moduledoc """
+  Defines an embedded schema for `ShippingMethod`.
+  """
+
+  use Snitch.Data.Schema
+  alias Snitch.Data.Schema.ShippingMethod
+
+  @type t :: %__MODULE__{}
+
+  @primary_key false
+  embedded_schema do
+    field(:id, :integer)
+    field(:slug, :string)
+    field(:name, :string)
+    field(:description, :string)
+    field(:cost, Money.Ecto.Composite.Type)
+  end
+
+  @update_fields ~w(cost)a
+  @create_fields @update_fields ++ ~w(id slug name description)a
+
+  def changeset(%__MODULE__{} = embedded_sm, %ShippingMethod{} = sm) do
+    changeset(embedded_sm, Map.from_struct(sm))
+  end
+
+  def changeset(%__MODULE__{} = embedded_sm, params) do
+    embedded_sm
+    |> cast(params, @create_fields)
+    |> validate_amount(:cost)
+  end
+end

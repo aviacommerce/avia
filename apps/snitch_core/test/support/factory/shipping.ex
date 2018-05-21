@@ -3,7 +3,7 @@ defmodule Snitch.Factory.Shipping do
 
   defmacro __using__(_opts) do
     quote do
-      alias Snitch.Data.Schema.{ShippingMethod, ShipmentUnit, ShippingCategory}
+      alias Snitch.Data.Schema.{ShippingMethod, PackageItem, Package, ShippingCategory}
 
       def shipping_method_factory do
         %ShippingMethod{
@@ -13,12 +13,29 @@ defmodule Snitch.Factory.Shipping do
         }
       end
 
-      def shipment_unit_factory do
-        %ShipmentUnit{
-          quantity: 1,
+      def package_item_factory do
+        %PackageItem{
+          number: sequence("item_"),
           state: "pending",
+          quantity: 1,
+          delta: 0,
           variant: build(:variant),
           line_item: build(:line_item)
+        }
+      end
+
+      def package_factory do
+        %Package{
+          number: sequence("package_"),
+          state: "ready",
+          shipped_at: nil,
+          tracking: %{id: "some_tracking_id"},
+          shipping_methods: [],
+          cost: Money.new(0, :USD),
+          total: Money.new(0, :USD),
+          tax_total: Money.new(0, :USD),
+          adjustment_total: Money.new(0, :USD),
+          promo_total: Money.new(0, :USD)
         }
       end
 
