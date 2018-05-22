@@ -6,8 +6,8 @@
   <%= input f, :city %>
   <%= input f, :zip_code %>
   <%= input f, :phone %>
-  <%= select_input f, :country_id, formatted_list(:country) %>
-  <%= select_input f, :state_id, formatted_list(:state) %>
+  <%= select_input f, :country_id, formated_list(:country) %>
+  <%= select_input f, :state_id, formated_list(:state) %>
   <%= checkbox_input f, :active %>
   <%= checkbox_input f, :backorderable_default %>
   <%= checkbox_input f, :propagate_all_variants %>

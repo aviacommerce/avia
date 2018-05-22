@@ -12,6 +12,6 @@ defmodule Snitch.Data.Model.Country do
     QH.get(Country, query_fields_or_primary_key, Repo)
   end
 
-  @spec formatted_list() :: [{}]
-  def formatted_list(), do: Repo.all(from(s in Country, select: {s.name, s.id}))
+  @spec formated_list() :: [{}]
+  def formated_list(), do: Repo.all(from(s in Country, select: {s.name, s.id}))
 end
