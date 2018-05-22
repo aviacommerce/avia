@@ -12,6 +12,6 @@ defmodule AdminAppWeb.DataHelpers do
   passed to like => <%= select_input f, :country_id, formated_list(:country) %>
   Can also be used elsewhere.
   """
-  def formated_list(:state), do: StateModel.formated_list()
-  def formated_list(:country), do: CountryModel.formated_list()
+  def formatted_list(:state), do: StateModel.formatted_list()
+  def formatted_list(:country), do: CountryModel.formatted_list()
 end
