@@ -61,11 +61,7 @@ exports.config = {
     },
     sass: {
       options: {
-          includePaths: [
-            "node_modules/bootstrap/scss",
-            "node_modules/font-awesome/scss",
-            "node_modules/select2/src/scss"
-          ], // tell sass-brunch where to look for files to @import
+        includePaths: ["node_modules/bootstrap/scss", "node_modules/font-awesome/scss"], // tell sass-brunch where to look for files to @import
         precision: 8 // minimum precision required by bootstrap
       }
     }
@@ -84,8 +80,7 @@ exports.config = {
       jQuery: 'jquery',
       Popper: 'popper.js',
       Tether: 'tether',
-      bootstrap: 'bootstrap',
-      select2: 'select2'
+      bootstrap: 'bootstrap'
     }
   }
 };

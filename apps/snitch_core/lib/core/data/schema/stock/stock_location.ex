@@ -13,7 +13,7 @@ defmodule Snitch.Data.Schema.StockLocation do
 
   If this is set to `true` when creating a new `StockLocation`, then a
   `StockItem` entry with `0` `:count_on_hand` and this `StockLocation` is
-  created for all currently existing variants.
+  created for _all currently existing variants_.
   """
   @type t :: %__MODULE__{}
 

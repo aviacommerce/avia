@@ -1,7 +1,7 @@
-import './main.scss';
+import './main.css';
 import { Main } from './Main.elm';
 import registerServiceWorker from './registerServiceWorker';
 
-Main.embed(document.getElementById('elm-root'));
+Main.embed(document.getElementById('root'));
 
 registerServiceWorker();

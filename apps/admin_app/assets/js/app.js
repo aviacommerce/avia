@@ -21,11 +21,6 @@ import "phoenix_html"
 // import socket from "./socket"
 
 import "bootstrap";
-import select2Selector from './form-helpers/select2-selector';
-
-$(document).ready(() => {
-  select2Selector();
-})
 
 const elmDiv = document.getElementById("elm-main");
 Elm.Main.embed(elmDiv);

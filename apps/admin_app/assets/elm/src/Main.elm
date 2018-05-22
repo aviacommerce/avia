@@ -1,66 +1,55 @@
 module Main exposing (..)
 
-import Html exposing (Html, div, text)
-import Html.Attributes exposing (class)
-import StockLocations.List as StockLocationList
+import Html exposing (Html, text, div, h1, img)
+import Html.Attributes exposing (src)
 
 
--- MODEL
+---- MODEL ----
 
 
 type alias Model =
-    { stockLocationListModel : StockLocationList.Model }
-
-
-initialModel : Model
-initialModel =
-    { stockLocationListModel = StockLocationList.initialModel }
+    {}
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel, Cmd.map StockLocationListMsg StockLocationList.httpCommand )
+    ( {}, Cmd.none )
 
 
 
--- UPDATE
+---- UPDATE ----
 
 
 type Msg
-    = StockLocationListMsg StockLocationList.Msg
+    = NoOp
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        StockLocationListMsg stockLocationMsg ->
-            let
-                ( updatedModel, cmd ) =
-                    StockLocationList.update stockLocationMsg model.stockLocationListModel
-            in
-            ( { model | stockLocationListModel = updatedModel }, Cmd.map StockLocationListMsg cmd )
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
+    ( model, Cmd.none )
 
 
 
--- VIEW
+---- VIEW ----
 
 
 view : Model -> Html Msg
 view model =
-    div [ class "elm-main" ]
-        [ Html.map StockLocationListMsg (StockLocationList.view model.stockLocationListModel) ]
+    div []
+        [ img [ src "images/logo.png" ] []
+        , h1 [] [ text "Your Elm App is working!" ]
+        ]
+
+
+
+---- PROGRAM ----
 
 
 main : Program Never Model Msg
 main =
     Html.program
-        { init = init
-        , view = view
+        { view = view
+        , init = init
         , update = update
-        , subscriptions = subscriptions
+        , subscriptions = always Sub.none
         }
