@@ -1,0 +1,15 @@
+<%= form_for @changeset, @action, fn f -> %>
+  <%= input f, :name%>
+  <%= input f, :admin_name %>
+  <%= textarea_input f, :address_line_1 %>
+  <%= textarea_input f, :address_line_2 %>
+  <%= input f, :city %>
+  <%= input f, :zip_code %>
+  <%= input f, :phone %>
+  <%= select_input f, :country_id, formatted_list(:country) %>
+  <%= select_input f, :state_id, formatted_list(:state) %>
+  <%= checkbox_input f, :active %>
+  <%= checkbox_input f, :backorderable_default %>
+  <%= checkbox_input f, :propagate_all_variants %>
+  <%= submit "Submit", class: "btn btn-primary submit-btn" %>
+<%end %>
