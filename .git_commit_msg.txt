@@ -1,0 +1,33 @@
+# If applied, this commit will...
+
+
+# this bar is where 50 columns is at    --------->|                                                 
+# Complete the sentence above,
+# +  Capitalize it!
+# +  Don't end with a period (full-stop)!
+#
+# Commit description, use maximum 72 chars
+#
+# Why is this change needed?
+Prior to this change, 
+
+
+# this bar is where 72 columns is at       ---------------------------->|
+#
+# How does it address the issue?
+This change
+
+
+# this bar is where 72 columns is at       ---------------------------->|
+#
+# Provide links to any relevant tickets, articles or other resources
+
+
+# this bar is where 72 columns is at       ---------------------------->|
+#
+# For more details on how to write a good commit message please visit:
+# https://chris.beams.io/posts/git-commit/
+#
+# Thank you for taking the time to write a good commit message!
+# We highly appreciate it!
+# Take a hug! (づ｡◕‿‿◕｡)づ
