@@ -6,7 +6,13 @@ defmodule Snitch.Data.Model.StockLocationTest do
 
   describe "create/4" do
     test "Fails for blank attributes" do
-      assert {:error, changeset} = StockLocationModel.create("", "", nil, nil)
+      assert {:error, changeset} =
+               StockLocationModel.create(%{
+                 name: "",
+                 address_line_1: "",
+                 state_id: nil,
+                 country_id: nil
+               })
 
       assert %{
                address_line_1: ["can't be blank"],
@@ -18,26 +24,36 @@ defmodule Snitch.Data.Model.StockLocationTest do
 
     test "Fails for invalid associations" do
       assert {:error, changeset} =
-               StockLocationModel.create("Diagon Alley", "Street 10 London", -1, -1)
+               StockLocationModel.create(%{
+                 name: "Diagon Alley",
+                 address_line_1: "Street 10 London",
+                 state_id: -1,
+                 country_id: -1
+               })
 
       assert %{state_id: ["does not exist"]} = errors_on(changeset)
 
       state = insert(:state)
 
       assert {:error, changeset} =
-               StockLocationModel.create("Diagon Alley", "Street 10 London", state.id, -1)
+               StockLocationModel.create(%{
+                 name: "Diagon Alley",
+                 address_line_1: "Street 10 London",
+                 state_id: state.id,
+                 country_id: -1
+               })
 
       assert %{country_id: ["does not exist"]} = errors_on(changeset)
     end
 
     test "Inserts with valid attributes" do
       assert {:ok, _stock_location} =
-               StockLocationModel.create(
-                 "Diagon Alley",
-                 "Street 10 London",
-                 insert(:state).id,
-                 insert(:country).id
-               )
+               StockLocationModel.create(%{
+                 name: "Diagon Alley",
+                 address_line_1: "Street 10 London",
+                 state_id: insert(:state).id,
+                 country_id: insert(:country).id
+               })
     end
   end
 
