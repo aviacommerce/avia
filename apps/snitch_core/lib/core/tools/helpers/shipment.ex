@@ -1,16 +1,17 @@
-defmodule Snitch.ShipmentCase do
+defmodule Snitch.Tools.Helper.Shipment do
   @moduledoc """
   Test helpers to insert shipping related schemas.
   """
 
   alias Snitch.Repo
+  alias Ecto.DateTime
   alias Snitch.Data.Schema.{ShippingCategory}
   alias Snitch.Data.Model.ShippingMethod
 
   @shipping_category %{
     name: nil,
-    inserted_at: Ecto.DateTime.utc(),
-    updated_at: Ecto.DateTime.utc()
+    inserted_at: DateTime.utc(),
+    updated_at: DateTime.utc()
   }
 
   @doc """
