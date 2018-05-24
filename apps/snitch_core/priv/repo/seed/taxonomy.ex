@@ -25,40 +25,43 @@ defmodule Snitch.Seed.Taxonomy do
           └── Sports Shoes and Floaters
   """
 
+  alias Snitch.Data.Schema.Taxonomy
+  alias Snitch.Repo
   alias Snitch.Tools.Helper.Taxonomy, as: TaxonomyHelper
 
-  @brands_taxonomy {"Brands",
-                    [
-                      {"Bags", []},
-                      {"Mugs", []},
-                      {"Clothing",
-                       [
-                         {"Shirts", []},
-                         {"T-Shirts", []}
-                       ]}
-                    ]}
+  # @brands_taxonomy {"Brands",
+  #                   [
+  #                     {"Bags", []},
+  #                     {"Mugs", []},
+  #                     {"Clothing",
+  #                      [
+  #                        {"Shirts", []},
+  #                        {"T-Shirts", []}
+  #                      ]}
+  #                   ]}
 
-  @footwear_taxonomy {"Footwear",
-                      [
-                        {"Men",
-                         [
-                           {"Casual Shoes", []},
-                           {"Sports Shoes", []},
-                           {"Formal Shoes", []},
-                           {"Sandal & Floaters", []},
-                           {"Flip Flops", []}
-                         ]},
-                        {"Women",
-                         [
-                           {"Flats & Casual Shoes", []},
-                           {"Heels", []},
-                           {"Boots", []},
-                           {"Sports Shoes and Floaters", []}
-                         ]}
-                      ]}
+  # @footwear_taxonomy {"Footwear",
+  #                     [
+  #                       {"Men",
+  #                        [
+  #                          {"Casual Shoes", []},
+  #                          {"Sports Shoes", []},
+  #                          {"Formal Shoes", []},
+  #                          {"Sandal & Floaters", []},
+  #                          {"Flip Flops", []}
+  #                        ]},
+  #                       {"Women",
+  #                        [
+  #                          {"Flats & Casual Shoes", []},
+  #                          {"Heels", []},
+  #                          {"Boots", []},
+  #                          {"Sports Shoes and Floaters", []}
+  #                        ]}
+  #                     ]}
 
   def seed do
-    TaxonomyHelper.create_taxonomy(@brands_taxonomy)
-    TaxonomyHelper.create_taxonomy(@footwear_taxonomy)
+    Repo.delete_all(Taxonomy)
+    TaxonomyHelper.create_taxonomy(@ofy_pets)
+    TaxonomyHelper.create_taxonomy(@brands)
   end
 end

@@ -1,8 +1,10 @@
 defmodule Snitch.Seed.Orders do
   @moduledoc false
 
+  import Ecto.Query
+
   alias Ecto.DateTime
-  alias Snitch.Data.Schema.{Address, LineItem, Order, User, Variant}
+  alias Snitch.Data.Schema.{Address, LineItem, Order, ShippingCategory, User, Variant}
   alias Snitch.Repo
 
   require Logger
@@ -126,7 +128,9 @@ defmodule Snitch.Seed.Orders do
     end)
   end
 
-  def seed_variants!(count) do
+  def seed_variants! do
+    count = 2 * Repo.one(from(sc in ShippingCategory, select: count(sc.id)))
+
     Repo.insert_all(
       Variant,
       Enum.take(variants(), count),
