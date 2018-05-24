@@ -1,9 +1,10 @@
-defmodule Snitch.OrderCase do
+defmodule Snitch.Tools.Helper.Order do
   @moduledoc """
-  Test helpers to insert stock items and locations.
+  Helpers to insert variants and line items for handcrafted orders.
   """
 
   import Snitch.Factory
+  alias Ecto.DateTime
 
   @line_item %{
     quantity: nil,
@@ -11,8 +12,8 @@ defmodule Snitch.OrderCase do
     total: nil,
     variant_id: nil,
     order_id: nil,
-    inserted_at: Ecto.DateTime.utc(),
-    updated_at: Ecto.DateTime.utc()
+    inserted_at: DateTime.utc(),
+    updated_at: DateTime.utc()
   }
 
   @variant %{
@@ -24,8 +25,8 @@ defmodule Snitch.OrderCase do
     cost_price: Money.new("9.99", :USD),
     selling_price: random_price(:USD, 14, 4),
     shipping_category_id: nil,
-    inserted_at: Ecto.DateTime.utc(),
-    updated_at: Ecto.DateTime.utc()
+    inserted_at: DateTime.utc(),
+    updated_at: DateTime.utc()
   }
 
   @doc """

@@ -3,7 +3,7 @@ defmodule Snitch.Data.Model.ZoneTest do
   use Snitch.DataCase
 
   import Snitch.Factory
-  import Snitch.ZoneCase
+  import Snitch.Tools.Helper.Zone
 
   alias Snitch.Domain.Zone
   alias Snitch.Data.Model.{StateZone, CountryZone}
