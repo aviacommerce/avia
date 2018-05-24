@@ -25,7 +25,9 @@ defmodule Snitch.Tools.Helper.Shipment do
   def shipping_categories_with_manifest(manifest) do
     categories = Enum.map(manifest, fn name -> %{@shipping_category | name: name} end)
 
-    {_, categories} = Repo.insert_all(ShippingCategory, categories, returning: true)
+    {_, categories} =
+      Repo.insert_all(ShippingCategory, categories, on_conflict: :nothing, returning: true)
+
     categories
   end
 
