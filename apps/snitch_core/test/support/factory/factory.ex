@@ -122,7 +122,7 @@ defmodule Snitch.Factory do
     }
   end
 
-  def random_price(currency, min, delta) do
+  defp random_price(currency, min, delta) do
     Money.new(currency, "#{:rand.uniform(delta) + min}.99")
   end
 

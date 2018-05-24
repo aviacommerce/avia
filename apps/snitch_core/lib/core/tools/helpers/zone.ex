@@ -53,7 +53,7 @@ defmodule Snitch.Tools.Helper.Zone do
         %{@country | iso: iso, iso3: iso <> "_", name: iso, numcode: iso}
       end)
 
-    {_, countries} = Repo.insert_all(Country, cs, returning: true)
+    {_, countries} = Repo.insert_all(Country, cs, on_conflict: :nothing, returning: true)
     countries
   end
 
@@ -63,7 +63,7 @@ defmodule Snitch.Tools.Helper.Zone do
         %{@state | country_id: country.id, name: name, code: code}
       end)
 
-    {_, states} = Repo.insert_all(State, ss, returning: true)
+    {_, states} = Repo.insert_all(State, ss, on_conflict: :nothing, returning: true)
     states
   end
 
@@ -86,8 +86,11 @@ defmodule Snitch.Tools.Helper.Zone do
     szm = Enum.filter(zm, fn member -> Map.has_key?(member, :state_id) end)
     czm = Enum.filter(zm, fn member -> Map.has_key?(member, :country_id) end)
 
-    {_, state_members} = Repo.insert_all(StateZoneMember, szm, returning: true)
-    {_, country_members} = Repo.insert_all(CountryZoneMember, czm, returning: true)
+    {_, state_members} =
+      Repo.insert_all(StateZoneMember, szm, on_conflict: :nothing, returning: true)
+
+    {_, country_members} =
+      Repo.insert_all(CountryZoneMember, czm, on_conflict: :nothing, returning: true)
 
     {state_members, country_members}
   end
@@ -108,7 +111,7 @@ defmodule Snitch.Tools.Helper.Zone do
         Map.merge(%{@zone | name: name}, params)
       end)
 
-    {_, zones} = Repo.insert_all(Zone, zones, returning: true)
+    {_, zones} = Repo.insert_all(Zone, zones, on_conflict: :nothing, returning: true)
     zones
   end
 end
