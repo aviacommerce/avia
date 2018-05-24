@@ -1,4 +1,4 @@
-defmodule Snitch.StockCase do
+defmodule Snitch.Tools.Helper.Stock do
   @moduledoc """
   Test helpers to insert stock items and locations.
 
@@ -23,13 +23,15 @@ defmodule Snitch.StockCase do
   }
   """
 
+  alias Ecto.DateTime
+
   @stock_item %{
     backorderable: false,
     count_on_hand: nil,
     variant_id: nil,
     stock_location_id: nil,
-    inserted_at: Ecto.DateTime.utc(),
-    updated_at: Ecto.DateTime.utc()
+    inserted_at: DateTime.utc(),
+    updated_at: DateTime.utc()
   }
 
   @stock_location %{
@@ -42,8 +44,8 @@ defmodule Snitch.StockCase do
     propagate_all_variants: false,
     default: false,
     active: true,
-    inserted_at: Ecto.DateTime.utc(),
-    updated_at: Ecto.DateTime.utc()
+    inserted_at: DateTime.utc(),
+    updated_at: DateTime.utc()
   }
 
   def stock_locations_with_manifest(manifest) do
