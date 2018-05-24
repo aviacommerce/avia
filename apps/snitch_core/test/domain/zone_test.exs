@@ -1,4 +1,4 @@
-defmodule Snitch.Data.Model.ZoneTest do
+defmodule Snitch.Domain.ZoneTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
