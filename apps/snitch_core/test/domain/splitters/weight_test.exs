@@ -1,0 +1,304 @@
+defmodule Snitch.Domain.Splitter.WeightTest do
+  use ExUnit.Case, async: true
+  use Snitch.DataCase
+
+  import Snitch.{OrderCase, StockCase, ZoneCase, ShipmentCase}
+
+  alias Snitch.Core.Domain.Splitters.Weight, as: WeightSplitter
+  alias Snitch.Data.Schema.{StockItem, StockLocation, Order, Variant, Address}
+  alias Snitch.Domain.Shipment
+
+  @zone_manifest %{
+    "domestic" => %{zone_type: "S"},
+    "some_states" => %{zone_type: "S"}
+  }
+
+  @si_manifest %{
+    "default" => [
+      %{count_on_hand: 3, backorderable: true},
+      %{count_on_hand: 2, backorderable: true},
+      %{count_on_hand: 3, backorderable: true}
+    ],
+    "backup" => [
+      %{count_on_hand: 0},
+      %{count_on_hand: 0},
+      %{count_on_hand: 6}
+    ],
+    "origin" => [
+      %{count_on_hand: 3},
+      %{count_on_hand: 3},
+      %{count_on_hand: 3}
+    ]
+  }
+
+  setup(context) do
+    [india] = countries_with_manifest(~w(IN))
+
+    [ka, ap, tn, kl, _up, _mh] =
+      states =
+      states_with_manifest([
+        {"KA", "IN-KA", india},
+        {"AP", "IN-AP", india},
+        {"TN", "IN-TN", india},
+        {"KL", "IN-KL", india},
+        {"UP", "IN-UP", india},
+        {"MH", "IN-MH", india}
+      ])
+
+    zones = [domestic, south_india] = zones_with_manifest(@zone_manifest)
+
+    zone_members([
+      {domestic, states},
+      {south_india, [ka, ap, tn, kl]}
+    ])
+
+    categories =
+      [light, heavy, fragile] = shipping_categories_with_manifest(~w(light heavy fragile))
+
+    shipping_method_manifest = %{
+      "priority" => {zones, [light, fragile]},
+      "regular" => {zones, categories},
+      "hyperloop" => {[south_india], [light]}
+    }
+
+    methods = shipping_methods_with_manifest(shipping_method_manifest)
+
+    variant_manifest = [
+      %{category: light},
+      %{category: fragile},
+      %{category: heavy}
+    ]
+
+    vs = variants_with_categories(variant_manifest, context)
+
+    [
+      india: india,
+      states: states,
+      zones: zones,
+      domestic: domestic,
+      south_india: south_india,
+      zones: zones,
+      shipping_categories: categories,
+      shipping_methods: methods,
+      variants: vs
+    ]
+  end
+
+  setup(context) do
+    %{states: [ka, _, _, _, _, mh], india: india} = context
+
+    manifest = %{
+      "default" => %{
+        default: true,
+        state_id: ka.id,
+        country_id: india.id,
+        name: "default"
+      },
+      "backup" => %{
+        state_id: ka.id,
+        country_id: india.id,
+        name: "default"
+      },
+      "origin" => %{
+        state_id: mh.id,
+        country_id: india.id,
+        name: "default"
+      }
+    }
+
+    [stock_locations: stock_locations(manifest)]
+  end
+
+  setup :stock_items
+
+  describe "split/1" do
+    @tag weights: [10.0], variant_count: 1, state_zone_count: 2
+    test "no package with weight over threshold", context do
+      %{
+        variants: vs,
+        states: [_, _, _, _, up, _],
+        india: india
+      } = context
+
+      address = %Address{state_id: up.id, country_id: india.id}
+      line_items = line_items_with_price(vs, [1])
+      order = %Order{id: 42, line_items: line_items, shipping_address: address}
+
+      packages =
+        order
+        |> Shipment.default_packages()
+        |> WeightSplitter.split()
+
+      # ┌─────────────────────────────────────────────┬─────────────────────────────────────────────┐
+      # │              Default Packages               │               Weight Splitter               │
+      # ├─────────┬───────┬──────────┬────────┬───────┼─────────┬───────┬──────────┬────────┬───────┤
+      # │ Package │ Items │ Quantity │ Weight │ Delta │ Package │ Items │ Quantity │ Weight │ Delta │
+      # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
+      # │   P1    │  I1   │    1     │   10   │   0   │   P1    │  I1   │    1     │   10   │   0   │
+      # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
+      # │   P2    │  I1   │    1     │   10   │   0   │   P2    │  I1   │    1     │   10   │   0   │
+      # └─────────┴───────┴──────────┴────────┴───────┴─────────┴───────┴──────────┴────────┴───────┘
+
+      # Item {delta, quantity}
+      packages_to_assert = [
+        [{0, 1}],
+        [{0, 1}]
+      ]
+
+      assert length(packages) == 2
+
+      packages
+      |> Enum.zip(packages_to_assert)
+      |> Enum.map(&assert_package/1)
+    end
+  end
+
+  @tag weights: [60.0, 30.0], variant_count: 2, state_zone_count: 2
+  test "split package with more cumulative weight", context do
+    %{
+      variants: vs,
+      states: [_ka, _, _, _, up, _],
+      india: india
+    } = context
+
+    address = %Address{state_id: up.id, country_id: india.id}
+    line_items = line_items_with_price(vs, [3, 3])
+    order = %Order{id: 42, line_items: line_items, shipping_address: address}
+
+    packages =
+      order
+      |> Shipment.default_packages()
+      |> WeightSplitter.split()
+
+    # ┌─────────────────────────────────────────────┬─────────────────────────────────────────────┐
+    # │              Default Packages               │               Weight Splitter               │
+    # ├─────────┬───────┬──────────┬────────┬───────┼─────────┬───────┬──────────┬────────┬───────┤
+    # │ Package │ Items │ Quantity │ Weight │ Delta │ Package │ Items │ Quantity │ Weight │ Delta │
+    # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
+    # │   P1    │  I1   │    2     │   30   │   1   │   P1    │  I1   │    2     │   60   │   1   │
+    # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
+    # │         │       │          │        │       │   P2    │  I1   │    1     │   60   │   0   │
+    # │   P2    │  I1   │    3     │   60   │   0   ├─────────┼───────┼──────────┼────────┼───────┤
+    # │         │       │          │        │       │   P3    │  I1   │    2     │   120  │   0   │
+    # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
+    # │   P3    │  I1   │    3     │   30   │   0   │   P4    │  I1   │    3     │   90   │   0   │
+    # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
+    # │         │       │          │        │       │   P5    │  I1   │    1     │   60   │   0   │
+    # │   P4    │  I1   │    3     │   60   │   0   ├─────────┼───────┼──────────┼────────┼───────┤
+    # │         │       │          │        │       │   P6    │  I1   │    2     │   120  │   0   │
+    # └─────────┴───────┴──────────┴────────┴───────┴─────────┴───────┴──────────┴────────┴───────┘
+
+    # Item {delta, quantity}
+    packages_to_assert = [
+      [{1, 2}],
+      [{0, 1}],
+      [{0, 2}],
+      [{0, 3}],
+      [{0, 1}],
+      [{0, 2}]
+    ]
+
+    assert length(packages) == 6
+
+    packages
+    |> Enum.zip(packages_to_assert)
+    |> Enum.map(&assert_package/1)
+  end
+
+  @tag weights: [10.0, 40.0], variant_count: 2, state_zone_count: 2
+  test "split package with uneven weight", context do
+    %{
+      variants: vs,
+      states: [_, _, _, _, up, _],
+      india: india
+    } = context
+
+    address = %Address{state_id: up.id, country_id: india.id}
+    line_items = line_items_with_price(vs, [2, 6])
+    order = %Order{id: 42, line_items: line_items, shipping_address: address}
+
+    packages =
+      order
+      |> Shipment.default_packages()
+      |> WeightSplitter.split()
+
+    # ┌─────────────────────────────────────────────┬─────────────────────────────────────────────┐
+    # │              Default packages               │               Weight splitter               │
+    # ├─────────┬───────┬──────────┬────────┬───────┼─────────┬───────┬──────────┬────────┬───────┤
+    # │ Package │ Items │ Quantity │ Weight │ Delta │ Package │ Items │ Quantity │ Weight │ Delta │
+    # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
+    # │         │       │          │        │       │   P1    │  I1   │    0     │   0    │   3   │
+    # │   P1    │  I1   │    2     │   40   │   4   ├─────────┼───────┼──────────┼────────┼───────┤
+    # │         │       │          │        │       │   P2    │  I1   │    2     │   80   │   1   │
+    # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
+    # │   P2    │  I1   │    2     │   10   │   0   │   P3    │  I1   │    2     │   20   │   0   │
+    # ├─────────┼───────┼──────────┼────────┼───────┼─────────┼───────┼──────────┼────────┼───────┤
+    # │   P3    │  I1   │    2     │   10   │   0   │   P4    │  I1   │    2     │   20   │   0   │
+    # └─────────┴───────┴──────────┴────────┴───────┴─────────┴───────┴──────────┴────────┴───────┘
+
+    # Item {delta, quantity}
+    packages_to_assert = [
+      [{3, 0}],
+      [{1, 2}],
+      [{0, 2}],
+      [{0, 2}]
+    ]
+
+    assert length(packages) == 4
+
+    packages
+    |> Enum.zip(packages_to_assert)
+    |> Enum.map(&assert_package/1)
+  end
+
+  defp assert_package({package, items_to_assert}) do
+    package.items
+    |> Enum.zip(items_to_assert)
+    |> Enum.map(&assert_item/1)
+  end
+
+  defp assert_item({item, {delta, quantity}}) do
+    assert item.delta == delta
+    assert item.quantity == quantity
+  end
+
+  def pretty_print_package(package) do
+    %{
+      items:
+        Enum.map(package.items, fn item ->
+          %{weight: item.variant.weight, quantity: item.quantity, delta: item.delta}
+        end)
+    }
+  end
+
+  defp variants_with_categories(manifest, context) do
+    variants =
+      variants_with_manifest(manifest, context)
+      |> Enum.zip(context.weights)
+      |> Enum.map(fn {variant, weight} -> %{variant | weight: Decimal.new(weight)} end)
+
+    {_, vs} = Repo.insert_all(Variant, variants, returning: true)
+    vs
+  end
+
+  defp stock_locations(manifest) do
+    locations = stock_locations_with_manifest(manifest)
+
+    {_, stock_locations} = Repo.insert_all(StockLocation, locations, returning: true)
+
+    Enum.reduce(stock_locations, %{}, fn sl, acc ->
+      Map.put(acc, sl.admin_name, sl)
+    end)
+  end
+
+  defp stock_items(%{variants: vs, stock_locations: locations} = context) do
+    stock_items =
+      context
+      |> Map.get(:stock_item_manifest, @si_manifest)
+      |> stock_items_with_manifest(vs, locations)
+
+    {_, stock_items} = Repo.insert_all(StockItem, stock_items, returning: true)
+
+    [stock_items: stock_items]
+  end
+end
