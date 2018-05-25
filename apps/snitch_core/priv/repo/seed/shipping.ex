@@ -4,9 +4,9 @@ defmodule Snitch.Seed.Shipping do
   import Ecto.Query
   import Snitch.Tools.Helper.{Shipment, Zone}
 
-  alias Snitch.Data.Model.{Country, State}
+  alias Snitch.Data.Model.{Country, ShippingMethod, State}
   alias Snitch.Data.Schema.State, as: StateSchema
-  ggalias(Snitch.Data.Schema.{ShippingCategory, ShippingMethod, Zone})
+  alias Snitch.Data.Schema.{ShippingCategory, Zone}
   alias Snitch.Repo
 
   @shipping_categories ~w(light heavy fragile)
@@ -28,7 +28,7 @@ defmodule Snitch.Seed.Shipping do
       "hyperloop" => {[north_india], [light, fragile]}
     }
 
-    Stream.map(manifest, fn {name, {zones, categories}} ->
+    Enum.map(manifest, fn {name, {zones, categories}} ->
       ShippingMethod.create(%{name: name, slug: name}, zones, categories)
     end)
   end

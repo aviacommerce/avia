@@ -61,7 +61,7 @@ defmodule Snitch.Seed.Taxonomy do
 
   def seed do
     Repo.delete_all(Taxonomy)
-    TaxonomyHelper.create_taxonomy(@ofy_pets)
-    TaxonomyHelper.create_taxonomy(@brands)
+    TaxonomyHelper.create_taxonomy(@brands_taxonomy)
+    TaxonomyHelper.create_taxonomy(@footwear_taxonomy)
   end
 end
