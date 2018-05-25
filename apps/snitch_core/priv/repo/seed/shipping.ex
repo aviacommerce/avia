@@ -6,8 +6,8 @@ defmodule Snitch.Seed.Shipping do
 
   alias Snitch.Repo
   alias Snitch.Data.Schema.State, as: StateSchema
-  alias Snitch.Data.Schema.{Zone, ShippingCategory, ShippingMethod}
-  alias Snitch.Data.Model.{Country, State}
+  alias Snitch.Data.Schema.{Zone, ShippingCategory}
+  alias Snitch.Data.Model.{Country, State, ShippingMethod}
 
   @shipping_categories ~w(light heavy fragile)
 
@@ -28,8 +28,7 @@ defmodule Snitch.Seed.Shipping do
       "hyperloop" => {[north_india], [light, fragile]}
     }
 
-    manifest
-    |> Stream.map(fn {name, {zones, categories}} ->
+    Enum.map(manifest, fn {name, {zones, categories}} ->
       ShippingMethod.create(%{name: name, slug: name}, zones, categories)
     end)
   end
