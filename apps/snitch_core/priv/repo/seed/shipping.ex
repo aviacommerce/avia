@@ -6,6 +6,7 @@ defmodule Snitch.Seed.Shipping do
 
   alias Snitch.Data.Model.{Country, ShippingMethod, State}
   alias Snitch.Data.Schema.State, as: StateSchema
+  alias Snitch.Data.Schema.ShippingMethod, as: ShippingMethodSchema
   alias Snitch.Data.Schema.{ShippingCategory, Zone}
   alias Snitch.Repo
 
@@ -40,6 +41,7 @@ defmodule Snitch.Seed.Shipping do
 
   def seed_zones! do
     Repo.delete_all(Zone)
+    Repo.delete_all(ShippingMethodSchema)
     all_zones = [apac, india, north_india] = zones_with_manifest(@zone_manifest)
 
     ind = Country.get(%{iso: "IN"})

@@ -35,10 +35,7 @@ Repo.transaction(fn ->
   Orders.seed_orders!()
 end)
 
-Repo.transaction(fn ->
-  Stocks.seed_stock_locations!()
-  Stocks.seed_stock_items!()
-end)
+Stocks.seed!()
 
 # seeds the taxonomy
 Taxonomy.seed()
