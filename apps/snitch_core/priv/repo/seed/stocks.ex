@@ -1,8 +1,6 @@
 defmodule Snitch.Seed.Stocks do
   @moduledoc false
 
-  import Ecto.Query
-
   alias Snitch.Repo
   alias Snitch.Data.Schema.{StockLocation, Variant, StockItem}
   alias Snitch.Data.Model.{State, Country}
@@ -100,7 +98,7 @@ defmodule Snitch.Seed.Stocks do
     locations
   end
 
-  def seed_stock_items!(variants, locations) do
+  def seed_stock_items!(variants, locations) when map_size(locations) > 0 do
     stock_items =
       @stock_items
       |> Enum.map(fn {location, manifest} ->
@@ -121,5 +119,9 @@ defmodule Snitch.Seed.Stocks do
 
     {count, _} = Repo.insert_all(StockItem, stock_items, on_conflict: :nothing)
     Logger.info("Inserted #{count} stock_items.")
+  end
+
+  def seed_stock_items!(_, _) do
+    Logger.info("Inserted 0 stock_items.")
   end
 end
