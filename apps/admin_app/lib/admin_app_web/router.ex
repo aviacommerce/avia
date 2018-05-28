@@ -26,6 +26,7 @@ defmodule AdminAppWeb.Router do
 
     resources("/tax_categories", TaxCategoryController, only: [:index, :new, :create])
     resources("/stock_locations", StockLocationController)
+    resources("/return_authorizations", ReturnAuthorizationController)
   end
 
   # Other scopes may use custom stacks.

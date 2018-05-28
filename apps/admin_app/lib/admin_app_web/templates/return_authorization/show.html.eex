@@ -1,0 +1,43 @@
+<div class="container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/orders">Orders</a></li>
+      <li class="breadcrumb-item"><a href="/orders/<%= @return_auth.order.slug %>" rel="nofollow"><%= @return_auth.order.slug %></a></li>
+      <li class="breadcrumb-item"><a href="/return_authorizations">Return Authorizations</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><%= @return_auth.number %> (<%= @return_auth.state %>)</li>
+    </ol>
+  </nav>
+
+  <hr/>
+
+  <table class="table table-striped">
+    <thead class="thead-light">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Product</th>
+        <th scope="col">Status</th>
+        <th scope="col">Charged</th>
+        <th scope="col">Purchaged Quantity</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for {line_item, index} <- Enum.with_index(@return_auth.order.line_items) do %>
+        <tr>
+          <th scope="row"><%= index + 1 %></th>
+          <td class="text-uppercase"><%= line_item.variant.sku %></td>
+          <td><%= @return_auth.order.state %></td>
+          <td><%= line_item.total %></td>
+          <td><%= line_item.quantity %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <%= form_for @changeset, return_authorization_path(@conn, :update, @return_auth), fn f -> %>
+    <%= select_input f, :stock_location_id, formatted_list(:stock_location) %>
+    <%= select_input f, :reason_id, formatted_list(:return_reasons) %>
+    <%= textarea_input f, :memo %>
+    <%= submit "Submit", class: "btn btn-primary submit-btn" %>
+  <%end %>
+
+</div>

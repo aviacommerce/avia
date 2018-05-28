@@ -14,7 +14,9 @@ alias Snitch.Seed.{CountryState, PaymentMethods, Orders, Users, Taxonomy, Produc
 # and so on) as they will fail if something goes wrong.
 
 alias Snitch.Repo
-alias Snitch.Seed.{CountryState, PaymentMethods, Orders, Users, Stocks, Shipping}
+alias Snitch.Seed.{CountryState, PaymentMethods, Orders, Users, Stocks, Shipping, Returns}
+
+variant_count = 9
 
 # seeds countries and states entity
 Repo.transaction(fn ->
@@ -33,6 +35,7 @@ Shipping.seed!()
 Repo.transaction(fn ->
   Orders.seed_variants!()
   Orders.seed_orders!()
+  Returns.seed!()
 end)
 
 Stocks.seed!()

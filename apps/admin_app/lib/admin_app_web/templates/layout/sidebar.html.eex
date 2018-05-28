@@ -2,19 +2,26 @@
   <div class="row">
     <ul id="drilldown" class="nav nav-pills nav-stacked col-3">
         <li><a class="nav-link" href="/orders">Orders</a></li>
-        <li><a class="nav-link" href="#">Returns</a></li>
+        <li>
+          <a class="nav-link" href="#" data-toggle="collapse" data-target="#returns-menu">
+            Returns
+          </a>
+          <ul id="returns-menu" class="nav nav-pills nav-stacked collapse pl-3">
+            <li><a class="nav-link" href="/return_authorizations">Return Authorizations</a></li>
+            <li><a class="nav-link" href="#">Custom Returns</a></li>
+          </ul>
+        </li>
         <li><a class="nav-link" href="#">Products</a></li>
         <li><a class="nav-link" href="#">Reports</a></li>
         <li>
-          <a class="nav-link" href="#" data-toggle="collapse" data-target="#drilldown-1">
+          <a class="nav-link" href="#" data-toggle="collapse" data-target="#configs-menu">
             Configurations
           </a>
-          <ul id="drilldown-1" class="nav nav-pills nav-stacked collapse pl-3">
+          <ul id="configs-menu" class="nav nav-pills nav-stacked collapse pl-3">
             <li><a class="nav-link" href="#">Stock Items</a></li>
             <li><a class="nav-link" href="/stock_locations">Stock Locations</a></li>
             <li><a class="nav-link" href="#">Stock Movements</a></li>
           </ul>
-          </div>
         </li>
       </ul>
   </div>

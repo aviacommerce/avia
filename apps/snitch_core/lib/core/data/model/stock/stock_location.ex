@@ -79,4 +79,7 @@ defmodule Snitch.Data.Model.StockLocation do
   def search(_params) do
     Repo.all(StockLocationSchema)
   end
+
+  @spec formatted_list() :: [{String.t(), non_neg_integer}]
+  def formatted_list, do: Repo.all(from(s in StockLocationSchema, select: {s.name, s.id}))
 end
