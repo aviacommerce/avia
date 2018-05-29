@@ -119,6 +119,18 @@ defmodule Snitch.Data.Schema.Embedded.ShippingMethod do
   def changeset(%__MODULE__{} = embedded_sm, params) do
     embedded_sm
     |> cast(params, @create_fields)
-    |> validate_amount(:cost)
+    |> force_money()
+
+    # |> validate_amount(:cost)
+  end
+
+  defp force_money(changeset) do
+    case fetch_change(changeset, :cost) do
+      {:ok, %{amount: amount, currency: currency}} ->
+        put_change(changeset, :cost, %{amount: amount, currency: currency})
+
+      _ ->
+        changeset
+    end
   end
 end

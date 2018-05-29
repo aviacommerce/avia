@@ -47,6 +47,9 @@ defmodule Snitch.Core.Mixfile do
       {:as_nested_set, git: "https://github.com/SagarKarwande/as_nested_set.git"},
       {:ecto_atom, "~> 1.0.0"},
 
+      # state machine
+      {:beepbop, github: "oyeb/beepbop", branch: "optional-to-state"},
+
       # auth
       {:comeonin, "~> 4.1.1"},
       {:argon2_elixir, "~> 1.2"},

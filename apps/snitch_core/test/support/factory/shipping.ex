@@ -15,7 +15,6 @@ defmodule Snitch.Factory.Shipping do
 
       def package_item_factory do
         %PackageItem{
-          number: sequence("item_"),
           state: "pending",
           quantity: 1,
           delta: 0,

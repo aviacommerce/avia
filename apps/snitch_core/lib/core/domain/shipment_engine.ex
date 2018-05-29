@@ -113,7 +113,6 @@ defmodule Snitch.Domain.ShipmentEngine do
 
   defp create_csp(packages) do
     packages
-    |> append_keys()
     |> create_edges()
     |> find_unique_edges()
   end

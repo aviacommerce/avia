@@ -1,4 +1,4 @@
-defmodule Snitch.Core.Domain.Splitters.Weight do
+defmodule Snitch.Domain.Splitters.Weight do
   @moduledoc """
   Splitter to split that packages based on weight
   """

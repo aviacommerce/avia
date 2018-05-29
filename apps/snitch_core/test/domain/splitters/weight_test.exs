@@ -4,7 +4,7 @@ defmodule Snitch.Domain.Splitter.WeightTest do
 
   import Snitch.{OrderCase, StockCase, ZoneCase, ShipmentCase}
 
-  alias Snitch.Core.Domain.Splitters.Weight, as: WeightSplitter
+  alias Snitch.Domain.Splitters.Weight, as: WeightSplitter
   alias Snitch.Data.Schema.{StockItem, StockLocation, Order, Variant, Address}
   alias Snitch.Domain.Shipment
 
