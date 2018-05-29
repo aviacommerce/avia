@@ -15,5 +15,8 @@ defmodule ApiWeb.Router do
       post("/", OrderController, :create)
       get("/:order_number/payments/new", PaymentController, :payment_methods)
     end
+
+    get("/products", ProductController, :index)
+    get("/products/:product_slug", ProductController, :product)
   end
 end

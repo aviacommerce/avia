@@ -1,0 +1,100 @@
+{
+  "products": [
+  {
+			"name": "Hill's Prescription Diet Hypo-Treats Dog Treats, 12-oz bag",
+			"description": "Dogs with skin conditions and food sensitivities love treats just as much as any other dog, and that’s why there’s Hill's Prescription Diet Hypo-Treats Dog Treats. The nutritionists and veterinarians at Hill's developed these tasty, crunchy biscuits especially for dogs enjoying a z/d, d/d, i/d or Derm Defense prescription diet. The hydrolyzed chicken liver protein helps alleviate adverse reactions to food, while omega-3 and 6 fatty acids, including EPA, help nourish the skin and coat. Added vitamins, minerals and antioxidants help further support healthy skin barrier function.",
+			"meta_description": "",
+			"meta_keywords": "",
+      "variants": [
+        {
+          "name": "Hill's Prescription Diet Hypo-Treats Dog Treats, 12-oz bag",
+          "sku": "HILL-DOG-DIET",
+          "weight": 12,
+          "height": 0,
+          "weight": 0,
+          "depth": 0,
+          "selling_price": 10.99,
+          "cost_price": 10.99,
+          "currency": "USD",
+          "images": [
+            "https://res.cloudinary.com/dnnqvqxz0/image/upload/v1527765892/dog_1.jpg",
+            "https://res.cloudinary.com/dnnqvqxz0/image/upload/v1527766202/dog_2.jpg",
+            "https://res.cloudinary.com/dnnqvqxz0/image/upload/v1527766249/dog_3.jpg"
+          ]
+        }
+      ]
+  },
+  {
+			"name": "Hill's Prescription Diet c/d Multicare Urinary Care with Chicken Dry Cat Food",
+			"description": "A healthy bladder starts with the right balance of vital nutrients. Excess minerals can encourage the formation of crystals in the urine, which may lead to the creation of bladder stones. They can cause discomfort and lead to more serious problems that require the care of a veterinarian. Great tasting Hill's Prescription Diet c/d Multicare dry food was developed by nutritionists and veterinarians to help support your cat's urinary tract health. It contains the right balance of vital nutrients to help improve most lower urinary tract conditions without the need for surgery. This formula can be fed long-term as a way to reduce the recurrence of urinary stones and is ideal for multiple cat households.",
+			"meta_description": "",
+			"meta_keywords": "",
+      "variants": [
+        {
+          "name": "Hill's Prescription Diet c/d Multicare Urinary Care with Chicken Dry Cat Food",
+          "sku": "HILL-CAT-FOOD",
+          "weight": 17.6,
+          "height": 0,
+          "weight": 0,
+          "depth": 0,
+          "selling_price": 69.99,
+          "cost_price": 69.99,
+          "currency": "USD",
+          "images": [
+            "https://res.cloudinary.com/dnnqvqxz0/image/upload/v1527766457/cat_1.jpg",
+            "https://res.cloudinary.com/dnnqvqxz0/image/upload/v1527766507/cat_2.jpg",
+            "https://res.cloudinary.com/dnnqvqxz0/image/upload/v1527766539/cat_3.jpg"
+          ]
+        }
+      ]
+  },
+  {
+      "name": "Thomas Labs Fish Mox Forte Amoxicillin Antibacterial Fish Medication, 500 mg",
+      "description": "Deliver bacteria-busting medicine to your fish with ThomasLabs’ Fish Mox Forte Amoxicillin Antibacterial Fish Medication! This broad spectrum antibiotic contains just the right amount of Amoxicillin Trihydrate needed to control gram-positive and many gram-negative bacteria that can plague fish. Put an end to Dropsy, Fin Rot, Red Pest and other pesky diseases brought on by bacteria such as Aeromonas, Pseudomonas and Mycobacteria. Plus, Fish Mox is versatile enough to work on both tropical and freshwater tanks—perfect for multi-tank homes!",
+      "meta_description": "",
+      "meta_keywords": "",
+      "variants": [
+        {
+          "name": "Thomas Labs Fish Mox Forte Amoxicillin Antibacterial Fish Medication, 500 mg",
+          "sku": "THOMAS-FISH-FOOD",
+          "weight": 20,
+          "height": 0,
+          "weight": 0,
+          "depth": 0,
+          "selling_price": 27.99,
+          "cost_price": 27.99,
+          "currency": "USD",
+          "images": [
+            "https://res.cloudinary.com/dnnqvqxz0/image/upload/v1527770364/fish_1.jpg",
+            "https://res.cloudinary.com/dnnqvqxz0/image/upload/v1527770411/fish_2.jpg",
+            "https://res.cloudinary.com/dnnqvqxz0/image/upload/v1527770446/fish_3.jpg"
+          ]
+        }
+      ]
+  },
+  {
+      "name": "ZuPreem FruitBlend with Natural Fruit Flavors Parrot & Conure Bird Food",
+      "description": "ZuPreem FruitBlend with Natural Fruit Flavors for Parrots & Conures Bird Food takes the guesswork out of meeting the nutritional needs of your parrot or conure with a healthy, complete diet. This tasty blend is bursting with fruity flavors for an enjoyable eating experience that gives your pet bird a reliable source of balanced nutrition. It’s loaded with fruit like oranges, apples, grapes and bananas plus all the essential nutrients your bird needs every day for good health. ZuPreem FruitBlend is great for conures, amazons, greys, pionus, caiques, senegals and other medium to large parrots that prefer this pellet size.",
+      "meta_description": "",
+      "meta_keywords": "",
+      "variants": [
+        {
+          "name": "ZuPreem FruitBlend with Natural Fruit Flavors Parrot & Conure Bird Food",
+          "sku": "ZUPREEM-BIRD-FOOD",
+          "weight": 3.5,
+          "height": 0,
+          "weight": 0,
+          "depth": 0,
+          "selling_price": 14.49,
+          "cost_price": 14.49,
+          "currency": "USD",
+          "images": [
+            "https://res.cloudinary.com/dnnqvqxz0/image/upload/v1527770656/bird_1.jpg",
+            "https://res.cloudinary.com/dnnqvqxz0/image/upload/v1527770712/bird_2.jpg",
+            "https://res.cloudinary.com/dnnqvqxz0/image/upload/v1527770754/bird_3.jpg"
+          ]
+        }
+      ]
+  }
+]
+}
