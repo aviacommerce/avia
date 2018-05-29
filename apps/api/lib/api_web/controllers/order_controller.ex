@@ -9,7 +9,7 @@ defmodule ApiWeb.OrderController do
     order =
       Order.get_all()
       |> List.first()
-      |> Repo.preload(line_items: :variant, shipping_address: [], billing_address: [])
+      |> Repo.preload(line_items: [variant: :images], shipping_address: [], billing_address: [])
 
     render(conn, "order.json", order: order)
   end

@@ -6,7 +6,7 @@ defmodule Snitch.Data.Schema.Variant do
   use Snitch.Data.Schema
   import Ecto.Query
 
-  alias Snitch.Data.Schema.{StockItem, ShippingCategory}
+  alias Snitch.Data.Schema.{StockItem, ShippingCategory, Product, VariantImage}
   alias Money.Ecto.Composite.Type, as: MoneyType
   alias Snitch.Repo
 
@@ -26,6 +26,10 @@ defmodule Snitch.Data.Schema.Variant do
 
     has_many(:stock_items, StockItem)
     belongs_to(:shipping_category, ShippingCategory)
+    belongs_to(:product, Product)
+
+    # will be getting deleted soon
+    has_many(:images, VariantImage)
 
     timestamps()
   end
@@ -79,6 +83,7 @@ defmodule Snitch.Data.Schema.Variant do
     |> Map.delete(:__meta__)
     |> Map.delete(:stock_items)
     |> Map.delete(:shipping_category)
+    |> Map.delete(:images)
   end
 
   def to_map(_), do: nil

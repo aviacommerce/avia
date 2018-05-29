@@ -1,5 +1,5 @@
 alias Snitch.Repo
-alias Snitch.Seed.{CountryState, PaymentMethods, Orders, Users, Taxonomy}
+alias Snitch.Seed.{CountryState, PaymentMethods, Orders, Users, Taxonomy, Product}
 
 # Script for populating the database. You can run it as:
 #
@@ -39,3 +39,5 @@ Stocks.seed!()
 
 # seeds the taxonomy
 Taxonomy.seed()
+
+Product.seed()

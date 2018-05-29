@@ -33,6 +33,7 @@ defmodule ApiWeb.OrderView do
     })
     |> Map.merge(render_order(order))
     |> Map.merge(@static_fields)
+    |> Map.drop(~w[line_items]a)
   end
 
   def render_order(order) do
@@ -65,7 +66,7 @@ defmodule ApiWeb.OrderView do
   def render_line_item(line_item) do
     line_item
     |> Map.from_struct()
-    |> Map.drop(~w[__meta__ order]a)
+    |> Map.drop(~w[__meta__ order variant]a)
     |> Map.merge(%{
       "adjustments" => [],
       "single_display_amount" => Money.to_string!(line_item.unit_price),
@@ -79,7 +80,7 @@ defmodule ApiWeb.OrderView do
   def render_variant(variant) do
     variant
     |> Map.from_struct()
-    |> Map.drop(~w[__meta__ stock_items shipping_category]a)
+    |> Map.drop(~w[__meta__ stock_items shipping_category images product]a)
     |> Map.merge(%{
       "product_id" => 1,
       "name" => variant.sku,
