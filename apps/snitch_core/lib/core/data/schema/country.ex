@@ -44,4 +44,25 @@ defmodule Snitch.Data.Schema.Country do
       changeset
     end
   end
+
+  @doc """
+  Returns a JSON encodable `map`.
+
+  Associations that are not loaded are rendered as `nil`.
+  """
+  @spec to_map(__MODULE__.t()) :: map
+  def to_map(%__MODULE__{} = country) do
+    country
+    |> Map.from_struct()
+    |> Map.delete(:__meta__)
+    |> Map.update!(:states, &State.to_map/1)
+  end
+
+  def to_map(_), do: nil
+end
+
+defimpl Jason.Encoder, for: Snitch.Data.Schema.Country do
+  def encode(country, opts) do
+    Jason.Encode.map(@for.to_map(country), opts)
+  end
 end

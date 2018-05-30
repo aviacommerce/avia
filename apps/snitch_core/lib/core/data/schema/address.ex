@@ -82,4 +82,26 @@ defmodule Snitch.Data.Schema.Address do
   end
 
   def validate_country_and_state(changeset, _, _), do: changeset
+
+  @doc """
+  Returns a JSON encodable `map`.
+
+  Associations that are not loaded are rendered as `nil`.
+  """
+  @spec to_map(__MODULE__.t()) :: map
+  def to_map(%__MODULE__{} = address) do
+    address
+    |> Map.from_struct()
+    |> Map.delete(:__meta__)
+    |> Map.update!(:state, &State.to_map/1)
+    |> Map.update!(:country, &Country.to_map/1)
+  end
+
+  def to_map(_), do: nil
+end
+
+defimpl Jason.Encoder, for: Snitch.Data.Schema.Address do
+  def encode(address, opts) do
+    Jason.Encode.map(@for.to_map(address), opts)
+  end
 end
