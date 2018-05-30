@@ -7,6 +7,7 @@ use Mix.Config
 
 # General application configuration
 config :api, namespace: Api
+config :phoenix, :format_encoders, json: Jason
 
 # Configures the endpoint
 config :api, ApiWeb.Endpoint,

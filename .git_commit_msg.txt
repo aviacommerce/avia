@@ -1,15 +1,13 @@
-# If applied, this commit will...
 
-
-# this bar is where 50 columns is at    --------->|                                                 
-# Complete the sentence above,
+# this bar is where 50 columns is at    --------->|
+# Complete the sentence above, IF APPLIED, THIS COMMIT WILL...
 # +  Capitalize it!
 # +  Don't end with a period (full-stop)!
-#
-# Commit description, use maximum 72 chars
+
+# Commit description, use upto 72 cols per line
 #
 # Why is this change needed?
-Prior to this change, 
+Prior to this change,
 
 
 # this bar is where 72 columns is at       ---------------------------->|

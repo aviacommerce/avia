@@ -1,4 +1,6 @@
 defmodule ApiWeb.CORS do
+  @moduledoc false
+
   use Corsica.Router,
     origins: ["http://localhost:4200"],
     log: [rejected: :error],
