@@ -13,6 +13,7 @@ defmodule ApiWeb.Router do
     scope("/orders") do
       get("/current", OrderController, :current)
       post("/", OrderController, :create)
+      get("/:order_number/payments/new", PaymentController, :payment_methods)
     end
   end
 end
