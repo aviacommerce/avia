@@ -99,4 +99,27 @@ defmodule Snitch.Data.Schema.User do
   end
 
   defp put_pass_hash(changeset), do: changeset
+
+  @doc """
+  Returns a JSON encodable `map`.
+
+  Associations that are not loaded are rendered as `nil`.
+  """
+  @spec to_map(__MODULE__.t()) :: map
+  def to_map(%__MODULE__{} = user) do
+    user
+    |> Map.from_struct()
+    |> Map.delete(:__meta__)
+    |> Map.delete(:password)
+    |> Map.delete(:password_confirmation)
+    |> Map.delete(:password_hash)
+  end
+
+  def to_map(_), do: nil
+end
+
+defimpl Jason.Encoder, for: Snitch.Data.Schema.Address do
+  def encode(user, opts) do
+    Jason.Encode.map(@for.to_map(user), opts)
+  end
 end

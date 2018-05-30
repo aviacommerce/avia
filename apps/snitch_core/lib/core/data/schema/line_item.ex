@@ -46,4 +46,31 @@ defmodule Snitch.Data.Schema.LineItem do
     |> changeset(params)
     |> validate_required(@optional_fields)
   end
+
+  @doc """
+  Returns a JSON encodable `map`.
+
+  Associations that are not loaded are rendered as `nil`.
+  """
+  @spec to_map(__MODULE__.t()) :: map
+  def to_map(%__MODULE__{} = line_item) do
+    line_item
+    |> Map.from_struct()
+    |> Map.delete(:__meta__)
+    |> Map.delete(:order)
+    |> Map.update(:variant, nil, &Variant.to_map/1)
+  end
+
+  @spec to_map([__MODULE__.t()]) :: [map]
+  def to_map(line_items) when is_list(line_items) do
+    Enum.map(line_items, &to_map/1)
+  end
+
+  def to_map(_), do: nil
+end
+
+defimpl Jason.Encoder, for: Snitch.Data.Schema.LineItem do
+  def encode(line_item, opts) do
+    Jason.Encode.map(@for.to_map(line_item), opts)
+  end
 end

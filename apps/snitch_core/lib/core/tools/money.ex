@@ -54,3 +54,11 @@ defmodule Snitch.Tools.Money do
     Money.new!(0, currency)
   end
 end
+
+defimpl Jason.Encoder, for: Money do
+  def encode(money, opts) do
+    money
+    |> Map.from_struct()
+    |> Jason.Encode.map(opts)
+  end
+end

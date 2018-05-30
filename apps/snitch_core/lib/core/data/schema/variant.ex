@@ -66,4 +66,26 @@ defmodule Snitch.Data.Schema.Variant do
       Map.put(acc, v_id, cost)
     end)
   end
+
+  @doc """
+  Returns a JSON encodable `map`.
+
+  Associations that are not loaded are rendered as `nil`.
+  """
+  @spec to_map(__MODULE__.t()) :: map
+  def to_map(%__MODULE__{} = variant) do
+    variant
+    |> Map.from_struct()
+    |> Map.delete(:__meta__)
+    |> Map.delete(:stock_items)
+    |> Map.delete(:shipping_category)
+  end
+
+  def to_map(_), do: nil
+end
+
+defimpl Jason.Encoder, for: Snitch.Data.Schema.Variant do
+  def encode(order, opts) do
+    Jason.Encode.map(@for.to_map(order), opts)
+  end
 end

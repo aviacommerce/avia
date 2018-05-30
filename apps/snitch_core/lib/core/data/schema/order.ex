@@ -126,4 +126,26 @@ defmodule Snitch.Data.Schema.Order do
   end
 
   defp ensure_unique_line_items(order_changeset), do: order_changeset
+
+  @doc """
+  Returns a JSON encodable `map`.
+
+  Associations that are not loaded are rendered as `nil`.
+  """
+  @spec to_map(__MODULE__.t()) :: map
+  def to_map(%__MODULE__{} = order) do
+    order
+    |> Map.from_struct()
+    |> Map.delete(:__meta__)
+    |> Map.update!(:shipping_address, &Address.to_map/1)
+    |> Map.update!(:billing_address, &Address.to_map/1)
+    |> Map.delete(:user)
+    |> Map.update!(:line_items, &LineItem.to_map/1)
+  end
+end
+
+defimpl Jason.Encoder, for: Snitch.Data.Schema.Order do
+  def encode(order, opts) do
+    Jason.Encode.map(@for.to_map(order), opts)
+  end
 end
