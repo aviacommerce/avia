@@ -42,7 +42,8 @@ defmodule Api.Mixfile do
       {:cowboy, "~> 1.0"},
       {:snitch_core, "~> 0.0.1", in_umbrella: true},
       {:plug, "~> 1.0"},
-      {:corsica, "~> 1.0"}
+      {:corsica, "~> 1.0"},
+      {:uuid, "~> 1.1"}
     ]
   end
 end

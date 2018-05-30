@@ -9,5 +9,7 @@ defmodule ApiWeb.Router do
     pipe_through(:api)
 
     get("/taxonomies", TaxonomyController, :index)
+    post("/orders", OrderController, :create)
+    get("/orders/current", OrderController, :current)
   end
 end
