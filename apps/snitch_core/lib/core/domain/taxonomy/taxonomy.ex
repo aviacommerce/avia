@@ -9,7 +9,7 @@ defmodule Snitch.Domain.Taxonomy do
   import AsNestedSet.Queriable, only: [dump_one: 2]
 
   alias Snitch.Data.Schema.Taxon
-  alias Snitch.Data.Schema.Taxonomy, as: STaxonomy
+  alias Snitch.Data.Schema.Taxonomy, as: TaxonomySchema
   alias Snitch.Tools.Helper.Taxonomy, as: Helper
 
   @doc """
@@ -81,9 +81,10 @@ defmodule Snitch.Domain.Taxonomy do
     |> AsNestedSet.execute(Repo)
   end
 
-  @spec get_all_taxonomy() :: [map()]
-  def get_all_taxonomy() do
-    Repo.all(STaxonomy)
+  @spec get_all_taxonomy :: [map()]
+  def get_all_taxonomy do
+    TaxonomySchema
+    |> Repo.all()
     |> Repo.preload(:root)
     |> Enum.map(fn taxonomy -> %{taxonomy | taxons: dump_taxonomy(taxonomy.id)} end)
     |> Enum.map(&Helper.convert_to_map/1)
