@@ -21,8 +21,8 @@ defmodule Snitch.Data.Model.OrderTest do
     end
 
     test "without line_items", %{order_params: params} do
-      {:error, changeset} = Order.create(params, [])
-      assert errors_on(changeset) == %{line_items: ["can't be blank"]}
+      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :INR} end)
+      {:ok, _order} = Order.create(params, [])
     end
   end
 

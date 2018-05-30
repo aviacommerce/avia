@@ -1,8 +1,7 @@
 defmodule ApiWeb.OrderController do
   use ApiWeb, :controller
 
-  alias Snitch.Data.Model.Order
-  alias Snitch.Data.Model.User
+  alias Snitch.Data.Model.{Order, User}
   alias ApiWeb.FallbackController, as: Fallback
 
   def current(conn, _params) do
