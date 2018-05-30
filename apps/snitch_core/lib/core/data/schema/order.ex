@@ -55,7 +55,7 @@ defmodule Snitch.Data.Schema.Order do
     |> validate_required(@required_fields)
     |> common_changeset()
     |> foreign_key_constraint(:user_id)
-    |> cast_assoc(:line_items, with: &LineItem.create_changeset/2, required: true)
+    |> cast_assoc(:line_items, with: &LineItem.create_changeset/2, required: false)
     |> ensure_unique_line_items()
     |> compute_totals()
   end
