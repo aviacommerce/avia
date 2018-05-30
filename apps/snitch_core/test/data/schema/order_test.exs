@@ -36,7 +36,7 @@ defmodule Snitch.Data.Schema.OrderTest do
   @tag :skip
   test "create empty order with no lineitems", context do
     %{order: order} = context
-    %{valid?: validity, errors: [error]} = order
+    %{valid?: validity} = order
     refute validity
   end
 

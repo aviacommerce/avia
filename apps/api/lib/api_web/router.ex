@@ -5,11 +5,14 @@ defmodule ApiWeb.Router do
     plug(:accepts, ["json"])
   end
 
-  scope "/api/v1", ApiWeb do
+  scope "/api/v1", ApiWeb, as: :api_v1 do
     pipe_through(:api)
 
     get("/taxonomies", TaxonomyController, :index)
-    post("/orders", OrderController, :create)
-    get("/orders/current", OrderController, :current)
+
+    scope("/orders") do
+      get("/current", OrderController, :current)
+      post("/", OrderController, :create)
+    end
   end
 end
