@@ -2,10 +2,16 @@ defmodule ApiWeb.OrderController do
   use ApiWeb, :controller
 
   alias Snitch.Data.Model.{Order, User}
+  alias Snitch.Repo
   alias ApiWeb.FallbackController, as: Fallback
 
   def current(conn, _params) do
-    render(conn, "current.json")
+    order =
+      Order.get_all()
+      |> List.first()
+      |> Repo.preload(line_items: :variant, shipping_address: [], billing_address: [])
+
+    render(conn, "order.json", order: order)
   end
 
   def create(conn, %{"line_items" => line_items} = params) do
@@ -26,7 +32,7 @@ defmodule ApiWeb.OrderController do
     |> Order.create(line_items)
     |> case do
       {:ok, order} ->
-        render(conn, "new.json", order: order)
+        render(conn, "order.json", order: order)
 
       {:error, _} = error ->
         Fallback.call(conn, error)
@@ -34,10 +40,10 @@ defmodule ApiWeb.OrderController do
   end
 
   defp get_user do
-    User.get_all() |> List.first()
+    List.first(User.get_all())
   end
 
-  defp unique_id() do
+  defp unique_id do
     UUID.uuid1()
   end
 end

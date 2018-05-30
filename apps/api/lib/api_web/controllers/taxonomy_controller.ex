@@ -5,6 +5,6 @@ defmodule ApiWeb.TaxonomyController do
 
   def index(conn, _params) do
     taxonomy = Taxonomy.get_all_taxonomy()
-    render(conn, "taxonomy.json", taxonomy: taxonomy)
+    json(conn, %{taxonomies: taxonomy})
   end
 end
