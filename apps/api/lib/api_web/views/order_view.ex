@@ -35,6 +35,10 @@ defmodule ApiWeb.OrderView do
     |> Map.merge(@static_fields)
   end
 
+  def render("lineitem.json", %{line_item: line_item}) do
+    render_line_item(line_item)
+  end
+
   def render_order(order) do
     %{
       "number" => order.id,
