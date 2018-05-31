@@ -16,29 +16,15 @@ defmodule ApiWeb.PackageView do
         |> Map.drop(~w[__meta__ line_item order package variant]a)
       end)
 
-    shipping_methods = render_many(package.shipping_methods, __MODULE__, "shipping_method.json")
-
-    [x | xs] =
-      package.shipping_methods
-      |> Enum.sort_by(fn %{cost: %{amount: amount}} -> amount end)
-      |> render_many(__MODULE__, "shipping_rate.json")
-      |> Stream.with_index()
-      |> Enum.map(fn {sr, index} -> Map.put(sr, :id, index) end)
-
-    shipping_rates = [%{x | selected: true} | xs]
-
-    Map.merge(
-      %{
-        items: items,
-        manifest: manifest,
-        adjustments: [],
-        stock_location_name: package.origin.name,
-        shipping_methods: shipping_methods,
-        shipping_rates: shipping_rates,
-        selected_shipping_rate: %{x | selected: true}
-      },
-      Map.take(package, ~w[number order_id tracking state]a)
-    )
+    package
+    |> Map.take(~w[number order_id tracking state]a)
+    |> Map.merge(%{
+      items: items,
+      manifest: manifest,
+      adjustments: [],
+      stock_location_name: package.origin.name
+    })
+    |> Map.merge(shipping_details(package))
   end
 
   def render("shipping_method.json", %{package: sm}) do
@@ -62,5 +48,24 @@ defmodule ApiWeb.PackageView do
       display_cost: Money.to_string!(Money.new(sm.cost.amount, sm.cost.currency)),
       selected: false
     })
+  end
+
+  defp shipping_details(package) do
+    shipping_methods = render_many(package.shipping_methods, __MODULE__, "shipping_method.json")
+
+    [x | xs] =
+      package.shipping_methods
+      |> Enum.sort_by(fn %{cost: %{amount: amount}} -> amount end)
+      |> render_many(__MODULE__, "shipping_rate.json")
+      |> Stream.with_index()
+      |> Enum.map(fn {sr, index} -> Map.put(sr, :id, index) end)
+
+    shipping_rates = [%{x | selected: true} | xs]
+
+    %{
+      shipping_methods: shipping_methods,
+      shipping_rates: shipping_rates,
+      selected_shipping_rate: %{x | selected: true}
+    }
   end
 end
