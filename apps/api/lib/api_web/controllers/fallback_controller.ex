@@ -17,4 +17,10 @@ defmodule ApiWeb.FallbackController do
     |> put_status(:not_found)
     |> render(ApiWeb.ErrorView, :"404")
   end
+
+  def call(conn, {:error, detail}) when is_binary(detail) do
+    conn
+    |> put_status(400)
+    |> render(ApiWeb.ErrorView, :"400", detail: detail)
+  end
 end

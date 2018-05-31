@@ -1,6 +1,14 @@
 defmodule ApiWeb.ErrorView do
   use ApiWeb, :view
 
+  def render("400.json", assigns) do
+    %{
+      errors: %{
+        detail: assigns[:detail] || "Hmm, does not look good.. and you can't do nothing about it."
+      }
+    }
+  end
+
   def render("404.json", _assigns) do
     %{errors: %{detail: "Page not found"}}
   end

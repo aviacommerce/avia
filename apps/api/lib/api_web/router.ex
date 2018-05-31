@@ -19,5 +19,10 @@ defmodule ApiWeb.Router do
 
     get("/products", ProductController, :index)
     get("/products/:product_slug", ProductController, :product)
+
+    scope("/checkouts") do
+      put("/:order_id/next.json", CheckoutController, :next)
+      put("/*order_id", CheckoutController, :add_addresses)
+    end
   end
 end
