@@ -118,7 +118,7 @@ defmodule Snitch.Data.Schema.User do
   def to_map(_), do: nil
 end
 
-defimpl Jason.Encoder, for: Snitch.Data.Schema.Address do
+defimpl Jason.Encoder, for: Snitch.Data.Schema.User do
   def encode(user, opts) do
     Jason.Encode.map(@for.to_map(user), opts)
   end
