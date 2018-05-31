@@ -27,12 +27,13 @@ defmodule ApiWeb.OrderView do
   def render("order.json", %{order: order} = assigns) do
     order
     |> Map.from_struct()
-    |> Map.drop(~w[user __meta__]a)
+    |> Map.drop(~w[user __meta__ billing_address shipping_address]a)
     |> Map.merge(%{
       item_total: order.item_total.amount,
       total: order.total.amount
     })
     |> Map.merge(render_order(order))
+    |> Map.merge(render_addresses(assigns))
     |> Map.merge(@static_fields)
     |> Map.put(
       "shipments",
@@ -61,9 +62,21 @@ defmodule ApiWeb.OrderView do
         "payment",
         "complete"
       ],
-      "bill_address" => nil,
-      "ship_address" => nil,
       "line_items" => Enum.map(order.line_items, &render_line_item/1)
+    }
+  end
+
+  def render_addresses(%{order: _order, addresses: %{billing: b, shipping: s}}) do
+    %{
+      "bill_address" => render_one(b, AddressView, "address.json"),
+      "ship_address" => render_one(s, AddressView, "address.json")
+    }
+  end
+
+  def render_addresses(%{order: order}) do
+    %{
+      "bill_address" => render_one(order.billing_address, AddressView, "address.json"),
+      "ship_address" => render_one(order.shipping_address, AddressView, "address.json")
     }
   end
 

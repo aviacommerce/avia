@@ -37,29 +37,13 @@ defmodule Snitch.Domain.Order.Transitions do
   irrespective of the result of the full event transition.
   """
   @spec associate_address(Context.t()) :: Context.t()
-  def associate_address(%Context{valid?: true} = context) do
-    %{
-      struct: %Order{} = order,
-      state: %{billing_cs: %Changeset{} = billing_cs, shipping_cs: %Changeset{} = shipping_cs},
-      multi: multi
-    } = context
-
-    old_line_items = Enum.map(order.line_items, &Map.from_struct/1)
-
-    multi =
-      multi
-      |> Multi.insert(:billing, billing_cs)
-      |> Multi.insert(:shipping, shipping_cs)
-      |> Multi.run(:order, fn %{billing: b, shipping: s} ->
-        OrderModel.update(
-          %{billing_address_id: b.id, shipping_address_id: s.id, line_items: old_line_items},
-          order
-        )
-      end)
-
-    case Repo.transaction(multi) do
-      {:ok, %{order: order}} ->
-        Context.new(order)
+  def associate_address(%Context{valid?: true, struct: %Order{} = order} = context) do
+    context
+    |> address_insert_multi()
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{order: order, billing: billing, shipping: shipping}} ->
+        Context.new(order, state: %{billing: billing, shipping: shipping})
 
       {:error, errors} ->
         Context.new(order, valid?: false, state: context.state, multi: errors)
@@ -85,14 +69,14 @@ defmodule Snitch.Domain.Order.Transitions do
   """
   @spec compute_shipments(Context.t()) :: Context.t()
   # TODO: This function does not gracefully handle errors, they are raised!
-  def compute_shipments(%Context{valid?: true, struct: %Order{} = order} = context) do
+  def compute_shipments(%Context{valid?: true, state: state, struct: %Order{} = order} = context) do
     shipment =
       order
       |> Shipment.default_packages()
       |> ShipmentEngine.run(order)
       |> Weight.split()
 
-    struct(context, state: %{shipment: shipment})
+    struct(context, state: Map.put(state, :shipment, shipment))
   end
 
   def compute_shipments(%Context{valid?: false} = context), do: context
@@ -129,4 +113,24 @@ defmodule Snitch.Domain.Order.Transitions do
   end
 
   def persist_shipment(%Context{valid?: false} = context), do: context
+
+  defp address_insert_multi(context) do
+    %{
+      struct: %Order{} = order,
+      state: %{billing_cs: %Changeset{} = billing_cs, shipping_cs: %Changeset{} = shipping_cs},
+      multi: multi
+    } = context
+
+    old_line_items = Enum.map(order.line_items, &Map.from_struct/1)
+
+    multi
+    |> Multi.insert(:billing, billing_cs)
+    |> Multi.insert(:shipping, shipping_cs)
+    |> Multi.run(:order, fn %{billing: b, shipping: s} ->
+      OrderModel.update(
+        %{billing_address_id: b.id, shipping_address_id: s.id, line_items: old_line_items},
+        order
+      )
+    end)
+  end
 end

@@ -2,7 +2,7 @@ defmodule ApiWeb.CheckoutController do
   use ApiWeb, :controller
 
   alias BeepBop.Context
-  alias Snitch.Data.Model.{Order, User, State, Country}
+  alias Snitch.Data.Model.{Order, State, Country}
   alias Snitch.Data.Schema.Address
   alias Snitch.Domain.Order.DefaultMachine
   alias Snitch.Repo
@@ -16,6 +16,10 @@ defmodule ApiWeb.CheckoutController do
   end
 
   def do_next(conn, %{state: "cart"}) do
+    json(conn, %{})
+  end
+
+  def do_next(conn, %{state: "address"}) do
     json(conn, %{})
   end
 
@@ -45,15 +49,20 @@ defmodule ApiWeb.CheckoutController do
     context =
       %{id: id}
       |> Order.get()
-      |> Repo.preload(line_items: [:variant], shipping_address: [], billing_address: [])
+      |> Repo.preload(line_items: [:variant])
       |> Context.new(state: %{billing_cs: shipping_cs, shipping_cs: shipping_cs})
       |> DefaultMachine.add_addresses()
 
     case context do
-      %{valid?: true, multi: %{packages: packages, persist: order}} ->
+      %{valid?: true, state: state, multi: %{packages: packages, persist: order}} ->
         conn
         |> put_view(OrderView)
-        |> render("order.json", order: order, packages: Repo.preload(packages, :origin))
+        |> render(
+          "order.json",
+          order: order,
+          packages: Repo.preload(packages, :origin),
+          addresses: state
+        )
 
       %{valid?: false, multi: errors} ->
         Fallback.call(conn, errors)
