@@ -7,6 +7,7 @@ defmodule ApiWeb.CheckoutController do
   alias Snitch.Domain.Order.DefaultMachine
   alias Snitch.Repo
   alias ApiWeb.FallbackController, as: Fallback
+  alias ApiWeb.OrderView
 
   def next(conn, params) do
     id = String.to_integer(params["order_id"])
@@ -44,13 +45,15 @@ defmodule ApiWeb.CheckoutController do
     context =
       %{id: id}
       |> Order.get()
-      |> Repo.preload(:line_items)
+      |> Repo.preload(line_items: [:variant], shipping_address: [], billing_address: [])
       |> Context.new(state: %{billing_cs: shipping_cs, shipping_cs: shipping_cs})
       |> DefaultMachine.add_addresses()
 
     case context do
       %{valid?: true, multi: %{packages: packages, persist: order}} ->
-        render(conn, "packages.json", packages: Repo.preload(packages, :origin))
+        conn
+        |> put_view(OrderView)
+        |> render("order.json", order: order, packages: Repo.preload(packages, :origin))
 
       %{valid?: false, multi: errors} ->
         Fallback.call(conn, errors)

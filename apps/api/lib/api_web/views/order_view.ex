@@ -1,6 +1,7 @@
 defmodule ApiWeb.OrderView do
   use ApiWeb, :view
   import ApiWeb.ProductView, only: [image_variant: 1]
+  alias ApiWeb.PackageView
 
   @static_fields %{
     "ship_total" => "0.0",
@@ -16,7 +17,6 @@ defmodule ApiWeb.OrderView do
     "considered_risky" => false,
     "canceler_id" => nil,
     "payments" => [],
-    "shipments" => [],
     "adjustments" => [],
     "credit_cards" => [],
     "permissions" => %{
@@ -24,7 +24,7 @@ defmodule ApiWeb.OrderView do
     }
   }
 
-  def render("order.json", %{order: order}) do
+  def render("order.json", %{order: order} = assigns) do
     order
     |> Map.from_struct()
     |> Map.drop(~w[user __meta__]a)
@@ -34,11 +34,10 @@ defmodule ApiWeb.OrderView do
     })
     |> Map.merge(render_order(order))
     |> Map.merge(@static_fields)
-    |> Map.drop(~w[line_items]a)
-  end
-
-  def render("lineitem.json", %{line_item: line_item}) do
-    render_line_item(line_item)
+    |> Map.put(
+      "shipments",
+      render_many(Map.get(assigns, :packages, []), PackageView, "package.json")
+    )
   end
 
   def render_order(order) do
