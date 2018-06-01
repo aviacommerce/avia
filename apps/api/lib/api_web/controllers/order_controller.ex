@@ -8,7 +8,7 @@ defmodule ApiWeb.OrderController do
   import Ecto.Query
 
   def current(conn, _params) do
-    query = from(c in OrderSchema, order_by: c.id)
+    query = from(o in OrderSchema, order_by: o.id)
 
     order =
       query

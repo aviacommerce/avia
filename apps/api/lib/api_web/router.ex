@@ -19,8 +19,7 @@ defmodule ApiWeb.Router do
       resources("/payments", PaymentController, only: [:new])
     end
 
-    get("/products", ProductController, :index)
-    get("/products/:product_slug", ProductController, :product)
+    resources("/products", ProductController, only: [:index, :show])
 
     scope("/checkouts") do
       put("/:order_id/next.json", CheckoutController, :next)
