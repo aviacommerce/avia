@@ -2,21 +2,19 @@ defmodule ApiWeb.OrderController do
   use ApiWeb, :controller
 
   alias Snitch.Data.Model.{Order, User}
-  alias Snitch.Data.Schema.Order, as: OrderSchema
   alias Snitch.Repo
   alias ApiWeb.FallbackController, as: Fallback
-  import Ecto.Query
 
-  def current(conn, _params) do
-    query = from(o in OrderSchema, order_by: o.id)
+  def current(conn, params) do
+    order_id = String.to_integer(Map.fetch!(params, "id"))
 
-    order =
-      query
-      |> Repo.all()
-      |> List.first()
-      |> Repo.preload(line_items: [variant: :images], shipping_address: [], billing_address: [])
+    case Order.get(order_id) do
+      nil ->
+        do_create(conn, params, [])
 
-    render(conn, "order.json", order: order)
+      order ->
+        render_order(conn, order)
+    end
   end
 
   def create(conn, %{"line_items" => line_items} = params) do
@@ -37,11 +35,23 @@ defmodule ApiWeb.OrderController do
     |> Order.create(line_items)
     |> case do
       {:ok, order} ->
-        render(conn, "order.json", order: order)
+        render_order(conn, order)
 
       {:error, _} = error ->
         Fallback.call(conn, error)
     end
+  end
+
+  def render_order(conn, order) do
+    order =
+      Repo.preload(
+        order,
+        line_items: [variant: :images],
+        shipping_address: [],
+        billing_address: []
+      )
+
+    render(conn, "order.json", order: order)
   end
 
   defp get_user do
@@ -125,7 +135,7 @@ defmodule ApiWeb.OrderController do
       |> Enum.find(fn line_item ->
         line_item.variant_id == variant_id
       end)
-      |> Repo.preload(:variant)
+      |> Repo.preload(variant: :images)
 
     render(conn, "lineitem.json", line_item: item)
   end
