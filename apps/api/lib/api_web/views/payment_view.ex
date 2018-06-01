@@ -1,6 +1,17 @@
 defmodule ApiWeb.PaymentView do
   use ApiWeb, :view
 
+  def render("payment.json", %{payment: payment}) do
+    payment
+    |> Map.from_struct()
+    |> Map.drop(~w[__meta__ order payment_method]a)
+    |> Map.merge(%{
+      amount: payment.amount,
+      display_amount: Money.to_string!(payment.amount),
+      number: payment.slug
+    })
+  end
+
   def render("payment_methods.json", %{payment_methods: payments}) do
     %{
       payment_methods: render_many(payments, __MODULE__, "payment_method.json"),
