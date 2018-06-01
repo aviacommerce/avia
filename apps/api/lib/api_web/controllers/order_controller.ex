@@ -83,7 +83,12 @@ defmodule ApiWeb.OrderController do
 
       order ->
         {:ok,
-         Repo.preload(order, line_items: [variant: :images], shipping_address: [], billing_address: [])}
+         Repo.preload(
+           order,
+           line_items: [variant: :images],
+           shipping_address: [],
+           billing_address: []
+         )}
     end
   end
 

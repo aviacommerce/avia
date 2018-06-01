@@ -3,7 +3,7 @@ defmodule ApiWeb.PaymentView do
 
   def render("payment_methods.json", %{payment_methods: payments}) do
     %{
-      payent_methods: render_many(payments, __MODULE__, "payment_method.json"),
+      payment_methods: render_many(payments, __MODULE__, "payment_method.json"),
       attributes: [
         "id",
         "source_type",
@@ -20,11 +20,18 @@ defmodule ApiWeb.PaymentView do
     }
   end
 
+  @translate %{
+    "card" => "Credit Card",
+    "check" => "Check"
+  }
+
   def render("payment_method.json", %{payment: payment}) do
+    name = Map.get(@translate, payment.name, payment.name)
+
     %{
       id: payment.id,
-      name: payment.name,
-      description: "Pay by #{payment.name}"
+      name: name,
+      description: "Pay by #{name}"
     }
   end
 end

@@ -12,9 +12,11 @@ defmodule ApiWeb.Router do
 
     scope("/orders") do
       get("/current", OrderController, :current)
-      post("/", OrderController, :create)
-      get("/:order_number/payments/new", PaymentController, :payment_methods)
       post("/:order_number/line_items/", OrderController, :add_line_item)
+    end
+
+    resources("/orders", OrderController, only: [:create]) do
+      resources("/payments", PaymentController, only: [:new])
     end
 
     get("/products", ProductController, :index)
