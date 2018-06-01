@@ -23,6 +23,10 @@ defmodule ApiWeb.CheckoutController do
     json(conn, %{})
   end
 
+  def do_next(conn, %{state: "payment"}) do
+    json(conn, %{})
+  end
+
   def add_addresses(conn, %{"order_id" => order_id, "order" => addresses}) do
     id =
       order_id
