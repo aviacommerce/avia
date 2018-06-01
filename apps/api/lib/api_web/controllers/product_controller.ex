@@ -14,7 +14,7 @@ defmodule ApiWeb.ProductController do
 
   def show(conn, params) do
     product =
-      Repo.get_by(Product, slug: params["product_slug"])
+      Repo.get_by(Product, slug: params["id"])
       |> Repo.preload(variants: [:images])
 
     render(conn, "product.json", product: product)
