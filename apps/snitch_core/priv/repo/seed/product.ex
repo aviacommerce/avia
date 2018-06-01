@@ -1,7 +1,15 @@
 defmodule Snitch.Seed.Product do
   alias Ecto.DateTime
   alias Snitch.Repo
-  alias Snitch.Data.Schema.{Product, Variant, VariantImage, StockLocation, StockItem}
+
+  alias Snitch.Data.Schema.{
+    Product,
+    Variant,
+    VariantImage,
+    StockLocation,
+    StockItem,
+    ShippingCategory
+  }
 
   @base_path Application.app_dir(:snitch_core, "priv/seed_data/pets_shop")
 
@@ -16,12 +24,14 @@ defmodule Snitch.Seed.Product do
 
       {_, products} = Repo.insert_all(Product, product_list, returning: [:id])
 
+      light = Repo.get_by(ShippingCategory, name: "light")
+
       variants =
         products_json["products"]
         |> Enum.zip(products)
         |> Enum.map(fn {product_json, product} ->
           product_json["variants"]
-          |> Enum.map(fn v -> variant(v, product.id) end)
+          |> Enum.map(fn v -> variant(v, product.id, light.id) end)
         end)
         |> List.flatten()
 
@@ -80,7 +90,7 @@ defmodule Snitch.Seed.Product do
     }
   end
 
-  def variant(v, product_id) do
+  def variant(v, product_id, category_id) do
     %{
       sku: v["sku"],
       weight: v["weight"],
@@ -90,6 +100,7 @@ defmodule Snitch.Seed.Product do
       cost_price: Money.from_float(v["cost_price"], String.to_atom(v["currency"])),
       position: 0,
       product_id: product_id,
+      shipping_category_id: category_id,
       inserted_at: DateTime.utc(),
       updated_at: DateTime.utc()
     }
