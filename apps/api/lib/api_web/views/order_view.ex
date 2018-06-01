@@ -1,5 +1,6 @@
 defmodule ApiWeb.OrderView do
   use ApiWeb, :view
+  import ApiWeb.ProductView, only: [image_variant: 1]
 
   @static_fields %{
     "ship_total" => "0.0",
@@ -84,7 +85,7 @@ defmodule ApiWeb.OrderView do
   def render_variant(variant) do
     variant
     |> Map.from_struct()
-    |> Map.drop(~w[__meta__ stock_items shipping_category images product]a)
+    |> Map.drop(~w[__meta__ stock_items shipping_category product]a)
     |> Map.merge(%{
       "product_id" => 1,
       "name" => variant.sku,
@@ -100,7 +101,8 @@ defmodule ApiWeb.OrderView do
       "is_orderable" => true,
       "total_on_hand" => 100,
       "is_destroyed" => false,
-      "images" => [%{product_url: "#"}]
+      "images" => Enum.map(variant.images, &image_variant/1)
     })
+    |> Map.drop([:images])
   end
 end

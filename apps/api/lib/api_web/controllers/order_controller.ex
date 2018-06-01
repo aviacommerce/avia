@@ -2,12 +2,17 @@ defmodule ApiWeb.OrderController do
   use ApiWeb, :controller
 
   alias Snitch.Data.Model.{Order, User}
+  alias Snitch.Data.Schema.Order, as: OrderSchema
   alias Snitch.Repo
   alias ApiWeb.FallbackController, as: Fallback
+  import Ecto.Query
 
   def current(conn, _params) do
+    query = from(c in OrderSchema, order_by: c.id)
+
     order =
-      Order.get_all()
+      query
+      |> Repo.all()
       |> List.first()
       |> Repo.preload(line_items: [variant: :images], shipping_address: [], billing_address: [])
 
@@ -78,7 +83,7 @@ defmodule ApiWeb.OrderController do
 
       order ->
         {:ok,
-         Repo.preload(order, line_items: :variant, shipping_address: [], billing_address: [])}
+         Repo.preload(order, line_items: [variant: :images], shipping_address: [], billing_address: [])}
     end
   end
 
