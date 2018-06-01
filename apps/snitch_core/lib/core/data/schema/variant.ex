@@ -80,10 +80,7 @@ defmodule Snitch.Data.Schema.Variant do
   def to_map(%__MODULE__{} = variant) do
     variant
     |> Map.from_struct()
-    |> Map.delete(:__meta__)
-    |> Map.delete(:stock_items)
-    |> Map.delete(:shipping_category)
-    |> Map.delete(:images)
+    |> Map.drop(~w[__meta__ stock_items shipping_category images product]a)
   end
 
   def to_map(_), do: nil

@@ -49,7 +49,7 @@ defmodule ApiWeb.CheckoutController do
     context =
       %{id: id}
       |> Order.get()
-      |> Repo.preload(line_items: [:variant])
+      |> Repo.preload(line_items: [variant: :images])
       |> Context.new(state: %{billing_cs: shipping_cs, shipping_cs: shipping_cs})
       |> DefaultMachine.add_addresses()
 
