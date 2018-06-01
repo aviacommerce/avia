@@ -10,16 +10,11 @@ defmodule ApiWeb.Router do
 
     get("/taxonomies", TaxonomyController, :index)
 
-    post("orders.json", OrderController, :create)
+    post("/orders.json", OrderController, :create)
 
-    scope("/orders") do
-      get("/current/:id", OrderController, :current)
-      get("/:order_number/payments/new", PaymentController, :payment_methods)
-      post("/:order_number/line_items/", OrderController, :add_line_item)
-    end
-
-    resources("/orders", OrderController, only: [:create]) do
+    resources("/orders", OrderController, only: [:show]) do
       resources("/payments", PaymentController, only: [:new, :create])
+      resources("/line_items", LineItemController, only: [:create])
     end
 
     resources("/products", ProductController, only: [:index, :show])

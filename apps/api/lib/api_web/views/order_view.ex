@@ -1,7 +1,7 @@
 defmodule ApiWeb.OrderView do
   use ApiWeb, :view
-  import ApiWeb.ProductView, only: [image_variant: 1]
-  alias ApiWeb.{PackageView, AddressView}
+
+  alias ApiWeb.{PackageView, AddressView, LineItemView}
 
   @static_fields %{
     "ship_total" => "0.0",
@@ -41,10 +41,6 @@ defmodule ApiWeb.OrderView do
     )
   end
 
-  def render("lineitem.json", %{line_item: line_item}) do
-    render_line_item(line_item)
-  end
-
   def render_order(order) do
     %{
       "number" => order.id,
@@ -66,7 +62,8 @@ defmodule ApiWeb.OrderView do
         "payment",
         "complete"
       ],
-      "line_items" => Enum.map(order.line_items, &render_line_item/1)
+      "line_items" =>
+        render_many(order.line_items, LineItemView, "line_item.json", as: :line_item)
     }
   end
 
@@ -82,41 +79,5 @@ defmodule ApiWeb.OrderView do
       "bill_address" => render_one(order.billing_address, AddressView, "address.json"),
       "ship_address" => render_one(order.shipping_address, AddressView, "address.json")
     }
-  end
-
-  def render_line_item(line_item) do
-    line_item
-    |> Map.from_struct()
-    |> Map.drop(~w[__meta__ order variant]a)
-    |> Map.merge(%{
-      "adjustments" => [],
-      "single_display_amount" => Money.to_string!(line_item.unit_price),
-      "display_amount" => Money.to_string!(line_item.total),
-      "total" => line_item.total.amount,
-      "price" => line_item.unit_price.amount,
-      "variant" => render_variant(line_item.variant)
-    })
-  end
-
-  def render_variant(variant) do
-    variant
-    |> Map.from_struct()
-    |> Map.drop(~w[__meta__ stock_items shipping_category images product]a)
-    |> Map.merge(%{
-      "name" => variant.sku,
-      "price" => variant.selling_price.amount,
-      "is_master" => true,
-      "slug" => variant.sku,
-      "cost_price" => variant.cost_price.amount,
-      "option_values" => [],
-      "display_price" => Money.to_string!(variant.selling_price),
-      "options_text" => "",
-      "in_stock" => true,
-      "is_backorderable" => true,
-      "is_orderable" => true,
-      "total_on_hand" => 100,
-      "is_destroyed" => false,
-      "images" => Enum.map(variant.images, &image_variant/1)
-    })
   end
 end
