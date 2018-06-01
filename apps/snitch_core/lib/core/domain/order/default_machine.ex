@@ -65,9 +65,7 @@ defmodule Snitch.Domain.Order.DefaultMachine do
       |> Transitions.persist_shipment()
     end)
 
-    event(:add_payment, %{from: [:address], to: :payment}, fn context ->
-      context
-    end)
+    event(:add_payment, %{from: [:address], to: :payment}, &Transitions.associate_payment/1)
 
     event(:confirm, %{from: [:payment], to: :processing}, fn context ->
       context

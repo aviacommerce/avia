@@ -13,7 +13,7 @@ defmodule Snitch.Domain.Order.Transitions do
   alias Ecto.Changeset
   alias BeepBop.Context
   alias Snitch.Data.Model.Order, as: OrderModel
-  alias Snitch.Data.Model.Package
+  alias Snitch.Data.Model.{Package, CheckPayment}
   alias Snitch.Data.Schema.Order
   alias Snitch.Domain.{Shipment, ShipmentEngine, Splitters.Weight}
 
@@ -25,7 +25,7 @@ defmodule Snitch.Domain.Order.Transitions do
   * `:shipping_cs` The shipping `Address` changeset (will be inserted).
 
   Returns a new `Context.t` struct with the updated `Order` struct.
-  The `:state` is reset to `nil`.
+  The `:state` contains the inserted `billing` and `shipping` addresses.
 
   In case of any errors, the `context` is marked "invalid" and errors are put
   under the `:multi` key.
@@ -57,8 +57,6 @@ defmodule Snitch.Domain.Order.Transitions do
 
   Returns a new `Context.t` struct with the `shipment` under the the [`:state`,
   `:shipment`] key-path.
-
-  > The `:state` key of the `context` is not utilised here.
 
   ## Note
 
@@ -113,6 +111,38 @@ defmodule Snitch.Domain.Order.Transitions do
   end
 
   def persist_shipment(%Context{valid?: false} = context), do: context
+
+  @doc """
+  Persists the payment and associate it with the `order`.
+
+  The following fields are required under the `:state` key:
+  * `:payment_params`
+  * `:card_params` (in case the payment is a CardPayment)
+
+  Returns a new `Context.t` struct with the updated `Order` struct.
+
+  In case of any errors, the `context` is marked "invalid" and errors are put
+  under the `:multi` key.
+  """
+  @spec associate_payment(Context.t()) :: Context.t()
+  def associate_payment(%Context{valid?: true, state: state, struct: %Order{} = order} = context) do
+    %{
+      payment_params: payment_params,
+      card_params: _card_params
+    } = state
+
+    multi =
+      Multi.run(context.multi, :payment, fn _ ->
+        payment_params
+        |> Map.put(:order_id, order.id)
+        |> Map.put(:slug, Integer.to_string(DateTime.to_unix(DateTime.utc_now())))
+        |> CheckPayment.create()
+      end)
+
+    struct(context, multi: multi)
+  end
+
+  def associate_payment(%Context{valid?: false} = context), do: context
 
   defp address_insert_multi(context) do
     %{
