@@ -6,7 +6,7 @@ defmodule ApiWeb.CORS do
     log: [rejected: :error],
     allow_credentials: true,
     allow_headers: ["content-type", "token-type"],
-    allow_methods: ["GET", "PUT", "OPTIONS"],
+    allow_methods: ["GET", "PUT", "OPTIONS", "DELETE"],
     max_age: 600
 
   resource("/*")
