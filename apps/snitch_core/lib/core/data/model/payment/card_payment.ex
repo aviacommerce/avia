@@ -21,11 +21,11 @@ defmodule Snitch.Data.Model.CardPayment do
   represented by `order_id`.
 
   * `payment_params` are validated using
-    `Snitch.Data.Schema.Payment.changeset/3` with the `:create` action and
-    because `slug` and `order_id` are passed explicitly to this function,
-    they'll be ignored if present in `payment_params`.
+    `Snitch.Data.Schema.Payment.create_changeset/3` and because `slug` and
+    `order_id` are passed explicitly to this function, they'll be ignored if
+    present in `payment_params`.
   * `card_params` are validated using
-  `Snitch.Data.Schema.CardPayment.changeset/3` with the `:create` action.
+  `Snitch.Data.Schema.CardPayment.create_changeset/3`.
   """
   @spec create(String.t(), non_neg_integer(), map, map) ::
           {:ok, %{card_payment: CardPayment.t(), payment: Payment.t()}}
@@ -58,10 +58,8 @@ defmodule Snitch.Data.Model.CardPayment do
   Everything except the `:payment_type` and `amount` can be changed, because by
   changing the type, `CardPayment` will have to be deleted.
 
-  * `card_params` are validated using `CardPayment.changeset/3` with the
-    `:update` action.
-  * `payment_params` are validated using `Schema.Payment.changeset/3` with the
-    `:update` action.
+  * `card_params` are validated using `CardPayment.update_changeset/3`.
+  * `payment_params` are validated using `Schema.Payment.update_changeset/3`
   """
   @spec update(CardPayment.t(), map, map) ::
           {:ok, %{card_payment: CardPayment.t(), payment: Payment.t()}}
@@ -78,7 +76,7 @@ defmodule Snitch.Data.Model.CardPayment do
   end
 
   @doc """
-  Fetches the struct but does not preload `:payment` association.
+  Fetches the `CardPayment` struct but does not preload `:payment` association.
   """
   @spec get(map | non_neg_integer) :: CardPayment.t() | nil
   def get(query_fields_or_primary_key) do
