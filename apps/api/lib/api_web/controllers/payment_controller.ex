@@ -8,7 +8,6 @@ defmodule ApiWeb.PaymentController do
   alias Snitch.Domain.Order.DefaultMachine
   alias Snitch.Data.Schema.PaymentMethod
   alias Snitch.Data.Model.Order
-  alias Snitch.Data.Model.PaymentMethod, as: PaymentMethodModel
   alias ApiWeb.FallbackController, as: Fallback
 
   def new(conn, _params) do
@@ -18,12 +17,11 @@ defmodule ApiWeb.PaymentController do
 
   def create(conn, %{"payment" => payment_params, "order_id" => id}) do
     %{
-      "payment_method_id" => pm_id,
+      "payment_method_id" => _pm_id,
       "amount" => amount
     } = payment_params
 
     order = Order.get(%{id: id})
-    payment_method = PaymentMethodModel.get(%{id: pm_id})
 
     params = %{
       amount: Money.from_float(amount, order.total.currency)
@@ -36,7 +34,7 @@ defmodule ApiWeb.PaymentController do
       |> DefaultMachine.add_payment()
 
     case context do
-      %{valid?: true, multi: %{payment: payment, persist: order}} ->
+      %{valid?: true, multi: %{payment: payment}} ->
         render(conn, "payment.json", payment: payment)
 
       %{valid?: false, multi: errors} ->

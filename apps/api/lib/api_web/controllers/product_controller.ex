@@ -4,7 +4,7 @@ defmodule ApiWeb.ProductController do
   alias Snitch.Data.Schema.Product
   alias Snitch.Repo
 
-  def index(conn, params) do
+  def index(conn, _params) do
     products =
       Repo.all(Product)
       |> Repo.preload(variants: [:images])
