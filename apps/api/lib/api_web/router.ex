@@ -23,5 +23,9 @@ defmodule ApiWeb.Router do
       put("/:order_id/next.json", CheckoutController, :next)
       put("/*order_id", CheckoutController, :add_addresses)
     end
+
+    resources("/countries", CountryController, only: [:index, :show]) do
+      resources("/states", StateController, only: [:index, :show])
+    end
   end
 end
