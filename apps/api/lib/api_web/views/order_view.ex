@@ -41,6 +41,10 @@ defmodule ApiWeb.OrderView do
     )
   end
 
+  def render("lineitem.json", %{line_item: line_item}) do
+    render_line_item(line_item)
+  end
+
   def render_order(order) do
     %{
       "number" => order.id,
@@ -50,7 +54,7 @@ defmodule ApiWeb.OrderView do
       "currency" => order.total.currency,
       "display_item_total" => Money.to_string!(order.item_total),
       "total_quantity" =>
-        Enum.reduce(Enum.map(order.line_items, fn %{quantity: q} -> q end), &+/2),
+        Enum.reduce(Enum.map(order.line_items, fn %{quantity: q} -> q end), 0, &+/2),
       "display_total" => Money.to_string!(order.item_total),
       "display_ship_total" => Money.to_string!(Money.zero(:USD)),
       "display_tax_total" => Money.to_string!(Money.zero(:USD)),
