@@ -14,7 +14,7 @@ defmodule ApiWeb.Router do
 
     resources("/orders", OrderController, only: [:show]) do
       resources("/payments", PaymentController, only: [:new, :create])
-      resources("/line_items", LineItemController, only: [:create])
+      resources("/line_items", LineItemController, only: [:create, :delete])
     end
 
     resources("/products", ProductController, only: [:index, :show])

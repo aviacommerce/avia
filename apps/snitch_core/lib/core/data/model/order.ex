@@ -54,7 +54,7 @@ defmodule Snitch.Data.Model.Order do
 
   ```
   order # this is the order you wish to update, and `:line_items` are preloaded
-  line_items = Enum.reduce(order.line_items, [], fn x, acc -> 
+  line_items = Enum.reduce(order.line_items, [], fn x, acc ->
     [%{id: x.id} | acc]
   end)
   params = %{} # All changes except line-items

@@ -26,7 +26,24 @@ defmodule ApiWeb.LineItemController do
     end
   end
 
-  def load_order(order_id) do
+  def delete(conn, params) do
+    order_id = Map.fetch!(params, "order_id")
+    line_item_id = Map.fetch!(params, "id")
+
+    with {:ok, order} <- load_order(order_id) do
+      new_line_items =
+        order.line_items
+        |> Enum.filter(fn x -> x.id != String.to_integer(line_item_id) end)
+        |> Enum.map(fn x -> %{id: x.id} end)
+
+      Order.update(%{line_items: new_line_items}, order)
+      send_resp(conn, 200, "")
+    else
+      :error -> Fallback.call(conn, {:error, :not_found})
+    end
+  end
+
+  defp load_order(order_id) do
     order_id
     |> String.to_integer()
     |> Order.get()
