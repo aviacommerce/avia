@@ -78,21 +78,23 @@ defmodule Snitch.Domain.Order.Transitions do
 
   ## Note
 
-  The validity of the returned context is the same as the `context` passed
-  in.
-  This means we do NOT mark the `context` "invalid" even if `shipment` is `[]`
-  (we could not find any shipment).
+  If `shipment` is `[]`, we mark the `context` "invalid" because we could not
+  find any shipment.
   """
   @spec compute_shipments(Context.t()) :: Context.t()
   # TODO: This function does not gracefully handle errors, they are raised!
   def compute_shipments(%Context{valid?: true, struct: %Order{} = order} = context) do
-    shipment =
-      order
-      |> Shipment.default_packages()
-      |> ShipmentEngine.run(order)
-      |> Weight.split()
+    order
+    |> Shipment.default_packages()
+    |> ShipmentEngine.run(order)
+    |> Weight.split()
+    |> case do
+      [] ->
+        struct(context, valid?: false, state: %{shipment: []})
 
-    struct(context, state: %{shipment: shipment})
+      shipment ->
+        struct(context, state: %{shipment: shipment})
+    end
   end
 
   def compute_shipments(%Context{valid?: false} = context), do: context
