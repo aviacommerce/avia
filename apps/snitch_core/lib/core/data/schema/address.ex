@@ -9,6 +9,7 @@ defmodule Snitch.Data.Schema.Address do
 
   use Snitch.Data.Schema
   alias Snitch.Data.Schema.{State, Country}
+  alias Snitch.Repo
 
   @type t :: %__MODULE__{}
 
@@ -28,7 +29,7 @@ defmodule Snitch.Data.Schema.Address do
   end
 
   @required_fields ~w(first_name last_name address_line_1 city zip_code)a
-  @optional_fields ~w(phone alternate_phone)a
+  @optional_fields ~w(phone alternate_phone country_id state_id)a
 
   @doc """
   Returns an `Address` changeset to create a new `address`.
@@ -38,27 +39,68 @@ defmodule Snitch.Data.Schema.Address do
   be associated with a state.
 
   ## Note
-  * `country` must be a `Country.t` struct.
-  * `state` must be a `State.t` struct.
+  You can provide either the Country and State structs under the `:country` and
+  `:state` keys resp. or just their IDs under `:country_id` and `:state_id`
+
+  If you provide both, the `:country_id` and/or `:state_id` will be ignored.
   """
-  @spec create_changeset(t, map, Country.t(), State.t()) :: Ecto.Changeset.t()
-  def create_changeset(%__MODULE__{} = address, params, %Country{} = country, state \\ nil) do
+  @spec create_changeset(t, map) :: Ecto.Changeset.t()
+  def create_changeset(%__MODULE__{} = address, params) do
+    filtered_params =
+      params
+      |> Stream.reject(fn {_, x} ->
+        is_nil(x)
+      end)
+      |> Enum.into(%{})
+
     address
-    |> cast(params, @required_fields ++ @optional_fields)
+    |> cast(filtered_params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> validate_length(:address_line_1, min: 10)
-    |> put_assoc(:country, country)
-    |> validate_country_and_state(country, state)
+    |> assoc_country_and_state()
   end
 
-  @spec validate_country_and_state(Ecto.Changeset.t(), Country.t(), State.t() | nil) ::
-          Ecto.Changeset.t()
-  def validate_country_and_state(
-        %Ecto.Changeset{valid?: true} = changeset,
-        %{states_required: true} = country,
-        state
-      )
-      when is_map(state) do
+  defp assoc_country_and_state(changeset) do
+    with :error <- Map.fetch(changeset.params, "country"),
+         {:ok, country_id} <- fetch_change(changeset, :country_id),
+         nil <- Repo.get(Country, country_id) do
+      add_error(changeset, :country_id, "does not exist", country_id: country_id)
+    else
+      {:ok, %Country{} = country} ->
+        changeset
+        |> put_assoc(:country, country)
+        |> assoc_state(country)
+
+      :error ->
+        add_error(changeset, :country, "country or country_id can't be blank")
+
+      %Country{} = country ->
+        changeset
+        |> put_assoc(:country, country)
+        |> assoc_state(country)
+    end
+  end
+
+  defp assoc_state(changeset, %{states_required: true} = country) do
+    with :error <- Map.fetch(changeset.params, "state"),
+         {:ok, state_id} <- fetch_change(changeset, :state_id),
+         nil <- Repo.get(State, state_id) do
+      add_error(changeset, :state_id, "does not exist", state_id: state_id)
+    else
+      {:ok, %State{} = state} ->
+        validate_state(changeset, country, state)
+
+      :error ->
+        add_error(changeset, :state, "state is required for this country", country_id: country.id)
+
+      %State{} = state ->
+        validate_state(changeset, country, state)
+    end
+  end
+
+  defp assoc_state(changeset, _), do: changeset
+
+  defp validate_state(changeset, country, state) do
     if state.country_id == country.id do
       put_assoc(changeset, :state, state)
     else
@@ -67,19 +109,8 @@ defmodule Snitch.Data.Schema.Address do
         :state,
         "state does not belong to country",
         state_id: state.id,
-        country_id: country.id,
-        validation: :address
+        country_id: country.id
       )
     end
   end
-
-  def validate_country_and_state(
-        %Ecto.Changeset{valid?: true} = changeset,
-        %{states_required: true} = country,
-        nil
-      ) do
-    add_error(changeset, :state, "state is required for this country", country_id: country.id)
-  end
-
-  def validate_country_and_state(changeset, _, _), do: changeset
 end
