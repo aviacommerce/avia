@@ -13,15 +13,13 @@ defmodule Snitch.Data.Schema.AddressTest do
     zip_code: "90265",
     city: "Malibu",
     phone: "1234567890",
-    state: nil,
     state_id: nil,
-    country: nil,
     country_id: nil
   }
 
-  describe "create_changeset/3" do
+  describe "changeset/3 for creation" do
     test "fails if required stuff is missing" do
-      cs = Address.create_changeset(%Address{}, %{})
+      cs = Address.changeset(%Address{}, %{})
       refute cs.valid?
 
       assert %{
@@ -30,36 +28,26 @@ defmodule Snitch.Data.Schema.AddressTest do
                first_name: ["can't be blank"],
                last_name: ["can't be blank"],
                zip_code: ["can't be blank"],
-               country: ["country or country_id can't be blank"]
+               country_id: ["can't be blank"]
              } = errors_on(cs)
     end
 
     test "fails when address_line_1 is less than 10 chars long" do
       short = %{@params | address_line_1: "123456789"}
 
-      cs = Address.create_changeset(%Address{}, short)
+      cs = Address.changeset(%Address{}, short)
       refute cs.valid?
 
       assert %{
                address_line_1: ["should be at least 10 character(s)"],
-               country: ["country or country_id can't be blank"]
+               country_id: ["can't be blank"]
              } = errors_on(cs)
     end
   end
 
-  describe "create_changeset/3 and state, country" do
-    setup :states
-    setup :countries
-
-    test "succeeds with valid params", %{states: [state]} do
-      params = %{
-        @params
-        | country: state.country,
-          state: state
-      }
-
-      %{valid?: validity} = Address.create_changeset(%Address{}, params)
-      assert validity
+  describe "changeset/3 for creation (state, country)" do
+    test "succeeds with valid params" do
+      state = insert(:state)
 
       params = %{
         @params
@@ -67,19 +55,20 @@ defmodule Snitch.Data.Schema.AddressTest do
           state_id: state.id
       }
 
-      %{valid?: validity} = Address.create_changeset(%Address{}, params)
+      %{valid?: validity} = Address.changeset(%Address{}, params)
       assert validity
     end
 
-    test "succeeds w/o state/state_id if it is not needed in country", %{countries: [country]} do
+    test "succeeds w/o state/state_id if it is not needed in country" do
+      country = insert(:country, states_required: false)
+
       params = %{
         @params
-        | country: %{country | states_required: false}
+        | country_id: country.id
       }
 
-      %{valid?: validity} = Address.create_changeset(%Address{}, params)
-
-      assert validity
+      cs = Address.changeset(%Address{}, params)
+      assert cs.valid?
     end
 
     test "fails with bad country_id" do
@@ -88,56 +77,42 @@ defmodule Snitch.Data.Schema.AddressTest do
         | country_id: -1
       }
 
-      cs = Address.create_changeset(%Address{}, params)
+      cs = Address.changeset(%Address{}, params)
       refute cs.valid?
       assert %{country_id: ["does not exist"]} = errors_on(cs)
     end
 
-    test "fails with bad state_id", %{countries: [country]} do
+    test "fails with bad state_id" do
+      country = insert(:country)
+
       params = %{
         @params
-        | country: country,
+        | country_id: country.id,
           state_id: -1
       }
 
-      cs = Address.create_changeset(%Address{}, params)
+      cs = Address.changeset(%Address{}, params)
       refute cs.valid?
       assert %{state_id: ["does not exist"]} = errors_on(cs)
     end
 
-    test "fails without state if it was needed by country", %{countries: [country]} do
-      assert country.states_required
+    test "fails without state if it was needed by country" do
+      state = insert(:state)
+      assert state.country.states_required
 
       params = %{
         @params
-        | country_id: country.id
+        | country_id: state.country.id
       }
 
-      cs = Address.create_changeset(%Address{}, params)
+      cs = Address.changeset(%Address{}, params)
       refute cs.valid?
-      assert %{state: ["state is required for this country"]} = errors_on(cs)
-
-      params = %{
-        @params
-        | country: country
-      }
-
-      cs = Address.create_changeset(%Address{}, params)
-      refute cs.valid?
-      assert %{state: ["state is required for this country"]} = errors_on(cs)
+      assert %{state_id: ["state is explicitly required for this country"]} = errors_on(cs)
     end
 
-    test "fails if state.country different from country", %{states: [state], countries: [country]} do
-      params = %{
-        @params
-        | country: country,
-          state: state
-      }
-
-      cs = Address.create_changeset(%Address{}, params)
-
-      refute cs.valid?
-      assert %{state: ["state does not belong to country"]} = errors_on(cs)
+    test "fails if state.country different from country" do
+      state = insert(:state)
+      country = insert(:country)
 
       params = %{
         @params
@@ -145,10 +120,80 @@ defmodule Snitch.Data.Schema.AddressTest do
           state_id: state.id
       }
 
-      cs = Address.create_changeset(%Address{}, params)
+      cs = Address.changeset(%Address{}, params)
 
       refute cs.valid?
       assert %{state: ["state does not belong to country"]} = errors_on(cs)
+    end
+  end
+
+  describe "changeset/3 for update" do
+    setup do
+      [address: insert(:address)]
+    end
+
+    test "succeeds even when there is no 'change'", %{address: a} do
+      cs = Address.changeset(a, %{})
+      assert cs.valid?
+      assert cs.changes == %{}
+    end
+
+    test "succeeds with 'change' in both country and state", %{address: a} do
+      state = insert(:state)
+
+      params = %{
+        @params
+        | country_id: state.country.id,
+          state_id: state.id
+      }
+
+      cs = Address.changeset(a, params)
+      assert cs.valid?
+      assert {:ok, _} = Repo.update(cs)
+    end
+
+    test "succeeds with 'change' in only state (of same country)", %{address: a} do
+      state = insert(:state, country: a.country)
+
+      params =
+        @params
+        |> Map.put(:state_id, state.id)
+        |> Map.delete(:country_id)
+
+      cs = Address.changeset(a, params)
+      assert cs.valid?
+      assert {:ok, _} = Repo.update(cs)
+    end
+
+    test "fails with 'change' in only state (of other country)", %{address: a} do
+      state = insert(:state)
+
+      params =
+        @params
+        |> Map.put(:state_id, state.id)
+        |> Map.delete(:country_id)
+
+      cs = Address.changeset(a, params)
+      refute cs.valid?
+      assert %{state: ["state does not belong to country"]} = errors_on(cs)
+    end
+
+    test "fails with 'change' in only country that has states", %{address: a} do
+      country = insert(:country)
+      params = %{@params | country_id: country.id}
+
+      cs = Address.changeset(a, params)
+      refute cs.valid?
+      assert %{state_id: ["state is explicitly required for this country"]} = errors_on(cs)
+    end
+
+    test "succeds with 'change' in only country that has no states", %{address: a} do
+      country = insert(:country, states_required: false)
+      params = %{@params | country_id: country.id, state_id: -1}
+
+      cs = Address.changeset(a, params)
+      assert cs.valid?
+      assert %{state_id: nil} = cs.changes
     end
   end
 end
