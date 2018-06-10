@@ -10,30 +10,21 @@ defmodule Snitch.Domain.Order.Transitions do
 
   use Snitch.Domain
 
-  alias Ecto.Changeset
   alias BeepBop.Context
   alias Snitch.Data.Model.Package
   alias Snitch.Data.Schema.Order
   alias Snitch.Domain.{Shipment, ShipmentEngine, Splitters.Weight}
 
   @doc """
-  Persists the address changesets and associates them with the `order`.
+  Persists the address and associates them with the `order`.
 
   The following fields are required under the `:state` key:
-  * `:billing_cs` The billing `Address` changeset (will be inserted).
-  * `:shipping_cs` The shipping `Address` changeset (will be inserted).
-
-  Returns a new `Context.t` struct with the updated `Order` struct.
-  The `:state` is reset to `nil`.
-
-  In case of any errors, the `context` is marked "invalid" and errors are put
-  under the `:multi` key.
+  * `:billing_address` The billing `Address` params
+  * `:shipping_address` The shipping `Address` params
 
   ## Note
-  > _This transition is "impure"!_
-
-  The addresses are persisted to the DB (and associated with the `order`)
-  irrespective of the result of the full event transition.
+  This transition is "impure" as it does not use the multi, the addresses are
+  associated "out-of-band".
   """
   @spec associate_address(Context.t()) :: Context.t()
   def associate_address(
@@ -43,23 +34,24 @@ defmodule Snitch.Domain.Order.Transitions do
           state: %{
             billing_address: billing,
             shipping_address: shipping
-          },
-          multi: multi
+          }
         } = context
       ) do
-    order = Repo.preload(order, [:billing_address, :shipping_address])
+    changeset =
+      order
+      |> Repo.preload([:billing_address, :shipping_address])
+      |> Order.partial_update_changeset(%{
+        billing_address: billing,
+        shipping_address: shipping
+      })
 
-    multi =
-      Multi.update(
-        multi,
-        :order,
-        Order.partial_update_changeset(order, %{
-          billing_address: billing,
-          shipping_address: shipping
-        })
-      )
+    case Repo.update(changeset) do
+      {:ok, order} ->
+        Context.new(order, state: context.state)
 
-    struct(context, struct: order, multi: multi)
+      {:error, errors} ->
+        struct(context, valid?: false, multi: errors)
+    end
   end
 
   def associate_address(%Context{} = context), do: struct(context, valid?: false)
@@ -82,14 +74,10 @@ defmodule Snitch.Domain.Order.Transitions do
   def compute_shipments(
         %Context{
           valid?: true,
-          struct: order,
-          state: %{
-            shipping_address: %Changeset{} = address
-          }
+          struct: %Order{} = order
         } = context
       ) do
     order
-    |> struct(shipping_address: Changeset.apply_changes(address))
     |> Shipment.default_packages()
     |> ShipmentEngine.run(order)
     |> Weight.split()

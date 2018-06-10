@@ -33,7 +33,7 @@ defmodule Snitch.Domain.Shipment do
   alias Snitch.Data.Schema.{Order}
   alias Snitch.Domain.{ShippingMethod, Zone}
 
-  def default_packages(%Order{state: "address"} = order) do
+  def default_packages(%Order{} = order) do
     order = Repo.preload(order, line_items: [], shipping_address: [:state, :country])
     variant_ids = Enum.map(order.line_items, fn %{variant_id: id} -> id end)
     stock_locations = StockLocation.get_all_with_items_for_variants(variant_ids)
