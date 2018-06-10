@@ -7,6 +7,7 @@ defmodule Snitch.Data.Schema.PackageItemTest do
   alias Snitch.Data.Schema.PackageItem
 
   @params %{
+    number: "PI01",
     state: "ready",
     quantity: 3,
     delta: 2,
@@ -32,8 +33,8 @@ defmodule Snitch.Data.Schema.PackageItemTest do
       assert cs = %{valid?: false} = PackageItem.create_changeset(%PackageItem{}, %{})
 
       assert %{
+               number: ["can't be blank"],
                line_item_id: ["can't be blank"],
-               quantity: ["can't be blank"],
                state: ["can't be blank"],
                variant_id: ["can't be blank"]
              } = errors_on(cs)

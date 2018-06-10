@@ -4,8 +4,8 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
   import Snitch.Factory
 
-  alias Ecto.Multi
   alias BeepBop.Context
+  alias Ecto.Multi
   alias Snitch.Data.Schema.Order
   alias Snitch.Domain.Order.Transitions
 

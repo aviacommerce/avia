@@ -429,44 +429,72 @@ defmodule Snitch.Domain.ShipmentTest do
     end
   end
 
-  @package %{
-    items: [
-      %{line_item: %{id: :li}, variant: %{id: :v}, delta: 0, quantity: :q, state: :fulfilled}
-    ],
-    origin: %{id: :origin},
-    category: %{id: :sc},
-    shipping_methods: [%ShippingMethod{id: :sm, name: "foo"}],
-    shipping_costs: [{-1, :USD}],
-    backorders?: false
-  }
-
   describe "to_package/1" do
-    test "embeds cost and shipping method together" do
+    setup do
+      [order: insert(:order, user: build(:user))]
+    end
+
+    setup :variants
+    setup :line_items
+
+    setup %{line_items: [line_item], variants: [v]} do
+      [
+        shipment: %{
+          items: [
+            %{
+              line_item: line_item,
+              variant: v,
+              delta: 0,
+              quantity: 4,
+              state: :fulfilled
+            }
+          ],
+          origin: insert(:stock_location),
+          category: insert(:shipping_category),
+          zones: [insert(:zone, zone_type: "C")],
+          shipping_methods: [insert(:shipping_method)],
+          shipping_costs: [Money.new(0, :USD)],
+          backorders?: false,
+          variants: nil
+        }
+      ]
+    end
+
+    @tag variant_count: 1
+    test "embeds cost and shipping method together", context do
+      %{
+        order: order,
+        shipment: %{items: [shipment_item], shipping_methods: [shipping_method]} = shipment
+      } = context
+
       assert %{
                items: [
                  %{
-                   line_item: %{id: :li},
-                   variant: %{id: :v},
                    delta: 0,
-                   quantity: :q,
+                   quantity: 4,
                    backordered?: false,
                    state: "fulfilled"
-                 }
+                 } = item
                ],
-               order_id: :order,
-               origin_id: :origin,
-               shipping_category_id: :sc,
-               shipping_methods: [
-                 %{
-                   cost: {-1, :USD},
-                   id: :sm,
-                   name: "foo"
-                 }
-               ],
+               shipping_methods: [method],
                state: "ready"
-             } = package = Shipment.to_package(@package, %{id: :order})
+             } = package = Shipment.to_package(shipment, order)
+
+      assert item.line_item_id == shipment_item.line_item.id
+      assert item.variant_id == shipment_item.line_item.variant_id
+      assert package.shipping_category_id == shipment.category.id
+      assert package.origin_id == shipment.origin.id
+      assert package.order_id == order.id
+
+      assert method.id == shipping_method.id
+      assert method.cost == Money.new(0, :USD)
 
       refute is_nil(package.number)
+      refute is_nil(item.number)
+
+      cs = Package.create_changeset(%Package{}, package)
+      assert cs.valid?
+      assert {:ok, _} = Repo.insert(cs)
     end
   end
 
