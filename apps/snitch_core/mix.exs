@@ -41,11 +41,12 @@ defmodule Snitch.Core.Mixfile do
       {:postgrex, "~> 0.13.5"},
       {:ecto, "~> 2.2"},
       {:jason, "~> 1.0"},
-      {:ex_money, "~> 2.5.0"},
+      {:ex_money, "~> 2.6.0"},
       {:credo, "~> 0.9.1", only: :dev, runtime: false},
       {:credo_contrib, "~> 0.1.0-rc3", only: :dev, runtime: false},
       {:as_nested_set, git: "https://github.com/SagarKarwande/as_nested_set.git"},
       {:ecto_atom, "~> 1.0.0"},
+      {:ecto_identifier, "~> 0.1.0"},
 
       # auth
       {:comeonin, "~> 4.1.1"},
@@ -56,7 +57,7 @@ defmodule Snitch.Core.Mixfile do
 
       # docs and tests
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.8", only: :test},
+      {:excoveralls, "~> 0.8.2", only: :test},
       {:mox, "~> 0.3", only: :test},
       {:ex_machina, "~> 2.2", only: :test},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},

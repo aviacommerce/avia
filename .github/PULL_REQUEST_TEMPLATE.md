@@ -35,9 +35,9 @@
 Dear Gatekeeper,
 
 Please make sure that the commits that will be merged or rebased into the base
-branch are [formatted according to our standards](commit-template).
+branch are [formatted according to our standards][commit-style].
 
 > The only additional requirement is that the the PR number must appear in the
 > commit title in brackets: `(#XXX)`
 
-[commit-template]: https://github.com/aviabird/snitch/blob/develop/.git_commit_msg.txt
+[commit-style]: https://github.com/aviabird/snitch/blob/develop/CONTRIBUTING.md#styling
