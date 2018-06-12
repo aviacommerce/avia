@@ -3,7 +3,7 @@ defmodule Snitch.Data.Schema.Taxon do
   use Snitch.Data.Schema
   use AsNestedSet, scope: [:taxonomy_id]
 
-  alias Snitch.Data.Schema.{Taxonomy, Taxon}
+  alias Snitch.Data.Schema.{Taxon, Taxonomy}
 
   @type t :: %__MODULE__{}
 

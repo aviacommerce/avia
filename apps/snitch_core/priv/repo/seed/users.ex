@@ -1,11 +1,11 @@
 defmodule Snitch.Seed.Users do
   @moduledoc false
 
-  alias Ecto.DateTime
   alias Comeonin.Argon2
+  alias Ecto.DateTime
+  alias Snitch.Data.Model.{Country, State}
+  alias Snitch.Data.Schema.{Address, User}
   alias Snitch.Repo
-  alias Snitch.Data.Schema.{User, Address}
-  alias Snitch.Data.Model.{State, Country}
 
   require Logger
 

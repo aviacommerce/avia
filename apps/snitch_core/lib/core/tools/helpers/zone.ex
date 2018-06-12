@@ -4,9 +4,9 @@ defmodule Snitch.Tools.Helper.Zone do
   """
 
   alias Ecto.Multi
-  alias Snitch.Repo
+  alias Snitch.Data.Model.{CountryZone, StateZone}
   alias Snitch.Data.Schema.Zone
-  alias Snitch.Data.Model.{StateZone, CountryZone}
+  alias Snitch.Repo
 
   defmacro __using__(_) do
     quote do

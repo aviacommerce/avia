@@ -7,7 +7,7 @@ defmodule Snitch.Data.Model.CountryZone do
 
   import Ecto.Query
 
-  alias Snitch.Data.Schema.{CountryZoneMember, Zone, Country}
+  alias Snitch.Data.Schema.{Country, CountryZoneMember, Zone}
   alias Snitch.Tools.Helper.Zone, as: ZH
 
   @doc """

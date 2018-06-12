@@ -3,9 +3,9 @@ defmodule Snitch.ShipmentCase do
   Test helpers to insert shipping related schemas.
   """
 
-  alias Snitch.Repo
-  alias Snitch.Data.Schema.{ShippingCategory}
   alias Snitch.Data.Model.ShippingMethod
+  alias Snitch.Data.Schema.ShippingCategory
+  alias Snitch.Repo
 
   @shipping_category %{
     name: nil,

@@ -10,7 +10,7 @@ defmodule Snitch.Data.Schema.ShippingMethod do
   """
 
   use Snitch.Data.Schema
-  alias Snitch.Data.Schema.{Zone, ShippingCategory}
+  alias Snitch.Data.Schema.{ShippingCategory, Zone}
 
   @type t :: %__MODULE__{}
 

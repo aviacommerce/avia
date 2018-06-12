@@ -5,7 +5,7 @@ defmodule Snitch.Data.Model.CountryZoneTest do
   import Snitch.Factory
 
   alias Snitch.Data.Model.CountryZone
-  alias Snitch.Data.Schema.{Zone, CountryZoneMember}
+  alias Snitch.Data.Schema.{CountryZoneMember, Zone}
 
   setup :countries
 

@@ -3,7 +3,7 @@ defmodule Snitch.Factory.Address do
 
   defmacro __using__(_opts) do
     quote do
-      alias Snitch.Data.Schema.{State, Country, Address}
+      alias Snitch.Data.Schema.{Address, Country, State}
 
       def state_factory do
         %State{

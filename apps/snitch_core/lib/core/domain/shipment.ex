@@ -29,9 +29,9 @@ defmodule Snitch.Domain.Shipment do
 
   use Snitch.Domain
 
-  alias Snitch.Data.Schema.{Order}
   alias Snitch.Data.Model.StockLocation
-  alias Snitch.Domain.{Zone, ShippingMethod}
+  alias Snitch.Data.Schema.{Order}
+  alias Snitch.Domain.{ShippingMethod, Zone}
 
   def default_packages(%Order{} = order) do
     order = Repo.preload(order, line_items: [], shipping_address: [:state, :country])

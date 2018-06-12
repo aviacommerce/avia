@@ -4,9 +4,10 @@ defmodule Snitch.Domain.ShippingMethod do
   """
 
   use Snitch.Domain
+
   alias Snitch.Data.Model.ShippingMethod
   alias Snitch.Data.Schema.ShippingMethod, as: SMSchema
-  alias Snitch.Data.Schema.{ShippingCategory, Order}
+  alias Snitch.Data.Schema.{Order, ShippingCategory}
 
   @doc """
   Returns the `ShippingMethod.t` structs that are applicable for the given

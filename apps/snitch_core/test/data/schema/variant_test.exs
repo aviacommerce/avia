@@ -3,8 +3,9 @@ defmodule Snitch.Data.Schema.VariantTest do
   use Snitch.DataCase
 
   import Snitch.Factory
-  alias Snitch.Repo
+
   alias Snitch.Data.Schema.Variant
+  alias Snitch.Repo
 
   @valid_params %{
     sku: "shoes-nike-sz-9",

@@ -11,7 +11,7 @@ defmodule Snitch.Data.Schema.CardPayment do
 
   use Snitch.Data.Schema
 
-  alias Snitch.Data.Schema.{Payment, Card}
+  alias Snitch.Data.Schema.{Card, Payment}
 
   @type t :: %__MODULE__{}
 
