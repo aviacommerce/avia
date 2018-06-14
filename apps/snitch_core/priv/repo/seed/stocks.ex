@@ -3,9 +3,9 @@ defmodule Snitch.Seed.Stocks do
 
   import Ecto.Query
 
+  alias Snitch.Data.Model.{Country, State}
+  alias Snitch.Data.Schema.{StockItem, StockLocation, Variant}
   alias Snitch.Repo
-  alias Snitch.Data.Schema.{StockLocation, Variant, StockItem}
-  alias Snitch.Data.Model.{State, Country}
 
   require Logger
 

@@ -7,8 +7,8 @@ defmodule Snitch.Data.Model.StateZone do
 
   import Ecto.Query
 
+  alias Snitch.Data.Schema.{State, StateZoneMember, Zone}
   alias Snitch.Tools.Helper.Zone, as: ZH
-  alias Snitch.Data.Schema.{StateZoneMember, Zone, State}
 
   @doc """
   Creates a new state `Zone` whose members are `state_ids`.

@@ -23,8 +23,8 @@ defmodule Snitch.Domain.ShipmentEngine do
   """
 
   alias Aruspex.Problem
-  alias Snitch.Data.Schema.Order
   alias Aruspex.Strategy.SimulatedAnnealing
+  alias Snitch.Data.Schema.Order
 
   @domain [true, false]
 

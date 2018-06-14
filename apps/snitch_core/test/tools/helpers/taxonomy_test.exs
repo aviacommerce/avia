@@ -2,9 +2,9 @@ defmodule Snitch.Tools.Helpers.Taxonomy do
   use ExUnit.Case, async: false
   use Snitch.DataCase
 
-  alias Snitch.Tools.Helper.Taxonomy, as: TaxonomyHelper
   alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
   alias Snitch.Repo
+  alias Snitch.Tools.Helper.Taxonomy, as: TaxonomyHelper
 
   @brands_taxonomy {"Brands",
                     [

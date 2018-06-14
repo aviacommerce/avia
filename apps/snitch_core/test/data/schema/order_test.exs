@@ -4,8 +4,8 @@ defmodule Snitch.Data.Schema.OrderTest do
 
   import Snitch.Factory
 
-  alias Snitch.Data.Schema.Order
   alias Snitch.Data.Model.LineItem
+  alias Snitch.Data.Schema.Order
 
   setup :variants
   setup :user_with_address

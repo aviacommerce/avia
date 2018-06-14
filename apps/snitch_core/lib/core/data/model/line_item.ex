@@ -3,7 +3,8 @@ defmodule Snitch.Data.Model.LineItem do
   LineItem API and utilities.
   """
   use Snitch.Data.Model
-  alias Snitch.Data.Schema.{Variant, LineItem}
+
+  alias Snitch.Data.Schema.{LineItem, Variant}
   alias Snitch.Tools.Money, as: MoneyTools
 
   @spec get(map) :: LineItem.t() | nil

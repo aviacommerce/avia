@@ -4,7 +4,8 @@ defmodule Snitch.Data.Schema.LineItem do
   """
 
   use Snitch.Data.Schema
-  alias Snitch.Data.Schema.{Variant, Order}
+
+  alias Snitch.Data.Schema.{Order, Variant}
 
   @type t :: %__MODULE__{}
 

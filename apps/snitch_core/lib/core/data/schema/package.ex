@@ -5,8 +5,8 @@ defmodule Snitch.Data.Schema.Package do
   use Snitch.Data.Schema
 
   alias Ecto.Nanoid
-  alias Snitch.Data.Schema.{Order, PackageItem, StockLocation, ShippingCategory, ShippingMethod}
   alias Snitch.Data.Schema.Embedded.ShippingMethod, as: EmbeddedShippingMethod
+  alias Snitch.Data.Schema.{Order, PackageItem, ShippingCategory, ShippingMethod, StockLocation}
 
   @typedoc """
   A Package gets shipped to a user.

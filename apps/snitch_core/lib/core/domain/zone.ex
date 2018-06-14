@@ -4,7 +4,7 @@ defmodule Snitch.Domain.Zone do
   """
 
   use Snitch.Domain
-  alias Snitch.Data.Model.{StateZone, CountryZone}
+  alias Snitch.Data.Model.{CountryZone, StateZone}
 
   @doc """
   Returns the state and country zone `struct`s that are common to both addresses
