@@ -4,7 +4,8 @@ defmodule Snitch.Data.Schema.StockLocation do
   shipped.
   """
   use Snitch.Data.Schema
-  alias Snitch.Data.Schema.{StockItem, State, Country}
+
+  alias Snitch.Data.Schema.{Country, State, StockItem}
 
   @typedoc """
   ## Fields

@@ -3,7 +3,8 @@ defmodule Snitch.Data.Schema.StateZoneMember do
   Models a StateZone member.
   """
   use Snitch.Data.Schema
-  alias Snitch.Data.Schema.{Zone, State}
+
+  alias Snitch.Data.Schema.{State, Zone}
 
   @typedoc """
   StateZoneMember struct.

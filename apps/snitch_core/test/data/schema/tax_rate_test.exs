@@ -1,10 +1,12 @@
 defmodule Snitch.Data.Schema.TaxRateTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
+
   import Snitch.Factory
   import Mox
-  alias Snitch.Repo
+
   alias Snitch.Data.Schema.TaxRate
+  alias Snitch.Repo
 
   @valid_params %{
     name: "North America",

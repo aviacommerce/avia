@@ -39,7 +39,7 @@ defmodule Snitch.Data.Schema.PackageItem do
   use Snitch.Data.Schema
 
   alias Ecto.Nanoid
-  alias Snitch.Data.Schema.{Variant, LineItem, Package}
+  alias Snitch.Data.Schema.{LineItem, Package, Variant}
 
   @typedoc """
   Every fulfilled `LineItem` get shipped in as `PackageItem` in a `Package`.

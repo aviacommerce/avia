@@ -1,6 +1,7 @@
 defmodule Snitch.Data.Schema.Taxonomy do
   @moduledoc false
   use Snitch.Data.Schema
+
   alias Snitch.Data.Schema.Taxon
 
   @type t :: %__MODULE__{}

@@ -3,7 +3,8 @@ defmodule Snitch.Data.Schema.CountryZoneMember do
   Models a CountryZone member.
   """
   use Snitch.Data.Schema
-  alias Snitch.Data.Schema.{Zone, Country}
+
+  alias Snitch.Data.Schema.{Country, Zone}
 
   @typedoc """
   CountryZoneMember struct.

@@ -4,8 +4,8 @@ defmodule Snitch.Data.Schema.TaxCategoryTest do
 
   import Snitch.Factory
 
-  alias Snitch.Repo
   alias Snitch.Data.Schema.TaxCategory
+  alias Snitch.Repo
 
   @valid_params %{
     name: "EU_VAT",

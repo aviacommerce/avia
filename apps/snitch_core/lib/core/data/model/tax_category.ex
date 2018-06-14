@@ -6,8 +6,8 @@ defmodule Snitch.Data.Model.TaxCategory do
 
   import Ecto.Changeset
 
-  alias Snitch.Data.Schema.TaxCategory
   alias Ecto.Multi
+  alias Snitch.Data.Schema.TaxCategory
 
   @doc """
   Creates a TaxCategory in the db with the supplied `params`.

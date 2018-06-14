@@ -14,14 +14,14 @@ defmodule Snitch.DataCase do
 
   use ExUnit.CaseTemplate
 
-  alias Snitch.Repo
   alias Ecto.Adapters.SQL.Sandbox
   alias Ecto.Changeset
+  alias Snitch.Repo
 
   using do
     quote do
-      alias Snitch.Repo
       alias Ecto.Adapters.SQL.Sandbox
+      alias Snitch.Repo
 
       import Ecto
       import Ecto.Changeset

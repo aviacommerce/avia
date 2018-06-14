@@ -4,9 +4,10 @@ defmodule Snitch.Data.Schema.Order do
   """
 
   use Snitch.Data.Schema
+
   alias Ecto.Nanoid
-  alias Snitch.Data.Schema.{Address, User, LineItem}
   alias Snitch.Data.Model.LineItem, as: LineItemModel
+  alias Snitch.Data.Schema.{Address, LineItem, User}
 
   @type t :: %__MODULE__{}
 

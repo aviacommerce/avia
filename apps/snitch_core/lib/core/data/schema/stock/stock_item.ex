@@ -3,7 +3,8 @@ defmodule Snitch.Data.Schema.StockItem do
   StockItem tracks the store's inventory.
   """
   use Snitch.Data.Schema
-  alias Snitch.Data.Schema.{Variant, StockLocation}
+
+  alias Snitch.Data.Schema.{StockLocation, Variant}
 
   @type t :: %__MODULE__{}
 

@@ -4,8 +4,8 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
 
   import Snitch.Factory
 
-  alias Snitch.Domain.Taxonomy
   alias Snitch.Data.Schema.Taxon
+  alias Snitch.Domain.Taxonomy
 
   # Will create a better code for this to create taxonomy from list or map
   # Creates following taxonomy

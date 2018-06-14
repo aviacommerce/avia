@@ -3,8 +3,8 @@ defmodule Snitch.ZoneCase do
   Test helpers to insert zones and zone members.
   """
 
+  alias Snitch.Data.Schema.{Country, CountryZoneMember, State, StateZoneMember, Zone}
   alias Snitch.Repo
-  alias Snitch.Data.Schema.{Country, State, Zone, StateZoneMember, CountryZoneMember}
 
   @zone %{
     name: nil,
