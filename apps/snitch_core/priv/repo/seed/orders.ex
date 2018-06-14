@@ -18,7 +18,7 @@ defmodule Snitch.Seed.Orders do
   }
 
   @order %{
-    slug: nil,
+    number: nil,
     state: nil,
     billing_address_id: nil,
     shipping_address_id: nil,
@@ -58,20 +58,20 @@ defmodule Snitch.Seed.Orders do
         Order,
         orders,
         on_conflict: :nothing,
-        conflict_target: [:slug],
-        returning: [:id, :slug]
+        conflict_target: [:number],
+        returning: [:id, :number]
       )
 
     Logger.info("Inserted #{count} orders.")
 
     filtered_line_items =
       order_structs
-      |> Enum.map(fn %{id: id, slug: slug} ->
+      |> Enum.map(fn %{id: id, number: number} ->
         line_items
         |> Enum.reduce(&Map.merge/2)
-        |> Map.fetch!(slug)
+        |> Map.fetch!(number)
         |> Stream.map(&Map.put(&1, :order_id, id))
-        |> Enum.map(&Map.delete(&1, :slug))
+        |> Enum.map(&Map.delete(&1, :number))
       end)
       |> List.flatten()
 
@@ -82,13 +82,13 @@ defmodule Snitch.Seed.Orders do
   def make_orders(digest, variants) do
     digest
     |> Enum.map(fn {state, opts} ->
-      slug = "order-in-#{state}"
+      number = Nanoid.generate()
 
       line_items =
         variants
         |> Enum.shuffle()
         |> random_line_items()
-        |> Stream.map(&Map.put(&1, :slug, slug))
+        |> Stream.map(&Map.put(&1, :number, number))
         |> Enum.take(2 + :rand.uniform(3))
 
       item_total =
@@ -98,7 +98,7 @@ defmodule Snitch.Seed.Orders do
 
       order = %{
         @order
-        | slug: slug,
+        | number: number,
           state: "#{state}",
           user_id: opts[:user_id],
           billing_address_id: opts[:address_id],
@@ -107,7 +107,7 @@ defmodule Snitch.Seed.Orders do
           total: item_total
       }
 
-      {order, %{slug => line_items}}
+      {order, %{number => line_items}}
     end)
     |> Enum.unzip()
   end

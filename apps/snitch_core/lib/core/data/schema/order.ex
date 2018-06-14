@@ -4,13 +4,14 @@ defmodule Snitch.Data.Schema.Order do
   """
 
   use Snitch.Data.Schema
+  alias Ecto.Nanoid
   alias Snitch.Data.Schema.{Address, User, LineItem}
   alias Snitch.Data.Model.LineItem, as: LineItemModel
 
   @type t :: %__MODULE__{}
 
   schema "snitch_orders" do
-    field(:slug, :string)
+    field(:number, Nanoid, autogenerate: true)
     field(:state, :string, default: "cart")
     field(:special_instructions, :string)
     field(:confirmed?, :boolean, default: false)
@@ -35,10 +36,10 @@ defmodule Snitch.Data.Schema.Order do
     timestamps()
   end
 
-  @required_fields ~w(slug state user_id)a
+  @required_fields ~w(state user_id)a
   @optional_fields ~w(billing_address_id shipping_address_id)a
   @create_fields @required_fields
-  @update_fields ~w(slug state)a ++ @optional_fields
+  @update_fields ~w(state)a ++ @optional_fields
 
   @doc """
   Returns a Order changeset with totals for a "new" order.
@@ -79,7 +80,7 @@ defmodule Snitch.Data.Schema.Order do
   @spec common_changeset(Ecto.Changeset.t()) :: Ecto.Changeset.t()
   defp common_changeset(order_changeset) do
     order_changeset
-    |> unique_constraint(:slug)
+    |> unique_constraint(:number)
     |> foreign_key_constraint(:billing_address_id)
     |> foreign_key_constraint(:shipping_address_id)
   end
