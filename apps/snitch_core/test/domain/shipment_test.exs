@@ -2,9 +2,10 @@ defmodule Snitch.Domain.ShipmentTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
+  import Snitch.Factory
   import Snitch.{OrderCase, ShipmentCase, StockCase, ZoneCase}
 
-  alias Snitch.Data.Schema.{Address, Order, StockItem, StockLocation, Variant}
+  alias Snitch.Data.Schema.{Address, Order, Package, StockItem, StockLocation, Variant}
   alias Snitch.Domain.Shipment
 
   @zone_manifest %{
