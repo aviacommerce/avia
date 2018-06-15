@@ -9,9 +9,6 @@ defmodule Snitch.Data.Model.Order do
   @doc """
   Creates an order with supplied `params` and `line_items`.
 
-  Since line-items are "owned" by an order it does not make sense to persist
-  `LineItem`s first and then `create/2` an `Order`.
-
   `params` is a map that is passed to the
   `Snitch.Data.Schema.Order.changeset/3`.
 
@@ -30,12 +27,9 @@ defmodule Snitch.Data.Model.Order do
   ## See also
   `Ecto.Changeset.cast_assoc/3`
   """
-  @spec create(map, [line_items]) :: {:ok, Order.t()} | {:error, Ecto.Changeset.t()}
-        when line_items: %{variant_id: non_neg_integer, quantity: non_neg_integer}
-  def create(params, line_items) do
-    priced_items = update_line_item_costs(line_items)
-
-    QH.create(Order, Map.put(params, :line_items, priced_items), Repo)
+  @spec create(map) :: {:ok, Order.t()} | {:error, Ecto.Changeset.t()}
+  def create(params) do
+    QH.create(Order, update_in(params, [:line_items], &update_line_item_costs/1), Repo)
   end
 
   @doc """
@@ -54,7 +48,7 @@ defmodule Snitch.Data.Model.Order do
 
   ```
   order # this is the order you wish to update, and `:line_items` are preloaded
-  line_items = Enum.reduce(order.line_items, [], fn x, acc -> 
+  line_items = Enum.reduce(order.line_items, [], fn x, acc ->
     [%{id: x.id} | acc]
   end)
   params = %{} # All changes except line-items
@@ -112,12 +106,17 @@ defmodule Snitch.Data.Model.Order do
   """
   @spec update(map, Order.t()) :: {:ok, Order.t()} | {:error, Ecto.Changeset.t()}
   def update(params, order \\ nil) do
-    priced_items =
-      params
-      |> Map.get(:line_items, [])
-      |> update_line_item_costs()
+    QH.update(Order, update_in(params, [:line_items], &update_line_item_costs/1), order, Repo)
+  end
 
-    QH.update(Order, Map.put(params, :line_items, priced_items), order, Repo)
+  @doc """
+  Updates the order with supplied `params`. Does not update line_items.
+  """
+  @spec partial_update(map, Order.t()) :: {:ok, Order.t()} | {:error, Ecto.Changeset.t()}
+  def partial_update(params, order \\ nil) do
+    order
+    |> Order.partial_update_changeset(params)
+    |> Repo.update()
   end
 
   @spec delete(non_neg_integer | Order.t()) ::
@@ -134,12 +133,10 @@ defmodule Snitch.Data.Model.Order do
   @spec get_all() :: [Order.t()]
   def get_all, do: Repo.all(Order)
 
-  # Compute price totals only if line_items are going to be changed
+  # Compute price totals only if line_items are provided
+  defp update_line_item_costs([]), do: []
+
   defp update_line_item_costs(line_items) when is_list(line_items) do
-    if Enum.empty?(line_items) do
-      line_items
-    else
-      LineItemModel.update_price_and_totals(line_items)
-    end
+    LineItemModel.update_price_and_totals(line_items)
   end
 end

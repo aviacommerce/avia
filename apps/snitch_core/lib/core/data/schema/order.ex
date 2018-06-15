@@ -6,7 +6,6 @@ defmodule Snitch.Data.Schema.Order do
   use Snitch.Data.Schema
 
   alias Ecto.Nanoid
-  alias Snitch.Data.Model.LineItem, as: LineItemModel
   alias Snitch.Data.Schema.{LineItem, OrderAddress, User}
 
   @type t :: %__MODULE__{}
@@ -15,7 +14,6 @@ defmodule Snitch.Data.Schema.Order do
     field(:number, Nanoid, autogenerate: true)
     field(:state, :string, default: "cart")
     field(:special_instructions, :string)
-    field(:confirmed?, :boolean, default: false)
 
     # various prices and totals
     field(:total, Money.Ecto.Composite.Type)
@@ -34,15 +32,17 @@ defmodule Snitch.Data.Schema.Order do
   end
 
   @required_fields ~w(state user_id)a
-  @create_fields @required_fields
+  @money_fields ~w(item_total promo_total adjustment_total total)a
 
-  @update_fields [:state]
+  @create_fields @required_fields ++ @money_fields
+  @update_fields ~w(state special_instructions)a ++ @money_fields
+  @partial_update_fields @update_fields
 
   @doc """
   Returns a Order changeset with totals for a "new" order.
 
-  A list of `LineItem` params are expected under the `:line_items` key, and each
-  of those must include price fields, use
+  A list of `LineItem` params can be provided under the `:line_items` key, and
+  each of those must include price fields, use
   `Snitch.Data.Model.LineItem.update_price_and_totals/1` if needed.
   > Note that `variant_id`s must be unique in each line item.
   """
@@ -53,9 +53,9 @@ defmodule Snitch.Data.Schema.Order do
     |> validate_required(@required_fields)
     |> unique_constraint(:number)
     |> foreign_key_constraint(:user_id)
-    |> cast_assoc(:line_items, with: &LineItem.create_changeset/2, required: true)
+    |> cast_assoc(:line_items)
     |> ensure_unique_line_items()
-    |> compute_totals()
+    |> common_changeset()
   end
 
   @doc """
@@ -68,41 +68,38 @@ defmodule Snitch.Data.Schema.Order do
   def update_changeset(%__MODULE__{} = order, params) do
     order
     |> cast(params, @update_fields)
-    |> cast_assoc(:line_items, with: &LineItem.create_changeset/2)
+    |> cast_assoc(:line_items)
     |> ensure_unique_line_items()
-    |> compute_totals()
+    |> common_changeset()
   end
 
+  @doc """
+  Returns a Order changeset that does not update line items.
+
+  Use this function to update an order's fields (as opposed to associations like
+  `:line_items`).
+  """
   @spec partial_update_changeset(t, map) :: Ecto.Changeset.t()
   def partial_update_changeset(%__MODULE__{} = order, params) do
     order
-    |> cast(params, [:state])
+    |> cast(params, @partial_update_fields)
     |> cast_embed(:billing_address)
     |> cast_embed(:shipping_address)
+    |> common_changeset()
   end
 
-  @spec compute_totals(Ecto.Changeset.t()) :: Ecto.Changeset.t()
-  defp compute_totals(%Ecto.Changeset{valid?: true} = order_changeset) do
-    item_total =
-      order_changeset
-      |> get_field(:line_items)
-      |> LineItemModel.compute_total()
-
-    total = Enum.reduce([item_total], &Money.add!/2)
-
-    # TODO: This is only till we have adjustment and promo calculators ready.
+  @spec common_changeset(Ecto.Changeset.t()) :: Ecto.Changeset.t()
+  defp common_changeset(order_changeset) do
     order_changeset
-    |> put_change(:item_total, item_total)
-    |> put_change(:total, total)
-    |> put_change(:adjustment_total, Money.new(0, :USD))
-    |> put_change(:promo_total, Money.new(0, :USD))
+    |> validate_amount(:item_total)
+    |> validate_amount(:promo_total)
+    |> validate_amount(:adjustment_total)
+    |> validate_amount(:total)
   end
-
-  defp compute_totals(order_changeset), do: order_changeset
 
   @spec ensure_unique_line_items(Ecto.Changeset.t()) :: Ecto.Changeset.t()
   defp ensure_unique_line_items(%Ecto.Changeset{valid?: true} = order_changeset) do
-    line_item_changesets = get_field(order_changeset, :line_items)
+    line_item_changesets = get_field(order_changeset, :line_items, [])
 
     items_are_unique? =
       Enum.reduce_while(line_item_changesets, MapSet.new(), fn item, map_set ->
@@ -118,7 +115,7 @@ defmodule Snitch.Data.Schema.Order do
     if items_are_unique? do
       order_changeset
     else
-      add_error(order_changeset, :duplicate_variants, "line_items must have unique variant_ids")
+      add_error(order_changeset, :line_items, "line_items must have unique variant_ids")
     end
   end
 
