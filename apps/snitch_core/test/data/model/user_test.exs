@@ -2,16 +2,20 @@ defmodule Snitch.Data.Model.UserTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
+  import Snitch.Factory
   alias Snitch.Data.Model.User
   alias Snitch.Data.Schema.User, as: UserSchema
 
   setup do
+    role = insert(:role)
+
     valid_attrs = %{
       first_name: "John",
       last_name: "Doe",
       email: "john@domain.com",
       password: "password123",
-      password_confirmation: "password123"
+      password_confirmation: "password123",
+      role_id: role.id
     }
 
     [valid_attrs: valid_attrs]

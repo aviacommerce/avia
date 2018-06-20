@@ -1,0 +1,6 @@
+<%= form_for @changeset, @action, [as: :role], fn f -> %>
+  <%= input f, :name %>
+  <%= input f, :description %>
+  <%= submit "Submit", class: "btn btn-primary submit-btn" %>
+  <%= link("Cancel", to: role_path(@conn, :index), class: "btn btn-primary") %>
+<% end %>

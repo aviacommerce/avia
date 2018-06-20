@@ -1,7 +1,9 @@
 <main role="main" class="row my-3">
-  <div class="col-2">
-    <%= render "sidebar.html" %>
-  </div>
+  <%= if Guardian.Plug.authenticated?(@conn) do %>
+    <div class="col-2">
+      <%= render "sidebar.html" %>
+    </div>
+  <% end %>
   <div class="col">
     <%= render @view_module, @view_template, assigns %>
   </div>
