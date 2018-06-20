@@ -6,4 +6,4 @@
     <hr/>
     <%= render "_form.html", changeset: @changeset,
                              action: stock_location_path(@conn, :update, @stock_location) %>
-</div> 
+</div>

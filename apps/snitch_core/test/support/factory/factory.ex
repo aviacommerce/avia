@@ -15,7 +15,8 @@ defmodule Snitch.Factory do
     TaxCategory,
     TaxRate,
     User,
-    Variant
+    Variant,
+    Role
   }
 
   alias Snitch.Repo
@@ -29,7 +30,8 @@ defmodule Snitch.Factory do
       first_name: sequence(:first_name, &"Tony-#{&1}"),
       last_name: sequence(:last_name, &"Stark-#{&1}"),
       email: sequence(:email, &"ceo-#{&1}@stark.com"),
-      password_hash: "NOTASECRET"
+      password_hash: "NOTASECRET",
+      role: build(:role)
     }
   end
 
@@ -132,6 +134,13 @@ defmodule Snitch.Factory do
       value: 0.5,
       included_in_price: false,
       calculator: Snitch.Domain.Calculator.Default
+    }
+  end
+
+  def role_factory do
+    %Role{
+      name: "admin",
+      description: "can manage all"
     }
   end
 
