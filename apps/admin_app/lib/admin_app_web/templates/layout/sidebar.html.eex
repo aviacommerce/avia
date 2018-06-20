@@ -12,6 +12,7 @@
           </ul>
         </li>
         <li><a class="nav-link" href="#">Reports</a></li>
+        <li><a class="nav-link" href="/users"</a>Users</li>
         <li>
           <a class="nav-link" href="#" data-toggle="collapse" data-target="#drilldown-1">
             Configurations
@@ -20,6 +21,7 @@
             <li><a class="nav-link" href="#">Stock Items</a></li>
             <li><a class="nav-link" href="/stock_locations">Stock Locations</a></li>
             <li><a class="nav-link" href="#">Stock Movements</a></li>
+            <li> <a class="nav-link" href="/roles"> Roles</a> </li>
           </ul>
           </div>
         </li>

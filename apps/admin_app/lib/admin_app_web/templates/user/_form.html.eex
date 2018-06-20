@@ -1,0 +1,11 @@
+<%= form_for @changeset, @action, [as: :user],
+fn f -> %>
+  <%= input f, :first_name %>
+  <%= input f, :last_name %>
+  <%= input f, :email %>
+  <%= input f, :password %>
+  <%= input f, :password_confirmation %>
+  <%= select_input f, :role_id, formatted_list(:role) %>
+  <%= submit "Submit", class: "btn btn-primary submit-btn" %>
+  <%= link("Cancel", to: user_path(@conn, :index), class: "btn btn-primary") %>
+<% end %>

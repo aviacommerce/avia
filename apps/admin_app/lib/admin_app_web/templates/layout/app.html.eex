@@ -12,9 +12,9 @@
   </head>
 
   <body>
-    <%= render "header.html" %>
+    <%= render "header.html", conn: @conn%>
     <%= render "flash.html", conn: @conn%>
-    <%= render "main.html", assigns %>
+    <%= render "main.html", assigns%>
     <%=# render "footer.html" %>
       <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
       <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
