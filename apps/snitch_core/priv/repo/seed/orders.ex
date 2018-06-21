@@ -20,8 +20,8 @@ defmodule Snitch.Seed.Orders do
   @order %{
     number: nil,
     state: nil,
-    billing_address_id: nil,
-    shipping_address_id: nil,
+    billing_address: nil,
+    shipping_address: nil,
     user_id: nil,
     adjustment_total: Money.new(0, :USD),
     promo_total: Money.new(0, :USD),
@@ -38,13 +38,13 @@ defmodule Snitch.Seed.Orders do
 
     digest = %{
       cart: [user_id: user.id],
-      address: [user_id: user.id, address_id: address.id],
-      payment: [user_id: user.id, address_id: address.id],
-      processing: [user_id: user.id, address_id: address.id],
-      shipping: [user_id: user.id, address_id: address.id],
-      shipped: [user_id: user.id, address_id: address.id],
-      cancelled: [user_id: user.id, address_id: address.id],
-      completed: [user_id: user.id, address_id: address.id]
+      address: [user_id: user.id, address: address],
+      payment: [user_id: user.id, address: address],
+      processing: [user_id: user.id, address: address],
+      shipping: [user_id: user.id, address: address],
+      shipped: [user_id: user.id, address: address],
+      cancelled: [user_id: user.id, address: address],
+      completed: [user_id: user.id, address: address]
     }
 
     make_orders(digest, variants)
@@ -101,8 +101,8 @@ defmodule Snitch.Seed.Orders do
         | number: number,
           state: "#{state}",
           user_id: opts[:user_id],
-          billing_address_id: opts[:address_id],
-          shipping_address_id: opts[:address_id],
+          billing_address: opts[:address],
+          shipping_address: opts[:address],
           item_total: item_total,
           total: item_total
       }

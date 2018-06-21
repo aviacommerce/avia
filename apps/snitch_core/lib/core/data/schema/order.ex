@@ -38,9 +38,8 @@ defmodule Snitch.Data.Schema.Order do
   end
 
   @required_fields ~w(state user_id)a
-  @optional_fields ~w(billing_address_id shipping_address_id)a
   @create_fields @required_fields
-  @update_fields [:state | @optional_fields]
+  @update_fields [:state]
 
   @doc """
   Returns a Order changeset with totals for a "new" order.
@@ -72,7 +71,8 @@ defmodule Snitch.Data.Schema.Order do
   def update_changeset(%__MODULE__{} = order, params) do
     order
     |> cast(params, @update_fields)
-    |> IO.inspect(label: "after casting addres params")
+    |> cast_embed(:billing_address)
+    |> cast_embed(:shipping_address)
     |> cast_assoc(:line_items, with: &LineItem.create_changeset/2)
     |> ensure_unique_line_items()
     |> compute_totals()
@@ -83,8 +83,8 @@ defmodule Snitch.Data.Schema.Order do
   def partial_update_changeset(%__MODULE__{} = order, params) do
     order
     |> cast(params, @partial_update_fields)
-    |> cast_assoc(:billing_address)
-    |> cast_assoc(:shipping_address)
+    |> cast_embed(:billing_address)
+    |> cast_embed(:shipping_address)
   end
 
   @spec compute_totals(Ecto.Changeset.t()) :: Ecto.Changeset.t()

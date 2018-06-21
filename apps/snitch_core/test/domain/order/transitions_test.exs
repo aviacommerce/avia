@@ -59,12 +59,13 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     end
 
     test "with an order that has no addresses", %{patna: patna, order: order} do
-      assert is_nil(order.billing_address_id) and is_nil(order.shipping_address_id)
+      assert is_nil(order.billing_address) and is_nil(order.shipping_address)
 
       result =
         order
         |> Context.new(state: %{billing_address: patna, shipping_address: patna})
         |> Transitions.associate_address()
+        |> IO.inspect(label: "associating address")
 
       assert result.valid?
     end
@@ -72,7 +73,6 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     test "with an order that already has addresses", %{patna: patna, order: order} do
       order =
         order
-        |> Repo.preload([:shipping_address, :billing_address])
         |> Order.partial_update_changeset(%{billing_address: patna, shipping_address: patna})
         |> Repo.update!()
 
