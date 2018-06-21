@@ -30,8 +30,8 @@ defmodule Snitch.Data.Schema.Order do
 
     # associations
     belongs_to(:user, User)
-    belongs_to(:billing_address, Address, on_replace: :update)
-    belongs_to(:shipping_address, Address, on_replace: :update)
+    embeds_one(:billing_address, Address, on_replace: :update)
+    embeds_one(:shipping_address, Address, on_replace: :update)
     has_many(:line_items, LineItem, on_delete: :delete_all, on_replace: :delete)
 
     timestamps()
@@ -72,6 +72,7 @@ defmodule Snitch.Data.Schema.Order do
   def update_changeset(%__MODULE__{} = order, params) do
     order
     |> cast(params, @update_fields)
+    |> IO.inspect(label: "after casting addres params")
     |> cast_assoc(:line_items, with: &LineItem.create_changeset/2)
     |> ensure_unique_line_items()
     |> compute_totals()

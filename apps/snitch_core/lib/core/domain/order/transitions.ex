@@ -38,7 +38,6 @@ defmodule Snitch.Domain.Order.Transitions do
         } = context
       ) do
     order
-    |> Repo.preload([:billing_address, :shipping_address])
     |> Order.partial_update_changeset(%{billing_address: billing, shipping_address: shipping})
     |> Repo.update()
     |> case do
