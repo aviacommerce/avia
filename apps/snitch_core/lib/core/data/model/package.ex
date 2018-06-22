@@ -16,13 +16,9 @@ defmodule Snitch.Data.Model.Package do
   ## See also
   `Ecto.Changeset.cast_assoc/3`
   """
-  @spec create(map, [map] | nil) :: {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
+  @spec create(map) :: {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
   def create(params) do
     QH.create(Package, params, Repo)
-  end
-
-  def create(params, items) do
-    QH.create(Package, Map.put(params, :items, items), Repo)
   end
 
   @doc """

@@ -42,7 +42,9 @@ defmodule Snitch.Domain.ShipmentEngine do
   [ac3]: https://en.wikipedia.org/wiki/AC-3_algorithm
   """
   @spec run(list, Order.t()) :: list
-  def run(packages, %Order{} = order) do
+  def run([], _), do: []
+
+  def run(packages, %Order{} = order) when is_list(packages) do
     packages_with_id = append_keys(packages)
     edges = create_csp(packages_with_id)
 
@@ -113,7 +115,6 @@ defmodule Snitch.Domain.ShipmentEngine do
 
   defp create_csp(packages) do
     packages
-    |> append_keys()
     |> create_edges()
     |> find_unique_edges()
   end

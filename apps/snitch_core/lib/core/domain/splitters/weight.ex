@@ -5,6 +5,8 @@ defmodule Snitch.Domain.Splitters.Weight do
   # TODO https://www.pivotaltracker.com/story/show/157818616
   @bin_threshold Decimal.new(150)
 
+  def split([]), do: []
+
   def split(packages) do
     packages
     |> Enum.map(&sort_items_by_weight/1)

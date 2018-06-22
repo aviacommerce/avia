@@ -7,6 +7,19 @@ defmodule Snitch.Data.Schema.OrderTest do
   alias Snitch.Data.Model.LineItem
   alias Snitch.Data.Schema.Order
 
+  @address_params %{
+    first_name: "Tony",
+    last_name: "Stark",
+    address_line_1: "10-8-80 Malibu Point",
+    zip_code: "90265",
+    city: "Malibu",
+    phone: "1234567890",
+    state: nil,
+    state_id: nil,
+    country: nil,
+    country_id: nil
+  }
+
   setup :variants
   setup :user_with_address
   setup :some_line_items
@@ -97,6 +110,45 @@ defmodule Snitch.Data.Schema.OrderTest do
       assert validity
       assert {:ok, _} = Repo.update(new_order)
       assert changes == %{}
+    end
+  end
+
+  describe "partial_update_changeset" do
+    setup %{user: u} do
+      [persisted: insert(:order, user: u, shipping_address: nil, billing_address: nil)]
+    end
+
+    test "fails with bad address params", %{persisted: persisted, address: address} do
+      address_params = %{
+        @address_params
+        | country_id: address.country.id,
+          state_id: -1
+      }
+
+      params = %{
+        shipping_address: address_params
+      }
+
+      cs = Order.partial_update_changeset(persisted, params)
+      refute cs.valid?
+      assert %{shipping_address: %{state_id: ["does not exist"]}} = errors_on(cs)
+    end
+
+    test "with valid address params", %{persisted: persisted, address: address} do
+      address_params = %{
+        @address_params
+        | country_id: address.country.id,
+          state_id: address.state.id
+      }
+
+      params = %{
+        shipping_address: address_params,
+        billing_address: address_params
+      }
+
+      cs = Order.partial_update_changeset(persisted, params)
+      assert cs.valid?
+      assert {:ok, _} = Repo.update(cs)
     end
   end
 

@@ -137,6 +137,35 @@ defmodule Snitch.Domain.Shipment do
     end)
   end
 
+  def to_package(package, order) do
+    shipping_methods =
+      package.shipping_methods
+      |> Stream.zip(package.shipping_costs)
+      |> Enum.map(fn {method, cost} ->
+        Map.put(method, :cost, cost)
+      end)
+
+    items =
+      Enum.map(package.items, fn %{line_item: li, variant: v} = item ->
+        item
+        |> Map.put(:number, Integer.to_string(System.unique_integer()))
+        |> Map.put(:line_item_id, li.id)
+        |> Map.put(:variant_id, v.id)
+        |> Map.put(:backordered?, item.delta > 0)
+        |> Map.put(:state, Atom.to_string(item.state))
+      end)
+
+    %{
+      number: Integer.to_string(System.unique_integer()),
+      order_id: order.id,
+      origin_id: package.origin.id,
+      shipping_category_id: package.category.id,
+      shipping_methods: shipping_methods,
+      items: items,
+      state: if(package.backorders?, do: "backordered", else: "ready")
+    }
+  end
+
   ###############################################################################
   #                             REFLECTION FUNCTIONS                            #
   ###############################################################################
