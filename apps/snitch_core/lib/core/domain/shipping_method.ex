@@ -20,6 +20,8 @@ defmodule Snitch.Domain.ShippingMethod do
   `Snitch.Domain.Zone.common/2`.
   """
   @spec for_package([Zone.t()], ShippingCategory.t()) :: [SMSchema.t()]
+  def for_package([], _), do: []
+
   def for_package(zones, %ShippingCategory{} = category)
       when is_list(zones) do
     Repo.all(ShippingMethod.for_package_query(zones, category))

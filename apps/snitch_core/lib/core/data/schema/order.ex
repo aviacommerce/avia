@@ -30,8 +30,8 @@ defmodule Snitch.Data.Schema.Order do
 
     # associations
     belongs_to(:user, User)
-    belongs_to(:billing_address, Address)
-    belongs_to(:shipping_address, Address)
+    belongs_to(:billing_address, Address, on_replace: :update)
+    belongs_to(:shipping_address, Address, on_replace: :update)
     has_many(:line_items, LineItem, on_delete: :delete_all, on_replace: :delete)
 
     timestamps()
@@ -40,7 +40,7 @@ defmodule Snitch.Data.Schema.Order do
   @required_fields ~w(state user_id)a
   @optional_fields ~w(billing_address_id shipping_address_id)a
   @create_fields @required_fields
-  @update_fields ~w(state)a ++ @optional_fields
+  @update_fields [:state | @optional_fields]
 
   @doc """
   Returns a Order changeset with totals for a "new" order.
@@ -55,7 +55,7 @@ defmodule Snitch.Data.Schema.Order do
     order
     |> cast(params, @create_fields)
     |> validate_required(@required_fields)
-    |> common_changeset()
+    |> unique_constraint(:number)
     |> foreign_key_constraint(:user_id)
     |> cast_assoc(:line_items, with: &LineItem.create_changeset/2, required: true)
     |> ensure_unique_line_items()
@@ -72,18 +72,18 @@ defmodule Snitch.Data.Schema.Order do
   def update_changeset(%__MODULE__{} = order, params) do
     order
     |> cast(params, @update_fields)
-    |> common_changeset()
     |> cast_assoc(:line_items, with: &LineItem.create_changeset/2)
     |> ensure_unique_line_items()
     |> compute_totals()
   end
 
-  @spec common_changeset(Ecto.Changeset.t()) :: Ecto.Changeset.t()
-  defp common_changeset(order_changeset) do
-    order_changeset
-    |> unique_constraint(:number)
-    |> foreign_key_constraint(:billing_address_id)
-    |> foreign_key_constraint(:shipping_address_id)
+  @partial_update_fields ~w(state)a
+  @spec partial_update_changeset(t, map) :: Ecto.Changeset.t()
+  def partial_update_changeset(%__MODULE__{} = order, params) do
+    order
+    |> cast(params, @partial_update_fields)
+    |> cast_assoc(:billing_address)
+    |> cast_assoc(:shipping_address)
   end
 
   @spec compute_totals(Ecto.Changeset.t()) :: Ecto.Changeset.t()

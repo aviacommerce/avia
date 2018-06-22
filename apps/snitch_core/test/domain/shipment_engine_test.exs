@@ -3,7 +3,9 @@ defmodule Snitch.Domain.ShipmentEngineTest do
   use Snitch.DataCase
 
   import Snitch.Factory
-  import Snitch.{OrderCase, ShipmentEngineCase}
+  import Snitch.OrderCase
+  import Snitch.ShipmentEngineCase
+
   alias Snitch.Data.Schema.Order
   alias Snitch.Domain.ShipmentEngine
 

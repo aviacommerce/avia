@@ -63,11 +63,12 @@ defmodule Snitch.Data.Schema.PackageItem do
   """
   @type t :: %__MODULE__{}
 
+  # TODO: :backordered can be made a virtual field
   schema "snitch_package_items" do
     field(:number, Nanoid, autogenerate: true)
     field(:state, :string)
-    field(:quantity, :integer)
-    field(:delta, :integer)
+    field(:quantity, :integer, default: 0)
+    field(:delta, :integer, default: 0)
     field(:backordered?, :boolean)
 
     belongs_to(:variant, Variant)
@@ -80,7 +81,7 @@ defmodule Snitch.Data.Schema.PackageItem do
   end
 
   @create_fields ~w(number state delta quantity line_item_id variant_id package_id)a
-  @required_fields ~w(number state quantity line_item_id variant_id package_id)a
+  @required_fields ~w(number state quantity line_item_id variant_id)a
   @update_fields ~w(state quantity delta)a
 
   @doc """
@@ -116,11 +117,11 @@ defmodule Snitch.Data.Schema.PackageItem do
   end
 
   defp validate_backorder_and_delta(%Ecto.Changeset{valid?: true} = changeset) do
-    case fetch_change(changeset, :delta) do
-      {:ok, delta} when delta == 0 ->
+    case fetch_field(changeset, :delta) do
+      {_, delta} when delta == 0 ->
         put_change(changeset, :backordered?, false)
 
-      {:ok, delta} when delta > 0 ->
+      {_, delta} when delta > 0 ->
         put_change(changeset, :backordered?, true)
 
       _ ->
