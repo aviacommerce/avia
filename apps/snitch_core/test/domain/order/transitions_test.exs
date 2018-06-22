@@ -65,8 +65,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
         order
         |> Context.new(state: %{billing_address: patna, shipping_address: patna})
         |> Transitions.associate_address()
-        |> IO.inspect(label: "associating address")
-
+        
       assert result.valid?
     end
 

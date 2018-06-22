@@ -32,6 +32,7 @@ defmodule Snitch.Data.Schema.Order do
     belongs_to(:user, User)
     embeds_one(:billing_address, Address, on_replace: :update)
     embeds_one(:shipping_address, Address, on_replace: :update)
+
     has_many(:line_items, LineItem, on_delete: :delete_all, on_replace: :delete)
 
     timestamps()
@@ -39,6 +40,7 @@ defmodule Snitch.Data.Schema.Order do
 
   @required_fields ~w(state user_id)a
   @create_fields @required_fields
+
   @update_fields [:state]
 
   @doc """
