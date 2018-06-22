@@ -49,7 +49,7 @@ defmodule Snitch.Core.Mixfile do
       {:ecto_identifier, "~> 0.1.0"},
 
       # state machine
-      {:beepbop, github: "oyeb/beepbop", branch: "optional-to-state"},
+      {:beepbop, github: "oyeb/beepbop", branch: "enforce-compilation-order-3"},
 
       # auth
       {:comeonin, "~> 4.1.1"},
