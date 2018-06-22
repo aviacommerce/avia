@@ -65,7 +65,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
         order
         |> Context.new(state: %{billing_address: patna, shipping_address: patna})
         |> Transitions.associate_address()
-        
+
       assert result.valid?
     end
 
@@ -89,12 +89,18 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
   describe "compute_shipments" do
     setup do
+      shipping_address =
+        :address
+        |> build()
+        |> Map.from_struct()
+        |> Map.delete(:__meta__)
+
       [
         order:
           insert(
             :order,
             user: build(:user),
-            shipping_address: build(:address)
+            shipping_address: shipping_address
           )
       ]
     end

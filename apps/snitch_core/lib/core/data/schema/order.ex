@@ -7,7 +7,7 @@ defmodule Snitch.Data.Schema.Order do
 
   alias Ecto.Nanoid
   alias Snitch.Data.Model.LineItem, as: LineItemModel
-  alias Snitch.Data.Schema.{Address, LineItem, User}
+  alias Snitch.Data.Schema.{LineItem, User, OrderAddress}
 
   @type t :: %__MODULE__{}
 
@@ -25,13 +25,13 @@ defmodule Snitch.Data.Schema.Order do
 
     # field :shipping
     # field :payment
-
+    #
     # field(:completed_at, :naive_datetime)
 
     # associations
     belongs_to(:user, User)
-    embeds_one(:billing_address, Address, on_replace: :update)
-    embeds_one(:shipping_address, Address, on_replace: :update)
+    embeds_one(:billing_address, OrderAddress, on_replace: :update)
+    embeds_one(:shipping_address, OrderAddress, on_replace: :update)
 
     has_many(:line_items, LineItem, on_delete: :delete_all, on_replace: :delete)
 
@@ -80,11 +80,10 @@ defmodule Snitch.Data.Schema.Order do
     |> compute_totals()
   end
 
-  @partial_update_fields ~w(state)a
   @spec partial_update_changeset(t, map) :: Ecto.Changeset.t()
   def partial_update_changeset(%__MODULE__{} = order, params) do
     order
-    |> cast(params, @partial_update_fields)
+    |> cast(params, [:state])
     |> cast_embed(:billing_address)
     |> cast_embed(:shipping_address)
   end
