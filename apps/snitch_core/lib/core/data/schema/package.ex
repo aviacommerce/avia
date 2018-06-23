@@ -66,9 +66,9 @@ defmodule Snitch.Data.Schema.Package do
   @update_fields ~w(state shipped_at tracking shipping_method_id)a ++
                    ~w(cost tax_total adjustment_total promo_total total)a
 
-  @create_fields ~w(number order_id origin_id shipping_category_id)a ++ @update_fields
+  @create_fields ~w(order_id origin_id shipping_category_id)a ++ @update_fields
 
-  @required_fields ~w(number state order_id origin_id shipping_category_id)a
+  @required_fields ~w(state order_id origin_id shipping_category_id)a
 
   @doc """
   Returns a `Package` changeset to create a new package.

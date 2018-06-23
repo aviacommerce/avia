@@ -148,7 +148,6 @@ defmodule Snitch.Domain.Shipment do
     items =
       Enum.map(package.items, fn %{line_item: li, variant: v} = item ->
         item
-        |> Map.put(:number, Integer.to_string(System.unique_integer()))
         |> Map.put(:line_item_id, li.id)
         |> Map.put(:variant_id, v.id)
         |> Map.put(:backordered?, item.delta > 0)
@@ -156,7 +155,6 @@ defmodule Snitch.Domain.Shipment do
       end)
 
     %{
-      number: Integer.to_string(System.unique_integer()),
       order_id: order.id,
       origin_id: package.origin.id,
       shipping_category_id: package.category.id,

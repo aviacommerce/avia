@@ -80,8 +80,8 @@ defmodule Snitch.Data.Schema.PackageItem do
     timestamps()
   end
 
-  @create_fields ~w(number state delta quantity line_item_id variant_id package_id)a
-  @required_fields ~w(number state quantity line_item_id variant_id)a
+  @create_fields ~w(state delta quantity line_item_id variant_id package_id)a
+  @required_fields ~w(state quantity line_item_id variant_id)a
   @update_fields ~w(state quantity delta)a
 
   @doc """
