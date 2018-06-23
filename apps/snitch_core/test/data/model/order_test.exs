@@ -5,6 +5,7 @@ defmodule Snitch.Data.Model.OrderTest do
   import Snitch.Factory
 
   alias Snitch.Data.Model.{LineItem, Order}
+  alias Snitch.Data.Model.Order
 
   setup :variants
   setup :user_with_address
@@ -113,7 +114,7 @@ defmodule Snitch.Data.Model.OrderTest do
     test "params only", %{order_params: order_params} do
       {:ok, order} = Order.create(order_params)
 
-      {:ok, new_order} = Order.partial_update(%{state: "foo"}, order)
+      {:ok, new_order} = Order.partial_update(order, %{state: "foo"})
       assert extract_ids(order.line_items) == extract_ids(new_order.line_items)
       assert new_order.state == "foo"
     end
