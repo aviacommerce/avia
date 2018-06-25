@@ -7,7 +7,7 @@ use Mix.Config
 # watchers to your application. For example, we use it
 # with brunch.io to recompile .js and .css sources.
 config :snitch_api, SnitchApiWeb.Endpoint,
-  http: [port: 4000],
+  http: [port: 4100],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
