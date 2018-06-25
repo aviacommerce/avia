@@ -1,4 +1,6 @@
 defmodule Snitch.Data.Schema.OrderAddress do
+  @moduledoc false
+
   use Snitch.Data.Schema
 
   alias Snitch.Data.Schema.{Country, State}
@@ -6,8 +8,6 @@ defmodule Snitch.Data.Schema.OrderAddress do
 
   @required_fields ~w(first_name last_name address_line_1 city zip_code country_id)a
   @cast_fields ~w(phone alternate_phone state_id)a ++ @required_fields
-
-  @moduledoc false
 
   embedded_schema do
     field(:first_name, :string)
