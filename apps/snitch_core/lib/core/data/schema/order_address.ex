@@ -16,6 +16,7 @@ defmodule Snitch.Data.Schema.OrderAddress do
     field(:zip_code, :string)
     field(:phone, :string)
     field(:alternate_phone, :string)
+
     field(:state_id, :integer)
     field(:country_id, :integer)
   end
@@ -25,7 +26,7 @@ defmodule Snitch.Data.Schema.OrderAddress do
     |> cast(params, @cast_fields)
     |> validate_required(@required_fields)
     |> validate_length(:address_line_1, min: 10)
-    |> assoc_country_and_state()
+    |> assoc_state_and_country()
   end
 
   defp struct_to_map(struct) do
@@ -34,7 +35,7 @@ defmodule Snitch.Data.Schema.OrderAddress do
     |> Map.delete(:__meta__)
   end
 
-  defp assoc_country_and_state(
+  defp assoc_state_and_country(
          %{
            valid?: true,
            changes: %{
@@ -49,12 +50,11 @@ defmodule Snitch.Data.Schema.OrderAddress do
 
       %Country{} = country ->
         changeset
-        |> put_change(:country, struct_to_map(country))
         |> assoc_state(country, s_id)
     end
   end
 
-  defp assoc_country_and_state(
+  defp assoc_state_and_country(
          %{
            valid?: true,
            changes: %{state_id: s_id},
@@ -70,7 +70,7 @@ defmodule Snitch.Data.Schema.OrderAddress do
     end
   end
 
-  defp assoc_country_and_state(
+  defp assoc_state_and_country(
          %{
            valid?: true,
            changes: %{country_id: c_id}
@@ -82,12 +82,11 @@ defmodule Snitch.Data.Schema.OrderAddress do
 
       %Country{} = country ->
         changeset
-        |> put_change(:country, struct_to_map(country))
         |> assoc_state(country, nil)
     end
   end
 
-  defp assoc_country_and_state(changeset), do: changeset
+  defp assoc_state_and_country(changeset), do: changeset
 
   defp assoc_state(changeset, %Country{states_required: false}, _) do
     put_change(changeset, :state_id, nil)
@@ -100,7 +99,7 @@ defmodule Snitch.Data.Schema.OrderAddress do
 
       %State{} = state ->
         if state.country_id == country.id do
-          put_change(changeset, :state, struct_to_map(state))
+          changeset
         else
           add_error(
             changeset,

@@ -2,7 +2,7 @@ defmodule Snitch.Seed.Orders do
   @moduledoc false
 
   alias Ecto.DateTime
-  alias Snitch.Data.Schema.{Address, LineItem, Order, User, Variant}
+  alias Snitch.Data.Schema.{Address, LineItem, Order, User, Variant, OrderAddress}
   alias Snitch.Repo
 
   require Logger
@@ -31,10 +31,21 @@ defmodule Snitch.Seed.Orders do
     updated_at: DateTime.utc()
   }
 
+  defp address_order_address(address) do
+    address = Map.delete(address, :id)
+    Repo.load(OrderAddress, address)
+  end
+
   defp build_orders do
     variants = Repo.all(Variant)
     [address | _] = Repo.all(Address)
     [user | _] = Repo.all(User)
+
+    address =
+      address
+      |> Map.from_struct()
+      |> Map.delete(:__meta__)
+      |> address_order_address()
 
     digest = %{
       cart: [user_id: user.id],

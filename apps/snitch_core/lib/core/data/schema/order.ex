@@ -73,8 +73,6 @@ defmodule Snitch.Data.Schema.Order do
   def update_changeset(%__MODULE__{} = order, params) do
     order
     |> cast(params, @update_fields)
-    |> cast_embed(:billing_address)
-    |> cast_embed(:shipping_address)
     |> cast_assoc(:line_items, with: &LineItem.create_changeset/2)
     |> ensure_unique_line_items()
     |> compute_totals()

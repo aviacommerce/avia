@@ -7,6 +7,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
   alias BeepBop.Context
   alias Ecto.Multi
   alias Snitch.Data.Schema.Order
+  alias Snitch.Data.Schema.OrderAddress
   alias Snitch.Domain.Order.Transitions
 
   @patna %{
@@ -100,7 +101,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
           insert(
             :order,
             user: build(:user),
-            shipping_address: shipping_address
+            shipping_address: Repo.load(OrderAddress, shipping_address)
           )
       ]
     end
