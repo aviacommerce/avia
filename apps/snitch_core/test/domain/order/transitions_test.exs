@@ -152,8 +152,9 @@ defmodule Snitch.Domain.Order.TransitionsTest do
         order
         |> Context.new(state: %{packages: []})
         |> Transitions.associate_package()
+
       order_info = Repo.get(Order, order.order_id)
-      assert order_cost == 0
+      assert order_info.cost == 0
     end
   end
 end

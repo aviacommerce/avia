@@ -61,6 +61,7 @@ defmodule Snitch.Data.Schema.Order do
     |> unique_constraint(:number)
     |> foreign_key_constraint(:user_id)
     |> cast_assoc(:line_items, with: &LineItem.create_changeset/2, required: true)
+    |> cast_assoc(:packages)
     |> ensure_unique_line_items()
     |> compute_totals()
   end
@@ -96,12 +97,14 @@ defmodule Snitch.Data.Schema.Order do
       |> get_field(:line_items)
       |> LineItemModel.compute_total()
 
-    package_total =
-      order_changeset
-      |> get_field(:packages)
-      |> PackageModel.compute_total()
+    packages_total =
+      if(order_changeset.data.id != nil) do
+        PackageModel.compute_package_total(order_changeset.data)
+      else
+        Money.new(0, :USD)
+      end
 
-    total = Enum.reduce([item_total, package_total], &Money.add!/2)
+    total = Enum.reduce([item_total, packages_total], &Money.add!/2)
 
     # TODO: This is only till we have adjustment and promo calculators ready.
     order_changeset
