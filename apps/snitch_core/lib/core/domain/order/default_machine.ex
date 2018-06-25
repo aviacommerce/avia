@@ -66,8 +66,7 @@ defmodule Snitch.Domain.Order.DefaultMachine do
     end)
 
     event(:process_packages, %{from: [:address], to: :delivery}, fn context ->
-      context
-      |> Transitions.associate_package()
+      Transitions.associate_package(context)
     end)
 
     event(:confirm, %{from: [:payment], to: :processing}, fn context ->

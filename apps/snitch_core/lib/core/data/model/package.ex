@@ -39,9 +39,7 @@ defmodule Snitch.Data.Model.Package do
   end
 
   @doc """
-
   Calculate the cost of packages for an order
-
   """
 
   @spec compute_package_total(Order.t()) :: Money.t()
@@ -59,9 +57,7 @@ defmodule Snitch.Data.Model.Package do
   end
 
   @doc """
-
   Query of packages related to order
-
   """
 
   # @spec get_packages(Order.t()) ::

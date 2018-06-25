@@ -139,7 +139,6 @@ defmodule Snitch.Domain.Order.Transitions do
   end
 
   @doc """
-
   Persists shipping_method_id to packages
 
   Calculate pacakge total cost Sum(shipping_cost, adjustment_total,promo_total, shipping_cost)
