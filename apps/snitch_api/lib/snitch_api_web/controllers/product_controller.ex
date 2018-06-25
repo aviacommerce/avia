@@ -1,5 +1,5 @@
-defmodule ApiWeb.ProductController do
-  use ApiWeb, :controller
+defmodule SnitchApiWeb.ProductController do
+  use SnitchApiWeb, :controller
 
   alias Snitch.Data.Schema.Product
   alias Snitch.Repo
