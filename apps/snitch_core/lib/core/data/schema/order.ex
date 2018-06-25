@@ -23,7 +23,6 @@ defmodule Snitch.Data.Schema.Order do
     field(:item_total, Money.Ecto.Composite.Type)
     field(:adjustment_total, Money.Ecto.Composite.Type)
     field(:promo_total, Money.Ecto.Composite.Type)
-    field(:order_total, Money.Ecto.Composite.Type)
 
     # field :shipping
     # field :payment

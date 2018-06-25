@@ -5,8 +5,8 @@ defmodule Snitch.Data.Model.Package do
 
   use Snitch.Data.Model
   alias Snitch.Data.Schema.Package
-  alias Snitch.Tools.Money
-
+  alias Snitch.Tools.Money, as: MoneyTools
+  
   @doc """
   Creates a package with supplied `params` and package `items`.
 
@@ -48,7 +48,7 @@ defmodule Snitch.Data.Model.Package do
   def compute_package_total(order) do
     case get_packages(order) do
       [] ->
-        Money.zero!()
+        MoneyTools.zero!()
 
       packages ->
         packages

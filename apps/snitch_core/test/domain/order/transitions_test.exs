@@ -8,7 +8,8 @@ defmodule Snitch.Domain.Order.TransitionsTest do
   alias Ecto.Multi
   alias Snitch.Data.Schema.Order
   alias Snitch.Domain.Order.Transitions
-
+  alias Snitch.Data.Model.Order, as: OrderModel
+  
   @patna %{
     first_name: "someone",
     last_name: "enoemos",
@@ -153,8 +154,8 @@ defmodule Snitch.Domain.Order.TransitionsTest do
         |> Context.new(state: %{packages: []})
         |> Transitions.associate_package()
 
-      order_info = Repo.get(Order, order.order_id)
-      assert order_info.cost == 0
+      order_info = OrderModel.get(order.id)
+      assert order_info.total = 0 
     end
   end
 end
