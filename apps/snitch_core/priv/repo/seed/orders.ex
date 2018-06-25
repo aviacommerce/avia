@@ -2,7 +2,7 @@ defmodule Snitch.Seed.Orders do
   @moduledoc false
 
   alias Ecto.DateTime
-  alias Snitch.Data.Schema.{Address, LineItem, Order, User, Variant, OrderAddress}
+  alias Snitch.Data.Schema.{Address, LineItem, Order, OrderAddress, User, Variant}
   alias Snitch.Repo
 
   require Logger

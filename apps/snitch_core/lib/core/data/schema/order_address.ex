@@ -7,6 +7,8 @@ defmodule Snitch.Data.Schema.OrderAddress do
   @required_fields ~w(first_name last_name address_line_1 city zip_code country_id)a
   @cast_fields ~w(phone alternate_phone state_id)a ++ @required_fields
 
+  @moduledoc false
+
   embedded_schema do
     field(:first_name, :string)
     field(:last_name, :string)
@@ -49,8 +51,7 @@ defmodule Snitch.Data.Schema.OrderAddress do
         add_error(changeset, :country_id, "does not exist", country_id: c_id)
 
       %Country{} = country ->
-        changeset
-        |> assoc_state(country, s_id)
+        assoc_state(changeset, country, s_id)
     end
   end
 
@@ -81,8 +82,7 @@ defmodule Snitch.Data.Schema.OrderAddress do
         add_error(changeset, :country_id, "does not exist", country_id: c_id)
 
       %Country{} = country ->
-        changeset
-        |> assoc_state(country, nil)
+        assoc_state(changeset, country, nil)
     end
   end
 
