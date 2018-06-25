@@ -39,7 +39,7 @@ defmodule Snitch.Data.Model.Package do
   end
 
   @spec compute_total([Package.t()]) :: Money.t()
-  def compute_total([]), do: MoneyTools.zero()
+  def compute_total([]), do: MoneyTools.zero!()
 
   def compute_total(packages) when is_list(packages) do
     packages
