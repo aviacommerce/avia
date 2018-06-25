@@ -8,6 +8,7 @@
   <a href="https://codecov.io/gh/aviabird/snitch">
     <img src="https://codecov.io/gh/aviabird/snitch/branch/develop/graph/badge.svg" alt="codecov" title="coverage-status"/>
   </a>
+<a href="https://app.fossa.io/projects/git%2Bgithub.com%2Faviabird%2Fsnitch?ref=badge_shield" alt="FOSSA Status"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Faviabird%2Fsnitch.svg?type=shield"/></a>
   <a href="http://inch-ci.org/github/aviabird/snitch">
     <img src="http://inch-ci.org/github/aviabird/snitch.svg" alt="inch-ci" title="doc-status"/>
   </a>
@@ -54,3 +55,7 @@ on our [pivotal project][pivotal]!
 ----
 
 [Logo attribution](http://getdrawings.com/golden-snitch-drawing)
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Faviabird%2Fsnitch.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Faviabird%2Fsnitch?ref=badge_large)
