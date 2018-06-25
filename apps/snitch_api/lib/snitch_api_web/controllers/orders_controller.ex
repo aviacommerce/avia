@@ -5,7 +5,8 @@ defmodule SnitchApiWeb.OrdersController do
   alias Snitch.Repo
 
   def index(conn, params) do
-    orders = OrderModel.get_all()
+    orders =
+      OrderModel.get_all()
       |> Repo.preload(:line_items)
 
     render(
