@@ -99,7 +99,6 @@ defmodule Snitch.Data.Schema.Order do
     package_total =
       order_changeset
       |> get_field(:packages)
-      |> IO.inspect
       |> PackageModel.compute_total()
 
     total = Enum.reduce([item_total, package_total], &Money.add!/2)
