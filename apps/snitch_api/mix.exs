@@ -43,7 +43,8 @@ defmodule SnitchApi.Mixfile do
       {:snitch_core, "~> 0.0.1", in_umbrella: true},
       {:plug, "~> 1.0"},
       {:corsica, "~> 1.0"},
-      {:uuid, "~> 1.1"}
+      {:uuid, "~> 1.1"},
+      {:ja_serializer, "~> 0.13.0"}
     ]
   end
 end

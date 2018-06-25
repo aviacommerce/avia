@@ -2,12 +2,13 @@ defmodule SnitchApiWeb.Router do
   use SnitchApiWeb, :router
 
   pipeline :api do
-    plug(:accepts, ["json"])
+    plug :accepts, ["json-api", "json"]
+    plug JaSerializer.Deserializer
   end
 
   scope "/api/v1", SnitchApiWeb do
     pipe_through(:api)
 
-    resources("/products", ProductController, only: [:index, :show])
+    resources("/orders", OrdersController, only: [:index])
   end
 end

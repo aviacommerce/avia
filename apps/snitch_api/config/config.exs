@@ -22,6 +22,20 @@ config :snitch_core,
     currency: :USD
   ]
 
+
+# Configures JSON API encoding
+config :phoenix, :format_encoders,
+  "json-api": Poison
+
+# Configures JSON API mime type
+config :mime, :types, %{
+  "application/vnd.api+json" => ["json-api"]
+}
+
+# Configures Key Format
+config :ja_serializer,
+  key_format: {:custom, CheetahApi.StringFormatter, :camelize}
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
