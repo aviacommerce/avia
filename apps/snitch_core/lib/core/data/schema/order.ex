@@ -7,7 +7,8 @@ defmodule Snitch.Data.Schema.Order do
 
   alias Ecto.Nanoid
   alias Snitch.Data.Model.LineItem, as: LineItemModel
-  alias Snitch.Data.Schema.{Address, LineItem, User}
+  alias Snitch.Data.Model.Package, as: PackageModel
+  alias Snitch.Data.Schema.{Address, LineItem, User, Package}
 
   @type t :: %__MODULE__{}
 
@@ -22,6 +23,7 @@ defmodule Snitch.Data.Schema.Order do
     field(:item_total, Money.Ecto.Composite.Type)
     field(:adjustment_total, Money.Ecto.Composite.Type)
     field(:promo_total, Money.Ecto.Composite.Type)
+    field(:order_total, Money.Ecto.Composite.Type)
 
     # field :shipping
     # field :payment
@@ -32,6 +34,7 @@ defmodule Snitch.Data.Schema.Order do
     belongs_to(:user, User)
     belongs_to(:billing_address, Address, on_replace: :update)
     belongs_to(:shipping_address, Address, on_replace: :update)
+    has_many(:packages, Package)
     has_many(:line_items, LineItem, on_delete: :delete_all, on_replace: :delete)
 
     timestamps()
@@ -93,7 +96,13 @@ defmodule Snitch.Data.Schema.Order do
       |> get_field(:line_items)
       |> LineItemModel.compute_total()
 
-    total = Enum.reduce([item_total], &Money.add!/2)
+    package_total =
+      order_changeset
+      |> get_field(:packages)
+      |> IO.inspect
+      |> PackageModel.compute_total()
+
+    total = Enum.reduce([item_total, package_total], &Money.add!/2)
 
     # TODO: This is only till we have adjustment and promo calculators ready.
     order_changeset

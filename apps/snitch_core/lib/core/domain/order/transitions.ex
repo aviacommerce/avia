@@ -124,4 +124,39 @@ defmodule Snitch.Domain.Order.Transitions do
   end
 
   def persist_shipment(%Context{valid?: false} = context), do: context
+
+  defp extract_shipping_method_cost(shipping_method_id) do
+    shipping_method = Repo.get(ShippingMethod, shipping_method_id)
+    shipping_method.cost
+  end
+
+  defp calculate_package_total(
+         %{tax_total: tax_total, adjustment_total: adjustment_total, promo_total: promo_total},
+         shipping_cost
+       ) do
+    Enum.reduce([tax_total, adjustment_total, promo_total, shipping_cost], &Money.add!/2)
+  end
+
+  @doc """
+
+  Persists shipping_method_id to packages
+
+  Calculate pacakge total cost Sum(shipping_cost, adjustment_total,promo_total, shipping_cost)
+
+  Update package cost total in DB
+  """
+
+  @spec associate_package(Context.t()) :: Context.t()
+  def associate_package(%Context{valid?: true, struct: %Order{} = order} = context) do
+    %{state: %{packages: packages}} = context
+
+    Enum.map(packages, fn package ->
+      shipping_cost = extract_shipping_method_cost(package.shipping_method_id)
+      package_total = calculate_package_total(package, shipping_cost)
+
+      Package.update(package, %{cost: shipping_cost, total: package_total})
+
+      struct(context)
+    end)
+  end
 end

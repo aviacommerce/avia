@@ -141,4 +141,19 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       assert {:ok, %{packages: []}} = Repo.transaction(result.multi)
     end
   end
+
+  describe "associate_package" do
+    setup do
+      [order: insert(:order, user: build(:user))]
+    end
+
+    test "when packages are empty", %{order: order} do
+      result =
+        order
+        |> Context.new(state: %{packages: []})
+        |> Transitions.associate_package()
+      order_info = Repo.get(Order, order.order_id)
+      assert order_cost == 0
+    end
+  end
 end
