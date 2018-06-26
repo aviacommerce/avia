@@ -133,12 +133,11 @@ defmodule Snitch.Domain.Order.Transitions do
   end
 
   def process_package(package) do
-    sm =
+    shipping_method =
       Enum.find(package.shipping_methods, fn %{id: id} ->
         id == package.shipping_method_id
       end)
-
-    shipping_cost = sm.cost
+    shipping_cost = shipping_method.cost
 
     package_total =
       Enum.reduce(
@@ -146,7 +145,7 @@ defmodule Snitch.Domain.Order.Transitions do
         &Money.add!/2
       )
 
-    Package.update(package, %{cost: shipping_cost, total: package_total})
+    Package.update(package, %{cost: shipping_cost, total: package_total, shipping_method_id: shipping_method.id})
   end
 
   @doc """
