@@ -1,105 +1,117 @@
 defmodule Snitch.Tools.Helper.Zone do
   @moduledoc """
-  Helper functions to bulk insert/update country/state zone's members.
+  Test helpers to insert zones and zone members.
   """
 
-  alias Ecto.Multi
-  alias Snitch.Data.Model.{CountryZone, StateZone}
-  alias Snitch.Data.Schema.Zone
+  alias Ecto.DateTime
+  alias Snitch.Data.Schema.{Country, CountryZoneMember, State, StateZoneMember, Zone}
   alias Snitch.Repo
 
-  defmacro __using__(_) do
-    quote do
-      model_name =
-        __MODULE__
-        |> Module.split()
-        |> List.last()
+  @zone %{
+    name: nil,
+    description: nil,
+    zone_type: nil,
+    inserted_at: DateTime.utc(),
+    updated_at: DateTime.utc()
+  }
 
-      @doc """
-      Updates `zone.members` with the list of
-      `Snitch.Data.Schema.#{model_name}Member.t` structs that make up this zone.
-      """
-      @spec fetch_members(Zone.t()) :: Zone.t()
-      def fetch_members(%Zone{} = zone) do
-        struct(zone, members: members(zone))
-      end
-    end
+  @state %{
+    name: nil,
+    code: nil,
+    country_id: nil,
+    inserted_at: DateTime.utc(),
+    updated_at: DateTime.utc()
+  }
+
+  @country %{
+    iso_name: nil,
+    iso: nil,
+    iso3: nil,
+    name: nil,
+    numcode: nil,
+    inserted_at: DateTime.utc(),
+    updated_at: DateTime.utc()
+  }
+
+  @state_zone_member %{
+    state_id: nil,
+    zone_id: nil,
+    inserted_at: DateTime.utc(),
+    updated_at: DateTime.utc()
+  }
+
+  @country_zone_member %{
+    country_id: nil,
+    zone_id: nil,
+    inserted_at: DateTime.utc(),
+    updated_at: DateTime.utc()
+  }
+
+  def countries_with_manifest(manifest) do
+    cs =
+      Enum.map(manifest, fn iso ->
+        %{@country | iso: iso, iso3: iso <> "_", name: iso, numcode: iso}
+      end)
+
+    {_, countries} = Repo.insert_all(Country, cs, on_conflict: :nothing, returning: true)
+    countries
+  end
+
+  def states_with_manifest(manifest) do
+    ss =
+      Enum.map(manifest, fn {name, code, country} ->
+        %{@state | country_id: country.id, name: name, code: code}
+      end)
+
+    {_, states} = Repo.insert_all(State, ss, on_conflict: :nothing, returning: true)
+    states
+  end
+
+  def zone_members(manifest) do
+    zm =
+      manifest
+      |> Enum.map(fn
+        {%{zone_type: "S"} = zone, states} ->
+          Enum.map(states, fn state ->
+            %{@state_zone_member | zone_id: zone.id, state_id: state.id}
+          end)
+
+        {%{zone_type: "C"} = zone, countries} ->
+          Enum.map(countries, fn country ->
+            %{@country_zone_member | zone_id: zone.id, country_id: country.id}
+          end)
+      end)
+      |> List.flatten()
+
+    szm = Enum.filter(zm, fn member -> Map.has_key?(member, :state_id) end)
+    czm = Enum.filter(zm, fn member -> Map.has_key?(member, :country_id) end)
+
+    {_, state_members} =
+      Repo.insert_all(StateZoneMember, szm, on_conflict: :nothing, returning: true)
+
+    {_, country_members} =
+      Repo.insert_all(CountryZoneMember, czm, on_conflict: :nothing, returning: true)
+
+    {state_members, country_members}
   end
 
   @doc """
-  Returns a `Multi.t` to bulk insert zone members for `zone_changeset`.
+  Creates zones according to the manifest.
 
-  * `zone_changeset` is the state/country `Zone` changeset.
-  * `member_ids` is the list of country/state primary keys which are to be inserted.
+  ## Sample manifest
+  ```
+  %{
+    "domestic" => %{zone_type: "S", description: "something"}
+  }
+  ```
   """
-  @spec creation_multi(Ecto.Changeset.t(), [non_neg_integer]) :: Multi.t()
-  def creation_multi(zone_changeset, member_ids) do
-    Multi.new()
-    |> Multi.insert(:zone, zone_changeset)
-    |> Multi.run(:members, fn %{zone: zone} ->
-      multi_run_insert_members(member_ids, zone)
-    end)
-  end
+  def zones_with_manifest(manifest) do
+    zones =
+      Enum.map(manifest, fn {name, params} ->
+        Map.merge(%{@zone | name: name}, params)
+      end)
 
-  @doc """
-  Returns a `Multi.t` to update all zone members for `zone_changeset`.
-
-  * `zone_changeset` is the state/country `Zone` changeset.
-  * `member_ids` is the list of _desired_ country/state primary keys.
-  """
-  @spec update_multi(Zone.t(), Ecto.Changeset.t(), [non_neg_integer]) :: Multi.t()
-  def update_multi(zone, zone_changeset, new_member_ids) do
-    %{added: added, removed: removed} = update_diff(new_member_ids, zone)
-
-    Multi.new()
-    |> Multi.update(:zone, zone_changeset)
-    |> Multi.run(:added, fn _ ->
-      multi_run_insert_members(added, zone)
-    end)
-    |> Multi.append(remove_members_multi(removed, zone))
-  end
-
-  defp multi_run_insert_members(member_ids, zone) do
-    zone_module = get_zone_module(zone)
-
-    member_ids
-    |> zone_module.member_changesets(zone)
-    |> Stream.map(&Repo.insert/1)
-    |> Enum.reduce_while({:ok, []}, fn
-      {:ok, member}, {:ok, acc} -> {:cont, {:ok, [member | acc]}}
-      changeset, _acc -> {:halt, changeset}
-    end)
-  end
-
-  defp remove_members_multi([], _), do: Multi.new()
-
-  defp remove_members_multi(to_be_removed, zone) do
-    zone_module = get_zone_module(zone)
-    removal_query = zone_module.remove_members_query(to_be_removed, zone)
-    Multi.delete_all(%Multi{}, :removed, removal_query)
-  end
-
-  defp update_diff(new_member_ids, current_zone) do
-    zone_module = get_zone_module(current_zone)
-
-    old_members =
-      current_zone
-      |> zone_module.member_ids()
-      |> MapSet.new()
-
-    new_members = MapSet.new(new_member_ids)
-    added = set_difference(new_members, old_members)
-    removed = set_difference(old_members, new_members)
-    %{added: added, removed: removed}
-  end
-
-  defp get_zone_module(%Zone{zone_type: "S"}), do: StateZone
-  defp get_zone_module(%Zone{zone_type: "C"}), do: CountryZone
-
-  @spec set_difference(MapSet.t(), MapSet.t()) :: list
-  defp set_difference(%MapSet{} = a, %MapSet{} = b) do
-    a
-    |> MapSet.difference(b)
-    |> MapSet.to_list()
+    {_, zones} = Repo.insert_all(Zone, zones, on_conflict: :nothing, returning: true)
+    zones
   end
 end

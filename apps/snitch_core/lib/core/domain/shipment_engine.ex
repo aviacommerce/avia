@@ -25,6 +25,7 @@ defmodule Snitch.Domain.ShipmentEngine do
   alias Aruspex.Problem
   alias Aruspex.Strategy.SimulatedAnnealing
   alias Snitch.Data.Schema.Order
+  alias Snitch.Repo
 
   @domain [true, false]
 
@@ -60,7 +61,7 @@ defmodule Snitch.Domain.ShipmentEngine do
     for var <- vars, do: Problem.add_variable(problem, var, @domain)
 
     binary_constraint(problem, edges)
-    summation_constraint(problem, vars, item_var_map, order)
+    summation_constraint(problem, vars, item_var_map, Repo.preload(order, [:line_items]))
 
     result =
       problem

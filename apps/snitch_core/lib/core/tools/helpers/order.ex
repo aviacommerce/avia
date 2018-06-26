@@ -1,9 +1,9 @@
-defmodule Snitch.OrderCase do
+defmodule Snitch.Tools.Helper.Order do
   @moduledoc """
-  Test helpers to insert stock items and locations.
+  Helpers to insert variants and line items for handcrafted orders.
   """
 
-  import Snitch.Factory
+  alias Ecto.DateTime
 
   @line_item %{
     quantity: nil,
@@ -11,8 +11,8 @@ defmodule Snitch.OrderCase do
     total: nil,
     variant_id: nil,
     order_id: nil,
-    inserted_at: Ecto.DateTime.utc(),
-    updated_at: Ecto.DateTime.utc()
+    inserted_at: DateTime.utc(),
+    updated_at: DateTime.utc()
   }
 
   @variant %{
@@ -22,10 +22,10 @@ defmodule Snitch.OrderCase do
     depth: Decimal.new("0.1"),
     width: Decimal.new("0.4"),
     cost_price: Money.new("9.99", :USD),
-    selling_price: random_price(:USD, 14, 4),
+    selling_price: nil,
     shipping_category_id: nil,
-    inserted_at: Ecto.DateTime.utc(),
-    updated_at: Ecto.DateTime.utc()
+    inserted_at: DateTime.utc(),
+    updated_at: DateTime.utc()
   }
 
   @doc """
@@ -47,7 +47,12 @@ defmodule Snitch.OrderCase do
     manifest
     |> Stream.with_index()
     |> Stream.map(fn {%{category: sc}, index} ->
-      %{@variant | sku: "shoes-nike-#{index}", shipping_category_id: sc.id}
+      %{
+        @variant
+        | sku: "shoes-nike-#{index}",
+          shipping_category_id: sc.id,
+          selling_price: random_price(:USD, 14, 4)
+      }
     end)
     |> Enum.take(variant_count)
   end
@@ -95,5 +100,9 @@ defmodule Snitch.OrderCase do
           total: Money.mult!(v.selling_price, q)
       }
     end)
+  end
+
+  defp random_price(currency, min, delta) do
+    Money.new(currency, "#{:rand.uniform(delta) + min}.99")
   end
 end
