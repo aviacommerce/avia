@@ -16,8 +16,10 @@ defmodule Snitch.Data.Model.Zone do
         |> List.last()
 
       @doc """
-      Updates `zone.members` with the list of
-      `Snitch.Data.Schema.#{model_name}Member.t` structs that make up this zone.
+      Fetches the member `Snitch.Data.Schema.#{model_name}Member.t` structs that
+      make up this `zone`.
+
+      The fetched structs are placed under the `:members` key.
       """
       @spec fetch_members(Zone.t()) :: Zone.t()
       def fetch_members(%Zone{} = zone) do
