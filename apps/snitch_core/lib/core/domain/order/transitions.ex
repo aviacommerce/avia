@@ -49,8 +49,8 @@ defmodule Snitch.Domain.Order.Transitions do
       {:ok, order} ->
         Context.new(order, state: context.state)
 
-      {:error, errors} ->
-        struct(context, valid?: false, multi: errors)
+      errors ->
+        struct(context, valid?: false, errors: errors)
     end
   end
 
@@ -83,7 +83,12 @@ defmodule Snitch.Domain.Order.Transitions do
     |> Weight.split()
     |> case do
       [] ->
-        struct(context, valid?: false, state: %{shipment: []})
+        struct(
+          context,
+          valid?: false,
+          state: %{shipment: []},
+          errors: {:error, "no shipment possible"}
+        )
 
       shipment ->
         struct(context, state: %{shipment: shipment})
