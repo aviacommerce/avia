@@ -17,6 +17,6 @@ defmodule SnitchApiWeb.OrderView do
   has_many(
     :line_items,
     serializer: SnitchApiWeb.LineItemView,
-    include: true,
+    include: true
   )
 end
