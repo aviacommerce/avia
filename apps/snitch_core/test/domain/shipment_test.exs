@@ -490,9 +490,6 @@ defmodule Snitch.Domain.ShipmentTest do
       assert method.id == shipping_method.id
       assert method.cost == Money.new(0, :USD)
 
-      refute is_nil(package.number)
-      refute is_nil(item.number)
-
       cs = Package.create_changeset(%Package{}, package)
       assert cs.valid?
       assert {:ok, _} = Repo.insert(cs)
