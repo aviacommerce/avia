@@ -124,6 +124,23 @@ defmodule Snitch.Domain.Order.Transitions do
   end
 
   def persist_shipment(%Context{valid?: false} = context), do: context
+defp calculate_package_total(
+         %{tax_total: tax_total, adjustment_total: adjustment_total, promo_total: promo_total},
+         shipping_cost
+       ) do
+    Enum.reduce([tax_total, adjustment_total, promo_total, shipping_cost], &Money.add!/2)
+  end
+
+  def process_package(package) do
+    sm =
+      Enum.find(package.shipping_methods, fn %{shipping_method_id: id} ->
+        id == package.shipping_method_id
+      end)
+    
+    shipping_cost = sm.cost
+    package_total = Enum.reduce([package.tax_total, package.adjustment_total, package.promo_total, sm.cost], &Money.add!/2)
+    Package.update(package, %{cost: shipping_cost, total: package_total})
+  end
 
   @doc """
   Persists shipping_method_id to packages
@@ -139,7 +156,7 @@ defmodule Snitch.Domain.Order.Transitions do
 
     function = fn _ ->
       packages
-      |> Stream.map(&process_package/1)
+      |> Enum.map(&process_package/1)
       |> Enum.reduce_while({:ok, []}, fn
         {:ok, package}, {:ok, acc} ->
           {:cont, {:ok, [package | acc]}}
@@ -152,27 +169,4 @@ defmodule Snitch.Domain.Order.Transitions do
     struct(context, multi: Multi.run(multi, :packages, function))
   end
 
-  defp extract_shipping_method_cost(package) do
-    sm =
-      Enum.find(package.shipping_methods, fn %{shipping_method_id: id} ->
-        id == package.shipping_method_id
-      end)
-
-    sm.cost
   end
-
-  defp calculate_package_total(
-         %{tax_total: tax_total, adjustment_total: adjustment_total, promo_total: promo_total},
-         shipping_cost
-       ) do
-    Enum.reduce([tax_total, adjustment_total, promo_total, shipping_cost], &Money.add!/2)
-  end
-
-  defp process_package(package) do
-    shipping_cost = extract_shipping_method_cost(package)
-    package_total = calculate_package_total(package, shipping_cost)
-
-    IO.inspect({shipping_cost, package_total}, label: "costs")
-    Package.update(package, %{cost: shipping_cost, total: package_total})
-  end
-end

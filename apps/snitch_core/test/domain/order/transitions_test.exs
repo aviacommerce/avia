@@ -175,8 +175,8 @@ defmodule Snitch.Domain.Order.TransitionsTest do
         |> Transitions.associate_package()
 
       assert result.valid?
-      # assert [packages: {:run, _}] = Multi.to_list(result.multi)
-      # assert {:ok, %{packages: _packages}} = Repo.transaction(result.multi)
+      assert [packages: {:run, _}] = Multi.to_list(result.multi)
+      assert {:ok, %{packages: _packages}} = Repo.transaction(result.multi)
     end
   end
 end
