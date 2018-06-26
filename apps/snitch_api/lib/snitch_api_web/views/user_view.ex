@@ -1,4 +1,4 @@
-defmodule SnitchApiWeb.UsersView do
+defmodule SnitchApiWeb.UserView do
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
 

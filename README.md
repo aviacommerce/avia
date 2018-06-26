@@ -1,72 +1,60 @@
-# API for Snitch
+<p align="center">
+    <img alt="Snitch logo" title="Snitch Logo" src="http://getdrawings.com/image/golden-snitch-drawing-59.jpg">
+</p>
+<p align="center">
+  <a href="https://travis-ci.org/aviabird/snitch">
+    <img src="https://travis-ci.org/aviabird/snitch.svg?branch=develop" alt="travis" title="build-status"/>
+  </a>
+  <a href="https://codecov.io/gh/aviabird/snitch">
+    <img src="https://codecov.io/gh/aviabird/snitch/branch/develop/graph/badge.svg" alt="codecov" title="coverage-status"/>
+  </a>
+  <a href="http://inch-ci.org/github/aviabird/snitch">
+    <img src="http://inch-ci.org/github/aviabird/snitch.svg" alt="inch-ci" title="doc-status"/>
+  </a>
+  <a href="https://www.pivotaltracker.com/n/projects/2149807">
+    <img src="http://res.cloudinary.com/zeus999/image/upload/c_limit,h_1041,w_1487/v1486457388/Yatrum%20Logo/pt-badge_ss3dyt.svg" alt="pivotal" title="project-tracker"/>
+  </a>
+</p>
 
-This phoenix API server exposes Snitch via a Spree like interface, and
-integrates well with most Spree frontends such as [Angularspree][angularspree].
+# Snitch
+**E-commerce re-invented :zap: in [Elixir][elixir]!**
+> Inspired from [magento][magento], [spree][spree] and [nectar-commerce][nectar]
 
-To start your Phoenix server:
+[magento]: https://github.com/magento/magento2
+[spree]: https://github.com/spree/spree
+[nectar]: https://github.com/vinsol/nectarcommerce
 
-- Install dependencies with `mix deps.get`
-- Start Phoenix endpoint with `mix phx.server`
+## Goals
 
-Now you can visit [`localhost:4100`](http://localhost:4100) from your browser.
+1. Fast and reliable
+   - We (will) profile all our code.
+2. Extensible to no end (conditions apply)
+   - We share this goal with [Nectar Commerce][nectar]
+3. Superb tooling
+   - Managing, importing, exporting and maintaing a store in production is quite
+     cumbersome. Great tooling is the only solution.
+4. First class support for multi-seller/vendor platform.
 
-Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
+_You can share feedback and requests [here][feedback]_
 
-## Snitch frontend
+## Contributing
 
-Though you can use any Spree frontend, we highly recommend the `develop` branch
-on [Angularspree][angularspree].
-All you have to do is:
+Check out our `CONTRIBUTING.md` to get started and track the project's progress
+on our [pivotal project][pivotal]!
 
-- clone [Angularspree][angularspree], just the `develop` branch will do:
-  ```sh
-  git clone https://github.com/aviabird/angularspree.git -b develop
-  ```
-- Angularspree uses `yarn`, so [install that][yarn-install].
-- Once inside the `angularspree` directory, run:
-  ```sh
-  npm install -g @angular/cli
-  ```
-- The frontend needs to be configured manually, just drop this snippet in `src/config/custom/custom.ts`
+> We regulary update our [Meeting notes][mom] with design decisions that we
+> make. These will turn into wiki pages or help in writing user and developer
+> guides.
 
-  ```typescript
-  // src/config/custom/custom.ts
+[pivotal]: https://www.pivotaltracker.com/n/projects/2149807
+[mom]: https://docs.google.com/document/d/15aNtYfPDKtdctC6KPLgW1BNN8I6EoBA-Q9KYqymt7gA/edit?usp=sharing
+[elixir]: http://elixir-lang.org/
+[feedback]: https://github.com/aviabird/snitch/issues/66
 
-  import { APP_DATA } from './app-data';
+----
 
-  export const CUSTOM_CONFIG = {
-    // Add Your custom configs here
-    prodApiEndpoint: 'http://localhost:4100/',
-    appName: 'Custom App Name',
-    fevicon: 'http://via.placeholder.com/350x150',
-    header: {
-      brand: {
-        logo: "/assets/default/logo.png",
-        name: "Angularspree",
-        height: "40",
-        width: "112"
-      },
-      searchPlaceholder: 'Find the best product for me ...',
-      showGithubRibon: false,
-    },
-    ...APP_DATA
-  };
-  ```
+[Logo attribution](http://getdrawings.com/golden-snitch-drawing)
 
-- Run the frontend!
-  ```sh
-  yarn install
-  yarn start:dev-ng-spree
-  ```
 
-[yarn-install]: https://yarnpkg.com/lang/en/docs/install/
 
-## Learn more
 
-- Official website: http://www.phoenixframework.org/
-- Guides: http://phoenixframework.org/docs/overview
-- Docs: https://hexdocs.pm/phoenix
-- Mailing list: http://groups.google.com/group/phoenix-talk
-- Source: https://github.com/phoenixframework/phoenix
-
-[angularspree]: https://github.com/aviabird/angularspree/tree/develop

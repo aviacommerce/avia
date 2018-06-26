@@ -1,4 +1,4 @@
-defmodule SnitchApiWeb.OrdersView do
+defmodule SnitchApiWeb.OrderView do
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
 
@@ -16,8 +16,7 @@ defmodule SnitchApiWeb.OrdersView do
 
   has_many(
     :line_items,
-    serializer: SnitchApiWeb.LineItemsView,
+    serializer: SnitchApiWeb.LineItemView,
     include: true,
-    identifiers: :when_included
   )
 end

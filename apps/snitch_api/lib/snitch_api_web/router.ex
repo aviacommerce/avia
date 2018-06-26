@@ -9,6 +9,6 @@ defmodule SnitchApiWeb.Router do
   scope "/api/v1", SnitchApiWeb do
     pipe_through(:api)
 
-    resources("/orders", OrdersController, only: [:index])
+    resources("/orders", OrderController, only: [:index])
   end
 end

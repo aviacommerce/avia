@@ -1,4 +1,4 @@
-defmodule SnitchApiWeb.LineItemsView do
+defmodule SnitchApiWeb.LineItemView do
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
 

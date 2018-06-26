@@ -17,13 +17,8 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
-config :snitch_core,
-  defaults: [
-    currency: :USD
-  ]
-
 # Configures JSON API encoding
-config :phoenix, :format_encoders, "json-api": Poison
+config :phoenix, :format_encoders, "json-api": Jason
 
 # Configures JSON API mime type
 config :mime, :types, %{
@@ -31,7 +26,7 @@ config :mime, :types, %{
 }
 
 # Configures Key Format
-config :ja_serializer, key_format: {:custom, CheetahApi.StringFormatter, :camelize}
+config :ja_serializer, key_format: :underscored
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

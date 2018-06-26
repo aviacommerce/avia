@@ -1,4 +1,4 @@
-defmodule SnitchApiWeb.OrdersController do
+defmodule SnitchApiWeb.OrderController do
   use SnitchApiWeb, :controller
 
   alias Snitch.Data.Model.Order, as: OrderModel
