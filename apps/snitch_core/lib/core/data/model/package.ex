@@ -54,7 +54,6 @@ defmodule Snitch.Data.Model.Package do
         packages
         |> Stream.map(&Map.fetch!(&1, :total))
         |> Enum.reduce(&Money.add!/2)
-        |> Money.reduce()
     end
   end
 

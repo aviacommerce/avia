@@ -61,7 +61,6 @@ defmodule Snitch.Data.Schema.Order do
     |> unique_constraint(:number)
     |> foreign_key_constraint(:user_id)
     |> cast_assoc(:line_items, with: &LineItem.create_changeset/2, required: true)
-    |> cast_assoc(:packages)
     |> ensure_unique_line_items()
     |> compute_totals()
   end
