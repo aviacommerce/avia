@@ -23,7 +23,6 @@ defmodule Snitch.Data.Schema.Order do
     field(:item_total, Money.Ecto.Composite.Type)
     field(:adjustment_total, Money.Ecto.Composite.Type)
     field(:promo_total, Money.Ecto.Composite.Type)
-    field(:order_total, Money.Ecto.Composite.Type)
 
     # field :shipping
     # field :payment
@@ -97,7 +96,7 @@ defmodule Snitch.Data.Schema.Order do
       |> LineItemModel.compute_total()
 
     packages_total =
-      if(order_changeset.data.id != nil) do
+      if order_changeset.data.id != nil do
         PackageModel.compute_package_total(order_changeset.data)
       else
         Money.new(0, :USD)
