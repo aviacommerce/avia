@@ -2,8 +2,8 @@ defmodule Snitch.Domain.ShippingMethodTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
-  import Snitch.ZoneCase, only: [zones_with_manifest: 1]
-  import Snitch.ShipmentCase
+  import Snitch.Tools.Helper.Zone, only: [zones_with_manifest: 1]
+  import Snitch.Tools.Helper.Shipment
 
   alias Snitch.Domain.ShippingMethod
 

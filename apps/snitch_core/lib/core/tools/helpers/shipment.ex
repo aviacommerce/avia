@@ -1,16 +1,17 @@
-defmodule Snitch.ShipmentCase do
+defmodule Snitch.Tools.Helper.Shipment do
   @moduledoc """
   Test helpers to insert shipping related schemas.
   """
 
+  alias Ecto.DateTime
   alias Snitch.Data.Model.ShippingMethod
   alias Snitch.Data.Schema.ShippingCategory
   alias Snitch.Repo
 
   @shipping_category %{
     name: nil,
-    inserted_at: Ecto.DateTime.utc(),
-    updated_at: Ecto.DateTime.utc()
+    inserted_at: DateTime.utc(),
+    updated_at: DateTime.utc()
   }
 
   @doc """
@@ -24,7 +25,9 @@ defmodule Snitch.ShipmentCase do
   def shipping_categories_with_manifest(manifest) do
     categories = Enum.map(manifest, fn name -> %{@shipping_category | name: name} end)
 
-    {_, categories} = Repo.insert_all(ShippingCategory, categories, returning: true)
+    {_, categories} =
+      Repo.insert_all(ShippingCategory, categories, on_conflict: :nothing, returning: true)
+
     categories
   end
 

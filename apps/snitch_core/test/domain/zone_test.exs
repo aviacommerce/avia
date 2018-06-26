@@ -1,9 +1,9 @@
-defmodule Snitch.Data.Model.ZoneTest do
+defmodule Snitch.Domain.ZoneTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
   import Snitch.Factory
-  import Snitch.ZoneCase
+  import Snitch.Tools.Helper.Zone
 
   alias Snitch.Data.Model.{CountryZone, StateZone}
   alias Snitch.Domain.Zone

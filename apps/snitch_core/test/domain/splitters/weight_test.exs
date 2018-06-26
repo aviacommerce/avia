@@ -2,7 +2,7 @@ defmodule Snitch.Domain.Splitter.WeightTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
-  import Snitch.{OrderCase, ShipmentCase, StockCase, ZoneCase}
+  import Snitch.Tools.Helper.{Order, Shipment, Stock, Zone}
 
   alias Snitch.Data.Schema.{Address, Order, StockItem, StockLocation, Variant}
   alias Snitch.Domain.Shipment

@@ -3,12 +3,12 @@ defmodule Snitch.Data.Model.StateZone do
   StateZone API
   """
   use Snitch.Data.Model
-  use Snitch.Tools.Helper.Zone
+  use Snitch.Data.Model.Zone
 
   import Ecto.Query
 
+  alias Snitch.Data.Model.Zone, as: ZoneModel
   alias Snitch.Data.Schema.{State, StateZoneMember, Zone}
-  alias Snitch.Tools.Helper.Zone, as: ZH
 
   @doc """
   Creates a new state `Zone` whose members are `state_ids`.
@@ -23,7 +23,7 @@ defmodule Snitch.Data.Model.StateZone do
   def create(name, description, state_ids) do
     zone_params = %{name: name, description: description, zone_type: "S"}
     zone_changeset = Zone.create_changeset(%Zone{}, zone_params)
-    multi = ZH.creation_multi(zone_changeset, state_ids)
+    multi = ZoneModel.creation_multi(zone_changeset, state_ids)
 
     case Repo.transaction(multi) do
       {:ok, %{zone: zone, members: members}} -> {:ok, %{zone | members: members}}
@@ -82,7 +82,7 @@ defmodule Snitch.Data.Model.StateZone do
   @spec update(Zone.t(), map, [non_neg_integer]) :: {:ok, Zone.t()} | {:error, Ecto.Changeset.t()}
   def update(zone, zone_params, new_state_ids) do
     zone_changeset = Zone.update_changeset(zone, zone_params)
-    multi = ZH.update_multi(zone, zone_changeset, new_state_ids)
+    multi = ZoneModel.update_multi(zone, zone_changeset, new_state_ids)
 
     case Repo.transaction(multi) do
       {:ok, %{zone: zone}} -> {:ok, %{zone | members: nil}}

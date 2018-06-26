@@ -1,21 +1,13 @@
 defmodule Snitch.Seed.Orders do
   @moduledoc false
 
+  import Snitch.Tools.Helper.Order, only: [line_items_with_price: 2]
+
   alias Ecto.DateTime
-  alias Snitch.Data.Schema.{Address, LineItem, Order, User, Variant}
+  alias Snitch.Data.Schema.{LineItem, Order, ShippingCategory, User, Variant}
   alias Snitch.Repo
 
   require Logger
-
-  @line_item %{
-    variant_id: nil,
-    order_id: nil,
-    quantity: nil,
-    unit_price: nil,
-    total: nil,
-    inserted_at: DateTime.utc(),
-    updated_at: DateTime.utc()
-  }
 
   @order %{
     number: nil,
@@ -31,26 +23,32 @@ defmodule Snitch.Seed.Orders do
     updated_at: DateTime.utc()
   }
 
+  # @stock_items %{
+  #   "origin" => %{
+  #     counts: [10, 10, 10, 10, 00, 00],
+  #     backorder: [:f, :f, :f, :f, :t, :t]
+  #   },
+  #   "warehouse" => %{
+  #     counts: [00, 00, 8, 20, 10, 00],
+  #     backorder: [:t, :f, :t, :f, :f, :f]
+  #   }
+  # }
+
   defp build_orders do
     variants = Repo.all(Variant)
-    [address | _] = Repo.all(Address)
     [user | _] = Repo.all(User)
 
-    digest = %{
-      cart: [user_id: user.id],
-      address: [user_id: user.id, address_id: address.id],
-      payment: [user_id: user.id, address_id: address.id],
-      processing: [user_id: user.id, address_id: address.id],
-      shipping: [user_id: user.id, address_id: address.id],
-      shipped: [user_id: user.id, address_id: address.id],
-      cancelled: [user_id: user.id, address_id: address.id],
-      completed: [user_id: user.id, address_id: address.id]
-    }
+    digest = [
+      %{quantity: [5, 5, 1, 0, 0, 0, 0], user_id: user.id, state: :cart},
+      %{quantity: [0, 0, 0, 0, 0, 100], user_id: user.id, state: :cart},
+      %{quantity: [5, 0, 8, 12, 0, 0, 0], user_id: user.id, state: :cart}
+    ]
 
     make_orders(digest, variants)
   end
 
   def seed_orders! do
+    Repo.delete_all(Order)
     {orders, line_items} = build_orders()
 
     {count, order_structs} =
@@ -59,37 +57,29 @@ defmodule Snitch.Seed.Orders do
         orders,
         on_conflict: :nothing,
         conflict_target: [:number],
-        returning: [:id, :number]
+        returning: [:id]
       )
 
     Logger.info("Inserted #{count} orders.")
 
-    filtered_line_items =
+    line_items =
       order_structs
-      |> Enum.map(fn %{id: id, number: number} ->
-        line_items
-        |> Enum.reduce(&Map.merge/2)
-        |> Map.fetch!(number)
-        |> Stream.map(&Map.put(&1, :order_id, id))
-        |> Enum.map(&Map.delete(&1, :number))
+      |> Stream.zip(line_items)
+      |> Enum.map(fn {%{id: id}, items} ->
+        Enum.map(items, &Map.put(&1, :order_id, id))
       end)
       |> List.flatten()
 
-    {count, _} = Repo.insert_all(LineItem, filtered_line_items)
+    {count, _} = Repo.insert_all(LineItem, line_items)
     Logger.info("Inserted #{count} line-items.")
   end
 
   def make_orders(digest, variants) do
     digest
-    |> Enum.map(fn {state, opts} ->
-      number = Nanoid.generate()
-
-      line_items =
-        variants
-        |> Enum.shuffle()
-        |> random_line_items()
-        |> Stream.map(&Map.put(&1, :number, number))
-        |> Enum.take(2 + :rand.uniform(3))
+    |> Stream.with_index()
+    |> Enum.map(fn {manifest, index} ->
+      number = "#{Nanoid.generate()}-#{index}"
+      line_items = line_items_with_price(variants, manifest.quantity)
 
       item_total =
         line_items
@@ -99,47 +89,44 @@ defmodule Snitch.Seed.Orders do
       order = %{
         @order
         | number: number,
-          state: "#{state}",
-          user_id: opts[:user_id],
-          billing_address_id: opts[:address_id],
-          shipping_address_id: opts[:address_id],
+          state: "#{manifest.state}",
+          user_id: manifest[:user_id],
+          billing_address_id: manifest[:address_id],
+          shipping_address_id: manifest[:address_id],
           item_total: item_total,
           total: item_total
       }
 
-      {order, %{number => line_items}}
+      {order, line_items}
     end)
     |> Enum.unzip()
   end
 
-  def random_line_items(variants) do
-    Stream.map(variants, fn v ->
-      quantity = :rand.uniform(3)
+  def seed_variants! do
+    categories =
+      ShippingCategory
+      |> Repo.all()
+      |> Enum.map(fn x ->
+        Enum.take(Stream.repeatedly(fn -> x.id end), 2)
+      end)
+      |> List.flatten()
 
-      %{
-        @line_item
-        | variant_id: v.id,
-          quantity: quantity,
-          unit_price: v.selling_price,
-          total: Money.mult!(v.selling_price, quantity)
-      }
-    end)
-  end
-
-  def seed_variants!(count) do
     Repo.insert_all(
       Variant,
-      Enum.take(variants(), count),
+      Enum.into(variants(categories), []),
       returning: [:id],
       on_conflict: :nothing
     )
   end
 
-  def variants do
+  def variants(categories) do
     0
     |> Stream.iterate(&(&1 + 1))
     |> Stream.map(&"shoes-nike-#{&1}")
-    |> Stream.map(fn sku -> %{random_variant() | sku: sku} end)
+    |> Stream.zip(categories)
+    |> Stream.map(fn {sku, sc_id} ->
+      %{random_variant() | sku: sku, shipping_category_id: sc_id}
+    end)
   end
 
   def random_variant do
@@ -152,6 +139,7 @@ defmodule Snitch.Seed.Orders do
       depth: Decimal.new("0.1"),
       width: Decimal.new("0.4"),
       selling_price: price,
+      shipping_category_id: nil,
       cost_price: Money.sub!(price, Money.new("1.499", :USD)),
       inserted_at: DateTime.utc(),
       updated_at: DateTime.utc()

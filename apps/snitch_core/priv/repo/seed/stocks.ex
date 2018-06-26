@@ -1,13 +1,35 @@
 defmodule Snitch.Seed.Stocks do
   @moduledoc false
 
-  import Ecto.Query
-
   alias Snitch.Data.Model.{Country, State}
   alias Snitch.Data.Schema.{StockItem, StockLocation, Variant}
   alias Snitch.Repo
 
   require Logger
+
+  @stock_items %{
+    "origin" => %{
+      counts: [10, 10, 10, 10, 00, 00],
+      backorder: [:f, :f, :f, :f, :t, :t]
+    },
+    "warehouse" => %{
+      counts: [00, 00, 8, 20, 10, 00],
+      backorder: [:t, :f, :t, :f, :f, :f]
+    }
+  }
+
+  def seed! do
+    variants = Repo.all(Variant)
+
+    Repo.transaction(fn ->
+      locations =
+        Enum.reduce(seed_stock_locations!(), %{}, fn %{id: id, admin_name: nickname}, acc ->
+          Map.put(acc, nickname, id)
+        end)
+
+      seed_stock_items!(variants, locations)
+    end)
+  end
 
   def seed_stock_locations! do
     locations =
@@ -28,7 +50,7 @@ defmodule Snitch.Seed.Stocks do
         },
         %{
           name: "Taj Mahal",
-          admin_name: "backup",
+          admin_name: "warehouse",
           address_line_1: "Dharmapuri, Forest Colony",
           address_line_2: "Tajganj",
           city: "Agra",
@@ -41,7 +63,7 @@ defmodule Snitch.Seed.Stocks do
         },
         %{
           name: "Colosseum",
-          admin_name: "origin",
+          admin_name: "backup",
           address_line_1: "Piazza del Colosseo, 1",
           address_line_2: "",
           city: "",
@@ -51,37 +73,43 @@ defmodule Snitch.Seed.Stocks do
           active: true,
           state_id: State.get(%{code: "IT-RM"}).id,
           country_id: Country.get(%{iso: "IT"}).id
+        },
+        %{
+          name: "Sinhagadh Fort",
+          admin_name: "origin",
+          address_line_1: "Sinhagad Ghat Road",
+          address_line_2: "Thoptewadi",
+          city: "Pune",
+          zip_code: "411025",
+          phone: "020 2612 8169",
+          propagate_all_variants: false,
+          active: true,
+          state_id: State.get(%{code: "IN-MH"}).id,
+          country_id: Country.get(%{iso: "IN"}).id
         }
       ]
       |> Stream.map(&Map.put(&1, :inserted_at, Ecto.DateTime.utc()))
       |> Enum.map(&Map.put(&1, :updated_at, Ecto.DateTime.utc()))
 
-    {count, _} = Repo.insert_all(StockLocation, locations, on_conflict: :nothing)
+    {count, locations} =
+      Repo.insert_all(StockLocation, locations, on_conflict: :nothing, returning: true)
+
     Logger.info("Inserted #{count} stock_locations.")
+    locations
   end
 
-  def seed_stock_items!(digest_fn \\ &digest/1) do
-    variants = Repo.all(Variant)
-
-    query = from(sl in StockLocation, select: [:id, :admin_name])
-
-    locations =
-      query
-      |> Repo.all()
-      |> Enum.reduce(%{}, fn %{id: id, admin_name: nickname}, acc ->
-        Map.put(acc, nickname, id)
-      end)
-
+  def seed_stock_items!(variants, locations) when map_size(locations) > 0 do
     stock_items =
-      variants
-      |> digest_fn.()
+      @stock_items
       |> Enum.map(fn {location, manifest} ->
-        Enum.map(manifest.variants, fn %{id: id} ->
+        [variants, manifest.counts, manifest.backorder]
+        |> Enum.zip()
+        |> Enum.map(fn {%{id: id}, count, backorder} ->
           %{
             variant_id: id,
             stock_location_id: Map.fetch!(locations, location),
-            count_on_hand: manifest.count_on_hand,
-            backorderable: manifest.backorder,
+            count_on_hand: count,
+            backorderable: if(backorder == :t, do: true, else: false),
             inserted_at: Ecto.DateTime.utc(),
             updated_at: Ecto.DateTime.utc()
           }
@@ -93,26 +121,7 @@ defmodule Snitch.Seed.Stocks do
     Logger.info("Inserted #{count} stock_items.")
   end
 
-  def digest(variants) do
-    vc = Enum.count(variants)
-    {one, two} = Enum.split(variants, div(vc, 2))
-
-    %{
-      "default" => %{
-        count_on_hand: 4,
-        variants: one,
-        backorder: false
-      },
-      "backup" => %{
-        count_on_hand: 6,
-        variants: two,
-        backorder: false
-      },
-      "origin" => %{
-        count_on_hand: 2,
-        variants: variants,
-        backorder: true
-      }
-    }
+  def seed_stock_items!(_, _) do
+    Logger.info("Inserted 0 stock_items.")
   end
 end

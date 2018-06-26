@@ -45,7 +45,6 @@ defmodule Snitch.Data.Schema.PackageTest do
       assert cs = %{valid?: false} = Package.create_changeset(%Package{}, %{})
 
       assert %{
-               number: ["can't be blank"],
                order_id: ["can't be blank"],
                origin_id: ["can't be blank"],
                shipping_category_id: ["can't be blank"],
