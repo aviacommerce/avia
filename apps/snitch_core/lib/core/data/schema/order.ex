@@ -95,14 +95,7 @@ defmodule Snitch.Data.Schema.Order do
       |> get_field(:line_items)
       |> LineItemModel.compute_total()
 
-    packages_total =
-      if order_changeset.data.id != nil do
-        PackageModel.compute_package_total(order_changeset.data)
-      else
-        Money.new(0, :USD)
-      end
-
-    total = Enum.reduce([item_total, packages_total], &Money.add!/2)
+    total = Enum.reduce([item_total], &Money.add!/2)
 
     # TODO: This is only till we have adjustment and promo calculators ready.
     order_changeset
