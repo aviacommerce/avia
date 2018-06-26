@@ -51,11 +51,10 @@ defmodule Snitch.Domain.Order.DefaultMachine do
   use Snitch.Domain
   use BeepBop, ecto_repo: Repo
 
+  alias Snitch.Data.Schema.Order
   alias Snitch.Domain.Order.Transitions
-  alias Snitch.Data.Model.Order, as: OrderModel
-  alias Snitch.Data.Schema.Order, as: OrderSchema
 
-  state_machine OrderSchema,
+  state_machine Order,
                 :state,
                 ~w(cart address payment processing rts shipping complete cancelled)a do
     event(:add_addresses, %{from: [:cart], to: :address}, fn context ->
@@ -98,8 +97,9 @@ defmodule Snitch.Domain.Order.DefaultMachine do
     end)
   end
 
-  def persist(%OrderSchema{} = order, to_state) do
-    old_line_items = Enum.map(order.line_items, &Map.from_struct/1)
-    OrderModel.update(%{state: to_state, line_items: old_line_items}, order)
+  def persist(%Order{} = order, to_state) do
+    order
+    |> Order.partial_update_changeset(%{state: to_state})
+    |> Repo.update()
   end
 end

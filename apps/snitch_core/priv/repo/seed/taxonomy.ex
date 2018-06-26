@@ -25,6 +25,8 @@ defmodule Snitch.Seed.Taxonomy do
           └── Sports Shoes and Floaters
   """
 
+  alias Snitch.Data.Schema.Taxonomy
+  alias Snitch.Repo
   alias Snitch.Tools.Helper.Taxonomy, as: TaxonomyHelper
 
   @brands_taxonomy {"Brands",
@@ -58,6 +60,7 @@ defmodule Snitch.Seed.Taxonomy do
                       ]}
 
   def seed do
+    Repo.delete_all(Taxonomy)
     TaxonomyHelper.create_taxonomy(@brands_taxonomy)
     TaxonomyHelper.create_taxonomy(@footwear_taxonomy)
   end
