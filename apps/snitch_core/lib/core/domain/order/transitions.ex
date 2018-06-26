@@ -13,7 +13,6 @@ defmodule Snitch.Domain.Order.Transitions do
   alias BeepBop.Context
   alias Snitch.Data.Model.Package
   alias Snitch.Data.Schema.Order
-  alias Snitch.Data.Model.Order, as: OrderModel
   alias Snitch.Domain.{Shipment, ShipmentEngine, Splitters.Weight}
 
   @doc """
@@ -38,15 +37,10 @@ defmodule Snitch.Domain.Order.Transitions do
           }
         } = context
       ) do
-    changeset =
-      order
-      |> Repo.preload([:billing_address, :shipping_address])
-      |> Order.partial_update_changeset(%{
-        billing_address: billing,
-        shipping_address: shipping
-      })
-
-    case Repo.update(changeset) do
+    order
+    |> Order.partial_update_changeset(%{billing_address: billing, shipping_address: shipping})
+    |> Repo.update()
+    |> case do
       {:ok, order} ->
         Context.new(order, state: context.state)
 
@@ -131,6 +125,33 @@ defmodule Snitch.Domain.Order.Transitions do
 
   def persist_shipment(%Context{valid?: false} = context), do: context
 
+  @doc """
+  Persists shipping_method_id to packages
+
+  Calculate pacakge total cost Sum(shipping_cost, adjustment_total,promo_total, shipping_cost)
+
+  Update package cost total in DB
+  """
+
+  @spec associate_package(Context.t()) :: Context.t()
+  def associate_package(%Context{valid?: true, struct: %Order{} = order} = context) do
+    %{state: %{packages: packages}, multi: multi} = context
+
+    function = fn _ ->
+      packages
+      |> Stream.map(&process_package/1)
+      |> Enum.reduce_while({:ok, []}, fn
+        {:ok, package}, {:ok, acc} ->
+          {:cont, {:ok, [package | acc]}}
+
+        {:error, _} = error, _ ->
+          {:halt, error}
+      end)
+    end
+
+    struct(context, multi: Multi.run(multi, :packages, function))
+  end
+
   defp extract_shipping_method_cost(package) do
     sm =
       Enum.find(package.shipping_methods, fn %{shipping_method_id: id} ->
@@ -147,25 +168,11 @@ defmodule Snitch.Domain.Order.Transitions do
     Enum.reduce([tax_total, adjustment_total, promo_total, shipping_cost], &Money.add!/2)
   end
 
-  @doc """
-  Persists shipping_method_id to packages
+  defp process_package(package) do
+    shipping_cost = extract_shipping_method_cost(package)
+    package_total = calculate_package_total(package, shipping_cost)
 
-  Calculate pacakge total cost Sum(shipping_cost, adjustment_total,promo_total, shipping_cost)
-
-  Update package cost total in DB
-  """
-
-  @spec associate_package(Context.t()) :: Context.t()
-  def associate_package(%Context{valid?: true, struct: %Order{} = order} = context) do
-    %{state: %{packages: packages}} = context
-
-    Enum.map(packages, fn package ->
-      shipping_cost = extract_shipping_method_cost(package)
-      package_total = calculate_package_total(package, shipping_cost)
-
-      Package.update(package, %{cost: shipping_cost, total: package_total})
-
-      struct(context)
-    end)
+    IO.inspect({shipping_cost, package_total}, label: "costs")
+    Package.update(package, %{cost: shipping_cost, total: package_total})
   end
 end

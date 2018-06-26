@@ -4,12 +4,23 @@ defmodule Snitch.Factory.Shipping do
   defmacro __using__(_opts) do
     quote do
       alias Snitch.Data.Schema.{Package, PackageItem, ShippingCategory, ShippingMethod}
+      alias Snitch.Data.Schema.Embedded.ShippingMethod, as: EmbeddedShippingMethod
 
       def shipping_method_factory do
         %ShippingMethod{
           slug: sequence("shipping_method"),
           name: sequence("hyperloop"),
           description: "Brought to you by spacex!"
+        }
+      end
+
+      def embedded_shipping_method_factory do
+        %EmbeddedShippingMethod{
+          id: sequence(:id, &(&1 + 1)),
+          slug: sequence("shipping_method"),
+          name: sequence(:name, &"method-#{&1}"),
+          description: "Snitch revolution",
+          cost: Money.new(0, :USD)
         }
       end
 

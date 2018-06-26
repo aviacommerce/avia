@@ -7,6 +7,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
   alias BeepBop.Context
   alias Ecto.Multi
   alias Snitch.Data.Schema.Order
+  alias Snitch.Data.Schema.OrderAddress
   alias Snitch.Domain.Order.Transitions
   alias Snitch.Data.Model.Order, as: OrderModel
 
@@ -61,7 +62,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     end
 
     test "with an order that has no addresses", %{patna: patna, order: order} do
-      assert is_nil(order.billing_address_id) and is_nil(order.shipping_address_id)
+      assert is_nil(order.billing_address) and is_nil(order.shipping_address)
 
       result =
         order
@@ -74,7 +75,6 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     test "with an order that already has addresses", %{patna: patna, order: order} do
       order =
         order
-        |> Repo.preload([:shipping_address, :billing_address])
         |> Order.partial_update_changeset(%{billing_address: patna, shipping_address: patna})
         |> Repo.update!()
 
@@ -92,12 +92,18 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
   describe "compute_shipments" do
     setup do
+      shipping_address =
+        :address
+        |> build()
+        |> Map.from_struct()
+        |> Map.delete(:__meta__)
+
       [
         order:
           insert(
             :order,
             user: build(:user),
-            shipping_address: build(:address)
+            shipping_address: Repo.load(OrderAddress, shipping_address)
           )
       ]
     end
@@ -146,17 +152,31 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
   describe "associate_package" do
     setup do
-      [order: insert(:order, user: build(:user))]
+      order = insert(:order, user: build(:user))
+
+      packages =
+        build_list(
+          5,
+          :package,
+          order: order,
+          shipping_methods: build_list(2, :embedded_shipping_method),
+          origin: build(:stock_location),
+          shipping_method: build(:shipping_method),
+          shipping_category: build(:shipping_category)
+        )
+
+      [order: order, packages: packages]
     end
 
-    test "when packages are empty", %{order: order} do
+    test "with packages", %{order: order, packages: packages} do
       result =
         order
-        |> Context.new(state: %{packages: []})
+        |> Context.new(state: %{packages: packages})
         |> Transitions.associate_package()
 
-      order_info = OrderModel.get(order.id)
-      IO.inspect order_info
+      assert result.valid?
+      # assert [packages: {:run, _}] = Multi.to_list(result.multi)
+      # assert {:ok, %{packages: _packages}} = Repo.transaction(result.multi)
     end
   end
 end

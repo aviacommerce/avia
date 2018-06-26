@@ -7,8 +7,7 @@ defmodule Snitch.Data.Schema.Order do
 
   alias Ecto.Nanoid
   alias Snitch.Data.Model.LineItem, as: LineItemModel
-  alias Snitch.Data.Model.Package, as: PackageModel
-  alias Snitch.Data.Schema.{Address, LineItem, User, Package}
+  alias Snitch.Data.Schema.{LineItem, OrderAddress, User}
 
   @type t :: %__MODULE__{}
 
@@ -26,23 +25,23 @@ defmodule Snitch.Data.Schema.Order do
 
     # field :shipping
     # field :payment
-
+    #
     # field(:completed_at, :naive_datetime)
 
     # associations
     belongs_to(:user, User)
-    belongs_to(:billing_address, Address, on_replace: :update)
-    belongs_to(:shipping_address, Address, on_replace: :update)
-    has_many(:packages, Package)
+    embeds_one(:billing_address, OrderAddress, on_replace: :update)
+    embeds_one(:shipping_address, OrderAddress, on_replace: :update)
+
     has_many(:line_items, LineItem, on_delete: :delete_all, on_replace: :delete)
 
     timestamps()
   end
 
   @required_fields ~w(state user_id)a
-  @optional_fields ~w(billing_address_id shipping_address_id)a
   @create_fields @required_fields
-  @update_fields [:state | @optional_fields]
+
+  @update_fields [:state]
 
   @doc """
   Returns a Order changeset with totals for a "new" order.
@@ -57,7 +56,7 @@ defmodule Snitch.Data.Schema.Order do
     order
     |> cast(params, @create_fields)
     |> validate_required(@required_fields)
-    |> unique_constraint(:number)
+    |> unique_constraint(:slug)
     |> foreign_key_constraint(:user_id)
     |> cast_assoc(:line_items, with: &LineItem.create_changeset/2, required: true)
     |> ensure_unique_line_items()
@@ -79,13 +78,12 @@ defmodule Snitch.Data.Schema.Order do
     |> compute_totals()
   end
 
-  @partial_update_fields ~w(state)a
   @spec partial_update_changeset(t, map) :: Ecto.Changeset.t()
   def partial_update_changeset(%__MODULE__{} = order, params) do
     order
-    |> cast(params, @partial_update_fields)
-    |> cast_assoc(:billing_address)
-    |> cast_assoc(:shipping_address)
+    |> cast(params, [:state])
+    |> cast_embed(:billing_address)
+    |> cast_embed(:shipping_address)
   end
 
   @spec compute_totals(Ecto.Changeset.t()) :: Ecto.Changeset.t()
