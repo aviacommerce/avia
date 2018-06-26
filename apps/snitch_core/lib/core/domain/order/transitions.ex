@@ -162,7 +162,7 @@ defmodule Snitch.Domain.Order.Transitions do
 
     function = fn _ ->
       packages
-      |> Enum.map(&process_package/1)
+      |> Stream.map(&process_package/1)
       |> Enum.reduce_while({:ok, []}, fn
         {:ok, package}, {:ok, acc} ->
           {:cont, {:ok, [package | acc]}}
