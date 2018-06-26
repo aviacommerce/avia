@@ -46,16 +46,17 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
       refute result.valid?
 
-      assert %{
-               valid?: false,
-               changes: %{
-                 shipping_address: %{
-                   action: :insert,
-                   valid?: false,
-                   errors: [state_id: {"state is explicitly required for this country", _}]
-                 }
-               }
-             } = result.multi
+      assert {:error,
+              %{
+                valid?: false,
+                changes: %{
+                  shipping_address: %{
+                    action: :insert,
+                    valid?: false,
+                    errors: [state_id: {"state is explicitly required for this country", _}]
+                  }
+                }
+              }} = result.errors
     end
 
     test "with an order that has no addresses", %{patna: patna, order: order} do
