@@ -124,7 +124,8 @@ defmodule Snitch.Domain.Order.Transitions do
   end
 
   def persist_shipment(%Context{valid?: false} = context), do: context
-defp calculate_package_total(
+
+  defp calculate_package_total(
          %{tax_total: tax_total, adjustment_total: adjustment_total, promo_total: promo_total},
          shipping_cost
        ) do
@@ -133,12 +134,18 @@ defp calculate_package_total(
 
   def process_package(package) do
     sm =
-      Enum.find(package.shipping_methods, fn %{shipping_method_id: id} ->
+      Enum.find(package.shipping_methods, fn %{id: id} ->
         id == package.shipping_method_id
       end)
-    
+
     shipping_cost = sm.cost
-    package_total = Enum.reduce([package.tax_total, package.adjustment_total, package.promo_total, sm.cost], &Money.add!/2)
+
+    package_total =
+      Enum.reduce(
+        [package.tax_total, package.adjustment_total, package.promo_total, shipping_cost],
+        &Money.add!/2
+      )
+
     Package.update(package, %{cost: shipping_cost, total: package_total})
   end
 
@@ -168,5 +175,4 @@ defp calculate_package_total(
 
     struct(context, multi: Multi.run(multi, :packages, function))
   end
-
-  end
+end

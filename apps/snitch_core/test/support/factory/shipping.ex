@@ -20,7 +20,7 @@ defmodule Snitch.Factory.Shipping do
           slug: sequence("shipping_method"),
           name: sequence(:name, &"method-#{&1}"),
           description: "Snitch revolution",
-          cost: Money.new(0, :USD)
+          cost: Money.new(3, :USD)
         }
       end
 
@@ -45,7 +45,8 @@ defmodule Snitch.Factory.Shipping do
           total: Money.new(0, :USD),
           tax_total: Money.new(0, :USD),
           adjustment_total: Money.new(0, :USD),
-          promo_total: Money.new(0, :USD)
+          promo_total: Money.new(0, :USD),
+          id: sequence(:id, &(&1 + 1))
         }
       end
 

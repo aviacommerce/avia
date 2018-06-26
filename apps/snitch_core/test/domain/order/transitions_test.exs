@@ -9,7 +9,6 @@ defmodule Snitch.Domain.Order.TransitionsTest do
   alias Snitch.Data.Schema.Order
   alias Snitch.Data.Schema.OrderAddress
   alias Snitch.Domain.Order.Transitions
-  alias Snitch.Data.Model.Order, as: OrderModel
 
   @patna %{
     first_name: "someone",
@@ -155,13 +154,12 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       order = insert(:order, user: build(:user))
 
       packages =
-        build_list(
-          5,
+        insert_list(
+          1,
           :package,
-          order: order,
-          shipping_methods: build_list(2, :embedded_shipping_method),
+          order_id: order.id,
           origin: build(:stock_location),
-          shipping_method: build(:shipping_method),
+          shipping_methods: build_list(1, :embedded_shipping_method),
           shipping_category: build(:shipping_category)
         )
 
@@ -169,14 +167,17 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     end
 
     test "with packages", %{order: order, packages: packages} do
+      packages = %{List.first(packages) | shipping_method_id: 3}
+
       result =
         order
-        |> Context.new(state: %{packages: packages})
+        |> Context.new(state: %{packages: [packages]})
         |> Transitions.associate_package()
 
       assert result.valid?
       assert [packages: {:run, _}] = Multi.to_list(result.multi)
-      assert {:ok, %{packages: _packages}} = Repo.transaction(result.multi)
+      assert {:ok, %{packages: result_packages}} = Repo.transaction(result.multi)
+      assert List.first(result_packages).cost == Money.new(3, :USD)
     end
   end
 end
