@@ -159,7 +159,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
           :package,
           order_id: order.id,
           origin: build(:stock_location),
-          shipping_methods: build_list(1, :embedded_shipping_method),
+          shipping_methods: build_list(2, :embedded_shipping_method),
           shipping_category: build(:shipping_category)
         )
 
@@ -167,17 +167,21 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     end
 
     test "with packages", %{order: order, packages: packages} do
-      packages = %{List.first(packages) | shipping_method_id: 3}
+      package = List.first(packages)
+      selected_shipping_method = List.first(package.shipping_methods)
+
+      shipping_methods = [
+        %{package_id: package.id, shipping_method_id: selected_shipping_method.id}
+      ]
 
       result =
         order
-        |> Context.new(state: %{packages: [packages]})
-        |> Transitions.associate_package()
+        |> Context.new(state: %{selected_shipping_methods: shipping_methods})
+        |> Transitions.save_packages_methods()
 
       assert result.valid?
       assert [packages: {:run, _}] = Multi.to_list(result.multi)
-      assert {:ok, %{packages: result_packages}} = Repo.transaction(result.multi)
-      assert List.first(result_packages).cost == Money.new(3, :USD)
+      assert {:ok, %{packages: _}} = Repo.transaction(result.multi)
     end
   end
 end

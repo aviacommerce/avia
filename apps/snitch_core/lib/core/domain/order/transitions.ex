@@ -9,10 +9,13 @@ defmodule Snitch.Domain.Order.Transitions do
   """
 
   use Snitch.Domain
+  import Ecto.Query, only: [from: 2]
 
   alias BeepBop.Context
   alias Snitch.Data.Model.Package
   alias Snitch.Data.Schema.Order
+  alias Snitch.Data.Schema.Package, as: PackageSchema
+
   alias Snitch.Domain.{Shipment, ShipmentEngine, Splitters.Weight}
 
   @doc """
@@ -125,27 +128,23 @@ defmodule Snitch.Domain.Order.Transitions do
 
   def persist_shipment(%Context{valid?: false} = context), do: context
 
-  defp calculate_package_total(
-         %{tax_total: tax_total, adjustment_total: adjustment_total, promo_total: promo_total},
-         shipping_cost
-       ) do
-    Enum.reduce([tax_total, adjustment_total, promo_total, shipping_cost], &Money.add!/2)
-  end
-
-  def process_package(package) do
+  defp process_package(package, shipping_method_id) do
     shipping_method =
       Enum.find(package.shipping_methods, fn %{id: id} ->
-        id == package.shipping_method_id
+        id == shipping_method_id
       end)
-    shipping_cost = shipping_method.cost
 
     package_total =
       Enum.reduce(
-        [package.tax_total, package.adjustment_total, package.promo_total, shipping_cost],
+        [shipping_method.cost],
         &Money.add!/2
       )
 
-    Package.update(package, %{cost: shipping_cost, total: package_total, shipping_method_id: shipping_method.id})
+    Package.update(package, %{
+      cost: shipping_method.cost,
+      total: package_total,
+      shipping_method: shipping_method
+    })
   end
 
   @doc """
@@ -156,13 +155,20 @@ defmodule Snitch.Domain.Order.Transitions do
   Update package cost total in DB
   """
 
-  @spec associate_package(Context.t()) :: Context.t()
-  def associate_package(%Context{valid?: true, struct: %Order{} = order} = context) do
-    %{state: %{packages: packages}, multi: multi} = context
+  @spec save_packages_methods(Context.t()) :: Context.t()
+  def save_packages_methods(
+        %Context{valid?: true, struct: %Order{id: order_id} = order} = context
+      ) do
+    %{state: %{selected_shipping_methods: selected_shipping_methods}, multi: multi} = context
+
+    packages = Repo.all(from(p in PackageSchema, where: p.order_id == ^order_id))
 
     function = fn _ ->
-      packages
-      |> Stream.map(&process_package/1)
+      selected_shipping_methods
+      |> Stream.map(fn %{package_id: package_id, shipping_method_id: shipping_method_id} ->
+        package = Enum.find(packages, fn package -> package.id == package_id end)
+        process_package(package, shipping_method_id)
+      end)
       |> Enum.reduce_while({:ok, []}, fn
         {:ok, package}, {:ok, acc} ->
           {:cont, {:ok, [package | acc]}}
