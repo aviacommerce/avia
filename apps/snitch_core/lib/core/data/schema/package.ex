@@ -58,7 +58,6 @@ defmodule Snitch.Data.Schema.Package do
     belongs_to(:shipping_method, ShippingMethod)
 
     has_many(:items, PackageItem)
-    has_one(:address, through: [:order, :shipping_address])
 
     timestamps()
   end
