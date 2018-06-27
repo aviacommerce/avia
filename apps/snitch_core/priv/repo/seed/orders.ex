@@ -12,9 +12,9 @@ defmodule Snitch.Seed.Orders do
   @order %{
     number: nil,
     state: nil,
+    user_id: nil,
     billing_address: nil,
     shipping_address: nil,
-    user_id: nil,
     adjustment_total: Money.new(0, :USD),
     promo_total: Money.new(0, :USD),
     item_total: Money.new(0, :USD),
@@ -36,6 +36,7 @@ defmodule Snitch.Seed.Orders do
   defp build_orders do
     variants = Repo.all(Variant)
     [user | _] = Repo.all(User)
+
     digest = [
       %{quantity: [5, 5, 1, 0, 0, 0, 0], user_id: user.id, state: :cart},
       %{quantity: [0, 0, 0, 0, 0, 100], user_id: user.id, state: :cart},
@@ -89,8 +90,8 @@ defmodule Snitch.Seed.Orders do
         | number: number,
           state: "#{manifest.state}",
           user_id: manifest[:user_id],
-          billing_address_id: manifest[:address_id],
-          shipping_address_id: manifest[:address_id],
+          billing_address: manifest[:address],
+          shipping_address: manifest[:address],
           item_total: item_total,
           total: item_total
       }
