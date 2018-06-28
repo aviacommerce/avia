@@ -2,6 +2,7 @@ defmodule AdminAppWeb.RoleController do
   use AdminAppWeb, :controller
   alias Snitch.Data.Model.Role
   alias Snitch.Data.Schema.Role, as: RoleSchema
+  alias Snitch.Repo
 
   def index(conn, _params) do
     roles = Role.get_all()
@@ -18,6 +19,8 @@ defmodule AdminAppWeb.RoleController do
         |> redirect(to: role_path(conn, :index))
 
       {:error, changeset} ->
+        changeset = update_in(changeset.data, &Repo.preload(&1, :permissions))
+
         conn
         |> put_flash(:error, "Sorry there were some errors !!")
         |> render("new.html", changeset: %{changeset | action: :insert})
@@ -26,15 +29,22 @@ defmodule AdminAppWeb.RoleController do
 
   def new(conn, _params) do
     changeset = RoleSchema.create_changeset(%RoleSchema{}, %{})
+    changeset = update_in(changeset.data, &Repo.preload(&1, :permissions))
     render(conn, "new.html", changeset: changeset)
   end
 
   def edit(conn, %{"id" => id}) do
-    case Role.get(String.to_integer(id)) do
+    role =
+      id
+      |> String.to_integer()
+      |> Role.get()
+      |> Repo.preload(:permissions)
+
+    case role do
       nil ->
         conn
         |> put_flash(:error, "Sorry role not found")
-        |> render("index.html")
+        |> redirect(to: role_path(conn, :index))
 
       role ->
         changeset = RoleSchema.update_changeset(role, %{})
@@ -45,7 +55,11 @@ defmodule AdminAppWeb.RoleController do
   def update(conn, %{"id" => id, "role" => role}) do
     id = String.to_integer(id)
     params = parse_role_params(role)
-    role = Role.get(id)
+
+    role =
+      id
+      |> Role.get()
+      |> Repo.preload(:permissions)
 
     case Role.update(params, role) do
       {:ok, _} ->
@@ -80,7 +94,14 @@ defmodule AdminAppWeb.RoleController do
   defp parse_role_params(role) do
     %{
       name: role["name"],
-      description: role["description"]
+      description: role["description"],
+      permissions: parse_permission_params(role["permissions"])
     }
+  end
+
+  defp parse_permission_params(nil), do: []
+
+  defp parse_permission_params(permissions) do
+    Enum.map(permissions, &String.to_integer(&1))
   end
 end
