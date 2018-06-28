@@ -12,9 +12,9 @@ defmodule Snitch.Seed.Orders do
   @order %{
     number: nil,
     state: nil,
-    billing_address_id: nil,
-    shipping_address_id: nil,
     user_id: nil,
+    billing_address: nil,
+    shipping_address: nil,
     adjustment_total: Money.new(0, :USD),
     promo_total: Money.new(0, :USD),
     item_total: Money.new(0, :USD),
@@ -22,7 +22,6 @@ defmodule Snitch.Seed.Orders do
     inserted_at: DateTime.utc(),
     updated_at: DateTime.utc()
   }
-
   # @stock_items %{
   #   "origin" => %{
   #     counts: [10, 10, 10, 10, 00, 00],
@@ -91,8 +90,8 @@ defmodule Snitch.Seed.Orders do
         | number: number,
           state: "#{manifest.state}",
           user_id: manifest[:user_id],
-          billing_address_id: manifest[:address_id],
-          shipping_address_id: manifest[:address_id],
+          billing_address: manifest[:address],
+          shipping_address: manifest[:address],
           item_total: item_total,
           total: item_total
       }

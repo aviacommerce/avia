@@ -7,7 +7,7 @@ defmodule Snitch.Data.Schema.Order do
 
   alias Ecto.Nanoid
   alias Snitch.Data.Model.LineItem, as: LineItemModel
-  alias Snitch.Data.Schema.{Address, LineItem, User}
+  alias Snitch.Data.Schema.{LineItem, OrderAddress, User}
 
   @type t :: %__MODULE__{}
 
@@ -23,24 +23,20 @@ defmodule Snitch.Data.Schema.Order do
     field(:adjustment_total, Money.Ecto.Composite.Type)
     field(:promo_total, Money.Ecto.Composite.Type)
 
-    # field :shipping
-    # field :payment
-
-    # field(:completed_at, :naive_datetime)
+    embeds_one(:billing_address, OrderAddress, on_replace: :update)
+    embeds_one(:shipping_address, OrderAddress, on_replace: :update)
 
     # associations
     belongs_to(:user, User)
-    belongs_to(:billing_address, Address, on_replace: :update)
-    belongs_to(:shipping_address, Address, on_replace: :update)
     has_many(:line_items, LineItem, on_delete: :delete_all, on_replace: :delete)
 
     timestamps()
   end
 
   @required_fields ~w(state user_id)a
-  @optional_fields ~w(billing_address_id shipping_address_id)a
   @create_fields @required_fields
-  @update_fields [:state | @optional_fields]
+
+  @update_fields [:state]
 
   @doc """
   Returns a Order changeset with totals for a "new" order.
@@ -77,13 +73,12 @@ defmodule Snitch.Data.Schema.Order do
     |> compute_totals()
   end
 
-  @partial_update_fields ~w(state)a
   @spec partial_update_changeset(t, map) :: Ecto.Changeset.t()
   def partial_update_changeset(%__MODULE__{} = order, params) do
     order
-    |> cast(params, @partial_update_fields)
-    |> cast_assoc(:billing_address)
-    |> cast_assoc(:shipping_address)
+    |> cast(params, [:state])
+    |> cast_embed(:billing_address)
+    |> cast_embed(:shipping_address)
   end
 
   @spec compute_totals(Ecto.Changeset.t()) :: Ecto.Changeset.t()

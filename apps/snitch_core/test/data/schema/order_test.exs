@@ -126,12 +126,17 @@ defmodule Snitch.Data.Schema.OrderTest do
       }
 
       params = %{
-        shipping_address: address_params
+        shipping_address: address_params,
+        billing_address: address_params
       }
 
       cs = Order.partial_update_changeset(persisted, params)
       refute cs.valid?
-      assert %{shipping_address: %{state_id: ["does not exist"]}} = errors_on(cs)
+
+      assert %{
+               shipping_address: %{state_id: ["does not exist"]},
+               billing_address: %{state_id: ["does not exist"]}
+             } = errors_on(cs)
     end
 
     test "with valid address params", %{persisted: persisted, address: address} do

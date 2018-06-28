@@ -7,6 +7,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
   alias BeepBop.Context
   alias Ecto.Multi
   alias Snitch.Data.Schema.Order
+  alias Snitch.Data.Schema.OrderAddress
   alias Snitch.Domain.Order.Transitions
 
   @patna %{
@@ -60,7 +61,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     end
 
     test "with an order that has no addresses", %{patna: patna, order: order} do
-      assert is_nil(order.billing_address_id) and is_nil(order.shipping_address_id)
+      assert is_nil(order.billing_address) and is_nil(order.shipping_address)
 
       result =
         order
@@ -73,7 +74,6 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     test "with an order that already has addresses", %{patna: patna, order: order} do
       order =
         order
-        |> Repo.preload([:shipping_address, :billing_address])
         |> Order.partial_update_changeset(%{billing_address: patna, shipping_address: patna})
         |> Repo.update!()
 
@@ -91,12 +91,18 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
   describe "compute_shipments" do
     setup do
+      shipping_address =
+        :address
+        |> build()
+        |> Map.from_struct()
+        |> Map.delete(:__meta__)
+
       [
         order:
           insert(
             :order,
             user: build(:user),
-            shipping_address: build(:address)
+            shipping_address: Repo.load(OrderAddress, shipping_address)
           )
       ]
     end

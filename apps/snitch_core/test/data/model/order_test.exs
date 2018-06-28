@@ -33,7 +33,7 @@ defmodule Snitch.Data.Model.OrderTest do
       line_items = extract_ids(order.line_items)
       params = %{slug: "chichuahua", line_items: line_items}
 
-      {:ok, _order} = Order.update(params, order)
+      assert {:ok, _order} = Order.update(params, order)
     end
 
     @tag variant_count: 4
