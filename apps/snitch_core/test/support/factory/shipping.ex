@@ -65,6 +65,29 @@ defmodule Snitch.Factory.Shipping do
         ]
       end
 
+      def shipping_methods_embedded(%{zones: zones} = context) do
+        sm_count = Map.get(context, :shipping_method_count, 0)
+        categories = Map.get(context, :shipping_categories, [])
+
+        shipping_methods =
+          insert_list(sm_count, :shipping_method, zones: zones, shipping_categories: categories)
+
+        shipping_method_ids = Enum.map(shipping_methods, fn method -> method.id end)
+
+        [
+          shipping_methods:
+            build_list(
+              sm_count,
+              :embedded_shipping_method,
+              id: sequence(:id, shipping_method_ids),
+              slug: sequence("shipping_method"),
+              name: sequence(:name, &"method-#{&1}"),
+              description: "Snitch revolution",
+              cost: Money.new(3, :USD)
+            )
+        ]
+      end
+
       def shipping_categories(context) do
         sc_count = Map.get(context, :shipping_category_count, 0)
 

@@ -150,8 +150,16 @@ defmodule Snitch.Domain.Order.TransitionsTest do
   end
 
   describe "associate_package" do
-    setup do
+    setup :shipping_categories
+    setup :zones
+    setup :shipping_methods_embedded
+
+    @tag shipping_category_count: 1,
+         shipping_method_count: 1,
+         state_zone_count: 1
+    setup context do
       order = insert(:order, user: build(:user))
+      %{shipping_methods: [sm]} = context
 
       packages =
         insert_list(
@@ -159,7 +167,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
           :package,
           order_id: order.id,
           origin: build(:stock_location),
-          shipping_methods: build_list(2, :embedded_shipping_method),
+          shipping_methods: [sm],
           shipping_category: build(:shipping_category)
         )
 
