@@ -1,0 +1,46 @@
+# The role manifest connects a set of permissions in the system with
+# respective controller modules.
+#
+# An association between a permission and set of controllers(including functions)
+# allows a user with some role having that particular permission to
+# access the associated controller functions.
+#  user --> has one --> role --> has many --> permissions --> associated with many controllers
+#  => user --> can access those controllers.
+#
+# In order to create a new association first of all a permission needs to be
+# created in the system from the admin app and then it needs to be updated
+# here in the role_manifest.yml.
+#
+# ### Example
+# Let's say there is a role "order_manager", let the permission created
+# from the application be "manage_orders".
+# The permission "manage_orders" can be connected with controller functions
+# in the following manner:
+#
+# --- # marks the beginning of yaml file
+# - manages_orders:
+#     Elixir.AdminAppWeb.OrderController:
+#       - edit
+#       - create
+#       - new
+#       - show
+#       - list
+#     Elixir.AdminAppWeb.ProductController:
+#       - show
+#       - list
+# ... # marks the end of yaml file
+# Then a user with role "order_manager" will be able to access the above mentioned
+# resources.
+# Make sure these controllers use the plug `AdminAppWeb.AuthorizePlug`.
+---
+- manage_orders:
+    Elixir.AdminAppWeb.OrderController:
+      - edit
+      - create
+      - new
+      - show
+      - list
+    Elixir.AdminAppWeb.ProductController:
+      - show
+      - list
+...

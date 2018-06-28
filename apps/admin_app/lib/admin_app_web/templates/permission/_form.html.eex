@@ -1,0 +1,6 @@
+<%= form_for @changeset, @action, [as: :permission], fn f -> %>
+  <%= input f, :code %>
+  <%= input f, :description %>
+  <%= submit "Submit", class: "btn btn-primary submit-btn" %>
+  <%= link("Cancel", to: permission_path(@conn, :index), class: "btn btn-primary") %>
+<% end %>
