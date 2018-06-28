@@ -4,6 +4,7 @@ defmodule Snitch.Data.Model.Order do
   """
   use Snitch.Data.Model
   alias Snitch.Data.Schema.Order
+  alias Snitch.Data.Schema.Package
   alias Snitch.Data.Model.LineItem, as: LineItemModel
 
   @doc """
@@ -54,7 +55,7 @@ defmodule Snitch.Data.Model.Order do
 
   ```
   order # this is the order you wish to update, and `:line_items` are preloaded
-  line_items = Enum.reduce(order.line_items, [], fn x, acc -> 
+  line_items = Enum.reduce(order.line_items, [], fn x, acc ->
     [%{id: x.id} | acc]
   end)
   params = %{} # All changes except line-items
@@ -141,5 +142,10 @@ defmodule Snitch.Data.Model.Order do
     else
       LineItemModel.update_price_and_totals(line_items)
     end
+  end
+
+  @spec order_packages(Order.t()) :: [Package.t()] | []
+  def order_packages(order) do
+    Repo.all(from(p in Package, where: p.order_id == ^order.id))
   end
 end

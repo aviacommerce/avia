@@ -45,8 +45,7 @@ defmodule Snitch.Factory.Shipping do
           total: Money.new(0, :USD),
           tax_total: Money.new(0, :USD),
           adjustment_total: Money.new(0, :USD),
-          promo_total: Money.new(0, :USD),
-          id: sequence(:id, &(&1 + 1))
+          promo_total: Money.new(0, :USD)
         }
       end
 

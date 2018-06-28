@@ -58,8 +58,7 @@ defmodule Snitch.Data.Model.Package do
   @doc """
   Query of packages related to order
   """
-
-  # @spec get_packages(Order.t()) ::
+  @spec get_packages(Order.t()) :: list(Package.t())
   def get_packages(order) do
     query =
       from(

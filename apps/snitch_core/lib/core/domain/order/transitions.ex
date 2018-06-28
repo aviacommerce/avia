@@ -14,7 +14,7 @@ defmodule Snitch.Domain.Order.Transitions do
   alias BeepBop.Context
   alias Snitch.Data.Model.Package
   alias Snitch.Data.Schema.Order
-  alias Snitch.Data.Schema.Package, as: PackageSchema
+  alias Snitch.Data.Model.Order, as: OrderModel
 
   alias Snitch.Domain.{Shipment, ShipmentEngine, Splitters.Weight}
 
@@ -136,7 +136,7 @@ defmodule Snitch.Domain.Order.Transitions do
 
     package_total =
       Enum.reduce(
-        [shipping_method.cost],
+        [shipping_method.cost, package.tax_total, package.promo_total, package.adjustment_total],
         &Money.add!/2
       )
 
@@ -161,7 +161,7 @@ defmodule Snitch.Domain.Order.Transitions do
       ) do
     %{state: %{selected_shipping_methods: selected_shipping_methods}, multi: multi} = context
 
-    packages = Repo.all(from(p in PackageSchema, where: p.order_id == ^order_id))
+    packages = OrderModel.order_packages(order)
 
     function = fn _ ->
       selected_shipping_methods

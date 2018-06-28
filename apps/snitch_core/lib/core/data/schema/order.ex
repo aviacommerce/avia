@@ -56,7 +56,7 @@ defmodule Snitch.Data.Schema.Order do
     order
     |> cast(params, @create_fields)
     |> validate_required(@required_fields)
-    |> unique_constraint(:slug)
+    |> unique_constraint(:number)
     |> foreign_key_constraint(:user_id)
     |> cast_assoc(:line_items, with: &LineItem.create_changeset/2, required: true)
     |> ensure_unique_line_items()
