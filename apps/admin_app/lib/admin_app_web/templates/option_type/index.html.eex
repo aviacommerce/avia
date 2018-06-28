@@ -1,0 +1,38 @@
+<div class="row">
+  <div class="col-5">
+    <h2>Option Types</h2>
+  </div>
+  <div class="col-6" align="right">
+    <%= link("Create New", to: option_type_path(@conn, :new), class: "btn btn-primary")%>
+  </div>
+  <div class="col-1"></div>
+</div>
+<div class="row">
+  <div class="col-12">
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col"></th>
+      <th scope="col">Name</th>
+      <th scope="col">Display Name</th>
+      <th actions="col"></th>
+    </tr>
+  </thead>
+  <tbody class="ui-sortable">
+    <%= for item <- @option_types do %>
+    <tr>
+      <th scope="row" class="ui-state-default"></th>
+      <td><%= item.name %></td>
+      <td><%= item.display_name %></td>
+      <td>
+        <div class="float-right">
+        <%= link("Edit", to: option_type_path(@conn, :edit, item.id), class: "btn btn-primary")%>
+        <%= link("Delete", to: option_type_path(@conn, :delete, item.id), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger")%>
+      </div>
+      </td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+</div>
