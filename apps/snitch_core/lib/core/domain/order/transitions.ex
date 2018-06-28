@@ -143,6 +143,9 @@ defmodule Snitch.Domain.Order.Transitions do
     Package.update(package, %{
       cost: shipping_method.cost,
       total: package_total,
+      tax_total: Money.zero!(),
+      promo_total: Money.zero!(),
+      adjustment_total: Money.zero!(),
       shipping_method_id: shipping_method_id
     })
   end
