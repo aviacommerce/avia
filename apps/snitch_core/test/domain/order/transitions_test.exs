@@ -3,6 +3,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
   use Snitch.DataCase
 
   import Snitch.Factory
+  import Mox
 
   alias BeepBop.Context
   alias Ecto.Multi
@@ -158,6 +159,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
          shipping_method_count: 1,
          state_zone_count: 1
     setup context do
+      expect(Snitch.Tools.DefaultsMock, :fetch, 3, fn :currency -> {:ok, :USD} end)
       order = insert(:order, user: build(:user))
       %{shipping_methods: [sm]} = context
 

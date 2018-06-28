@@ -15,6 +15,7 @@ defmodule Snitch.Domain.Order.Transitions do
   alias Snitch.Data.Model.Package
   alias Snitch.Data.Schema.Order
   alias Snitch.Data.Model.Order, as: OrderModel
+  alias Snitch.Tools.Money, as: MoneyTools
 
   alias Snitch.Domain.{Shipment, ShipmentEngine, Splitters.Weight}
 
@@ -143,9 +144,9 @@ defmodule Snitch.Domain.Order.Transitions do
     Package.update(package, %{
       cost: shipping_method.cost,
       total: package_total,
-      tax_total: Money.zero!(),
-      promo_total: Money.zero!(),
-      adjustment_total: Money.zero!(),
+      tax_total: MoneyTools.zero!(),
+      promo_total: MoneyTools.zero!(),
+      adjustment_total: MoneyTools.zero!(),
       shipping_method_id: shipping_method_id
     })
   end
