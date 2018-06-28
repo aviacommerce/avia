@@ -13,6 +13,7 @@ defmodule Snitch.Domain.Order.Transitions do
   alias BeepBop.Context
   alias Snitch.Data.Model.Package
   alias Snitch.Data.Schema.Order
+
   alias Snitch.Domain.{Shipment, ShipmentEngine, Splitters.Weight}
 
   @doc """
@@ -37,15 +38,10 @@ defmodule Snitch.Domain.Order.Transitions do
           }
         } = context
       ) do
-    changeset =
-      order
-      |> Repo.preload([:billing_address, :shipping_address])
-      |> Order.partial_update_changeset(%{
-        billing_address: billing,
-        shipping_address: shipping
-      })
-
-    case Repo.update(changeset) do
+    order
+    |> Order.partial_update_changeset(%{billing_address: billing, shipping_address: shipping})
+    |> Repo.update()
+    |> case do
       {:ok, order} ->
         Context.new(order, state: context.state)
 
