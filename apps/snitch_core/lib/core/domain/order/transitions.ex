@@ -136,7 +136,7 @@ defmodule Snitch.Domain.Order.Transitions do
 
     package_total =
       Enum.reduce(
-        [shipping_method.cost, package.tax_total, package.promo_total, package.adjustment_total],
+        [shipping_method.cost],
         &Money.add!/2
       )
 
