@@ -45,7 +45,8 @@ defmodule AdminApp.Mixfile do
       {:cowboy, "~> 1.0"},
       {:snitch_core, "~> 0.0.1", in_umbrella: true},
       {:guardian, "~> 1.0"},
-      {:params, "~> 2.0"}
+      {:params, "~> 2.0"},
+      {:yaml_elixir, "~> 2.1.0"}
     ]
   end
 end
