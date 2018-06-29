@@ -56,4 +56,18 @@ defmodule Snitch.Data.Model.Package do
         |> Enum.reduce(&Money.add!/2)
     end
   end
+
+  @doc """
+  Query of packages related to order
+  """
+  @spec get_packages(Order.t()) :: list(Package.t())
+  def get_packages(order) do
+    query =
+      from(
+        p in Package,
+        where: p.order_id == ^order.id
+      )
+
+    Repo.all(query)
+  end
 end
