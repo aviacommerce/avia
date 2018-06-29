@@ -31,12 +31,6 @@ defmodule Snitch.Data.Schema.OrderAddress do
     |> assoc_state_and_country()
   end
 
-  defp struct_to_map(struct) do
-    struct
-    |> Map.from_struct()
-    |> Map.delete(:__meta__)
-  end
-
   defp assoc_state_and_country(
          %{
            valid?: true,

@@ -67,7 +67,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
     test "with valid params", context do
       %{line_items: [line_item]} = context
 
-      assert {:ok, package} =
+      assert {:ok, package_item} =
                PackageItem.create(%{
                  @params
                  | line_item_id: line_item.id,
@@ -75,7 +75,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
                    package_id: make_package(context).id
                })
 
-      assert package.backordered?
+      assert package_item.backordered?
     end
   end
 
@@ -88,7 +88,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
     test "with valid params", context do
       %{line_items: [line_item]} = context
 
-      assert {:ok, package} =
+      assert {:ok, package_item} =
                PackageItem.create(%{
                  @params
                  | line_item_id: line_item.id,
@@ -96,19 +96,19 @@ defmodule Snitch.Data.Model.PackageItemTest do
                    package_id: make_package(context).id
                })
 
-      assert package.backordered?
+      assert package_item.backordered?
 
-      assert {:ok, package} =
+      assert {:ok, package_item} =
                PackageItem.update(
                  %{
                    state: "destroyed",
                    quantity: 5,
                    delta: 0
                  },
-                 package
+                 package_item
                )
 
-      refute package.backordered?
+      refute package_item.backordered?
     end
   end
 

@@ -3,7 +3,14 @@
     <ul id="drilldown" class="nav nav-pills nav-stacked col-3">
         <li><a class="nav-link" href="/orders">Orders</a></li>
         <li><a class="nav-link" href="#">Returns</a></li>
-        <li><a class="nav-link" href="#">Products</a></li>
+        <li>
+          <a class="nav-link" href="#" data-toggle="collapse" data-target="#drilldown-2">
+            Products
+          </a>
+          <ul id="drilldown-2" class="nav nav-pills nav-stacked collapse pl-3">
+            <li><a class="nav-link" href="/option_types">Option Types</a></li>
+          </ul>
+        </li>
         <li><a class="nav-link" href="#">Reports</a></li>
         <li>
           <a class="nav-link" href="#" data-toggle="collapse" data-target="#drilldown-1">

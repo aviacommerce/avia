@@ -14,7 +14,6 @@ defmodule Snitch.Domain.Order.Transitions do
   alias BeepBop.Context
   alias Snitch.Data.Model.Package
   alias Snitch.Data.Schema.Order
-  alias Snitch.Data.Model.Order, as: OrderModel
   alias Snitch.Tools.Money, as: MoneyTools
 
   alias Snitch.Domain.{Shipment, ShipmentEngine, Splitters.Weight}
