@@ -7,7 +7,7 @@ defmodule Snitch.Data.Schema.Order do
 
   alias Ecto.Nanoid
   alias Snitch.Data.Model.LineItem, as: LineItemModel
-  alias Snitch.Data.Schema.{LineItem, OrderAddress, User}
+  alias Snitch.Data.Schema.{LineItem, OrderAddress, User, Package}
 
   @type t :: %__MODULE__{}
 
@@ -34,6 +34,7 @@ defmodule Snitch.Data.Schema.Order do
     embeds_one(:shipping_address, OrderAddress, on_replace: :update)
 
     has_many(:line_items, LineItem, on_delete: :delete_all, on_replace: :delete)
+    has_many(:packages, Package)
 
     timestamps()
   end

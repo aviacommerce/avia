@@ -141,12 +141,14 @@ defmodule Snitch.Domain.Order.Transitions do
         &Money.add!/2
       )
 
+    money_zero = MoneyTools.zero!()
+
     Package.update(package, %{
       cost: shipping_method.cost,
       total: package_total,
-      tax_total: MoneyTools.zero!(),
-      promo_total: MoneyTools.zero!(),
-      adjustment_total: MoneyTools.zero!(),
+      tax_total: money_zero,
+      promo_total: money_zero,
+      adjustment_total: money_zero,
       shipping_method_id: shipping_method_id
     })
   end
@@ -165,7 +167,7 @@ defmodule Snitch.Domain.Order.Transitions do
       ) do
     %{state: %{selected_shipping_methods: selected_shipping_methods}, multi: multi} = context
 
-    packages = OrderModel.order_packages(order)
+    packages = Map.fetch!(Repo.preload(order, [:packages]), :packages)
 
     function = fn _ ->
       selected_shipping_methods

@@ -143,9 +143,4 @@ defmodule Snitch.Data.Model.Order do
       LineItemModel.update_price_and_totals(line_items)
     end
   end
-
-  @spec order_packages(Order.t()) :: [Package.t()] | []
-  def order_packages(order) do
-    Repo.all(from(p in Package, where: p.order_id == ^order.id))
-  end
 end
