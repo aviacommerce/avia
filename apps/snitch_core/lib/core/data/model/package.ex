@@ -45,6 +45,7 @@ defmodule Snitch.Data.Model.Package do
   @spec compute_package_total(Order.t()) :: Money.t()
   def compute_package_total(order) do
     packages = Map.fetch!(Repo.preload(order, [:packages]), :packages)
+
     case packages do
       [] ->
         MoneyTools.zero!()

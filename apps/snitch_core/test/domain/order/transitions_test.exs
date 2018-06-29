@@ -191,7 +191,15 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
       assert result.valid?
       assert [packages: {:run, _}] = Multi.to_list(result.multi)
-      assert {:ok, %{packages: _}} = Repo.transaction(result.multi)
+      assert {:ok, %{packages: packages}} = Repo.transaction(result.multi)
+
+      refute Enum.any?(packages, fn package ->
+               with false <- is_nil(package.shipping_method_id),
+                    false <- is_nil(package.tax_total),
+                    false <- is_nil(package.promo_total),
+                    false <- is_nil(package.adjustment_total),
+                    do: false
+             end)
     end
   end
 end
