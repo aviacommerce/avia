@@ -9,7 +9,6 @@ defmodule Snitch.Domain.Order.Transitions do
   """
 
   use Snitch.Domain
-  import Ecto.Query, only: [from: 2]
 
   alias BeepBop.Context
   alias Snitch.Data.Model.Package
@@ -158,31 +157,64 @@ defmodule Snitch.Domain.Order.Transitions do
   Calculate pacakge total cost Sum(shipping_cost, adjustment_total,promo_total, shipping_cost)
 
   Update package cost total in DB
+
+  selected_shipping_methods = [%{package_id: p_id, shipping_method_id: s_id}]
   """
 
   @spec save_packages_methods(Context.t()) :: Context.t()
-  def save_packages_methods(
-        %Context{valid?: true, struct: %Order{id: order_id} = order} = context
-      ) do
+  def save_packages_methods(%Context{valid?: true, struct: %Order{} = order} = context) do
     %{state: %{selected_shipping_methods: selected_shipping_methods}, multi: multi} = context
 
     packages = Map.fetch!(Repo.preload(order, [:packages]), :packages)
 
-    function = fn _ ->
-      selected_shipping_methods
-      |> Stream.map(fn %{package_id: package_id, shipping_method_id: shipping_method_id} ->
-        package = Enum.find(packages, fn package -> package.id == package_id end)
-        process_package(package, shipping_method_id)
-      end)
-      |> Enum.reduce_while({:ok, []}, fn
-        {:ok, package}, {:ok, acc} ->
-          {:cont, {:ok, [package | acc]}}
+    case evaluate_packages(packages, selected_shipping_methods) do
+      [] ->
+        struct(context, valid?: false, errors: [error: "empty packages in order"])
 
-        {:error, _} = error, _ ->
-          {:halt, error}
-      end)
+      :package_with_no_shpping_method_id ->
+        struct(context, valid?: false, errors: [error: "no shipping_method_id in package"])
+
+      :valid_order_packages ->
+        function = fn _ ->
+          selected_shipping_methods
+          |> Stream.map(fn %{package_id: package_id, shipping_method_id: shipping_method_id} ->
+            package = Enum.find(packages, fn package -> package.id == package_id end)
+            process_package(package, shipping_method_id)
+          end)
+          |> Enum.reduce_while({:ok, []}, fn
+            {:ok, package}, {:ok, acc} ->
+              {:cont, {:ok, [package | acc]}}
+
+            {:error, _} = error, _ ->
+              {:halt, error}
+          end)
+        end
+
+        struct(context, multi: Multi.run(multi, :packages, function))
     end
+  end
 
-    struct(context, multi: Multi.run(multi, :packages, function))
+  defp evaluate_packages([], _), do: []
+
+  defp evaluate_packages(packages, shipping_methods) do
+    # reduce to map like %{package_id: shipping_method_id}
+    package_methods =
+      Enum.reduce(shipping_methods, %{}, fn %{package_id: p_id, shipping_method_id: s_id}, acc ->
+        Map.put(acc, p_id, s_id)
+      end)
+
+    # ensures the shipping method id for package
+    packages_shipping_status =
+      Enum.any?(packages, fn %{id: p_id} ->
+        is_nil(package_methods[p_id])
+      end)
+
+    case packages_shipping_status do
+      true ->
+        :package_with_no_shpping_method_id
+
+      false ->
+        :valid_order_packages
+    end
   end
 end

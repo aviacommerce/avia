@@ -202,4 +202,69 @@ defmodule Snitch.Domain.Order.TransitionsTest do
              end)
     end
   end
+
+  describe "empty_packages" do
+    setup do
+      expect(Snitch.Tools.DefaultsMock, :fetch, 3, fn :currency -> {:ok, :USD} end)
+      order = insert(:order, user: build(:user))
+      [order: order]
+    end
+
+    test "with empty packages", %{order: order} do
+      shipping_methods = [
+        %{package_id: 123, shipping_method_id: nil}
+      ]
+
+      result =
+        order
+        |> Context.new(state: %{selected_shipping_methods: shipping_methods})
+        |> Transitions.save_packages_methods()
+
+      refute result.valid?
+      assert result.errors == [error: "empty packages in order"]
+    end
+  end
+
+  describe "missing shipping method" do
+    setup :shipping_categories
+    setup :zones
+    setup :shipping_methods_embedded
+
+    @tag shipping_category_count: 1,
+         shipping_method_count: 1,
+         state_zone_count: 1
+    setup context do
+      expect(Snitch.Tools.DefaultsMock, :fetch, 3, fn :currency -> {:ok, :USD} end)
+      order = insert(:order, user: build(:user))
+      %{shipping_methods: sm} = context
+
+      packages =
+        insert_list(
+          1,
+          :package,
+          order_id: order.id,
+          origin: build(:stock_location),
+          shipping_methods: sm,
+          shipping_category: build(:shipping_category)
+        )
+
+      [order: order, packages: packages]
+    end
+
+    test "package with no shpping method id", %{order: order, packages: packages} do
+      package = List.first(packages)
+
+      shipping_methods = [
+        %{package_id: package.id, shipping_method_id: nil}
+      ]
+
+      result =
+        order
+        |> Context.new(state: %{selected_shipping_methods: shipping_methods})
+        |> Transitions.save_packages_methods()
+
+      refute result.valid?
+      assert result.errors == [error: "no shipping_method_id in package"]
+    end
+  end
 end
