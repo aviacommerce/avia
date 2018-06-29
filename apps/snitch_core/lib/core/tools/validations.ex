@@ -22,7 +22,7 @@ defmodule Snitch.Tools.Validations do
     case fetch_change(changeset, key) do
       {:ok, %Money{amount: amount}} ->
         if Decimal.cmp(Decimal.reduce(amount), Decimal.new(0)) == :lt do
-          add_error(changeset, key, "must be greater than 0", validation: :number)
+          add_error(changeset, key, "must be equal or greater than 0", validation: :number)
         else
           changeset
         end

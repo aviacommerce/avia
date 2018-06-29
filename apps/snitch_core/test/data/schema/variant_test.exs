@@ -41,14 +41,14 @@ defmodule Snitch.Data.Schema.VariantTest do
       params = %{@valid_params | selling_price: Money.new("-0.01", :USD)}
       cs = %{valid?: validity} = Variant.create_changeset(%Variant{}, params)
       refute validity
-      assert %{selling_price: ["must be greater than 0"]} = errors_on(cs)
+      assert %{selling_price: ["must be equal or greater than 0"]} = errors_on(cs)
     end
 
     test "fails with bad cost price" do
       params = %{@valid_params | cost_price: Money.new("-0.01", :USD)}
       cs = %{valid?: validity} = Variant.create_changeset(%Variant{}, params)
       refute validity
-      assert %{cost_price: ["must be greater than 0"]} = errors_on(cs)
+      assert %{cost_price: ["must be equal or greater than 0"]} = errors_on(cs)
     end
 
     test "fails with duplicate sku" do
