@@ -4,7 +4,6 @@ defmodule Snitch.Data.Model.Order do
   """
   use Snitch.Data.Model
   alias Snitch.Data.Schema.Order
-  alias Snitch.Data.Schema.Package
   alias Snitch.Data.Model.LineItem, as: LineItemModel
 
   @doc """

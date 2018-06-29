@@ -13,7 +13,7 @@ defmodule Snitch.Domain.Order.Transitions do
   alias BeepBop.Context
   alias Snitch.Data.Model.Package
   alias Snitch.Data.Schema.Order
-  alias Snitch.Tools.Money, as: MoneyTools
+  alias Snitch.Domain.Package, as: PackageDomain
 
   alias Snitch.Domain.{Shipment, ShipmentEngine, Splitters.Weight}
 
@@ -113,13 +113,7 @@ defmodule Snitch.Domain.Order.Transitions do
       shipment
       |> Stream.map(&Shipment.to_package(&1, order))
       |> Stream.map(&Package.create/1)
-      |> Enum.reduce_while({:ok, []}, fn
-        {:ok, package}, {:ok, acc} ->
-          {:cont, {:ok, [package | acc]}}
-
-        {:error, _} = error, _ ->
-          {:halt, error}
-      end)
+      |> fail_fast_reduce()
     end
 
     struct(context, multi: Multi.run(multi, :packages, function))
@@ -127,94 +121,77 @@ defmodule Snitch.Domain.Order.Transitions do
 
   def persist_shipment(%Context{valid?: false} = context), do: context
 
-  defp process_package(package, shipping_method_id) do
-    shipping_method =
-      Enum.find(package.shipping_methods, fn %{id: id} ->
-        id == shipping_method_id
-      end)
-
-    package_total =
-      Enum.reduce(
-        [shipping_method.cost],
-        &Money.add!/2
-      )
-
-    money_zero = MoneyTools.zero!()
-
-    Package.update(package, %{
-      cost: shipping_method.cost,
-      total: package_total,
-      tax_total: money_zero,
-      promo_total: money_zero,
-      adjustment_total: money_zero,
-      shipping_method_id: shipping_method_id
-    })
-  end
-
   @doc """
-  Persists shipping_method_id to packages
+  Persists the shipping preferences of the user in each `package` of the `order`.
 
-  Calculate pacakge total cost Sum(shipping_cost, adjustment_total,promo_total, shipping_cost)
+  Along with the chosen `ShippingMethod`, we update pacakge price fields. User's
+  selection is assumed to be under the `context.state.shipping_preferences` key-path.
 
-  Update package cost total in DB
+  ## Schema of the `:state`
+  ```
+  %{
+    shipping_preferences: [
+      %{
+        package_id: string,
+        shipping_method_id: non_neg_integer
+      }
+    ]
+  }
+  ```
 
-  selected_shipping_methods = [%{package_id: p_id, shipping_method_id: s_id}]
+  ## Assumptions
+  * For each `package` of the `order`, a valid `shipping_method` must be chosen.
+    > If an `order` has 3 packages, then
+      `length(context.state.shipping_preferences)` must be `3`.
+  * The chosen `shipping_method` for the `package` must be one among the
+    `package.shipping_methods`.
   """
-
-  @spec save_packages_methods(Context.t()) :: Context.t()
-  def save_packages_methods(%Context{valid?: true, struct: %Order{} = order} = context) do
-    %{state: %{selected_shipping_methods: selected_shipping_methods}, multi: multi} = context
+  @spec persist_shipping_preferences(Context.t()) :: Context.t()
+  def persist_shipping_preferences(%Context{valid?: true, struct: %Order{} = order} = context) do
+    %{state: %{shipping_preferences: shipping_preferences}, multi: multi} = context
 
     packages = Map.fetch!(Repo.preload(order, [:packages]), :packages)
 
-    case evaluate_packages(packages, selected_shipping_methods) do
-      [] ->
-        struct(context, valid?: false, errors: [error: "empty packages in order"])
+    if validate_shipping_preferences(packages, shipping_preferences) do
+      function = fn _ ->
+        shipping_preferences
+        |> Stream.map(fn %{package_id: package_id, shipping_method_id: shipping_method_id} ->
+          packages
+          |> Enum.find(fn %{id: id} -> id == package_id end)
+          |> PackageDomain.set_shipping_method(shipping_method_id)
+        end)
+        |> fail_fast_reduce()
+      end
 
-      :package_with_no_shpping_method_id ->
-        struct(context, valid?: false, errors: [error: "no shipping_method_id in package"])
-
-      :valid_order_packages ->
-        function = fn _ ->
-          selected_shipping_methods
-          |> Stream.map(fn %{package_id: package_id, shipping_method_id: shipping_method_id} ->
-            package = Enum.find(packages, fn package -> package.id == package_id end)
-            process_package(package, shipping_method_id)
-          end)
-          |> Enum.reduce_while({:ok, []}, fn
-            {:ok, package}, {:ok, acc} ->
-              {:cont, {:ok, [package | acc]}}
-
-            {:error, _} = error, _ ->
-              {:halt, error}
-          end)
-        end
-
-        struct(context, multi: Multi.run(multi, :packages, function))
+      struct(context, multi: Multi.run(multi, :packages, function))
+    else
+      struct(context, valid?: false, errors: [shipping_preferences: "is invalid"])
     end
   end
 
-  defp evaluate_packages([], _), do: []
+  defp validate_shipping_preferences([], _), do: true
 
-  defp evaluate_packages(packages, shipping_methods) do
-    # reduce to map like %{package_id: shipping_method_id}
-    package_methods =
-      Enum.reduce(shipping_methods, %{}, fn %{package_id: p_id, shipping_method_id: s_id}, acc ->
-        Map.put(acc, p_id, s_id)
-      end)
+  defp validate_shipping_preferences(packages, selection) do
+    # selection must be over all packages, no package can be skipped.
+    # TODO: Replace with some nice API contract/validator.
+    package_ids =
+      packages
+      |> Enum.map(fn %{id: id} -> id end)
+      |> MapSet.new()
 
-    # ensures the shipping method id for package
-    packages_shipping_status =
-      Enum.any?(packages, fn %{id: p_id} ->
-        is_nil(package_methods[p_id])
-      end)
+    selection
+    |> Enum.map(fn %{package_id: p_id} -> p_id end)
+    |> MapSet.new()
+    |> MapSet.equal?(package_ids)
+  end
 
-    case packages_shipping_status do
-      true ->
-        :package_with_no_shpping_method_id
+  defp fail_fast_reduce(things) do
+    Enum.reduce_while(things, {:ok, []}, fn
+      {:ok, thing}, {:ok, acc} ->
+        {:cont, {:ok, [thing | acc]}}
 
-      false ->
-        :valid_order_packages
-    end
+      {:error, _} = error, _ ->
+        {:halt, error}
+    end)
   end
 end

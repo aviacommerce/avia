@@ -150,121 +150,53 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     end
   end
 
-  describe "associate_package" do
-    setup :shipping_categories
+  describe "persist_shipping_preferences/1" do
     setup :zones
-    setup :shipping_methods_embedded
+    setup :shipping_methods
+    setup :embedded_shipping_methods
 
-    @tag shipping_category_count: 1,
-         shipping_method_count: 1,
-         state_zone_count: 1
-    setup context do
-      expect(Snitch.Tools.DefaultsMock, :fetch, 3, fn :currency -> {:ok, :USD} end)
+    setup %{embedded_shipping_methods: methods} do
       order = insert(:order, user: build(:user))
-      %{shipping_methods: [sm]} = context
 
-      packages =
-        insert_list(
-          1,
-          :package,
-          order_id: order.id,
-          origin: build(:stock_location),
-          shipping_methods: [sm],
-          shipping_category: build(:shipping_category)
-        )
-
-      [order: order, packages: packages]
+      [order: order, packages: [insert(:package, shipping_methods: methods, order: order)]]
     end
 
-    test "with packages", %{order: order, packages: packages} do
-      package = List.first(packages)
-      selected_shipping_method = List.first(package.shipping_methods)
-
-      shipping_methods = [
-        %{package_id: package.id, shipping_method_id: selected_shipping_method.id}
+    @tag shipping_method_count: 1
+    test "with packages", %{order: order, packages: [package], shipping_methods: [sm]} do
+      preference = [
+        %{package_id: package.id, shipping_method_id: sm.id}
       ]
+
+      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :USD} end)
 
       result =
         order
-        |> Context.new(state: %{selected_shipping_methods: shipping_methods})
-        |> Transitions.save_packages_methods()
+        |> Context.new(state: %{shipping_preferences: preference})
+        |> Transitions.persist_shipping_preferences()
 
       assert result.valid?
       assert [packages: {:run, _}] = Multi.to_list(result.multi)
-      assert {:ok, %{packages: packages}} = Repo.transaction(result.multi)
+      assert {:ok, %{packages: _}} = Repo.transaction(result.multi)
+    end
 
-      refute Enum.any?(packages, fn package ->
-               with false <- is_nil(package.shipping_method_id),
-                    false <- is_nil(package.tax_total),
-                    false <- is_nil(package.promo_total),
-                    false <- is_nil(package.adjustment_total),
-                    do: false
-             end)
+    test "fails with invalid preferences", %{order: order} do
+      result =
+        order
+        |> Context.new(state: %{shipping_preferences: []})
+        |> Transitions.persist_shipping_preferences()
+
+      refute result.valid?
+      assert result.errors == [shipping_preferences: "is invalid"]
     end
   end
 
-  describe "empty_packages" do
-    setup do
-      expect(Snitch.Tools.DefaultsMock, :fetch, 3, fn :currency -> {:ok, :USD} end)
-      order = insert(:order, user: build(:user))
-      [order: order]
-    end
+  test "persist_shipping_preferences/1 with empty packages" do
+    result =
+      :order
+      |> insert(user: build(:user))
+      |> Context.new(state: %{shipping_preferences: []})
+      |> Transitions.persist_shipping_preferences()
 
-    test "with empty packages", %{order: order} do
-      shipping_methods = [
-        %{package_id: 123, shipping_method_id: nil}
-      ]
-
-      result =
-        order
-        |> Context.new(state: %{selected_shipping_methods: shipping_methods})
-        |> Transitions.save_packages_methods()
-
-      refute result.valid?
-      assert result.errors == [error: "empty packages in order"]
-    end
-  end
-
-  describe "missing shipping method" do
-    setup :shipping_categories
-    setup :zones
-    setup :shipping_methods_embedded
-
-    @tag shipping_category_count: 1,
-         shipping_method_count: 1,
-         state_zone_count: 1
-    setup context do
-      expect(Snitch.Tools.DefaultsMock, :fetch, 3, fn :currency -> {:ok, :USD} end)
-      order = insert(:order, user: build(:user))
-      %{shipping_methods: sm} = context
-
-      packages =
-        insert_list(
-          1,
-          :package,
-          order_id: order.id,
-          origin: build(:stock_location),
-          shipping_methods: sm,
-          shipping_category: build(:shipping_category)
-        )
-
-      [order: order, packages: packages]
-    end
-
-    test "package with no shpping method id", %{order: order, packages: packages} do
-      package = List.first(packages)
-
-      shipping_methods = [
-        %{package_id: package.id, shipping_method_id: nil}
-      ]
-
-      result =
-        order
-        |> Context.new(state: %{selected_shipping_methods: shipping_methods})
-        |> Transitions.save_packages_methods()
-
-      refute result.valid?
-      assert result.errors == [error: "no shipping_method_id in package"]
-    end
+    assert result.valid?
   end
 end

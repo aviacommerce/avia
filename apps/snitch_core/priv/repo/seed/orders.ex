@@ -33,11 +33,6 @@ defmodule Snitch.Seed.Orders do
   #   }
   # }
 
-  defp address_order_address(address) do
-    address = Map.delete(address, :id)
-    Repo.load(OrderAddress, address)
-  end
-
   defp build_orders do
     variants = Repo.all(Variant)
     [user | _] = Repo.all(User)

@@ -14,7 +14,7 @@ defmodule Snitch.Data.Schema.PackageTest do
     order_id: 0,
     origin_id: 0,
     shipping_category_id: 0,
-    shipping_method_id: 0
+    shipping_method_id: nil
   }
 
   @item_params %{
@@ -78,6 +78,23 @@ defmodule Snitch.Data.Schema.PackageTest do
                  )
 
   describe "update_changeset/2" do
+    test "fails with missing params" do
+      assert cs = %{valid?: true} = Package.create_changeset(%Package{}, @params)
+      package = apply_changes(cs)
+
+      cs = Package.update_changeset(package, %{})
+      refute cs.valid?
+
+      assert %{
+               adjustment_total: ["can't be blank"],
+               cost: ["can't be blank"],
+               promo_total: ["can't be blank"],
+               shipping_method_id: ["can't be blank"],
+               tax_total: ["can't be blank"],
+               total: ["can't be blank"]
+             } == errors_on(cs)
+    end
+
     test "with valid params" do
       assert cs = %{valid?: true} = Package.create_changeset(%Package{}, @params)
       package = apply_changes(cs)
@@ -89,7 +106,7 @@ defmodule Snitch.Data.Schema.PackageTest do
              |> MapSet.new()
              |> MapSet.equal?(@update_fields)
 
-      assert [] = apply_changes(cs).shipping_methods
+      assert apply_changes(cs).shipping_methods == []
     end
 
     test "with invalid params" do

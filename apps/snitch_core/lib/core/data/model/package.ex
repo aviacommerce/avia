@@ -5,7 +5,6 @@ defmodule Snitch.Data.Model.Package do
 
   use Snitch.Data.Model
   alias Snitch.Data.Schema.Package
-  alias Snitch.Tools.Money, as: MoneyTools
 
   @doc """
   Creates a package with supplied `params` and package `items`.
@@ -36,38 +35,5 @@ defmodule Snitch.Data.Model.Package do
   @spec get(non_neg_integer | map) :: Package.t()
   def get(query_fields) do
     QH.get(Package, query_fields, Repo)
-  end
-
-  @doc """
-  Calculate the cost of packages for an order
-  """
-
-  @spec compute_package_total(Order.t()) :: Money.t()
-  def compute_package_total(order) do
-    packages = Map.fetch!(Repo.preload(order, [:packages]), :packages)
-
-    case packages do
-      [] ->
-        MoneyTools.zero!()
-
-      packages ->
-        packages
-        |> Stream.map(&Map.fetch!(&1, :total))
-        |> Enum.reduce(&Money.add!/2)
-    end
-  end
-
-  @doc """
-  Query of packages related to order
-  """
-  @spec get_packages(Order.t()) :: list(Package.t())
-  def get_packages(order) do
-    query =
-      from(
-        p in Package,
-        where: p.order_id == ^order.id
-      )
-
-    Repo.all(query)
   end
 end
