@@ -15,10 +15,10 @@ defmodule Snitch.Seed.Orders do
     user_id: nil,
     billing_address: nil,
     shipping_address: nil,
-    adjustment_total: Money.new(0, :USD),
-    promo_total: Money.new(0, :USD),
-    item_total: Money.new(0, :USD),
-    total: Money.new(0, :USD),
+    adjustment_total: nil,
+    promo_total: nil,
+    item_total: nil,
+    total: nil,
     inserted_at: DateTime.utc(),
     updated_at: DateTime.utc()
   }
