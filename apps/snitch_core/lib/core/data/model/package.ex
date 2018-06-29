@@ -44,7 +44,8 @@ defmodule Snitch.Data.Model.Package do
 
   @spec compute_package_total(Order.t()) :: Money.t()
   def compute_package_total(order) do
-    case get_packages(order) do
+    packages = Map.fetch!(Repo.preload(order, [:packages]), :packages)
+    case packages do
       [] ->
         MoneyTools.zero!()
 
@@ -53,19 +54,5 @@ defmodule Snitch.Data.Model.Package do
         |> Stream.map(&Map.fetch!(&1, :total))
         |> Enum.reduce(&Money.add!/2)
     end
-  end
-
-  @doc """
-  Query of packages related to order
-  """
-  @spec get_packages(Order.t()) :: list(Package.t())
-  def get_packages(order) do
-    query =
-      from(
-        p in Package,
-        where: p.order_id == ^order.id
-      )
-
-    Repo.all(query)
   end
 end
