@@ -121,9 +121,8 @@ defmodule Snitch.Data.Model.PackageItemTest do
 
     insert(
       :package,
-      order_id: order.id,
-      origin_id: insert(:stock_location).id,
-      shipping_category_id: sc.id,
+      order: order,
+      shipping_category: sc,
       shipping_method_id: sm.id
     )
   end
