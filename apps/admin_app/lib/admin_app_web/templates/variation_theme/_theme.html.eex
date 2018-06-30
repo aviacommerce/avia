@@ -1,0 +1,10 @@
+<tr>
+  <th scope="row" class="ui-state-default"></th>
+  <td><%= @theme.name %></td>
+  <td>
+    <div class="float-right">
+    <%= link("Edit", to: variation_theme_path(@conn, :edit, @theme.id), class: "btn btn-primary")%>
+    <%= link("Delete", to: variation_theme_path(@conn, :delete, @theme.id), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger")%>
+  </div>
+  </td>
+</tr>

@@ -6,8 +6,13 @@ defmodule Snitch.Tools.Helper.Query do
   everywhere.
   """
 
-  @spec get(module, map | non_neg_integer, Ecto.Repo.t()) :: Ecto.Schema.t() | nil | no_return
+  @spec get(module, map | non_neg_integer | binary, Ecto.Repo.t()) ::
+          Ecto.Schema.t() | nil | no_return
   def get(schema, id, repo) when is_integer(id) do
+    repo.get(schema, id)
+  end
+
+  def get(schema, id, repo) when is_binary(id) do
     repo.get(schema, id)
   end
 
@@ -41,9 +46,9 @@ defmodule Snitch.Tools.Helper.Query do
     |> commit_if_valid(:update, repo)
   end
 
-  @spec delete(module, non_neg_integer | struct(), Ecto.Repo.t()) ::
+  @spec delete(module, non_neg_integer | struct() | binary, Ecto.Repo.t()) ::
           {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
-  def delete(schema, id, repo) when is_integer(id) do
+  def delete(schema, id, repo) when is_integer(id) or is_binary(id) do
     case repo.get(schema, id) do
       nil -> {:error, :not_found}
       instance -> delete(schema, instance, repo)
