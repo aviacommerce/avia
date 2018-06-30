@@ -61,6 +61,16 @@ defmodule Snitch.Factory do
     }
   end
 
+  def line_item_factory do
+    %LineItem{
+      order: build(:order),
+      variant: build(:variant),
+      quantity: 2,
+      unit_price: Money.new("9.99", currency()),
+      total: Money.new("19.98", currency())
+    }
+  end
+
   def order_factory do
     %Order{
       number: sequence("order"),
