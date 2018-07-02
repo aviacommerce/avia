@@ -31,6 +31,6 @@ defmodule Snitch.Domain.Account do
     verify_password(user, Argon2.checkpw(password, user.password_hash))
   end
 
-  defp verify_password(user, _password_matches = true), do: {:ok, user}
+  defp verify_password(user, true = _password_matches), do: {:ok, user}
   defp verify_password(_user, _), do: {:error, :not_found}
 end

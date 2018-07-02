@@ -2,8 +2,8 @@ defmodule AdminAppWeb.SessionController do
   use AdminAppWeb, :controller
   use Params
   import AdminAppWeb.Helpers
-  alias Snitch.Domain.Account
   alias AdminAppWeb.Guardian
+  alias Snitch.Domain.Account
 
   defparams(
     signin_params(%{
