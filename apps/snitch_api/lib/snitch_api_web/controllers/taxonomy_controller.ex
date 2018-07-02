@@ -16,4 +16,17 @@ defmodule SnitchApiWeb.TaxonomyController do
       opts: [include: "root"]
     )
   end
+
+  def show(conn, %{"id" => id}) do
+    taxonomy =
+      Repo.get!(Taxonomy, id)
+      |> Repo.preload([:root])
+
+    render(
+      conn,
+      "show.json-api",
+      data: taxonomy,
+      opts: [include: "root"]
+    )
+  end
 end
