@@ -8,7 +8,7 @@ defmodule AdminAppWeb.SessionController do
   alias Snitch.Data.Model.User, as: UserModel
   alias Snitch.Data.Schema.User, as: UserSchema
 
-  @password_reset_salt System.get_env("password_reset_salt")
+  @password_reset_salt Application.get_env(:admin_app, AdminAppWeb.Endpoint)[:password_reset_salt]
 
   defparams(
     signin_params(%{
@@ -143,13 +143,14 @@ defmodule AdminAppWeb.SessionController do
   end
 
   defp verify_password_token(token) do
-    max_age = System.get_env("token_maximum_age") |> String.to_integer()
+    max_age = Application.get_env(:admin_app, AdminAppWeb.Endpoint)[:token_maximum_age]
+    max_age_int = String.to_integer(max_age)
 
     Token.verify(
       Endpoint,
       @password_reset_salt,
       token,
-      max_age: max_age
+      max_age: max_age_int
     )
   end
 
