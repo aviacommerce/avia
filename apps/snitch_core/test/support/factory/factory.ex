@@ -12,11 +12,11 @@ defmodule Snitch.Factory do
     Order,
     Payment,
     PaymentMethod,
+    Role,
     TaxCategory,
     TaxRate,
     User,
-    Variant,
-    Role
+    Variant
   }
 
   alias Snitch.Repo
