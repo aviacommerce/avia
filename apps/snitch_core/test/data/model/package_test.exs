@@ -142,8 +142,8 @@ defmodule Snitch.Data.Model.PackageTest do
                promo_total: ["can't be blank"],
                shipping_method_id: ["can't be blank"],
                total: ["can't be blank"],
-               cost: ["must be greater than 0"],
-               tax_total: ["must be greater than 0"]
+               cost: ["must be equal or greater than 0"],
+               tax_total: ["must be equal or greater than 0"]
              } == errors_on(cs)
     end
   end
