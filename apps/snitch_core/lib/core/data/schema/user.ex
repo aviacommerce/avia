@@ -4,7 +4,7 @@ defmodule Snitch.Data.Schema.User do
   """
   use Snitch.Data.Schema
   alias Comeonin.Argon2
-  alias Snitch.Data.Schema.Role
+  alias Snitch.Data.Schema.{Role, WishListItem}
 
   @password_min_length 8
   @type t :: %__MODULE__{}
@@ -12,6 +12,7 @@ defmodule Snitch.Data.Schema.User do
   schema "snitch_users" do
     # associations
     belongs_to(:role, Role)
+    has_many(:wishlist_items, WishListItem)
 
     field(:first_name, :string)
     field(:last_name, :string)
