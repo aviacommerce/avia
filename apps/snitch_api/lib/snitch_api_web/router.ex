@@ -10,5 +10,6 @@ defmodule SnitchApiWeb.Router do
     pipe_through(:api)
 
     resources("/orders", OrderController, only: [:index])
+    resources("/taxonomies", TaxonomyController, only: [:index])
   end
 end
