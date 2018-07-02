@@ -8,9 +8,11 @@ defmodule AdminAppWeb.Email do
   alias AdminAppWeb.Mailer
 
   def password_reset_mail(token, email, base_url) do
+    sender_email = Application.fetch_env!(:admin_app, :sender_email)
+
     new()
     |> to(email)
-    |> from({"Snitch", "jyotigautam108@gmail.com"})
+    |> from({"Snitch", sender_email})
     |> subject("Update your password")
     |> render_body("password_reset_email.html", %{token: token, base_url: base_url})
     |> Mailer.deliver()

@@ -33,6 +33,8 @@ config :admin_app, AdminAppWeb.Mailer,
   adapter: Swoosh.Adapters.Sendgrid,
   api_key: "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"
 
+config :admin_app, sender_email: "hello@aviabird.com"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
