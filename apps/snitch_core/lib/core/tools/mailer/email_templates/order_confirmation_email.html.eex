@@ -1,0 +1,28 @@
+<div>
+    <div>Dear Customer</div>
+
+    <p>Please review and retain the following order information for your records.</p>
+   
+    <p>Order #<%= order.id %> Summary</p>
+
+    <b> Order items list </b>:
+    <table class="table">
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+        </tr>
+    </thead>
+   <tbody>
+    <%= for line_item <- order.line_items do %>
+        <tr>
+            <td><%= line_item.product.sku %></td>
+            <td><%= line_item.quantity %></td>
+            <td><%= line_item.unit_price %></td>
+        </tr>
+    <% end %>
+    </tbody>
+
+    <p>Thank you for your business.</p>
+</div>

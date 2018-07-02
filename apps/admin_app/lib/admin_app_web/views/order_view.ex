@@ -7,6 +7,7 @@ defmodule AdminAppWeb.OrderView do
   alias Snitch.Data.Model.LineItem
 
   @bootstrap_contextual_class %{
+    "slug" => "light",
     "cart" => "light",
     "address" => "light",
     "payment" => "light",

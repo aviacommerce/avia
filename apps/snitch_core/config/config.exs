@@ -14,4 +14,9 @@ config :ex_aws,
     region: System.get_env("AWS_REGION")
   ]
 
+config :snitch_core, Snitch.Tools.Mailer,
+  adapter: Bamboo.SendGridAdapter,
+  api_key: System.get_env("SENDGRID_API_KEY"),
+  sendgrid_sender_mail: System.get_env("SENDGRID_SENDER_EMAIL")
+
 import_config "#{Mix.env()}.exs"
