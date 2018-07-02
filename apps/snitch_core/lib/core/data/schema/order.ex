@@ -6,7 +6,6 @@ defmodule Snitch.Data.Schema.Order do
   use Snitch.Data.Schema
 
   alias Ecto.Nanoid
-  alias Snitch.Data.Model.LineItem, as: LineItemModel
   alias Snitch.Data.Schema.{LineItem, OrderAddress, Package, User}
 
   @type t :: %__MODULE__{}

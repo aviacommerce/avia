@@ -2,8 +2,6 @@ defmodule SnitchApiWeb.OrderView do
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
 
-  alias Snitch.Data.Schema.User
-
   location("/orders/:id")
 
   attributes([
@@ -11,7 +9,6 @@ defmodule SnitchApiWeb.OrderView do
     :user_id,
     :billing_address_id,
     :shipping_address_id,
-    :state
   ])
 
   has_many(

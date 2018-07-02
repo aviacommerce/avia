@@ -11,3 +11,5 @@ config :snitch_core, Snitch.Repo,
 
 config :snitch_core, :defaults_module, Snitch.Tools.Defaults
 config :snitch_core, :user_config_module, Snitch.Tools.UserConfig
+
+config :snitch_core, :defaults, currency: :USD
