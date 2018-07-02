@@ -13,6 +13,7 @@ defmodule Snitch.Domain.Order.Transitions do
   alias BeepBop.Context
   alias Snitch.Data.Model.Package
   alias Snitch.Data.Schema.Order
+  alias Snitch.Domain.Package, as: PackageDomain
 
   alias Snitch.Domain.{Shipment, ShipmentEngine, Splitters.Weight}
 
@@ -112,17 +113,85 @@ defmodule Snitch.Domain.Order.Transitions do
       shipment
       |> Stream.map(&Shipment.to_package(&1, order))
       |> Stream.map(&Package.create/1)
-      |> Enum.reduce_while({:ok, []}, fn
-        {:ok, package}, {:ok, acc} ->
-          {:cont, {:ok, [package | acc]}}
-
-        {:error, _} = error, _ ->
-          {:halt, error}
-      end)
+      |> fail_fast_reduce()
     end
 
     struct(context, multi: Multi.run(multi, :packages, function))
   end
 
   def persist_shipment(%Context{valid?: false} = context), do: context
+
+  @doc """
+  Persists the shipping preferences of the user in each `package` of the `order`.
+
+  Along with the chosen `ShippingMethod`, we update pacakge price fields. User's
+  selection is assumed to be under the `context.state.shipping_preferences` key-path.
+
+  ## Schema of the `:state`
+  ```
+  %{
+    shipping_preferences: [
+      %{
+        package_id: string,
+        shipping_method_id: non_neg_integer
+      }
+    ]
+  }
+  ```
+
+  ## Assumptions
+  * For each `package` of the `order`, a valid `shipping_method` must be chosen.
+    > If an `order` has 3 packages, then
+      `length(context.state.shipping_preferences)` must be `3`.
+  * The chosen `shipping_method` for the `package` must be one among the
+    `package.shipping_methods`.
+  """
+  @spec persist_shipping_preferences(Context.t()) :: Context.t()
+  def persist_shipping_preferences(%Context{valid?: true, struct: %Order{} = order} = context) do
+    %{state: %{shipping_preferences: shipping_preferences}, multi: multi} = context
+
+    packages = Map.fetch!(Repo.preload(order, [:packages]), :packages)
+
+    if validate_shipping_preferences(packages, shipping_preferences) do
+      function = fn _ ->
+        shipping_preferences
+        |> Stream.map(fn %{package_id: package_id, shipping_method_id: shipping_method_id} ->
+          packages
+          |> Enum.find(fn %{id: id} -> id == package_id end)
+          |> PackageDomain.set_shipping_method(shipping_method_id)
+        end)
+        |> fail_fast_reduce()
+      end
+
+      struct(context, multi: Multi.run(multi, :packages, function))
+    else
+      struct(context, valid?: false, errors: [shipping_preferences: "is invalid"])
+    end
+  end
+
+  defp validate_shipping_preferences([], _), do: true
+
+  defp validate_shipping_preferences(packages, selection) do
+    # selection must be over all packages, no package can be skipped.
+    # TODO: Replace with some nice API contract/validator.
+    package_ids =
+      packages
+      |> Enum.map(fn %{id: id} -> id end)
+      |> MapSet.new()
+
+    selection
+    |> Enum.map(fn %{package_id: p_id} -> p_id end)
+    |> MapSet.new()
+    |> MapSet.equal?(package_ids)
+  end
+
+  defp fail_fast_reduce(things) do
+    Enum.reduce_while(things, {:ok, []}, fn
+      {:ok, thing}, {:ok, acc} ->
+        {:cont, {:ok, [thing | acc]}}
+
+      {:error, _} = error, _ ->
+        {:halt, error}
+    end)
+  end
 end

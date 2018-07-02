@@ -116,11 +116,18 @@ defmodule Snitch.Data.Model.PackageTest do
 
       assert [_] = package.shipping_methods
 
-      {:ok, package} = Package.update(package, %{shipping_methods: []})
-      assert [] = package.shipping_methods
+      params = %{
+        shipping_method_id: sm.id,
+        cost: Money.new(1, :USD),
+        total: Money.new(1, :USD),
+        tax_total: Money.zero(:USD),
+        promo_total: Money.zero(:USD),
+        adjustment_total: Money.zero(:USD)
+      }
 
-      {:ok, package} = Package.update(package, %{shipping_method_id: sm.id})
-      assert sm.id == package.shipping_method_id
+      {:ok, updated_package} = Package.update(package, params)
+
+      {:ok, _} = Package.update(updated_package, %{shipping_methods: []})
     end
 
     @tag variant_count: 1,
@@ -131,9 +138,13 @@ defmodule Snitch.Data.Model.PackageTest do
       {:error, cs} = Package.update(package, bad_params)
 
       assert %{
+               adjustment_total: ["can't be blank"],
+               promo_total: ["can't be blank"],
+               shipping_method_id: ["can't be blank"],
+               total: ["can't be blank"],
                cost: ["must be equal or greater than 0"],
                tax_total: ["must be equal or greater than 0"]
-             } = errors_on(cs)
+             } == errors_on(cs)
     end
   end
 end
