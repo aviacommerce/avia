@@ -21,10 +21,12 @@ defmodule Snitch.Data.Model.Payment do
   Create Payment
 
   See `Snitch.Data.Scheme.Payment`
-  #TODO: test cases
+
+  Inorder to create payment, create a changeset for payment.
+
   """
-  def create(params) do
-    QH.create(Payment, params, Repo)
+  def create(payment_changeset) do
+    Repo.insert(payment_changeset)
   end
 
   @doc """
