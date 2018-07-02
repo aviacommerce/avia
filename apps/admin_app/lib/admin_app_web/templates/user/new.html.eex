@@ -1,0 +1,6 @@
+<div class="card container text-uppercase">
+    <h4><a href="/users">Users</a> / New User</h4>
+    <hr/>
+    <%= render "_form.html", changeset: @changeset,
+      conn: @conn, action: user_path(@conn, :create) %>
+</div>

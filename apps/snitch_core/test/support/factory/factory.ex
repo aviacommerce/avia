@@ -12,6 +12,7 @@ defmodule Snitch.Factory do
     Order,
     Payment,
     PaymentMethod,
+    Role,
     TaxCategory,
     TaxRate,
     User,
@@ -20,12 +21,17 @@ defmodule Snitch.Factory do
 
   alias Snitch.Repo
 
+  def currency do
+    :USD
+  end
+
   def user_factory do
     %User{
       first_name: sequence(:first_name, &"Tony-#{&1}"),
       last_name: sequence(:last_name, &"Stark-#{&1}"),
       email: sequence(:email, &"ceo-#{&1}@stark.com"),
-      password_hash: "NOTASECRET"
+      password_hash: "NOTASECRET",
+      role: build(:role)
     }
   end
 
@@ -36,8 +42,8 @@ defmodule Snitch.Factory do
       height: Decimal.new("0.15"),
       depth: Decimal.new("0.1"),
       width: Decimal.new("0.4"),
-      cost_price: Money.new("9.99", :USD),
-      selling_price: random_price(:USD, 14, 4)
+      cost_price: Money.new("9.99", currency()),
+      selling_price: random_price(currency(), 14, 4)
     }
   end
 
@@ -48,19 +54,15 @@ defmodule Snitch.Factory do
       height: Decimal.new("0.15"),
       depth: Decimal.new("0.1"),
       width: Decimal.new("0.4"),
-      cost_price: Money.new("9.99", :USD),
-      selling_price: Money.new("14.99", :USD)
+      cost_price: Money.new("9.99", currency()),
+      selling_price: Money.new("14.99", currency())
     }
   end
 
   def order_factory do
     %Order{
       number: sequence("order"),
-      state: "cart",
-      adjustment_total: Money.new(0, :USD),
-      promo_total: Money.new(0, :USD),
-      item_total: Money.new(0, :USD),
-      total: Money.new(0, :USD)
+      state: "cart"
     }
   end
 
@@ -135,6 +137,13 @@ defmodule Snitch.Factory do
     }
   end
 
+  def role_factory do
+    %Role{
+      name: "admin",
+      description: "can manage all"
+    }
+  end
+
   # Associates the address with the user once user schema is corrected
   def user_with_address(_context) do
     %{
@@ -155,8 +164,8 @@ defmodule Snitch.Factory do
           order_id: order.id,
           variant_id: v.id,
           quantity: 1,
-          unit_price: v.cost_price,
-          total: v.cost_price
+          unit_price: v.selling_price,
+          total: v.selling_price
         )
       end)
       |> Enum.take(count)

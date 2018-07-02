@@ -3,126 +3,141 @@ defmodule Snitch.Data.Model.OrderTest do
   use Snitch.DataCase
 
   import Snitch.Factory
-  import Mox
 
-  alias Snitch.Data.Model.Order
+  alias Snitch.Data.Model.{LineItem, Order}
 
   setup :variants
   setup :user_with_address
-
-  @zero_inr Money.new(0, :INR)
+  setup :line_item_params
+  setup :order_params
 
   describe "create/3" do
-    setup :line_items_from_variants
-    setup :order_params
-
-    test "with valid data", %{order_params: params, line_items: line_items} do
-      {:ok, _order} = Order.create(params, line_items)
+    test "with valid data", %{order_params: params} do
+      {:ok, order} = Order.create(params)
+      assert order.item_total == total(params.line_items)
+      assert order.total == total(params.line_items)
     end
 
     test "without line_items", %{order_params: params} do
-      {:error, changeset} = Order.create(params, [])
-      assert errors_on(changeset) == %{line_items: ["can't be blank"]}
+      {:ok, order} =
+        params
+        |> Map.put(:line_items, [])
+        |> Map.drop([:item_total, :total])
+        |> Order.create()
+
+      assert order.item_total == nil
+      assert order.total == nil
     end
   end
 
   describe "update/3" do
-    setup :order_for_update
-
-    test "params, but retain all line-items", %{order: order} do
-      line_items = extract_ids(order.line_items)
-      params = %{slug: "chichuahua", line_items: line_items}
-
-      assert {:ok, _order} = Order.update(params, order)
-    end
-
-    @tag variant_count: 4
-    test "add some line_items", %{order: order, variants: variants} do
-      v = List.last(variants)
+    test "add some line_items", %{order_params: order_params} do
+      {:ok, order} = Order.create(order_params)
+      new_variant = insert(:variant)
       old_line_items = extract_ids(order.line_items)
-      line_items = [%{variant_id: v.id, quantity: 3} | old_line_items]
+      line_items = [%{variant_id: new_variant.id, quantity: 1} | old_line_items]
 
-      {:ok, %{line_items: new_items}} = Order.update(%{line_items: line_items}, order)
+      {:ok, %{line_items: new_items} = new_order} = Order.update(%{line_items: line_items}, order)
       assert Enum.count(new_items) == 4
       assert Enum.all?(old_line_items, fn x -> x in extract_ids(new_items) end)
+      assert order.item_total == new_order.item_total
+      assert order.total == new_order.total
     end
 
-    test "remove some line_items", %{order: order} do
-      line_items =
-        order.line_items
-        |> List.first()
-        |> List.wrap()
-        |> extract_ids()
+    test "remove some line_items", %{order_params: order_params} do
+      {:ok, order} = Order.create(order_params)
 
-      {:ok, %{line_items: new_items}} = Order.update(%{line_items: line_items}, order)
+      [line_item | _] = order.line_items
+
+      {:ok, %{line_items: new_items} = new_order} =
+        Order.update(
+          %{
+            line_items: [%{id: line_item.id}],
+            item_total: line_item.total,
+            total: line_item.total
+          },
+          order
+        )
+
       assert Enum.count(new_items) == 1
+      assert new_order.item_total == line_item.total
+      assert new_order.total == line_item.total
     end
 
-    test "remove all line_items", %{order: order} do
-      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :INR} end)
+    test "remove all line_items", %{order_params: order_params} do
+      {:ok, order} = Order.create(order_params)
 
-      assert {:ok,
-              %{
-                item_total: @zero_inr,
-                total: @zero_inr
-              }} = Order.update(%{line_items: []}, order)
+      assert {:ok, %{line_items: []} = new_order} =
+               Order.update(
+                 %{
+                   line_items: [],
+                   item_total: Money.zero(:USD),
+                   total: Money.zero(:USD)
+                 },
+                 order
+               )
 
-      verify!()
-
-      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency ->
-        {:error, "default 'currency' not set"}
-      end)
-
-      assert_raise RuntimeError, "default 'currency' not set", fn ->
-        Order.update(%{line_items: []}, order)
-      end
-
-      verify!()
+      assert new_order.item_total == Money.zero(:USD)
+      assert new_order.total == Money.zero(:USD)
     end
 
-    test "update few items", %{order: order} do
+    test "update few items", %{order_params: order_params} do
+      {:ok, order} = Order.create(order_params)
+
       [one, two, three] = extract_ids(order.line_items, [:quantity, :variant_id])
-      line_items = [%{one | quantity: 42}, two, %{three | quantity: 1}]
-      {:ok, %{line_items: new_items}} = Order.update(%{line_items: line_items}, order)
+
+      params = %{
+        line_items: [%{one | quantity: 42}, two, %{three | quantity: 1}]
+      }
+
+      {:ok, %{line_items: new_items}} = Order.update(params, order)
       assert Enum.map(new_items, &Map.fetch!(&1, :quantity)) == [42, 2, 1]
     end
 
-    @tag variant_count: 4
-    test "update one, add one, remove one, retain one", %{order: order, variants: variants} do
-      v = List.last(variants)
+    test "update one, add one, remove one, retain one", %{order_params: order_params} do
+      {:ok, order} = Order.create(order_params)
+
+      new_variant = insert(:variant)
       [_, two, three] = extract_ids(order.line_items, [:quantity, :variant_id])
-      line_items = [%{two | quantity: 42}, three, %{variant_id: v.id, quantity: 3}]
-      {:ok, %{line_items: new_items}} = Order.update(%{line_items: line_items}, order)
+
+      params = %{
+        line_items: [%{two | quantity: 42}, three, %{variant_id: new_variant.id, quantity: 3}]
+      }
+
+      {:ok, %{line_items: new_items}} = Order.update(params, order)
       assert Enum.map(new_items, &Map.fetch!(&1, :quantity)) == [42, 2, 3]
     end
   end
 
-  defp order_for_update(context) do
-    [{_, line_items}] = line_items_from_variants(context)
-    [{_, params}] = order_params(context)
+  describe "partial_update/2" do
+    test "params only", %{order_params: order_params} do
+      {:ok, order} = Order.create(order_params)
 
-    {:ok, order} = Order.create(params, line_items)
-    [order: order]
+      {:ok, new_order} = Order.partial_update(%{state: "foo"}, order)
+      assert extract_ids(order.line_items) == extract_ids(new_order.line_items)
+      assert new_order.state == "foo"
+    end
   end
 
-  defp line_items_from_variants(%{variants: variants} = context) do
-    count = Map.get(context, :line_item_count, 3)
-
+  defp line_item_params(%{variants: variants}) do
     line_items =
       variants
-      |> Enum.take(count)
       |> Enum.reduce([], fn v, acc ->
         [%{variant_id: v.id, quantity: 2} | acc]
       end)
+      |> LineItem.update_price_and_totals()
 
     [line_items: line_items]
   end
 
-  defp order_params(%{user: user}) do
+  defp order_params(%{user: user, line_items: li}) do
     [
       order_params: %{
         user_id: user.id,
-        slug: "mammoth"
+        number: "long_unique_number",
+        line_items: li,
+        item_total: total(li),
+        total: total(li)
       }
     ]
   end
@@ -142,5 +157,11 @@ defmodule Snitch.Data.Model.OrderTest do
       datum = Enum.reduce(transforms, %{id: x.id}, fn t, acc -> t.(acc, x) end)
       [datum | acc]
     end)
+  end
+
+  defp total(line_items) do
+    line_items
+    |> Stream.map(&Map.fetch!(&1, :total))
+    |> Enum.reduce(&Money.add!/2)
   end
 end

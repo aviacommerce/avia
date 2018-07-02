@@ -19,32 +19,60 @@ defmodule Snitch.Data.Schema.LineItem do
     timestamps()
   end
 
-  @required_fields ~w(quantity variant_id)a
-  @optional_fields ~w(unit_price total)a
+  @cast_fields ~w(quantity variant_id unit_price total)a
+  @update_fields ~w(quantity unit_price total)a
+  @create_fields [:order_id | @cast_fields]
 
   @doc """
-  Returns a `LineItem` changeset without `:total`.
-
-  Do not persist this to DB since price fields and order are not set! To set
-  prices see `update_totals/1` and `create_changeset/2`.
+  Returns a `LineItem` changeset to "cast" a line item via an order changeset.
   """
   @spec changeset(t, map) :: Ecto.Changeset.t()
   def changeset(%__MODULE__{} = line_item, params) do
     line_item
-    |> cast(params, @required_fields ++ @optional_fields)
-    |> validate_required(@required_fields)
-    |> validate_number(:quantity, greater_than: 0)
-    |> foreign_key_constraint(:variant_id)
+    |> cast(params, @cast_fields)
+    |> validate_required(@cast_fields)
     |> foreign_key_constraint(:order_id)
+    |> foreign_key_constraint(:variant_id)
+    |> common_changeset()
   end
 
   @doc """
-  Returns a `LineItem` changeset that can be used for `insert`/`update`.
+  Returns a `LineItem` changeset to insert a new line item.
   """
   @spec create_changeset(t, map) :: Ecto.Changeset.t()
   def create_changeset(%__MODULE__{} = line_item, params) do
     line_item
-    |> changeset(params)
-    |> validate_required(@optional_fields)
+    |> cast(params, @create_fields)
+    |> validate_required(@create_fields)
+    |> foreign_key_constraint(:order_id)
+    |> foreign_key_constraint(:variant_id)
+    |> common_changeset()
+  end
+
+  @doc """
+  Returns a `LineItem` changeset to update the `line_item`.
+  """
+  @spec update_changeset(t, map) :: Ecto.Changeset.t()
+  def update_changeset(%__MODULE__{} = line_item, params) do
+    line_item
+    |> cast(params, @update_fields)
+    |> validate_conditional_required()
+    |> common_changeset()
+  end
+
+  defp common_changeset(changeset) do
+    changeset
+    |> validate_number(:quantity, greater_than: 0)
+    |> validate_amount(:unit_price)
+    |> validate_amount(:total)
+  end
+
+  defp validate_conditional_required(%{changes: changes} = changeset) do
+    if (Map.has_key?(changes, :quantity) or Map.has_key?(changes, :unit_price)) and
+         not Map.has_key?(changes, :total) do
+      add_error(changeset, :total, "can't be blank", validation: :required)
+    else
+      changeset
+    end
   end
 end

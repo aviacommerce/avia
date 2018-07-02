@@ -31,6 +31,6 @@ defmodule Snitch.Data.Schema.PaymentTest do
       |> Payment.create_changeset(%{amount: Money.new("-0.0001", :USD)})
 
     assert %Ecto.Changeset{errors: errors} = check_payment
-    assert errors == [amount: {"must be greater than 0", [validation: :number]}]
+    assert errors == [amount: {"must be equal or greater than 0", [validation: :number]}]
   end
 end

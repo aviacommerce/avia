@@ -2,8 +2,8 @@ defmodule Snitch.Data.Model.LineItemTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
+  import Mox, only: [expect: 3, verify_on_exit!: 1]
   import Snitch.Factory
-  import Mox
 
   alias Snitch.Data.Model.LineItem
 
