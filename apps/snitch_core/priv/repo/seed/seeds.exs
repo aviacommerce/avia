@@ -11,7 +11,7 @@
 # and so on) as they will fail if something goes wrong.
 
 alias Snitch.Repo
-alias Snitch.Seed.{CountryState, PaymentMethods, Orders, Users, Stocks, Taxonomy, Role}
+alias Snitch.Seed.{CountryState, PaymentMethods, Orders, Users, Stocks, Taxonomy, Role, Shipping}
 
 variant_count = 9
 

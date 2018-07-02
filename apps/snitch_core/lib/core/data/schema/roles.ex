@@ -4,7 +4,7 @@ defmodule Snitch.Data.Schema.Role do
   """
 
   use Snitch.Data.Schema
-  alias Snitch.Data.Schema.{User, Permission}
+  alias Snitch.Data.Schema.{Permission, User}
 
   @type t :: %__MODULE__{}
 

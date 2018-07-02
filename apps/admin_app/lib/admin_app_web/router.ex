@@ -32,7 +32,7 @@ defmodule AdminAppWeb.Router do
     resources("/stock_locations", StockLocationController)
     resources("/option_types", OptionTypeController)
     resources("/registrations", RegistrationController, only: [:new, :create])
-    resources("/session", SessionController, only: [:new, :create, :delete])
+    resources("/session", SessionController, only: [:delete])
     resources("/users", UserController)
     resources("/roles", RoleController)
   end
