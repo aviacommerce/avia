@@ -1,35 +1,30 @@
-defmodule Snitch.Data.Schema.OptionType do
+defmodule Snitch.Data.Schema.Property do
   @moduledoc """
-  Models an OptionType
+  Models product property
   """
-  use Snitch.Data.Schema
 
-  alias Snitch.Data.Schema.TemplateOptionValue
+  use Snitch.Data.Schema
 
   @type t :: %__MODULE__{}
 
-  schema "snitch_option_types" do
+  schema "snitch_properties" do
     field(:name, :string)
     field(:display_name, :string)
-
-    has_many(:template_option_values, TemplateOptionValue)
     timestamps()
   end
 
   @create_params ~w(name display_name)a
 
   @doc """
-  Returns a changeset to create new OptionType
+  Returns a changeset to create new Property
   """
-  @spec create_changeset(t, map) :: Ecto.Changeset.t()
   def create_changeset(model, params) do
     common_changeset(model, params)
   end
 
   @doc """
-  Returns a changeset to update a OptionType
+  Returns a changeset to update a Property
   """
-  @spec update_changeset(t, map) :: Ecto.Changeset.t()
   def update_changeset(model, params) do
     common_changeset(model, params)
   end

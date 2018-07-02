@@ -1,0 +1,2 @@
+<h4>New Property</h4>
+<%= render "form.html", changeset: @changeset, conn: @conn, action: property_path(@conn, :create) %>

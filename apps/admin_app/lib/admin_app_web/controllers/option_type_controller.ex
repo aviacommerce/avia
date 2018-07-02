@@ -30,14 +30,9 @@ defmodule AdminAppWeb.OptionTypeController do
       changeset = OTSchema.update_changeset(option_type, %{})
       render(conn, "edit.html", changeset: changeset)
     else
-      :error ->
+      err when err in [:error, nil] ->
         conn
-        |> put_flash(:info, "Invalid id #{id}")
-        |> redirect(to: option_type_path(conn, :index))
-
-      nil ->
-        conn
-        |> put_flash(:info, "No resource found")
+        |> put_flash(:info, "Option Type not found")
         |> redirect(to: option_type_path(conn, :index))
     end
   end
@@ -45,7 +40,7 @@ defmodule AdminAppWeb.OptionTypeController do
   def update(conn, %{"id" => id, "option_type" => params}) do
     with {id, _} <- Integer.parse(id),
          option_type <- OTModel.get(id),
-         _ <- OTModel.update(option_type, params) do
+         {:ok, _} <- OTModel.update(option_type, params) do
       option_types = OTModel.get_all()
       render(conn, "index.html", %{option_types: option_types})
     else
@@ -55,7 +50,7 @@ defmodule AdminAppWeb.OptionTypeController do
       :error ->
         conn
         |> halt()
-        |> put_flash(:info, "Invalid id #{id}")
+        |> put_flash(:info, "Option Type not found")
         |> redirect(to: option_type_path(conn, :index))
     end
   end
@@ -75,7 +70,7 @@ defmodule AdminAppWeb.OptionTypeController do
       :error ->
         conn
         |> halt()
-        |> put_flash(:info, "Invalid id #{id}")
+        |> put_flash(:info, "Option Type not found")
         |> redirect(to: option_type_path(conn, :index))
     end
   end
