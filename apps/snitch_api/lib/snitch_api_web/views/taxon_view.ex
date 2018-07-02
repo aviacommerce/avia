@@ -7,8 +7,20 @@ defmodule SnitchApiWeb.TaxonView do
   attributes([
     :name,
     :lft,
-    :rgt,
-    :taxon,
-    :taxonomy
+    :rgt
   ])
+
+  has_one(
+    :taxonomy,
+    serializer: SnitchApiWeb.TaxonomyView,
+    include: true
+  )
+
+  has_one(
+    :taxon,
+    serializer: SnitchApiWeb.TaxonView,
+    include: true,
+    field: :parent_id,
+    type: :taxon
+  )
 end
