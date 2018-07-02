@@ -31,6 +31,7 @@ defmodule AdminAppWeb.Router do
     resources("/tax_categories", TaxCategoryController, only: [:index, :new, :create])
     resources("/stock_locations", StockLocationController)
     resources("/option_types", OptionTypeController)
+    resources("/properties", PropertyController, except: [:show])
     resources("/registrations", RegistrationController, only: [:new, :create])
     resources("/session", SessionController, only: [:delete])
     resources("/users", UserController)
