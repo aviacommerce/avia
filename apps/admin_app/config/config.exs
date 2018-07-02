@@ -13,7 +13,10 @@ config :admin_app, AdminAppWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "o7U+x3aM3mqN1vY+PGIbxEN+QBeMP7rwgCpyrbYfEUkAY6I12cxKvwEt/zJeGjgR",
   render_errors: [view: AdminAppWeb.ErrorView, accepts: ~w(html json json-api)],
-  pubsub: [name: AdminApp.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: AdminApp.PubSub, adapter: Phoenix.PubSub.PG2],
+  token_maximum_age: System.get_env("TOKEN_MAXIMUM_AGE"),
+  sendgrid_sender_mail: System.get_env("SENDGRID_SENDER_EMAIL"),
+  password_reset_salt: System.get_env("PASSWORD_RESET_SALT")
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -31,7 +34,7 @@ config :admin_app, AdminAppWeb.AuthenticationPipe,
 
 config :admin_app, AdminAppWeb.Mailer,
   adapter: Swoosh.Adapters.Sendgrid,
-  api_key: System.get_env("sendgrid_api_key")
+  api_key: System.get_env("SENDGRID_API_KEY")
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
