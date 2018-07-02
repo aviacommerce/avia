@@ -3,6 +3,7 @@ defmodule Snitch.Data.Model.Order do
   Order API
   """
   use Snitch.Data.Model
+
   alias Snitch.Data.Schema.Order
   alias Snitch.Data.Model.LineItem, as: LineItemModel
 
@@ -112,8 +113,8 @@ defmodule Snitch.Data.Model.Order do
   @doc """
   Updates the order with supplied `params`. Does not update line_items.
   """
-  @spec partial_update(map, Order.t()) :: {:ok, Order.t()} | {:error, Ecto.Changeset.t()}
-  def partial_update(params, order \\ nil) do
+  @spec partial_update(Order.t(), map) :: {:ok, Order.t()} | {:error, Ecto.Changeset.t()}
+  def partial_update(order, params) do
     order
     |> Order.partial_update_changeset(params)
     |> Repo.update()
@@ -132,9 +133,6 @@ defmodule Snitch.Data.Model.Order do
 
   @spec get_all() :: [Order.t()]
   def get_all, do: Repo.all(Order)
-
-  # Compute price totals only if line_items are provided
-  defp update_line_item_costs([]), do: []
 
   defp update_line_item_costs(line_items) when is_list(line_items) do
     LineItemModel.update_price_and_totals(line_items)
