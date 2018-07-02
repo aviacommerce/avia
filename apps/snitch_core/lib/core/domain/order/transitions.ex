@@ -197,4 +197,27 @@ defmodule Snitch.Domain.Order.Transitions do
         {:halt, error}
     end)
   end
+ 
+  defp calc_payable_amount(order) do
+    packages_total = Package.compute_package_total(order)
+    total_amount = Money.add!(packages_total, order.total)
+    amount_paid_before = Payment.compute_order_payments(order)
+    Money.sub!(total_amount, amount_paid_before)
+  end
+
+  @spec compute_order_payment(Context.t()) :: Context.t()
+  def compute_order_payment(
+        %Context{valid?: true, struct: %Order{id: order_id} = order} = context
+      ) do
+    %{state: %{payment: payment}, multi: multi} = context
+    amount_to_pay = calc_payable_amount(order)
+    payment_method = PaymentMethod.get(payment.payment_method_id)
+    # case payment_method.code do
+      # "chk" ->
+        # process_payment_chk(payment_method, order)
+    #
+    #   "ccd" ->
+    #     process_payment_chk(payment_method, order)
+    # end
+  end
 end

@@ -18,6 +18,16 @@ defmodule Snitch.Data.Model.Payment do
   alias Snitch.Data.Model.CardPayment, as: CardPaymentModel
 
   @doc """
+  Create Payment
+
+  See `Snitch.Data.Scheme.Payment`
+  #TODO: test cases
+  """
+  def create(params) do
+    QH.create(Payment, params, Repo)
+  end
+
+  @doc """
   Updates an existing `Payment`
 
   See `Snitch.Data.Schema.Payment.changeset/3` with the `:update` action.
