@@ -3,6 +3,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
   use Snitch.DataCase
 
   import Snitch.Factory
+  import Mox
 
   alias BeepBop.Context
   alias Ecto.Multi
@@ -147,5 +148,55 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       assert [packages: {:run, _}] = Multi.to_list(result.multi)
       assert {:ok, %{packages: []}} = Repo.transaction(result.multi)
     end
+  end
+
+  describe "persist_shipping_preferences/1" do
+    setup :zones
+    setup :shipping_methods
+    setup :embedded_shipping_methods
+
+    setup %{embedded_shipping_methods: methods} do
+      order = insert(:order, user: build(:user))
+
+      [order: order, packages: [insert(:package, shipping_methods: methods, order: order)]]
+    end
+
+    @tag shipping_method_count: 1
+    test "with packages", %{order: order, packages: [package], shipping_methods: [sm]} do
+      preference = [
+        %{package_id: package.id, shipping_method_id: sm.id}
+      ]
+
+      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :USD} end)
+
+      result =
+        order
+        |> Context.new(state: %{shipping_preferences: preference})
+        |> Transitions.persist_shipping_preferences()
+
+      assert result.valid?
+      assert [packages: {:run, _}] = Multi.to_list(result.multi)
+      assert {:ok, %{packages: _}} = Repo.transaction(result.multi)
+    end
+
+    test "fails with invalid preferences", %{order: order} do
+      result =
+        order
+        |> Context.new(state: %{shipping_preferences: []})
+        |> Transitions.persist_shipping_preferences()
+
+      refute result.valid?
+      assert result.errors == [shipping_preferences: "is invalid"]
+    end
+  end
+
+  test "persist_shipping_preferences/1 with empty packages" do
+    result =
+      :order
+      |> insert(user: build(:user))
+      |> Context.new(state: %{shipping_preferences: []})
+      |> Transitions.persist_shipping_preferences()
+
+    assert result.valid?
   end
 end

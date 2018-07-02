@@ -62,9 +62,9 @@ defmodule Snitch.Data.Schema.Package do
     timestamps()
   end
 
-  @update_fields ~w(state shipped_at tracking shipping_method_id)a ++
-                   ~w(cost tax_total adjustment_total promo_total total)a
-
+  @price_fields ~w(cost tax_total adjustment_total promo_total total)a
+  @update_fields ~w(state shipped_at tracking shipping_method_id)a ++ @price_fields
+  @shipping_preferences_fields [:shipping_method_id | @price_fields]
   @create_fields ~w(order_id origin_id shipping_category_id)a ++ @update_fields
 
   @required_fields ~w(state order_id origin_id shipping_category_id)a
@@ -91,12 +91,16 @@ defmodule Snitch.Data.Schema.Package do
   end
 
   @doc """
-  Returns a `Package` changeset to create a new package.
+  Returns a `Package` changeset to update the `package`.
+
+  The `shipping_method` and totals of the `package` must either be changed or
+  already set previously.
   """
   @spec update_changeset(t, map) :: Ecto.Changeset.t()
   def update_changeset(%__MODULE__{} = package, params) do
     package
     |> cast(params, @update_fields)
+    |> validate_required(@shipping_preferences_fields)
     |> cast_embed(:shipping_methods)
     |> common_changeset()
   end
