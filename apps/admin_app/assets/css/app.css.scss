@@ -4,32 +4,4 @@
 @import "font-awesome";
 @import "dropdown";
 @import "custom/custom";
-body {
-  .select2-container .select2-selection--single {
-    height: 2.8rem;
-  }
-  .form-control,
-  .select2-container .select2-selection--single {
-    padding: 0.5rem;
-    border-radius: 0;
-    transition: all 300ms;
-    &:hover,
-    &:focus {
-      transform: translateY(-3px);
-      @extend .shadow-sm;
-    }
-  }
-  .card {
-    @extend .p-5,
-    .shadow-sm,
-    .border,
-    .border-light;
-  }
-  .loader {
-    background-image: url("/images/loader.svg");
-    height: 30px;
-    width: inherit;
-    background-repeat: no-repeat;
-    background-position: center;
-  }
-}
+@import "dropdown";
