@@ -22,3 +22,5 @@ erl_crash.dump
 # Ignore the IEx bindings file
 .iex.exs
 .elixir_ls
+
+/.env

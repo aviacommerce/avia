@@ -8,7 +8,7 @@ defmodule AdminAppWeb.Email do
   alias AdminAppWeb.Mailer
 
   def password_reset_mail(token, email, base_url) do
-    sender_email = Application.fetch_env!(:admin_app, :sender_email)
+    sender_email = System.get_env("sendgrid_sender_email")
 
     new()
     |> to(email)

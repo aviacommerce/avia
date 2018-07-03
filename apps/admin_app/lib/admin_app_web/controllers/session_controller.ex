@@ -5,10 +5,10 @@ defmodule AdminAppWeb.SessionController do
   alias AdminAppWeb.{Email, Endpoint, Guardian.Plug}
   alias Phoenix.Token
   alias Snitch.Domain.Account
-  alias Snitch.Data.Model.User, as: ModelUser
-  alias Snitch.Data.Schema.User, as: SchemaUser
+  alias Snitch.Data.Model.User, as: UserModel
+  alias Snitch.Data.Schema.User, as: UserSchema
 
-  @password_reset_salt "password reset salt"
+  @password_reset_salt System.get_env("password_reset_salt")
 
   defparams(
     signin_params(%{
@@ -32,8 +32,8 @@ defmodule AdminAppWeb.SessionController do
   end
 
   def update(conn, %{"id" => id, "new_password" => password_params}) do
-    user = ModelUser.get(%{id: id})
-    update_user = ModelUser.update(password_params, user)
+    user = UserModel.get(%{id: id})
+    update_user = UserModel.update(password_params, user)
     update_password_result(update_user, conn)
   end
 
@@ -49,7 +49,7 @@ defmodule AdminAppWeb.SessionController do
 
   def send_email(conn, %{"password_reset" => params}) do
     email = params["email"]
-    user = ModelUser.get(%{email: email})
+    user = UserModel.get(%{email: email})
     verify_user(user, conn)
   end
 
@@ -79,7 +79,7 @@ defmodule AdminAppWeb.SessionController do
     |> render("new.html", changeset: %{changeset | action: :insert})
   end
 
-  defp verify_user(%SchemaUser{} = user, conn) do
+  defp verify_user(%UserSchema{} = user, conn) do
     token = tokenize(user)
     sent_at = DateTime.utc_now()
     base_url = Endpoint.url()
@@ -91,7 +91,7 @@ defmodule AdminAppWeb.SessionController do
     }
 
     user =
-      ModelUser.update(
+      UserModel.update(
         password_reset_params,
         user
       )
@@ -130,12 +130,13 @@ defmodule AdminAppWeb.SessionController do
     |> redirect(to: session_path(conn, :new))
   end
 
-  defp tokenize(%SchemaUser{id: user_id}) do
+  defp tokenize(%UserSchema{id: user_id}) do
     Token.sign(Endpoint, @password_reset_salt, user_id)
   end
 
   defp verify_password_token(token) do
-    max_age = 86_400
+
+    max_age = System.get_env("token_maximum_age") |> String.to_integer
 
     Token.verify(
       Endpoint,
