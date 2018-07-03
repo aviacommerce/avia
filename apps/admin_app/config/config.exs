@@ -12,7 +12,7 @@ config :admin_app, namespace: AdminApp
 config :admin_app, AdminAppWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "o7U+x3aM3mqN1vY+PGIbxEN+QBeMP7rwgCpyrbYfEUkAY6I12cxKvwEt/zJeGjgR",
-  render_errors: [view: AdminAppWeb.ErrorView, accepts: ~w(html json)],
+  render_errors: [view: AdminAppWeb.ErrorView, accepts: ~w(html json json-api)],
   pubsub: [name: AdminApp.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
