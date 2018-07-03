@@ -47,10 +47,10 @@ defmodule AdminAppWeb.SessionController do
     render(conn, "password_reset.html")
   end
 
-  def send_email(conn, %{"password_reset" => params}) do
+  def check_email(conn, %{"password_reset" => params}) do
     email = params["email"]
     user = UserModel.get(%{email: email})
-    verify_user(user, conn)
+    mail_verified_user(user, conn)
   end
 
   def verify(conn, params) do
@@ -79,39 +79,44 @@ defmodule AdminAppWeb.SessionController do
     |> render("new.html", changeset: %{changeset | action: :insert})
   end
 
-  defp verify_user(%UserSchema{} = user, conn) do
+  defp mail_verified_user(%UserSchema{} = user, conn) do
     token = tokenize(user)
-    sent_at = DateTime.utc_now()
     base_url = Endpoint.url()
-    Email.password_reset_mail(token, user.email, base_url)
-
-    password_reset_params = %{
-      reset_password_token: token,
-      reset_password_sent_at: sent_at
-    }
-
-    user =
-      UserModel.update(
-        password_reset_params,
-        user
-      )
-
-    update_user(user, conn)
+    send_mail(token, user.email, base_url)
+    update_user_with_token(token, user, conn)
   end
 
-  defp verify_user(nil, conn) do
+  defp mail_verified_user(nil, conn) do
     conn
     |> put_flash(:error, "Sorry, we don't know that email address. Try again?")
     |> redirect(to: session_path(conn, :new))
   end
 
-  defp update_user({:ok, _}, conn) do
+  defp send_mail(token, mail, url) do
+    Email.password_reset_mail(token, mail, url)
+  end
+
+  defp update_user_with_token(token, user, conn) do
+    sent_at = DateTime.utc_now()
+    password_reset_params = %{
+      reset_password_token: token,
+      reset_password_sent_at: sent_at
+    }
+    user =
+      UserModel.update(
+        password_reset_params,
+        user
+      )
+    update_user_result(user, conn)
+  end
+
+  defp update_user_result({:ok, _}, conn) do
     conn
     |> put_flash(:info, "A password reset email has been sent you. Please check")
     |> redirect(to: session_path(conn, :new))
   end
 
-  defp update_user({:error, _}, conn) do
+  defp update_user_result({:error, _}, conn) do
     conn
     |> put_flash(:error, "Please try again")
     |> redirect(to: session_path(conn, :new))
@@ -135,7 +140,6 @@ defmodule AdminAppWeb.SessionController do
   end
 
   defp verify_password_token(token) do
-
     max_age = System.get_env("token_maximum_age") |> String.to_integer
 
     Token.verify(

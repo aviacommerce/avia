@@ -53,7 +53,7 @@ defmodule AdminAppWeb.Router do
     resources("/session", SessionController, only: [:new, :create, :edit, :update])
     get("/password_reset", SessionController, :password_reset)
     get("/password_recovery", SessionController, :verify)
-    post("/send_email", SessionController, :send_email)
+    post("/check_email", SessionController, :check_email)
   end
 
   # Other scopes may use custom stacks.
