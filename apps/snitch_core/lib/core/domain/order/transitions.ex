@@ -13,6 +13,7 @@ defmodule Snitch.Domain.Order.Transitions do
   alias BeepBop.Context
   alias Snitch.Data.Model.{Package, Payment, PaymentMethod}
   alias Snitch.Data.Model.CardPayment, as: CardPaymentModel
+  alias Snitch.Data.Model.CheckPayment, as: CheckPaymentModel
   alias Snitch.Data.Schema.{Order, CardPayment}
   alias Snitch.Domain.Package, as: PackageDomain
 
@@ -210,6 +211,17 @@ defmodule Snitch.Domain.Order.Transitions do
   end
 
   defp process_payment_chk(context, multi, payment_method, payment, order, amount_to_pay) do
+    params = %{
+      amount: amount_to_pay,
+      order_id: order.id,
+      slug: "check-payment"
+    }
+
+    function = fn _ ->
+      CheckPaymentModel.create(params)
+    end
+
+    struct(context, multi: Multi.run(multi, :checkpayment, function))
   end
 
   defp process_payment_ccd(context, multi, payment_method, payment, order, amount_to_pay) do
@@ -233,7 +245,6 @@ defmodule Snitch.Domain.Order.Transitions do
   end
 
   @doc """
-
   Validator for payment method
 
   Responses
@@ -248,17 +259,18 @@ defmodule Snitch.Domain.Order.Transitions do
   end
 
   @doc """
-    Processing incoming payment.
+  Processing incoming payment.
 
     ## Schema of the `:state`
     ```
     %{
       payment:
         %{
-          payment_method_id: "some id"
+          payment_method_id: "payment_method_id"
         }
     }
     ```
+
   """
   @spec compute_order_payment(Context.t()) :: Context.t()
   def compute_order_payment(
