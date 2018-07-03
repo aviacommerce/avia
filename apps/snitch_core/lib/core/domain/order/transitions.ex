@@ -220,6 +220,7 @@ defmodule Snitch.Domain.Order.Transitions do
           payment_type: "ccd",
           payment_method_id: payment_method.id
         }
+
         function = fn _ ->
           CardPaymentModel.create("card-payment", order.id, params, %{card: payment})
         end

@@ -233,7 +233,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     assert result.valid?
   end
 
-  describe "process payment for order" do
+  describe "process payment for order with one package" do
     setup :zones
     setup :shipping_methods
     setup :embedded_shipping_methods
@@ -276,7 +276,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
       assert result.valid?
       assert {:ok, %{cardpayment: %{payment: payment}}} = Repo.transaction(result.multi)
-      assert payment.amount === Money.add!(order.total, package.total)
+      assert payment.amount == Money.add!(order.total, package.total)
     end
 
     @tag shipping_method_count: 1
@@ -311,16 +311,12 @@ defmodule Snitch.Domain.Order.TransitionsTest do
         |> Context.new(state: %{payment: payment})
         |> Transitions.compute_order_payment()
 
-        result =
-          order
-          |> Context.new(state: %{payment: payment})
-          |> Transitions.compute_order_payment()
+      refute result.valid?
 
-        refute result.valid?
-        assert result.errors == [
-          brand: {"can't be blank", [validation: :required]},
-          user_id: {"can't be blank", [validation: :required]}
-        ]
+      assert result.errors == [
+               brand: {"can't be blank", [validation: :required]},
+               user_id: {"can't be blank", [validation: :required]}
+             ]
     end
   end
 end
