@@ -8,7 +8,7 @@ defmodule SnitchApiWeb.OrderView do
     :state,
     :user_id,
     :billing_address_id,
-    :shipping_address_id,
+    :shipping_address_id
   ])
 
   has_many(

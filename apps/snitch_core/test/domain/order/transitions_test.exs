@@ -4,9 +4,9 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
   import Mox
   import Snitch.Factory
-  import Mox
 
   alias BeepBop.Context
+  alias Ecto.Multi
   alias Snitch.Data.Schema.{Order, OrderAddress}
   alias Snitch.Domain.Order.Transitions
 
@@ -159,7 +159,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
         |> Transitions.persist_shipment()
 
       assert result.valid?
-      assert {:error, changeset} = result.state.packages
+      assert {:error, _changeset} = result.state.packages
     end
   end
 

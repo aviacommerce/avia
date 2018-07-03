@@ -80,24 +80,26 @@ defmodule Snitch.Factory.Shipping do
       end
 
       def shipment!(%{line_items: [line_item], variants: [v]} = context) do
-        %{
-          items: [
-            %{
-              line_item: line_item,
-              variant: v,
-              delta: 0,
-              quantity: 4,
-              state: :fulfilled
-            }
-          ],
-          origin: insert(:stock_location),
-          category: insert(:shipping_category),
-          zones: [insert(:zone, zone_type: "C")],
-          shipping_methods: [insert(:shipping_method)],
-          shipping_costs: [Money.new(0, :USD)],
-          backorders?: false,
-          variants: MapSet.new([v.id])
-        }
+        [
+          shipment: %{
+            items: [
+              %{
+                line_item: line_item,
+                variant: v,
+                delta: 0,
+                quantity: 4,
+                state: :fulfilled
+              }
+            ],
+            origin: insert(:stock_location),
+            category: insert(:shipping_category),
+            zones: [insert(:zone, zone_type: "C")],
+            shipping_methods: [insert(:shipping_method)],
+            shipping_costs: [Money.new(0, :USD)],
+            backorders?: false,
+            variants: MapSet.new([v.id])
+          }
+        ]
       end
 
       def shipping_methods(%{zones: zones} = context) do

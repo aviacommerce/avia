@@ -113,7 +113,7 @@ defmodule Snitch.Domain.Order.Transitions do
           {:error, error} ->
             Repo.rollback(error)
 
-          packages ->
+          {:ok, packages} ->
             packages
         end
       end)
