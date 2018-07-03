@@ -6,7 +6,12 @@ defmodule Snitch.Data.Schema.Order do
   use Snitch.Data.Schema
 
   alias Ecto.Nanoid
+<<<<<<< HEAD
   alias Snitch.Data.Schema.{LineItem, OrderAddress, Package, User}
+=======
+  alias Snitch.Data.Model.LineItem, as: LineItemModel
+  alias Snitch.Data.Schema.{LineItem, OrderAddress, Package, User, Payment}
+>>>>>>> Transition
 
   @type t :: %__MODULE__{}
 
@@ -22,6 +27,7 @@ defmodule Snitch.Data.Schema.Order do
     belongs_to(:user, User)
     has_many(:line_items, LineItem, on_delete: :delete_all, on_replace: :delete)
     has_many(:packages, Package)
+    has_many(:payments, Payment)
 
     timestamps()
   end

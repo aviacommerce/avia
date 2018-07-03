@@ -8,6 +8,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
   alias BeepBop.Context
   alias Ecto.Multi
   alias Snitch.Data.Schema.{Order, OrderAddress}
+  alias Snitch.Data.Model.PaymentMethod
   alias Snitch.Domain.Order.Transitions
 
   @patna %{
@@ -20,6 +21,25 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     phone: "1234567890",
     country_id: nil,
     state_id: nil
+  }
+
+  @card %{
+    month: 12,
+    year: 2099,
+    name_on_card: "Tony Stark",
+    brand: "VISA",
+    number: "4111111111111111",
+    card_name: "My VISA card",
+    user_id: nil
+  }
+
+  @card_with_outbrand %{
+    month: 12,
+    year: 2099,
+    name_on_card: "Tony Stark",
+    number: "4111111111111111",
+    card_name: "My VISA card",
+    user_id: nil
   }
 
   setup :states
@@ -211,5 +231,96 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       |> Transitions.persist_shipping_preferences()
 
     assert result.valid?
+  end
+
+  describe "process payment for order" do
+    setup :zones
+    setup :shipping_methods
+    setup :embedded_shipping_methods
+    setup :payment_methods
+
+    setup %{embedded_shipping_methods: methods} do
+      order = insert(:order, user: build(:user), total: Money.new(3, :USD))
+
+      [order: order, packages: [insert(:package, shipping_methods: methods, order: order)]]
+    end
+
+    @tag shipping_method_count: 1
+    test "with valid card details", %{order: order, packages: [package], shipping_methods: [sm]} do
+      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :USD} end)
+      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :USD} end)
+
+      preference = [
+        %{package_id: package.id, shipping_method_id: sm.id}
+      ]
+
+      result =
+        order
+        |> Context.new(state: %{shipping_preferences: preference})
+        |> Transitions.persist_shipping_preferences()
+
+      assert result.valid?
+      assert [packages: {:run, _}] = Multi.to_list(result.multi)
+      assert {:ok, %{packages: packages}} = Repo.transaction(result.multi)
+
+      package = List.first(packages)
+
+      card_payment = List.first(PaymentMethod.get_all())
+      card = Map.put(@card, :user_id, order.user.id)
+      payment = Map.put(card, :payment_method_id, card_payment.id)
+
+      result =
+        order
+        |> Context.new(state: %{payment: payment})
+        |> Transitions.compute_order_payment()
+
+      assert result.valid?
+      assert {:ok, %{cardpayment: %{payment: payment}}} = Repo.transaction(result.multi)
+      assert payment.amount === Money.add!(order.total, package.total)
+    end
+
+    @tag shipping_method_count: 1
+    test "with out valid card details", %{
+      order: order,
+      packages: [package],
+      shipping_methods: [sm]
+    } do
+      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :USD} end)
+      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :USD} end)
+      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :USD} end)
+
+      preference = [
+        %{package_id: package.id, shipping_method_id: sm.id}
+      ]
+
+      result =
+        order
+        |> Context.new(state: %{shipping_preferences: preference})
+        |> Transitions.persist_shipping_preferences()
+
+      assert result.valid?
+      assert [packages: {:run, _}] = Multi.to_list(result.multi)
+      assert {:ok, %{packages: _}} = Repo.transaction(result.multi)
+
+      card_payment = List.first(PaymentMethod.get_all())
+
+      payment = Map.put(@card_with_outbrand, :payment_method_id, card_payment.id)
+
+      result =
+        order
+        |> Context.new(state: %{payment: payment})
+        |> Transitions.compute_order_payment()
+
+        result =
+          order
+          |> Context.new(state: %{payment: payment})
+          |> Transitions.compute_order_payment()
+
+        refute result.valid?
+        assert result.errors == [
+          brand: {"can't be blank", [validation: :required]},
+          user_id: {"can't be blank", [validation: :required]}
+        ]
+    end
   end
 end

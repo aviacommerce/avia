@@ -11,8 +11,10 @@ defmodule Snitch.Domain.Order.Transitions do
   use Snitch.Domain
 
   alias BeepBop.Context
-  alias Snitch.Data.Model.Package
-  alias Snitch.Data.Schema.Order
+  alias Snitch.Data.Model.{Package, Payment, PaymentMethod}
+  alias Snitch.Data.Model.CardPayment, as: CardPaymentModel
+  alias Snitch.Data.Schema.{Order, CardPayment}
+  alias Snitch.Domain.Package, as: PackageDomain
 
   alias Snitch.Domain.Order, as: OrderDomain
   alias Snitch.Domain.Package, as: PackageDomain
@@ -197,27 +199,81 @@ defmodule Snitch.Domain.Order.Transitions do
         {:halt, error}
     end)
   end
- 
+
+  # Guard Class to check negative amount is skipped.
+
   defp calc_payable_amount(order) do
-    packages_total = Package.compute_package_total(order)
+    packages_total = Package.compute_packages_total(order)
     total_amount = Money.add!(packages_total, order.total)
     amount_paid_before = Payment.compute_order_payments(order)
     Money.sub!(total_amount, amount_paid_before)
   end
 
+  defp process_payment_chk(context, multi, payment_method, payment, order, amount_to_pay) do
+  end
+
+  defp process_payment_ccd(context, multi, payment_method, payment, order, amount_to_pay) do
+    case validate_payment_method(payment) do
+      %{changes: %{card: %{errors: []}}} ->
+        params = %{
+          amount: amount_to_pay,
+          payment_type: "ccd",
+          payment_method_id: payment_method.id
+        }
+        function = fn _ ->
+          CardPaymentModel.create("card-payment", order.id, params, %{card: payment})
+        end
+
+        struct(context, multi: Multi.run(multi, :cardpayment, function))
+
+      %{changes: %{card: %{errors: errors}}} ->
+        struct(context, valid?: false, errors: errors)
+    end
+  end
+
+  @doc """
+
+  Validator for payment method
+
+  Responses
+  {:ok, payment}
+  {:error, errors}
+  """
+
+  defp validate_payment_method(payment) do
+    CardPayment.create_changeset(%CardPayment{}, %{
+      card: payment
+    })
+  end
+
+  @doc """
+    Processing incoming payment.
+
+    ## Schema of the `:state`
+    ```
+    %{
+      payment:
+        %{
+          payment_method_id: "some id"
+        }
+    }
+    ```
+  """
   @spec compute_order_payment(Context.t()) :: Context.t()
   def compute_order_payment(
         %Context{valid?: true, struct: %Order{id: order_id} = order} = context
       ) do
     %{state: %{payment: payment}, multi: multi} = context
+
     amount_to_pay = calc_payable_amount(order)
     payment_method = PaymentMethod.get(payment.payment_method_id)
-    # case payment_method.code do
-      # "chk" ->
-        # process_payment_chk(payment_method, order)
-    #
-    #   "ccd" ->
-    #     process_payment_chk(payment_method, order)
-    # end
+
+    case payment_method.code do
+      "chk" ->
+        process_payment_chk(context, multi, payment_method, payment, order, amount_to_pay)
+
+      "ccd" ->
+        process_payment_ccd(context, multi, payment_method, payment, order, amount_to_pay)
+    end
   end
 end
