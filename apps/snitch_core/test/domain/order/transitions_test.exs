@@ -276,7 +276,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
       assert result.valid?
       assert {:ok, %{cardpayment: %{payment: payment}}} = Repo.transaction(result.multi)
-      assert payment.amount == Money.add!(order.total, package.total)
+      assert Money.reduce(payment.amount) == Money.add!(order.total, package.total)
     end
 
     @tag shipping_method_count: 1
@@ -350,7 +350,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
       assert result.valid?
       assert {:ok, %{checkpayment: payment}} = Repo.transaction(result.multi)
-      assert payment.amount == Money.add!(order.total, package.total)
+      assert Money.reduce(payment.amount) == Money.add!(order.total, package.total)
     end
   end
 end

@@ -290,6 +290,12 @@ defmodule Snitch.Domain.Order.Transitions do
     }
     ```
 
+    ### 3rd party
+
+    * Payubiz
+
+    
+
   """
   @spec compute_order_payment(Context.t()) :: Context.t()
   def compute_order_payment(
