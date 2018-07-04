@@ -69,7 +69,7 @@ defmodule Snitch.Domain.Order.DefaultMachine do
     end)
 
     event(:process_payment, %{from: [:delivery], to: :payment}, fn context ->
-      Transitions.compute_order_payment(context)
+      Transitions.save_payment_info(context)
     end)
 
     event(:captured, %{from: [:processing], to: :rts}, fn context ->

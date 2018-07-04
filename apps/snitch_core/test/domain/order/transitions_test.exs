@@ -272,7 +272,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       result =
         order
         |> Context.new(state: %{payment: payment})
-        |> Transitions.compute_order_payment()
+        |> Transitions.save_payment_info()
 
       assert result.valid?
       assert {:ok, %{cardpayment: %{payment: payment}}} = Repo.transaction(result.multi)
@@ -280,7 +280,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     end
 
     @tag shipping_method_count: 1
-    test "with out valid card details", %{
+    test "with invalid card details", %{
       order: order,
       packages: [package],
       shipping_methods: [sm]
@@ -309,7 +309,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       result =
         order
         |> Context.new(state: %{payment: payment})
-        |> Transitions.compute_order_payment()
+        |> Transitions.save_payment_info()
 
       refute result.valid?
 
@@ -346,7 +346,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       result =
         order
         |> Context.new(state: %{payment: payment})
-        |> Transitions.compute_order_payment()
+        |> Transitions.save_payment_info()
 
       assert result.valid?
       assert {:ok, %{checkpayment: payment}} = Repo.transaction(result.multi)

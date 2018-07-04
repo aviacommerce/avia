@@ -39,7 +39,7 @@ defmodule Snitch.Data.Model.Package do
   end
 
   @doc """
-  Computes total amount of pacakges created
+  Computes total amount of packages created
   """
 
   def compute_packages_total(order) do
@@ -55,9 +55,4 @@ defmodule Snitch.Data.Model.Package do
         |> Enum.reduce(&Money.add!/2)
     end
   end
-
-  @doc """
-  Computes total amount of pacakges created
-  """
-  # def
 end

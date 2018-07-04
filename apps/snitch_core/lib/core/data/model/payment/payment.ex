@@ -56,7 +56,7 @@ defmodule Snitch.Data.Model.Payment do
     CardPaymentModel.from_payment(payment.id)
   end
 
-  def compute_order_payments(order) do
+  def total(order) do
     payments = Map.fetch!(Repo.preload(order, [:payments]), :payments)
 
     case payments do
