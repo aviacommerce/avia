@@ -16,7 +16,7 @@ defmodule SnitchApiWeb.ImageView do
     type: :variant
   )
 
-  def image_url(images, _conn) do
-    images.url
+  def image_url(image, _conn) do
+    Map.get(image, :url)
   end
 end

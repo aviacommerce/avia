@@ -2,7 +2,7 @@ defmodule SnitchApiWeb.ProductView do
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
 
-  location("/products/:id")
+  location("/products/:slug")
 
   attributes([
     :name,
@@ -17,16 +17,17 @@ defmodule SnitchApiWeb.ProductView do
     :promotionable
   ])
 
-  def relationships(product, _conn) do
-    %{
-      variants: %HasMany{
-        serializer: SnitchApiWeb.VariantView,
-        include: true,
-        links: [
-          related: "/products/#{product.id}/variants"
-        ],
-        data: product.variants
-      }
-    }
+  has_many(
+    :variants,
+    serializer: SnitchApiWeb.VariantView,
+    include: true
+  )
+
+  def variants(product, _conn) do
+    Map.get(product, :variants)
+  end
+
+  def images(product, _conn) do
+    get_in(product, [:variants, :images])
   end
 end

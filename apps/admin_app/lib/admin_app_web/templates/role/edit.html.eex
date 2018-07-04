@@ -1,6 +1,14 @@
 <div class="card container text-uppercase">
-    <h4><a href="/roles">Roles</a> / Edit Role</h4>
-    <hr/>
-    <%= render "_form.html", changeset: @changeset,
-      conn: @conn, action: role_path(@conn, :update, @role) %>
+  <h4><a href="/roles">Roles</a> / Edit Role</h4>
+  <hr/>
+  <%= form_for @changeset, role_path(@conn, :update, @role), [as: :role], fn f -> %>
+    <%= input f, :name %>
+    <%= input f, :description %>
+    <%= label f, :permissions, "Permissions" %>
+    <%= multiple_select(f, :permissions, formatted_list(:permissions),
+          value: selected_permissions(@role.permissions), class: "form-control custom-select") %>
+    <br><br>
+    <%= submit "Submit", class: "btn btn-primary submit-btn" %>
+    <%= link("Cancel", to: role_path(@conn, :index), class: "btn btn-primary") %>
+  <% end %>
 </div>

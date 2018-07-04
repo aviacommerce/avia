@@ -1,6 +1,8 @@
 <%= form_for @changeset, @action, [as: :role], fn f -> %>
   <%= input f, :name %>
   <%= input f, :description %>
+  <%= multiple_select(f, :permissions, formatted_list(:permissions),
+        class: "form-control custom-select")%>
   <%= submit "Submit", class: "btn btn-primary submit-btn" %>
   <%= link("Cancel", to: role_path(@conn, :index), class: "btn btn-primary") %>
 <% end %>
