@@ -247,8 +247,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
     @tag shipping_method_count: 1
     test "with valid card details", %{order: order, packages: [package], shipping_methods: [sm]} do
-      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :USD} end)
-      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :USD} end)
+      expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
 
       preference = [
         %{package_id: package.id, shipping_method_id: sm.id}
@@ -266,8 +265,8 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       package = List.first(packages)
 
       card_payment = List.first(PaymentMethod.get_all())
-      card = Map.put(@card, :user_id, order.user.id)
-      payment = Map.put(card, :payment_method_id, card_payment.id)
+      # card = Map.put(@card, :user_id, order.user.id)
+      payment = Map.put(@card, :payment_method_id, card_payment.id)
 
       result =
         order
@@ -285,9 +284,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       packages: [package],
       shipping_methods: [sm]
     } do
-      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :USD} end)
-      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :USD} end)
-      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :USD} end)
+      expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
 
       preference = [
         %{package_id: package.id, shipping_method_id: sm.id}
@@ -321,8 +318,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
     @tag shipping_method_count: 1
     test "with valid chk details", %{order: order, packages: [package], shipping_methods: [sm]} do
-      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :USD} end)
-      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :USD} end)
+      expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
 
       preference = [
         %{package_id: package.id, shipping_method_id: sm.id}

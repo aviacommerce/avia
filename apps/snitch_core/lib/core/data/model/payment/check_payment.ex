@@ -1,6 +1,7 @@
 defmodule Snitch.Data.Model.CheckPayment do
   @moduledoc """
   CheckPayment API and utilities.
+
   `CheckPayment` is a concrete payment subtype in Snitch. By `create/4`ing a
   CheckPayment, the supertype Payment is automatically created in the same
   transaction.

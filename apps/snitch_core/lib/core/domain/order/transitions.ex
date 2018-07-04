@@ -210,7 +210,7 @@ defmodule Snitch.Domain.Order.Transitions do
     Money.sub!(total_amount, amount_paid_before)
   end
 
-  defp process_payment_chk(context, multi, payment_method, payment, order, amount_to_pay) do
+  defp process_payment("chk", context, multi, payment_method, payment, order, amount_to_pay) do
     params = %{
       amount: amount_to_pay,
       order_id: order.id,
@@ -224,7 +224,7 @@ defmodule Snitch.Domain.Order.Transitions do
     struct(context, multi: Multi.run(multi, :checkpayment, function))
   end
 
-  defp process_payment_ccd(context, multi, payment_method, payment, order, amount_to_pay) do
+  defp process_payment("ccd", context, multi, payment_method, payment, order, amount_to_pay) do
     case validate_payment_method(payment) do
       %{changes: %{card: %{errors: []}}} ->
         params = %{
@@ -294,24 +294,22 @@ defmodule Snitch.Domain.Order.Transitions do
 
     * Payubiz
 
-
-
   """
   @spec save_payment_info(Context.t()) :: Context.t()
-  def save_payment_info(
-        %Context{valid?: true, struct: %Order{id: order_id} = order} = context
-      ) do
+  def save_payment_info(%Context{valid?: true, struct: %Order{id: order_id} = order} = context) do
     %{state: %{payment: payment}, multi: multi} = context
 
     amount_to_pay = payable_amount(order)
     payment_method = PaymentMethod.get(payment.payment_method_id)
 
-    case payment_method.code do
-      "chk" ->
-        process_payment_chk(context, multi, payment_method, payment, order, amount_to_pay)
-
-      "ccd" ->
-        process_payment_ccd(context, multi, payment_method, payment, order, amount_to_pay)
-    end
+    process_payment(
+      payment_method.code,
+      context,
+      multi,
+      payment_method,
+      payment,
+      order,
+      amount_to_pay
+    )
   end
 end
