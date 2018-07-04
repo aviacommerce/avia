@@ -17,9 +17,9 @@ defmodule SnitchApiWeb.ProductController do
     )
   end
 
-  def show(conn, params) do
+  def show(conn, %{"product_slug" => product_slug}) do
     product =
-      Repo.get_by(Product, slug: params["id"])
+      Repo.get_by(Product, slug: product_slug)
       |> Repo.preload(variants: [:images])
 
     render(
