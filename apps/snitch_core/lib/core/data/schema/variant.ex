@@ -7,7 +7,7 @@ defmodule Snitch.Data.Schema.Variant do
   import Ecto.Query
 
   alias Money.Ecto.Composite.Type, as: MoneyType
-  alias Snitch.Data.Schema.{ShippingCategory, StockItem}
+  alias Snitch.Data.Schema.{Image, Product, ShippingCategory, StockItem}
   alias Snitch.Repo
 
   @type t :: %__MODULE__{}
@@ -25,7 +25,9 @@ defmodule Snitch.Data.Schema.Variant do
     field(:discontinue_on, :utc_datetime)
 
     has_many(:stock_items, StockItem)
+    has_many(:images, Image)
     belongs_to(:shipping_category, ShippingCategory)
+    belongs_to(:product, Product)
 
     timestamps()
   end

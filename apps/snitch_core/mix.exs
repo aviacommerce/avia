@@ -46,6 +46,7 @@ defmodule Snitch.Core.Mixfile do
       {:credo_contrib, "~> 0.1.0-rc3", only: :dev, runtime: false},
       {:as_nested_set, git: "https://github.com/SagarKarwande/as_nested_set.git"},
       {:ecto_atom, "~> 1.0.0"},
+      {:ecto_autoslug_field, "~> 0.5"},
       {:ecto_identifier, "~> 0.1.0"},
 
       # state machine

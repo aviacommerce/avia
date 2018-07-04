@@ -51,7 +51,7 @@ defmodule AdminAppWeb.UserController do
     user =
       id
       |> UserModel.get()
-      |> Repo.preload(user, :role)
+      |> Repo.preload(:role)
 
     case UserModel.update(params, user) do
       {:ok, _} ->
