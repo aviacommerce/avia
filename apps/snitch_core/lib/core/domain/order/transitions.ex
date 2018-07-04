@@ -262,11 +262,30 @@ defmodule Snitch.Domain.Order.Transitions do
   Processing incoming payment.
 
     ## Schema of the `:state`
+
+    ### card
+
     ```
     %{
       payment:
         %{
-          payment_method_id: "payment_method_id"
+          payment_method_id: "payment_method_id",
+          month: 12,
+          name_on_card: "Helper",
+          brand: "VISA",
+          number: "411141114114111",
+          card_name: "Rupay",
+          user_id: "Somer user id"
+        }
+    }
+
+    `user_id` needs to be injected into map through webcontoller.
+
+    ### Check
+    %{
+      payment:
+        %{
+          payment_method_id: "payment"
         }
     }
     ```
