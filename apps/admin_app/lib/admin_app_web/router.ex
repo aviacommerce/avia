@@ -5,7 +5,7 @@ defmodule AdminAppWeb.Router do
     plug(:accepts, ["html"])
     plug(:fetch_session)
     plug(:fetch_flash)
-    plug(:protect_from_forgery)
+    # plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
   end
 
@@ -23,9 +23,12 @@ defmodule AdminAppWeb.Router do
 
     get("/", PageController, :index)
 
-    resources "/orders", OrderController, only: ~w[index show]a, param: "slug" do
-      get("/cart", OrderController, :edit, as: :cart)
+    resources "/orders", OrderController, only: ~w[index show create]a, param: "number" do
+      get("/cart", OrderController, :get, as: :cart)
       post("/cart", OrderController, :update, as: :cart)
+      put("/cart", OrderController, :add, as: :cart)
+      get("/address", OrderController, :index_address, as: :cart)
+      post("/address", OrderController, :add_address, as: :cart)
     end
 
     resources("/tax_categories", TaxCategoryController, only: [:index, :new, :create])

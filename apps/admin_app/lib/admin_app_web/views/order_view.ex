@@ -1,5 +1,7 @@
 defmodule AdminAppWeb.OrderView do
   use AdminAppWeb, :view
+  alias Phoenix.HTML.Form
+  alias Snitch.Data.Model.Order, as: OrderModel
 
   @bootstrap_contextual_class %{
     "cart" => "light",
@@ -32,13 +34,13 @@ defmodule AdminAppWeb.OrderView do
     content_tag(:span, state, class: "badge badge-pill badge-#{color_class}")
   end
 
-  defp render_line_item(line_item, state) do
+  defp render_line_item(line_item, order) do
     content = [
       render_variant(line_item.variant),
       content_tag(:td, line_item.unit_price),
       render_quantity_with_stock(line_item),
-      content_tag(:td, Money.mult!(line_item.unit_price, line_item.quantity)),
-      render_buttons(state)
+      content_tag(:td, line_item.total),
+      render_buttons(line_item.id, order)
     ]
 
     content_tag(:tr, List.flatten(content))
@@ -48,19 +50,25 @@ defmodule AdminAppWeb.OrderView do
     [content_tag(:th, content_tag(:i, "", class: "far fa-image")), content_tag(:td, variant.sku)]
   end
 
-  defp render_buttons(state) do
-    if is_editable?(state) do
+  defp render_edit_button() do
+    content_tag(
+      :button,
+      [
+        "remove"
+        # content_tag(:span, tag(:i, class: "far fa-edit"), class: "badge badge-light")
+      ],
+      class: "btn btn-primary",
+      type: "submit"
+    )
+  end
+
+  defp render_buttons(item, order) do
+    if is_editable?(order.state) do
       content_tag(
         :td,
-        content_tag(
-          :button,
-          [
-            "edit ",
-            content_tag(:span, tag(:i, class: "far fa-edit"), class: "badge badge-light")
-          ],
-          class: "btn btn-primary",
-          onclick: "foo()"
-        )
+        form_tag("/orders/#{order.number}/cart?edit=#{item}", method: "post") do
+          render_edit_button()
+        end
       )
     end
   end
@@ -108,4 +116,20 @@ defmodule AdminAppWeb.OrderView do
   end
 
   defp is_editable?(_), do: true
+
+  defp render_search_item(item, order) do
+    content = [
+      content_tag(:td, item.sku),
+      content_tag(:td, item.selling_price),
+      # content_tag(:input, type: :text),
+      content_tag(:td, content_tag(:button, ["Add"], type: "submit"))
+    ]
+
+    list =
+      form_tag("/orders/#{order.number}/cart?add=#{item.id}", method: "put") do
+        List.flatten(content)
+      end
+
+    content_tag(:tr, list)
+  end
 end
