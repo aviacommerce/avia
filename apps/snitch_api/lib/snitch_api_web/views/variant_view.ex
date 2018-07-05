@@ -17,16 +17,6 @@ defmodule SnitchApiWeb.VariantView do
     :discontinue_on
   ])
 
-  def relationships(variant, _conn) do
-    %{
-      stock_items: %HasMany{
-        serializer: SnitchApiWeb.StockItemView,
-        include: true,
-        data: variant.stock_items
-      }
-    }
-  end
-
   has_one(
     :shipping_category,
     serializer: SnitchApiWeb.ShippingCategoryView,
@@ -43,11 +33,19 @@ defmodule SnitchApiWeb.VariantView do
     type: :product
   )
 
-  has_one(
+  has_many(
     :images,
     serializer: SnitchApiWeb.ImageView,
     include: true,
     field: :image_id,
     type: :image
   )
+
+  def stock_items(variant, _conn) do
+    Map.get(variant, :stock_items)
+  end
+
+  def images(variant, _conn) do
+    Map.get(variant, :images)
+  end
 end

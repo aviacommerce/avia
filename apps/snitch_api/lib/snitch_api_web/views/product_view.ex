@@ -26,4 +26,8 @@ defmodule SnitchApiWeb.ProductView do
   def variants(product, _conn) do
     Map.get(product, :variants)
   end
+
+  def images(product, _conn) do
+    get_in(product, [:variants, :images])
+  end
 end
