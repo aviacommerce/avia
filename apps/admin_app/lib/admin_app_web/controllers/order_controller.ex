@@ -1,7 +1,8 @@
 defmodule AdminAppWeb.OrderController do
   use AdminAppWeb, :controller
-  alias Snitch.Data.Model.{Order, LineItem}
+  alias Snitch.Data.Model.Order
   alias Snitch.Data.Schema.Variant
+  alias Snitch.Data.Schema.Address
   alias Snitch.Repo
   import Ecto.Query
 
@@ -18,7 +19,7 @@ defmodule AdminAppWeb.OrderController do
           []
 
         _ ->
-          search_variant(params["search"])
+          search_item_variant(params["search"])
       end
 
     render(conn, "show.html", %{order: order, search: search})
@@ -31,17 +32,41 @@ defmodule AdminAppWeb.OrderController do
   end
 
   def edit(conn, params) do
-    order = load_order(%{number: params["number"]})
+    order = load_order(%{number: params["order_number"]})
 
-    render(conn, "show.html", %{order: order, search: []})
+    update_item = params["update"]
+    line_items = remove_line_item(update_item, order.line_items)
+    update_item = List.first(fetch_line_item(update_item, order.line_items))
+
+    render(conn, "edit.html", %{order: order, search: [], update_item: update_item})
+  end
+
+  def update_line_item(conn, params) do
+    order = load_order(%{number: params["order_number"]})
+
+    update_item = params["update"]
+    line_items = remove_line_item(update_item, order.line_items)
+    update_item = List.first(fetch_line_item(update_item, order.line_items))
+    updated_list = [%{quantity: params["quantity"], id: update_item.id} | line_items || []]
+
+    case Order.update(%{line_items: updated_list}, order) do
+      {:ok, order} ->
+        redirect(conn, to: "/orders/#{order.number}")
+
+      {:error, error} ->
+        %{errors: [line_items: {error_text, _}]} = error
+        conn = put_flash(conn, :error, error_text)
+        redirect(conn, to: "/orders/#{order.number}")
+    end
+
+    render(conn, "edit.html", %{order: order, search: [], update_item: update_item})
   end
 
   def add(conn, params) do
     order = load_order(%{number: params["order_number"]})
+
     variant_id = String.to_integer(params["add"])
-    IO.inspect(params)
-    # quantity = String.to_integer(params["quantity"])
-    quantity = 3
+    quantity = String.to_integer(params["quantity"])
     add_line_item = %{quantity: quantity, variant_id: variant_id}
     new_item_list = [add_line_item | struct_to_map(order.line_items)]
 
@@ -51,18 +76,16 @@ defmodule AdminAppWeb.OrderController do
 
       {:error, error} ->
         %{errors: [line_items: {error_text, _}]} = error
-        conn = conn |> put_flash(:error, error_text)
+        conn = put_flash(conn, :error, error_text)
         redirect(conn, to: "/orders/#{order.number}")
     end
   end
 
-  def update(conn, params) do
+  def remove_item(conn, params) do
     order = load_order(%{number: params["order_number"]})
 
     edit_item = params["edit"]
-
     line_items = remove_line_item(edit_item, order.line_items)
-    edit_line_item = get_line_item(edit_item, order.line_items)
 
     {:ok, order} =
       Order.update(
@@ -75,15 +98,62 @@ defmodule AdminAppWeb.OrderController do
     redirect(conn, to: "/orders/#{order.number}")
   end
 
-  def index_address(conn, params) do
+  def address_add_index(conn, params) do
     order = load_order(%{number: params["order_number"]})
 
     render(conn, "address_add.html", %{order: order})
   end
 
-  def add_address(conn, params) do
-    number = params["order_number"]
-    redirect(conn, to: "/orders/#{number}")
+  def address_search(conn, params) do
+    order = load_order(%{number: params["order_number"]})
+    address_list = search_address_list(params["address_search"])
+
+    case address_list do
+      [] ->
+        render(conn, "address_search.html", %{order: order, address_list: []})
+
+      address_list ->
+        render(conn, "address_search.html", %{order: order, address_list: address_list})
+    end
+  end
+
+  def address_attach(conn, params) do
+    order = load_order(%{number: params["order_number"]})
+    address_id = String.to_integer(params["address_id"])
+
+    address =
+      Repo.get(Address, address_id)
+      |> Map.from_struct()
+      |> Map.drop([:__meta])
+
+    {:ok, order} =
+      Order.partial_update(
+        order,
+        %{
+          shipping_address: address,
+          billing_address: address
+        }
+      )
+
+    redirect(conn, to: "/orders/#{order.number}")
+  end
+
+  def address_add(conn, params) do
+    order = load_order(%{number: params["order_number"]})
+
+    changeset = Address.changeset(%Address{}, params["address"])
+
+    case changeset.valid? do
+      true ->
+        {:ok, address} = Repo.insert(changeset)
+        redirect(conn, to: "/orders/#{order.number}/address/search")
+
+      false ->
+        [error_text | _] = changeset.errors
+        {title, {error_value, _}} = error_text
+        conn = put_flash(conn, :error, Atom.to_string(title) <> " - " <> error_value)
+        redirect(conn, to: "/orders/#{order.number}/address/add")
+    end
   end
 
   defp remove_line_item(edit_item, line_items) do
@@ -92,22 +162,30 @@ defmodule AdminAppWeb.OrderController do
     |> Enum.map(fn item -> Map.from_struct(item) |> Map.drop([:__meta]) end)
   end
 
-  defp get_line_item(edit_item, line_items) do
+  defp fetch_line_item(edit_item, line_items) do
     line_items
     |> Enum.reject(fn %{id: id} -> id != String.to_integer(edit_item) end)
-    |> Enum.map(fn item -> Map.from_struct(item) |> Map.drop([:__meta]) end)
   end
 
   defp struct_to_map(items) do
-    items
-    |> Enum.map(fn item -> Map.from_struct(item) |> Map.drop([:__meta]) end)
+    Enum.map(items, fn item -> Map.from_struct(item) |> Map.drop([:__meta]) end)
   end
 
-  defp search_variant(search) do
+  defp search_item_variant(search) do
     query =
       from(
         u in Variant,
         where: ilike(u.sku, ^"%#{search}%")
+      )
+
+    Repo.all(query)
+  end
+
+  defp search_address_list(search) do
+    query =
+      from(
+        u in Address,
+        where: ilike(u.first_name, ^"%#{search}%")
       )
 
     Repo.all(query)
