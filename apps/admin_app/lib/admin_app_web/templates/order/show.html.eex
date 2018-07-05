@@ -2,7 +2,7 @@
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="/orders">Orders</a></li>
-      <li class="breadcrumb-item active" aria-current="page"><%= @order.slug %></li>
+      <li class="breadcrumb-item active" aria-current="page"><%= @order.number %></li>
     </ol>
   </nav>
 
@@ -12,7 +12,15 @@
   </h2>
   <div class="row">
     <div class="col-8">
+      <div class="card">
+        <div class="card-body">
+          <form action="<%= @order.number %>" method="get">
+            <input type="text" name="search">
+          </form>
+        </div>
+      </div>
       <!-- The real deal  -->
+      <%= render "search_item.html", %{search: @search, order: @order} %>
       <%= render "line_item.html", %{order: @order} %>
       <%= render "addresses.html", %{order: @order} %>
     </div>
