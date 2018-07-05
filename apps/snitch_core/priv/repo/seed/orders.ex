@@ -15,10 +15,6 @@ defmodule Snitch.Seed.Orders do
     user_id: nil,
     billing_address: nil,
     shipping_address: nil,
-    adjustment_total: nil,
-    promo_total: nil,
-    item_total: nil,
-    total: nil,
     inserted_at: DateTime.utc(),
     updated_at: DateTime.utc()
   }
@@ -80,22 +76,13 @@ defmodule Snitch.Seed.Orders do
       number = "#{Nanoid.generate()}-#{index}"
       line_items = line_items_with_price(variants, manifest.quantity)
 
-      item_total =
-        line_items
-        |> Stream.map(fn %{unit_price: price, quantity: q} ->
-          Money.mult!(price, q)
-        end)
-        |> Enum.reduce(&Money.add!/2)
-
       order = %{
         @order
         | number: number,
           state: "#{manifest.state}",
           user_id: manifest[:user_id],
           billing_address: manifest[:address],
-          shipping_address: manifest[:address],
-          item_total: item_total,
-          total: item_total
+          shipping_address: manifest[:address]
       }
 
       {order, line_items}
