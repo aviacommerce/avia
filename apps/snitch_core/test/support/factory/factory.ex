@@ -66,8 +66,7 @@ defmodule Snitch.Factory do
       order: build(:order),
       variant: build(:variant),
       quantity: 2,
-      unit_price: Money.new("9.99", currency()),
-      total: Money.new("19.98", currency())
+      unit_price: Money.new("9.99", currency())
     }
   end
 
@@ -183,8 +182,7 @@ defmodule Snitch.Factory do
           order_id: order.id,
           variant_id: v.id,
           quantity: 1,
-          unit_price: v.selling_price,
-          total: v.selling_price
+          unit_price: v.selling_price
         )
       end)
       |> Enum.take(count)
