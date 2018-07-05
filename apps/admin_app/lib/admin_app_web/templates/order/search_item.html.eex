@@ -4,7 +4,7 @@
     <table class="table">
       <thead class="thead-light">
         <tr>
-          <th scope="col" colspan="2">Item Description</th>
+          <th scope="col">Item Description</th>
           <th scope="col">Price</th>
           <th scope="col">Quantity</th>
           <th scope="col"> Add </th>
