@@ -40,6 +40,7 @@ defmodule AdminAppWeb.OrderView do
       content_tag(:td, line_item.unit_price),
       render_quantity_with_stock(line_item),
       content_tag(:td, line_item.total),
+      render_update_buttons(line_item.id, order),
       render_buttons(line_item.id, order)
     ]
 
@@ -50,16 +51,15 @@ defmodule AdminAppWeb.OrderView do
     [content_tag(:th, content_tag(:i, "", class: "far fa-image")), content_tag(:td, variant.sku)]
   end
 
-  defp render_edit_button() do
-    content_tag(
-      :button,
-      [
-        "remove"
-        # content_tag(:span, tag(:i, class: "far fa-edit"), class: "badge badge-light")
-      ],
-      class: "btn btn-primary",
-      type: "submit"
-    )
+  defp render_update_buttons(item, order) do
+    if is_editable?(order.state) do
+      content_tag(
+        :td,
+        form_tag("/orders/#{order.number}/cart/edit?update=#{item}", method: "post") do
+          content_tag(:button, ["update"], class: "btn btn-primary", type: "submit")
+        end
+      )
+    end
   end
 
   defp render_buttons(item, order) do
@@ -67,7 +67,7 @@ defmodule AdminAppWeb.OrderView do
       content_tag(
         :td,
         form_tag("/orders/#{order.number}/cart?edit=#{item}", method: "post") do
-          render_edit_button()
+          content_tag(:button, ["remove"], class: "btn btn-primary", type: "submit")
         end
       )
     end
@@ -131,5 +131,22 @@ defmodule AdminAppWeb.OrderView do
       end
 
     content_tag(:tr, list)
+  end
+
+  def render_update_item(item, order) do
+    content = [
+      content_tag(:td, item.variant.sku),
+      content_tag(:td, item.variant.selling_price),
+      content_tag(:td, tag(:input, name: "quantity", value: item.quantity)),
+      content_tag(:td, tag(:hidden, name: "variant_id", value: item.variant_id)),
+      content_tag(:td, content_tag(:button, ["Add"], type: "submit"))
+    ]
+
+    list =
+      form_tag("/orders/#{order.number}/cart/update?update=#{item.id}", method: "put") do
+        List.flatten(content)
+      end
+
+    content_tag(:p, list)
   end
 end
