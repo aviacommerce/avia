@@ -1,6 +1,6 @@
 defmodule AdminAppWeb.OrderView do
   use AdminAppWeb, :view
-  alias Phoenix.HTML.Form
+  alias Phoenix.HTML.FormData
   alias Snitch.Data.Model.Order, as: OrderModel
 
   @bootstrap_contextual_class %{
@@ -121,7 +121,7 @@ defmodule AdminAppWeb.OrderView do
     content = [
       content_tag(:td, item.sku),
       content_tag(:td, item.selling_price),
-      # content_tag(:input, type: :text),
+      content_tag(:td, tag(:input, name: "quantity", id: "quantity")),
       content_tag(:td, content_tag(:button, ["Add"], type: "submit"))
     ]
 
