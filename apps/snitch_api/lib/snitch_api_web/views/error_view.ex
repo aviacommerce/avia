@@ -1,6 +1,8 @@
 defmodule SnitchApiWeb.ErrorView do
   use SnitchApiWeb, :view
 
+  use JaSerializer.PhoenixView
+
   def render("404.json", _assigns) do
     %{errors: %{detail: "Page not found"}}
   end

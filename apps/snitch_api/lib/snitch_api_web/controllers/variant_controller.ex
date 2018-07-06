@@ -6,7 +6,8 @@ defmodule SnitchApiWeb.VariantController do
 
   def index(conn, %{"product_id" => id}) do
     variants =
-      Repo.all(Variant, where: %{product_id: id})
+      Variant
+      |> Repo.all(where: %{product_id: id})
       |> Repo.preload([:images, :shipping_category, :product, stock_items: :stock_location])
 
     render(
