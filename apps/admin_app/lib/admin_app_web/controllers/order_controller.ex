@@ -29,8 +29,7 @@ defmodule AdminAppWeb.OrderController do
 
   def create(conn, _params) do
     current_user = Guardian.Plug.current_resource(conn)
-    {:ok, order} = Order.create(%{line_items: [], user_id: current_user.id}) |> IO.inspect
-
+    {:ok, order} = Order.create(%{line_items: [], user_id: current_user.id})
     redirect(conn, to: "/orders/#{order.number}")
   end
 
