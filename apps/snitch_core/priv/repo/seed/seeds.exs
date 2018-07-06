@@ -21,7 +21,8 @@ alias Snitch.Seed.{
   Taxonomy,
   Role,
   Shipping,
-  Product
+  Product,
+  ProductRating
 }
 
 variant_count = 9
@@ -55,3 +56,6 @@ Role.seed()
 
 # seed products
 Product.seed()
+
+# seeds a product rating and it's types
+ProductRating.seed()

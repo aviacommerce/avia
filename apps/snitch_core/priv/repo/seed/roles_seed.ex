@@ -5,6 +5,8 @@ defmodule Snitch.Seed.Role do
   alias Snitch.Data.Schema.Role
   alias Snitch.Repo
 
+  require Logger
+
   def seed do
     data =
       Enum.reduce(@roles, [], fn {role, description}, acc ->
@@ -18,6 +20,7 @@ defmodule Snitch.Seed.Role do
         [value | acc]
       end)
 
-    Repo.insert_all(Role, data, on_conflict: :nothing, conflict_target: :name)
+    {count, _} = Repo.insert_all(Role, data, on_conflict: :nothing, conflict_target: :name)
+    Logger.info("Inserted #{count} roles")
   end
 end
