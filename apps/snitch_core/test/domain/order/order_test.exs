@@ -60,9 +60,11 @@ defmodule Snitch.Domain.OrderTest do
         |> Order.partial_update_changeset(%{})
         |> OrderDomain.compute_taxes_changeset()
 
+      total = Money.mult!(item.unit_price, item.quantity)
+
       assert %{
-               item_total: item.total,
-               total: item.total,
+               item_total: total,
+               total: total,
                tax_total: Money.zero(:USD)
              } == cs.changes
 
