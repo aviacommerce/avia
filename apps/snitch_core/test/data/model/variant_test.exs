@@ -6,11 +6,6 @@ defmodule Snitch.Data.Model.VariantTest do
 
   alias Snitch.Data.Model.Variant
 
-  test "get_category/1" do
-    v = insert(:variant, shipping_category: build(:shipping_category))
-    assert v.shipping_category == Variant.get_category(v)
-  end
-
   describe "get_selling_prices/1" do
     setup :variants
 
