@@ -4,6 +4,8 @@ defmodule SnitchApiWeb.TaxonomyController do
   alias Snitch.Data.Schema.Taxonomy
   alias Snitch.Repo
 
+  action_fallback(SnitchApiWeb.FallbackController)
+
   def index(conn, _params) do
     taxonomies =
       Taxonomy
