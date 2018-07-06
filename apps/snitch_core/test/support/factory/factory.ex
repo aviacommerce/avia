@@ -2,7 +2,7 @@ defmodule Snitch.Factory do
   @moduledoc false
 
   use ExMachina.Ecto, repo: Snitch.Repo
-  use Snitch.Factory.{Address, Shipping, Stock, Taxonomy, Zone}
+  use Snitch.Factory.{Address, Shipping, Stock, Taxonomy, Zone, Rating}
 
   alias Snitch.Data.Schema.{
     Address,
@@ -10,14 +10,15 @@ defmodule Snitch.Factory do
     CardPayment,
     LineItem,
     Order,
-    Permission,
     Payment,
     PaymentMethod,
+    Permission,
     Role,
     TaxCategory,
     TaxRate,
     User,
-    Variant
+    Variant,
+    Product
   }
 
   alias Snitch.Repo
@@ -136,7 +137,7 @@ defmodule Snitch.Factory do
 
   def tax_category_factory do
     %TaxCategory{
-      name: sequence(:name, ["CE_VAT", "GST", "CGST", "AU_VAT"]),
+      name: sequence(:tax_category, ["CE_VAT", "GST", "CGST", "AU_VAT"]),
       description: "tax applied",
       is_default?: false,
       tax_code: sequence(:tax_code, ["CE_1", "GST", "CGST", "AU_VAT"]),
@@ -150,7 +151,7 @@ defmodule Snitch.Factory do
 
   def tax_rate_factory do
     %TaxRate{
-      name: sequence(:name, ["North America", "Europe", "India", "China"]),
+      name: sequence(:tax_region, ["North America", "Europe", "India", "China"]),
       value: 0.5,
       included_in_price: false,
       calculator: Snitch.Domain.Calculator.Default
@@ -168,6 +169,14 @@ defmodule Snitch.Factory do
     %Permission{
       code: sequence(:code, ["manage_products", "manage_orders", "manage_all"]),
       description: "can manage respective"
+    }
+  end
+
+  def product_factory do
+    %Product{
+      name: sequence(:product, &"shoes-nike-#{&1}"),
+      description: "awesome products",
+      slug: sequence(:slug, &"nike-#{&1}")
     }
   end
 

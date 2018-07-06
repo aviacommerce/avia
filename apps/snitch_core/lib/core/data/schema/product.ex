@@ -5,6 +5,7 @@ defmodule Snitch.Data.Schema.Product do
 
   use Snitch.Data.Schema
   alias Snitch.Data.Schema.Product.NameSlug
+  alias Snitch.Data.Schema.Review
   alias Snitch.Data.Schema.Variant
 
   @type t :: %__MODULE__{}
@@ -22,13 +23,24 @@ defmodule Snitch.Data.Schema.Product do
     field(:promotionable, :boolean)
     timestamps()
 
+    # associations
     has_many(:variants, Variant)
+    many_to_many(:reviews, Review, join_through: "snitch_product_reviews")
   end
 
   @required_fields ~w(name)a
-  @optional_fields ~w(description meta_description meta_keywords meta_title)a
+  @optional_fields ~w(description meta_description meta_keywords
+    meta_title average_rating review_count)a
 
   def changeset(model, params \\ %{}) do
+    common_changeset(model, params)
+  end
+
+  def update_changeset(%__MODULE__{} = product, params) do
+    common_changeset(product, params)
+  end
+
+  def common_changeset(model, params) do
     model
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
