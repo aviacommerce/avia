@@ -19,7 +19,7 @@ defmodule AdminAppWeb.OrderController do
           []
 
         _ ->
-          search_variant(params["search"])
+          search_item_variant(params["search"])
       end
 
     render(conn, "show.html", %{order: order, search: search})
@@ -98,13 +98,46 @@ defmodule AdminAppWeb.OrderController do
     redirect(conn, to: "/orders/#{order.number}")
   end
 
-  def index_address(conn, params) do
+  def address_add_index(conn, params) do
     order = load_order(%{number: params["order_number"]})
 
     render(conn, "address_add.html", %{order: order})
   end
 
-  def add_address(conn, params) do
+  def address_search(conn, params) do
+    order = load_order(%{number: params["order_number"]})
+    address_list = search_address_list(params["address_search"])
+
+    case address_list do
+      [] ->
+        render(conn, "address_search.html", %{order: order, address_list: []})
+
+      address_list ->
+        render(conn, "address_search.html", %{order: order, address_list: address_list})
+    end
+  end
+
+  def address_attach(conn, params) do
+    order = load_order(%{number: params["order_number"]})
+    address_id = String.to_integer(params["address_id"])
+
+    address =
+      Repo.get(Address, address_id)
+      |>Map.from_struct
+      |> Map.drop([:__meta])
+
+    {:ok, order} =
+      Order.partial_update(
+        order,
+        %{
+          shipping_address: address,
+          billing_address: address
+        }
+      )
+    redirect(conn, to: "/orders/#{order.number}")
+  end
+
+  def address_add(conn, params) do
     order = load_order(%{number: params["order_number"]})
 
     changeset = Address.changeset(%Address{}, params["address"])
@@ -112,23 +145,13 @@ defmodule AdminAppWeb.OrderController do
     case changeset.valid? do
       true ->
         {:ok, address} = Repo.insert(changeset)
-
-        {:ok, order} =
-          Order.update(
-            %{
-              shipping_address_id: address.id,
-              billing_address_id: address.id
-            },
-            order
-          )
-
-        redirect(conn, to: "/orders/#{order.number}")
+        redirect(conn, to: "/orders/#{order.number}/address/search")
 
       false ->
         [error_text | _] = changeset.errors
         {title, {error_value, _}} = error_text
         conn = put_flash(conn, :error, Atom.to_string(title) <> " - " <> error_value)
-        redirect(conn, to: "/orders/#{order.number}")
+        redirect(conn, to: "/orders/#{order.number}/address/add")
     end
   end
 
@@ -147,7 +170,7 @@ defmodule AdminAppWeb.OrderController do
     Enum.map(items, fn item -> Map.from_struct(item) |> Map.drop([:__meta]) end)
   end
 
-  defp search_variant(search) do
+  defp search_item_variant(search) do
     query =
       from(
         u in Variant,
@@ -155,6 +178,25 @@ defmodule AdminAppWeb.OrderController do
       )
 
     Repo.all(query)
+  end
+
+  defp search_address_list(search) do
+    query =
+      from(
+        u in Address,
+        where: ilike(u.first_name, ^"%#{search}%")
+      )
+
+    Repo.all(query)
+  end
+
+  defp get_address(id) do
+    query =
+      from(
+        u in Address,
+        where: u.id == ^id
+      )
+
   end
 
   defp load_order(order) do

@@ -147,6 +147,30 @@ defmodule AdminAppWeb.OrderView do
         List.flatten(content)
       end
 
-    content_tag(:p, list)
+    content_tag(:tr, list)
+  end
+
+  def build_address(address, order) do
+    content = [
+      content_tag(:td, address.first_name),
+      content_tag(:td, address.last_name),
+      content_tag(:td, address.address_line_1),
+      content_tag(:td, address.phone),
+      content_tag(:td, address.city),
+      content_tag(
+        :td,
+        content_tag(:button, ["Attach"], type: "submit", class: "btn btn-sm btn-primary")
+      )
+    ]
+
+    list =
+      form_tag(
+        "/orders/#{order.number}/address/search?address_id=#{address.id}",
+        method: "put"
+      ) do
+        List.flatten(content)
+      end
+
+    content_tag(:tr, list)
   end
 end

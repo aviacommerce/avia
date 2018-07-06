@@ -29,8 +29,10 @@ defmodule AdminAppWeb.Router do
       post("/cart/edit", OrderController, :edit, as: :cart)
       put("/cart/update", OrderController, :update_line_item, as: :cart)
       put("/cart", OrderController, :add, as: :cart)
-      get("/address", OrderController, :index_address, as: :cart)
-      post("/address", OrderController, :add_address, as: :cart)
+      get("/address/search", OrderController, :address_search, as: :cart)
+      put("/address/search", OrderController, :address_attach, as: :cart)
+      get("/address/add", OrderController, :address_add_index, as: :cart)
+      post("/address/add", OrderController, :address_add, as: :cart)
     end
 
     resources("/tax_categories", TaxCategoryController, only: [:index, :new, :create])
