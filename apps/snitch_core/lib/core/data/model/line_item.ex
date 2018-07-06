@@ -23,7 +23,9 @@ defmodule Snitch.Data.Model.LineItem do
   def create(params) do
     Multi.new()
     |> Multi.insert(:line_item, LineItem.create_changeset(%LineItem{}, params))
-    |> do_operation(&OrderDomain.add_line_item/2)
+    |> fetch_order([:line_items])
+    |> update_order(&OrderDomain.add_line_item/2)
+    |> do_operation()
   end
 
   @doc """
@@ -36,7 +38,9 @@ defmodule Snitch.Data.Model.LineItem do
   def update(%LineItem{} = line_item, params) do
     Multi.new()
     |> Multi.update(:line_item, LineItem.update_changeset(line_item, params))
-    |> do_operation(&OrderDomain.update_line_item/2)
+    |> fetch_order([:line_items])
+    |> update_order(&OrderDomain.update_line_item/2)
+    |> do_operation()
   end
 
   @doc """
@@ -51,7 +55,9 @@ defmodule Snitch.Data.Model.LineItem do
   def delete(%LineItem{} = line_item) do
     Multi.new()
     |> Multi.delete(:line_item, line_item)
-    |> do_operation(&OrderDomain.remove_line_item/2)
+    |> fetch_order([:line_items])
+    |> update_order(&OrderDomain.remove_line_item/2)
+    |> do_operation()
   end
 
   @spec get(map) :: LineItem.t() | nil
@@ -135,24 +141,24 @@ defmodule Snitch.Data.Model.LineItem do
     end
   end
 
-  @spec do_operation(Ecto.Multi.t(), (Order.t(), LineItem.t() -> {:ok | :error, term})) ::
-          LineItem.t()
-  defp do_operation(multi, order_updater) do
+  defp fetch_order(multi, preloads \\ []) do
+    Multi.run(multi, :fetch_order, fn %{line_item: li} ->
+      {:ok, Repo.preload(OrderModel.get(li.order_id), preloads)}
+    end)
+  end
+
+  defp update_order(multi, updater_fn) do
+    Multi.run(multi, :order, fn %{line_item: line_item, fetch_order: order} ->
+      updater_fn.(order, line_item)
+    end)
+  end
+
+  @spec do_operation(Ecto.Multi.t()) :: LineItem.t()
+  defp do_operation(multi) do
     multi
-    |> Multi.run(:fetch_order, fn %{line_item: line_item} ->
-      {
-        :ok,
-        line_item.order_id
-        |> OrderModel.get()
-        |> Repo.preload([:line_items])
-      }
-    end)
-    |> Multi.run(:updated_order, fn %{fetch_order: order, line_item: line_item} ->
-      order_updater.(order, line_item)
-    end)
     |> Repo.transaction()
     |> case do
-      {:ok, %{line_item: line_item, updated_order: order}} ->
+      {:ok, %{line_item: line_item, order: order}} ->
         {:ok, struct(line_item, order: order)}
 
       error ->

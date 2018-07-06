@@ -13,41 +13,43 @@ defmodule Snitch.Domain.Order.Transitions do
   alias BeepBop.Context
   alias Snitch.Data.Model.Package
   alias Snitch.Data.Schema.Order
-  alias Snitch.Domain.Package, as: PackageDomain
 
+  alias Snitch.Domain.Order, as: OrderDomain
+  alias Snitch.Domain.Package, as: PackageDomain
   alias Snitch.Domain.{Shipment, ShipmentEngine, Splitters.Weight}
 
   @doc """
-  Persists the address and associates them with the `order`.
+  Embeds the addresses and computes some totals of the `order`.
 
   The following fields are required under the `:state` key:
   * `:billing_address` The billing `Address` params
   * `:shipping_address` The shipping `Address` params
 
-  ## Note
-  This transition is "impure" as it does not use the multi, the addresses are
-  associated "out-of-band".
+  The following fields are computed: `item_total`, `tax_total` and `total`.
+  `total` = `item_total` + `tax_total`
+  > The promo and adjustment totals are ignored for now.
   """
   @spec associate_address(Context.t()) :: Context.t()
   def associate_address(
         %Context{
           valid?: true,
-          struct: %Order{} = order,
+          struct: order,
+          multi: multi,
           state: %{
             billing_address: billing,
             shipping_address: shipping
           }
         } = context
       ) do
-    order
-    |> Order.partial_update_changeset(%{billing_address: billing, shipping_address: shipping})
-    |> Repo.update()
-    |> case do
-      {:ok, order} ->
-        Context.new(order, state: context.state)
+    changeset =
+      order
+      |> Order.partial_update_changeset(%{billing_address: billing, shipping_address: shipping})
+      |> OrderDomain.compute_taxes_changeset()
 
-      errors ->
-        struct(context, valid?: false, errors: errors)
+    if changeset.valid? do
+      struct(context, multi: Multi.update(multi, :order, changeset))
+    else
+      struct(context, valid?: false, errors: [order: changeset])
     end
   end
 
@@ -63,33 +65,25 @@ defmodule Snitch.Domain.Order.Transitions do
 
   ## Note
 
-  If `shipment` is `[]`, we mark the `context` "invalid" because we could not
-  find any shipment.
+  If `shipment` is `[]`, we DO NOT mark the `context` "invalid".
   """
   @spec compute_shipments(Context.t()) :: Context.t()
   # TODO: This function does not gracefully handle errors, they are raised!
-  def compute_shipments(
-        %Context{
-          valid?: true,
-          struct: %Order{} = order
-        } = context
-      ) do
-    order
-    |> Shipment.default_packages()
-    |> ShipmentEngine.run(order)
-    |> Weight.split()
-    |> case do
-      [] ->
-        struct(
-          context,
-          valid?: false,
-          state: %{shipment: []},
-          errors: {:error, "no shipment possible"}
-        )
+  def compute_shipments(%Context{valid?: true, struct: order, state: state} = context) do
+    order =
+      if is_nil(order.shipping_address) do
+        %{order | shipping_address: state.shipping_address}
+      else
+        order
+      end
 
-      shipment ->
-        struct(context, state: %{shipment: shipment})
-    end
+    shipment =
+      order
+      |> Shipment.default_packages()
+      |> ShipmentEngine.run(order)
+      |> Weight.split()
+
+    struct(context, state: %{shipment: shipment})
   end
 
   def compute_shipments(%Context{valid?: false} = context), do: context
@@ -99,24 +93,33 @@ defmodule Snitch.Domain.Order.Transitions do
 
   `Package`s and their `PackageItem`s are inserted together in a DB transaction.
 
-  Returns a new `Context.t` struct with the `shipment` under the the [`:state`,
-  `:shipment`] key-path.
-
-  In case of any errors, an invalid Context struct is returned, with the error
-  under the `:multi`.
+  The `packages` are added to the `:state` under the `:packages` key.
+  Thus the signature of `context.state.packages` is,
+  ```
+  context.state.packages :: {:ok, [Pacakge.t()]} | {:error, Ecto.Changeset.t()}
+  ```
   """
   @spec persist_shipment(Context.t()) :: Context.t()
   def persist_shipment(%Context{valid?: true, struct: %Order{} = order} = context) do
-    %{state: %{shipment: shipment}, multi: multi} = context
+    %{state: %{shipment: shipment}} = context
 
-    function = fn _ ->
-      shipment
-      |> Stream.map(&Shipment.to_package(&1, order))
-      |> Stream.map(&Package.create/1)
-      |> fail_fast_reduce()
-    end
+    packages =
+      Repo.transaction(fn ->
+        shipment
+        |> Stream.map(&Shipment.to_package(&1, order))
+        |> Stream.map(&Package.create/1)
+        |> fail_fast_reduce()
+        |> case do
+          {:error, error} ->
+            Repo.rollback(error)
 
-    struct(context, multi: Multi.run(multi, :packages, function))
+          {:ok, packages} ->
+            packages
+        end
+      end)
+
+    state = Map.put(context.state, :packages, packages)
+    struct(context, state: state)
   end
 
   def persist_shipment(%Context{valid?: false} = context), do: context
