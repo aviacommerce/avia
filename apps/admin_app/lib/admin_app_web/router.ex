@@ -36,6 +36,7 @@ defmodule AdminAppWeb.Router do
     resources("/session", SessionController, only: [:delete])
     resources("/users", UserController)
     resources("/roles", RoleController)
+    resources("/permissions", PermissionController)
   end
 
   scope "/", AdminAppWeb do
