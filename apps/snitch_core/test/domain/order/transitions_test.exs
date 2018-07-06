@@ -2,13 +2,12 @@ defmodule Snitch.Domain.Order.TransitionsTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
-  import Snitch.Factory
   import Mox
+  import Snitch.Factory
 
   alias BeepBop.Context
   alias Ecto.Multi
-  alias Snitch.Data.Schema.Order
-  alias Snitch.Data.Schema.OrderAddress
+  alias Snitch.Data.Schema.{Order, OrderAddress}
   alias Snitch.Domain.Order.Transitions
 
   @patna %{
@@ -24,6 +23,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
   }
 
   setup :states
+  setup :verify_on_exit!
 
   describe "associate_address" do
     setup %{states: [%{country: country} = state]} do
@@ -48,21 +48,23 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
       refute result.valid?
 
-      assert {:error,
-              %{
-                valid?: false,
-                changes: %{
-                  shipping_address: %{
-                    action: :insert,
-                    valid?: false,
-                    errors: [state_id: {"state is explicitly required for this country", _}]
-                  }
-                }
-              }} = result.errors
+      assert [
+               order: %{
+                 valid?: false,
+                 changes: %{
+                   shipping_address: %{
+                     action: :insert,
+                     valid?: false,
+                     errors: [state_id: {"state is explicitly required for this country", _}]
+                   }
+                 }
+               }
+             ] = result.errors
     end
 
     test "with an order that has no addresses", %{patna: patna, order: order} do
       assert is_nil(order.billing_address) and is_nil(order.shipping_address)
+      expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
 
       result =
         order
@@ -80,6 +82,8 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
       state = insert(:state, country: nil, country_id: patna.country_id)
       not_patna = %{patna | state_id: state.id}
+
+      expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
 
       result =
         order
@@ -128,7 +132,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
         |> Context.new()
         |> Transitions.compute_shipments()
 
-      refute result.valid?
+      assert result.valid?
       assert [] = result.state.shipment
     end
   end
@@ -145,8 +149,17 @@ defmodule Snitch.Domain.Order.TransitionsTest do
         |> Transitions.persist_shipment()
 
       assert result.valid?
-      assert [packages: {:run, _}] = Multi.to_list(result.multi)
-      assert {:ok, %{packages: []}} = Repo.transaction(result.multi)
+      assert {:ok, []} = result.state.packages
+    end
+
+    test "fails when shipment is erroneous", %{order: order} do
+      result =
+        order
+        |> Context.new(state: %{shipment: build_list(1, :shipment)})
+        |> Transitions.persist_shipment()
+
+      assert result.valid?
+      assert {:error, _changeset} = result.state.packages
     end
   end
 
