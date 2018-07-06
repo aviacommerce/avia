@@ -14,6 +14,7 @@ defmodule SnitchApiWeb.ConnCase do
   """
 
   use ExUnit.CaseTemplate
+  alias Ecto.Adapters.SQL.Sandbox
 
   using do
     quote do
@@ -24,6 +25,16 @@ defmodule SnitchApiWeb.ConnCase do
       # The default endpoint for testing
       @endpoint SnitchApiWeb.Endpoint
     end
+  end
+
+  setup tags do
+    :ok = Sandbox.checkout(Snitch.Repo)
+
+    unless tags[:async] do
+      Sandbox.mode(Snitch.Repo, {:shared, self()})
+    end
+
+    :ok
   end
 
   setup _tags do
