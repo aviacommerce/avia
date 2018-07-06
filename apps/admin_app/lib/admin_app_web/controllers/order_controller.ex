@@ -1,6 +1,8 @@
 defmodule AdminAppWeb.OrderController do
   use AdminAppWeb, :controller
   alias Snitch.Data.Model.Order
+  alias BeepBop.Context
+  alias Snitch.Domain.Order.DefaultMachine
   alias Snitch.Data.Schema.Variant
   alias Snitch.Data.Schema.Address
   alias Snitch.Repo
@@ -27,7 +29,8 @@ defmodule AdminAppWeb.OrderController do
 
   def create(conn, _params) do
     current_user = Guardian.Plug.current_resource(conn)
-    {:ok, order} = Order.create(%{line_items: [], user_id: current_user.id})
+    {:ok, order} = Order.create(%{line_items: [], user_id: current_user.id}) |> IO.inspect
+
     redirect(conn, to: "/orders/#{order.number}")
   end
 
@@ -126,16 +129,25 @@ defmodule AdminAppWeb.OrderController do
       |> Map.from_struct()
       |> Map.drop([:__meta])
 
-    {:ok, order} =
-      Order.partial_update(
-        order,
-        %{
-          shipping_address: address,
-          billing_address: address
+    context =
+      order
+      |> Context.new(
+        state: %{
+          billing_address: address,
+          shipping_address: address
         }
       )
 
-    redirect(conn, to: "/orders/#{order.number}")
+    transition = DefaultMachine.add_addresses(context)
+
+    case transition.valid? do
+      true ->
+        redirect(conn, to: "/orders/#{order.number}")
+
+      false ->
+        conn = put_flash(conn, :error, transition.errors[:error])
+        redirect(conn, to: "/orders/#{order.number}/address/search")
+    end
   end
 
   def address_add(conn, params) do

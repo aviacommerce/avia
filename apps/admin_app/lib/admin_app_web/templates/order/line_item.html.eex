@@ -8,10 +8,9 @@
           <th scope="col" colspan="2">Item Description</th>
           <th scope="col">Price</th>
           <th scope="col">Quantity</th>
-          <th scope="col">Total</th>
-          <th scope="col">Updates</th>
           <%= if is_editable?(@order) do %>
-          <th scope="col"></th><!-- action buttons -->
+          <th scope="col"></th>
+          <th scope="col"></th>
           <% end %>
         </tr>
       </thead>
