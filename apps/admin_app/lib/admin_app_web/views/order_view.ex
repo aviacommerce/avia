@@ -37,7 +37,7 @@ defmodule AdminAppWeb.OrderView do
       render_variant(line_item.variant),
       content_tag(:td, line_item.unit_price),
       render_quantity_with_stock(line_item),
-      content_tag(:td, line_item.total),
+      content_tag(:td, Money.mult!(line_item.unit_price, line_item.quantity)),
       render_buttons(state)
     ]
 

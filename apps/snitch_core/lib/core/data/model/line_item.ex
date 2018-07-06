@@ -6,7 +6,8 @@ defmodule Snitch.Data.Model.LineItem do
 
   alias Ecto.Multi
   alias Snitch.Data.Model.Order, as: OrderModel
-  alias Snitch.Data.Schema.{LineItem, Variant}
+  alias Snitch.Data.Model.Variant
+  alias Snitch.Data.Schema.{LineItem}
   alias Snitch.Domain.Order, as: OrderDomain
   alias Snitch.Tools.Money, as: MoneyTools
 
@@ -69,10 +70,10 @@ defmodule Snitch.Data.Model.LineItem do
   def get_all, do: Repo.all(LineItem)
 
   @doc """
-  Set `:unit_price` and `:total` for many `LineItem` `params`.
+  Set `:unit_price` for many `LineItem` `params`.
 
-  `params` from external sources might not include `unit_price` and `total`,
-  this function _can_ compute them and return updated `params`.
+  `params` from external sources might not include `unit_price`, this function
+  _can_ compute it and return updated `params`.
 
   Since it accepts any list of maps, and not validated changesets we might not
   be able to compute said fields. Such items are returned as is in the list.
@@ -83,26 +84,25 @@ defmodule Snitch.Data.Model.LineItem do
   ## Example
   When `variant_id` is `nil` or does not exist, no update is made.
   ```
-  iex> Model.LineItem.update_price_and_totals([%{variant_id: -1, quantity: 2}])
+  iex> Model.LineItem.update_unit_price([%{variant_id: -1, quantity: 2}])
   [%{variant_id: -1, quantity: 2}]
   ```
 
-  When both `variant_id` and `quantity` are valid, update is made.
   ```
   iex> variant = Snitch.Repo.one(Snitch.Data.Schema.Variant)
   iex> variant.selling_price
   #Money<:USD, 14.99000000>
-  iex> [priced_item] = Model.LineItem.update_price_and_totals(
+  iex> [priced_item] = Model.LineItem.update_unit_price(
   ...>   [%{variant_id: variant.id, quantity: 2}]
   ...> )
-  iex> priced_item.total
-  #Money<:USD, 29.98000000>
+  iex> priced_item.unit_price
+  #Money<:USD, 14.99000000>
   ```
   """
-  @spec update_price_and_totals([map]) :: [map]
-  def update_price_and_totals([]), do: []
+  @spec update_unit_price([map]) :: [map]
+  def update_unit_price([]), do: []
 
-  def update_price_and_totals(line_items) do
+  def update_unit_price(line_items) do
     unit_selling_prices =
       line_items
       |> Stream.map(&Map.get(&1, :variant_id))
@@ -115,27 +115,25 @@ defmodule Snitch.Data.Model.LineItem do
   @doc """
   Returns the item total for given `line_items`.
 
-  If the list is empty, the call is delegated to `MoneyTools.zero/1`.
+  If the list is empty, the call is delegated to `MoneyTools.zero!/1`.
   """
   @spec compute_total([LineItem.t()]) :: Money.t()
   def compute_total([]), do: MoneyTools.zero!()
 
   def compute_total(line_items) when is_list(line_items) do
     line_items
-    |> Stream.map(&Map.fetch!(&1, :total))
+    |> Stream.map(fn %{quantity: q, unit_price: price} ->
+      Money.mult!(price, q)
+    end)
     |> Enum.reduce(&Money.add!/2)
     |> Money.reduce()
   end
 
   @spec set_price_and_total(map, %{non_neg_integer: Money.t()}) :: map
   defp set_price_and_total(line_item, unit_selling_prices) do
-    with {:ok, quantity} <- Map.fetch(line_item, :quantity),
-         {:ok, variant_id} <- Map.fetch(line_item, :variant_id),
-         {:ok, unit_price} <- Map.fetch(unit_selling_prices, variant_id),
-         {:ok, total} <- Money.mult(unit_price, quantity) do
-      line_item
-      |> Map.put(:unit_price, unit_price)
-      |> Map.put(:total, total)
+    with {:ok, variant_id} <- Map.fetch(line_item, :variant_id),
+         {:ok, unit_price} <- Map.fetch(unit_selling_prices, variant_id) do
+      Map.put(line_item, :unit_price, unit_price)
     else
       _ -> line_item
     end

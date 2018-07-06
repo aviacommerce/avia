@@ -4,5 +4,5 @@ defmodule SnitchApiWeb.LineItemView do
 
   location("/line_items/:id")
 
-  attributes([:id, :quantity, :unit_price, :total])
+  attributes([:id, :variant_id, :quantity, :unit_price])
 end

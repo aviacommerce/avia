@@ -35,7 +35,7 @@ defmodule Snitch.Data.Schema.OrderTest do
   test "both order and line_items are inserted to DB", context do
     %{user: user, variants: variants} = context
     line_items = line_item_params(variants)
-    item_total = total(line_items)
+    item_total = LineItem.compute_total(line_items)
 
     params = %{
       @order_params
@@ -97,7 +97,7 @@ defmodule Snitch.Data.Schema.OrderTest do
   describe "order updates" do
     setup %{user: user, variants: variants} do
       line_items = line_item_params(variants)
-      item_total = total(line_items)
+      item_total = LineItem.compute_total(line_items)
 
       params = %{
         @order_params
@@ -138,13 +138,13 @@ defmodule Snitch.Data.Schema.OrderTest do
       [one, two, three] = persisted.line_items
 
       line_items =
-        LineItem.update_price_and_totals([
+        LineItem.update_unit_price([
           %{id: two.id, variant_id: two.variant_id, quantity: 9},
           %{id: one.id, variant_id: three.variant_id, quantity: one.quantity},
           %{id: three.id, variant_id: one.variant_id, quantity: three.quantity}
         ])
 
-      item_total = total(line_items)
+      item_total = LineItem.compute_total(line_items)
 
       params = %{
         line_items: line_items,
@@ -166,10 +166,9 @@ defmodule Snitch.Data.Schema.OrderTest do
       %{persisted: persisted} = context
       [one, two, three] = persisted.line_items
 
-      line_items =
-        LineItem.update_price_and_totals([%{id: one.id}, %{id: two.id}, %{id: three.id}])
+      line_items = LineItem.update_unit_price([%{id: one.id}, %{id: two.id}, %{id: three.id}])
 
-      item_total = total(persisted.line_items)
+      item_total = LineItem.compute_total(persisted.line_items)
 
       params = %{
         line_items: line_items,
@@ -244,13 +243,7 @@ defmodule Snitch.Data.Schema.OrderTest do
         %{variant_id: variant_id, quantity: 2}
       end)
 
-    LineItem.update_price_and_totals(line_items)
-  end
-
-  defp total(line_items) do
-    line_items
-    |> Stream.map(&Map.fetch!(&1, :total))
-    |> Enum.reduce(&Money.add!/2)
+    LineItem.update_unit_price(line_items)
   end
 end
 

@@ -14,8 +14,7 @@ defmodule Snitch.Domain.DefaultCalculatorTest do
     order_id: 1,
     variant_id: 1,
     quantity: 1,
-    unit_price: Money.new("15.00", :USD),
-    total: Money.new("15.00", :USD)
+    unit_price: Money.new("15.00", :USD)
   }
 
   describe "compute/2" do

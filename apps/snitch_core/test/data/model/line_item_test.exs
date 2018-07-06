@@ -11,15 +11,15 @@ defmodule Snitch.Data.Model.LineItemTest do
     setup :variants
     setup :good_line_items
 
-    test "update_price_and_totals/1", context do
-      %{line_items: line_items, totals: totals} = context
-      priced_items = LineItem.update_price_and_totals(line_items)
-      assert Enum.all?(priced_items, fn x -> totals[x.variant_id] == Money.reduce(x.total) end)
+    test "update_unit_price/1", context do
+      %{line_items: line_items} = context
+      priced_items = LineItem.update_unit_price(line_items)
+      assert Enum.all?(priced_items, fn %{unit_price: price} -> not is_nil(price) end)
     end
 
-    test "compute_totals/1", context do
+    test "compute_total/1", context do
       %{line_items: line_items} = context
-      priced_items = LineItem.update_price_and_totals(line_items)
+      priced_items = LineItem.update_unit_price(line_items)
       assert %Money{} = LineItem.compute_total(priced_items)
     end
   end
@@ -28,12 +28,14 @@ defmodule Snitch.Data.Model.LineItemTest do
     setup :variants
     setup :bad_line_items
 
-    test "update_price_and_totals/1", context do
-      %{line_items: line_items} = context
-      priced_items = LineItem.update_price_and_totals(line_items)
+    test "update_unit_price/1", %{line_items: line_items} do
+      priced_items = LineItem.update_unit_price(line_items)
 
-      assert Enum.all?(priced_items, &(not Map.has_key?(&1, :total)))
-      assert Enum.all?(priced_items, &(not Map.has_key?(&1, :unit_price)))
+      assert [
+               %{quantity: 2, variant_id: -1},
+               %{quantity: nil, unit_price: %Money{}, variant_id: _},
+               %{quantity: 2, variant_id: nil}
+             ] = priced_items
     end
   end
 
@@ -106,31 +108,13 @@ defmodule Snitch.Data.Model.LineItemTest do
     setup :user_with_address
 
     @tag variant_count: 1
-    test "fails with invalid params", %{variants: [v], user: user} do
-      order = insert(:order, user: user)
-      order = struct(order, line_items(%{order: order, variants: [v]}))
-
-      [li] = order.line_items
-
-      params = %{
-        quantity: li.quantity + 1
-      }
-
-      {:error, :line_item, cs, %{}} = LineItem.update(li, params)
-      assert %{total: ["can't be blank"]} = errors_on(cs)
-    end
-
-    @tag variant_count: 1
     test "with valid params", %{variants: [v], user: user} do
       order = insert(:order, user: user)
       order = struct(order, line_items(%{order: order, variants: [v]}))
 
       [li] = order.line_items
 
-      params = %{
-        quantity: li.quantity + 1,
-        total: Money.add!(li.total, li.unit_price)
-      }
+      params = %{quantity: li.quantity + 1}
 
       {:ok, li} = LineItem.update(li, params)
       assert Ecto.assoc_loaded?(li.order)
@@ -157,62 +141,18 @@ defmodule Snitch.Data.Model.LineItemTest do
     end
   end
 
-  describe "create/1 for order in `address` state" do
-    setup :variants
-    setup :user_with_address
-
-    @tag :skip
-    @tag variant_count: 1
-    test "which is empty", %{variants: [v], user: user} do
-      order = insert(:order, line_items: [], user: user)
-
-      {:ok, li} = LineItem.create(%{line_item_params(v) | order_id: order.id})
-      assert Ecto.assoc_loaded?(li.order)
-      assert Ecto.assoc_loaded?(li.order.line_items)
-      assert length(li.order.line_items) == 1
-      assert order.item_total == li.total
-      assert order.total == li.total
-    end
-
-    @tag :skip
-    @tag variant_count: 2
-    test "with existing line_items", %{variants: [v1, v2], user: user} do
-      order =
-        insert(
-          :order,
-          item_total: v1.selling_price,
-          total: v1.selling_price,
-          user: user,
-          state: "address"
-        )
-
-      order = struct(order, line_items(%{order: order, variants: [v1]}))
-
-      assert length(order.line_items) == 1
-      [li] = order.line_items
-      assert li.variant_id == v1.id
-
-      {:ok, li} = LineItem.create(%{line_item_params(v2) | order_id: order.id})
-      assert Money.reduce(li.order.item_total) == Money.add!(li.total, v1.selling_price)
-      assert Money.reduce(li.order.total) == Money.add!(li.total, v1.selling_price)
-    end
-  end
-
   defp good_line_items(context) do
     %{variants: vs} = context
     quantities = Stream.cycle([2])
 
-    {line_items, totals} =
+    line_items =
       vs
       |> Stream.zip(quantities)
-      |> Enum.reduce({[], %{}}, fn {variant, quantity}, {ls, ts} ->
-        {
-          [%{variant_id: variant.id, quantity: quantity} | ls],
-          Map.put(ts, variant.id, Money.mult!(variant.selling_price, quantity))
-        }
+      |> Enum.reduce([], fn {variant, quantity}, acc ->
+        [%{variant_id: variant.id, quantity: quantity} | acc]
       end)
 
-    [line_items: line_items, totals: totals]
+    [line_items: line_items]
   end
 
   defp bad_line_items(context) do

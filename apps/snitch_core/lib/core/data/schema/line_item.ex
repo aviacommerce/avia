@@ -12,15 +12,14 @@ defmodule Snitch.Data.Schema.LineItem do
   schema "snitch_line_items" do
     field(:quantity, :integer)
     field(:unit_price, Money.Ecto.Composite.Type)
-    field(:total, Money.Ecto.Composite.Type)
 
     belongs_to(:variant, Variant)
     belongs_to(:order, Order)
     timestamps()
   end
 
-  @cast_fields ~w(quantity variant_id unit_price total)a
-  @update_fields ~w(quantity unit_price total)a
+  @cast_fields ~w(quantity variant_id unit_price)a
+  @update_fields ~w(quantity unit_price)a
   @create_fields [:order_id | @cast_fields]
 
   @doc """
@@ -56,7 +55,6 @@ defmodule Snitch.Data.Schema.LineItem do
   def update_changeset(%__MODULE__{} = line_item, params) do
     line_item
     |> cast(params, @update_fields)
-    |> validate_conditional_required()
     |> common_changeset()
   end
 
@@ -64,15 +62,5 @@ defmodule Snitch.Data.Schema.LineItem do
     changeset
     |> validate_number(:quantity, greater_than: 0)
     |> validate_amount(:unit_price)
-    |> validate_amount(:total)
-  end
-
-  defp validate_conditional_required(%{changes: changes} = changeset) do
-    if (Map.has_key?(changes, :quantity) or Map.has_key?(changes, :unit_price)) and
-         not Map.has_key?(changes, :total) do
-      add_error(changeset, :total, "can't be blank", validation: :required)
-    else
-      changeset
-    end
   end
 end

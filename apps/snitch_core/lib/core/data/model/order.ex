@@ -135,6 +135,6 @@ defmodule Snitch.Data.Model.Order do
   def get_all, do: Repo.all(Order)
 
   defp update_line_item_costs(line_items) when is_list(line_items) do
-    LineItemModel.update_price_and_totals(line_items)
+    LineItemModel.update_unit_price(line_items)
   end
 end
