@@ -437,29 +437,7 @@ defmodule Snitch.Domain.ShipmentTest do
 
     setup :variants
     setup :line_items
-
-    setup %{line_items: [line_item], variants: [v]} do
-      [
-        shipment: %{
-          items: [
-            %{
-              line_item: line_item,
-              variant: v,
-              delta: 0,
-              quantity: 4,
-              state: :fulfilled
-            }
-          ],
-          origin: insert(:stock_location),
-          category: insert(:shipping_category),
-          zones: [insert(:zone, zone_type: "C")],
-          shipping_methods: [insert(:shipping_method)],
-          shipping_costs: [Money.new(0, :USD)],
-          backorders?: false,
-          variants: nil
-        }
-      ]
-    end
+    setup :shipment!
 
     @tag variant_count: 1
     test "embeds cost and shipping method together", context do

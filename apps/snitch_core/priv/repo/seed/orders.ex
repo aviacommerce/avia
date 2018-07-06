@@ -82,7 +82,9 @@ defmodule Snitch.Seed.Orders do
 
       item_total =
         line_items
-        |> Stream.map(&Map.fetch!(&1, :total))
+        |> Stream.map(fn %{unit_price: price, quantity: q} ->
+          Money.mult!(price, q)
+        end)
         |> Enum.reduce(&Money.add!/2)
 
       order = %{

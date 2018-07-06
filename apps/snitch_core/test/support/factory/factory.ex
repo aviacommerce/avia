@@ -16,7 +16,9 @@ defmodule Snitch.Factory do
     TaxCategory,
     TaxRate,
     User,
-    Variant
+    Variant,
+    Role,
+    Permission
   }
 
   alias Snitch.Repo
@@ -56,6 +58,15 @@ defmodule Snitch.Factory do
       width: Decimal.new("0.4"),
       cost_price: Money.new("9.99", currency()),
       selling_price: Money.new("14.99", currency())
+    }
+  end
+
+  def line_item_factory do
+    %LineItem{
+      order: build(:order),
+      variant: build(:variant),
+      quantity: 2,
+      unit_price: Money.new("9.99", currency())
     }
   end
 
@@ -144,6 +155,13 @@ defmodule Snitch.Factory do
     }
   end
 
+  def permission_factory do
+    %Permission{
+      code: sequence(:code, ["manage_products", "manage_orders", "manage_all"]),
+      description: "can manage respective"
+    }
+  end
+
   # Associates the address with the user once user schema is corrected
   def user_with_address(_context) do
     %{
@@ -164,8 +182,7 @@ defmodule Snitch.Factory do
           order_id: order.id,
           variant_id: v.id,
           quantity: 1,
-          unit_price: v.selling_price,
-          total: v.selling_price
+          unit_price: v.selling_price
         )
       end)
       |> Enum.take(count)
@@ -232,5 +249,10 @@ defmodule Snitch.Factory do
     zone = insert(:zone, %{zone_type: "S"})
     count = Map.get(context, :tax_rate_count, 3)
     [tax_rates: insert_list(count, :tax_rate, %{tax_category_id: tc.id, zone_id: zone.id})]
+  end
+
+  def permissions(context) do
+    count = Map.get(context, :permission_count, 2)
+    [permissions: insert_list(count, :permission)]
   end
 end

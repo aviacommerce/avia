@@ -1,12 +1,13 @@
 defmodule SnitchApiWeb.TaxonController do
   use SnitchApiWeb, :controller
 
-  alias Snitch.Repo
   alias Snitch.Data.Schema.Taxon
+  alias Snitch.Repo
 
   def index(conn, _params) do
     taxons =
-      Repo.all(Taxon)
+      Taxon
+      |> Repo.all()
       |> Repo.preload([:parent, :taxonomy])
 
     render(
@@ -19,7 +20,8 @@ defmodule SnitchApiWeb.TaxonController do
 
   def show(conn, %{"id" => id}) do
     taxon =
-      Repo.get!(Taxon, id)
+      Taxon
+      |> Repo.get!(id)
       |> Repo.preload([:parent, :taxonomy])
 
     render(
