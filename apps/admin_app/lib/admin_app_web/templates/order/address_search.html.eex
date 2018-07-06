@@ -1,0 +1,56 @@
+<div class="container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/orders">Orders</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><%= @order.number %></li>
+    </ol>
+  </nav>
+
+  <h2>
+    Order #<%= @order.id %>
+    <%= state_badge(@order.state) %>
+  </h2>
+  <div class="row">
+    <div class="col-8">
+      <div class="card">
+        <div class="card-body">
+          <div class="card-body">
+            <form method="get">
+              <input type="text" name="address_search">
+            </form>
+          </div>
+            <div class="card-header text-center">Cart</div>
+            <div class="card-body">
+              <table class="table">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">City</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Attach</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <%= for address <- @address_list do %>
+                    <%= build_address(address, @order) %>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-4">
+      <h3>Order Summary</h3>
+      <table class="table table-sm">
+        <caption class="sr-only">order summary</caption>
+        <tbody>
+          <%= summary(@order) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </div>
+</div>
