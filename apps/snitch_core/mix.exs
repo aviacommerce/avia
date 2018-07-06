@@ -1,10 +1,12 @@
 defmodule Snitch.Core.Mixfile do
   use Mix.Project
 
+  @version "0.0.1"
+
   def project do
     [
       app: :snitch_core,
-      version: "0.0.1",
+      version: @version,
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
@@ -13,6 +15,7 @@ defmodule Snitch.Core.Mixfile do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
+      package: package(),
       deps: deps(),
       test_coverage: [tool: ExCoveralls],
       docs: docs()
@@ -30,7 +33,7 @@ defmodule Snitch.Core.Mixfile do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support", "priv/repo/seed"]
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib", "priv/repo/seed"]
 
   # Specifies your project dependencies.
@@ -71,9 +74,24 @@ defmodule Snitch.Core.Mixfile do
     ]
   end
 
+  defp package do
+    [
+      contributors: [],
+      maintainers: [],
+      licenses: [],
+      links: %{
+        "GitHub" => "https://github.com/aviabird/snitch",
+        "Readme" => "https://github.com/aviabird/snitch/blob/v#{@version}/README.md"
+        # "Changelog" => "https://github.com/aviabird/snitch/blob/v#{@version}/CHANGELOG.md"
+      }
+    ]
+  end
+
   defp docs do
     [
-      main: Snitch.Data.Schema.Order,
+      extras: ~w(README.md),
+      main: "readme",
+      source_ref: "v#{@version}",
       source_url: "https://github.com/aviabird/snitch",
       groups_for_modules: groups_for_modules()
     ]

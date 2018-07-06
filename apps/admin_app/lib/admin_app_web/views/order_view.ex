@@ -1,6 +1,5 @@
 defmodule AdminAppWeb.OrderView do
   use AdminAppWeb, :view
-  alias Snitch.Data.Model.Order, as: OrderModel
 
   @bootstrap_contextual_class %{
     "cart" => "light",
