@@ -8,7 +8,6 @@ defmodule Snitch.Tools.Helper.Order do
   @line_item %{
     quantity: nil,
     unit_price: nil,
-    total: nil,
     variant_id: nil,
     order_id: nil,
     inserted_at: DateTime.utc(),
@@ -96,8 +95,7 @@ defmodule Snitch.Tools.Helper.Order do
         | quantity: q,
           variant_id: v.id,
           order_id: order_id,
-          unit_price: v.selling_price,
-          total: Money.mult!(v.selling_price, q)
+          unit_price: v.selling_price
       }
     end)
   end

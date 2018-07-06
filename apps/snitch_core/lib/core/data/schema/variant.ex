@@ -4,7 +4,6 @@ defmodule Snitch.Data.Schema.Variant do
   """
 
   use Snitch.Data.Schema
-  import Ecto.Query
 
   alias Money.Ecto.Composite.Type, as: MoneyType
   alias Snitch.Data.Schema.{Image, Product, ShippingCategory, StockItem}
@@ -54,18 +53,5 @@ defmodule Snitch.Data.Schema.Variant do
     #
     # Variants has_one shipping category through Products, so we won't be
     # placing a FK constraint here.
-  end
-
-  def get_selling_prices(variant_ids) do
-    # TODO: move the function to variant model
-    query =
-      from(v in "snitch_variants", select: [v.id, v.selling_price], where: v.id in ^variant_ids)
-
-    query
-    |> Repo.all()
-    |> Enum.reduce(%{}, fn [v_id, sp], acc ->
-      {:ok, cost} = MoneyType.load(sp)
-      Map.put(acc, v_id, cost)
-    end)
   end
 end

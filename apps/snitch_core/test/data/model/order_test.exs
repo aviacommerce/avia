@@ -14,8 +14,8 @@ defmodule Snitch.Data.Model.OrderTest do
   describe "create/3" do
     test "with valid data", %{order_params: params} do
       {:ok, order} = Order.create(params)
-      assert order.item_total == total(params.line_items)
-      assert order.total == total(params.line_items)
+      assert order.item_total == LineItem.compute_total(params.line_items)
+      assert order.total == LineItem.compute_total(params.line_items)
     end
 
     test "without line_items", %{order_params: params} do
@@ -48,20 +48,21 @@ defmodule Snitch.Data.Model.OrderTest do
       {:ok, order} = Order.create(order_params)
 
       [line_item | _] = order.line_items
+      total = Money.mult!(line_item.unit_price, line_item.quantity)
 
       {:ok, %{line_items: new_items} = new_order} =
         Order.update(
           %{
             line_items: [%{id: line_item.id}],
-            item_total: line_item.total,
-            total: line_item.total
+            item_total: total,
+            total: total
           },
           order
         )
 
       assert Enum.count(new_items) == 1
-      assert new_order.item_total == line_item.total
-      assert new_order.total == line_item.total
+      assert new_order.item_total == total
+      assert new_order.total == total
     end
 
     test "remove all line_items", %{order_params: order_params} do
@@ -125,7 +126,7 @@ defmodule Snitch.Data.Model.OrderTest do
       |> Enum.reduce([], fn v, acc ->
         [%{variant_id: v.id, quantity: 2} | acc]
       end)
-      |> LineItem.update_price_and_totals()
+      |> LineItem.update_unit_price()
 
     [line_items: line_items]
   end
@@ -136,8 +137,8 @@ defmodule Snitch.Data.Model.OrderTest do
         user_id: user.id,
         number: "long_unique_number",
         line_items: li,
-        item_total: total(li),
-        total: total(li)
+        item_total: LineItem.compute_total(li),
+        total: LineItem.compute_total(li)
       }
     ]
   end
@@ -157,11 +158,5 @@ defmodule Snitch.Data.Model.OrderTest do
       datum = Enum.reduce(transforms, %{id: x.id}, fn t, acc -> t.(acc, x) end)
       [datum | acc]
     end)
-  end
-
-  defp total(line_items) do
-    line_items
-    |> Stream.map(&Map.fetch!(&1, :total))
-    |> Enum.reduce(&Money.add!/2)
   end
 end
