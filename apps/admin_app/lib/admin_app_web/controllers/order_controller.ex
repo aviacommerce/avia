@@ -123,7 +123,7 @@ defmodule AdminAppWeb.OrderController do
 
     address =
       Repo.get(Address, address_id)
-      |>Map.from_struct
+      |> Map.from_struct()
       |> Map.drop([:__meta])
 
     {:ok, order} =
@@ -134,6 +134,7 @@ defmodule AdminAppWeb.OrderController do
           billing_address: address
         }
       )
+
     redirect(conn, to: "/orders/#{order.number}")
   end
 
@@ -188,15 +189,6 @@ defmodule AdminAppWeb.OrderController do
       )
 
     Repo.all(query)
-  end
-
-  defp get_address(id) do
-    query =
-      from(
-        u in Address,
-        where: u.id == ^id
-      )
-
   end
 
   defp load_order(order) do
