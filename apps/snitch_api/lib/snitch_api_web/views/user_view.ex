@@ -4,5 +4,16 @@ defmodule SnitchApiWeb.UserView do
 
   location("/users/:id")
 
-  attributes([:id, :name])
+  attributes([:name, :email])
+
+  def name(user, _conn) do
+    user
+    |> Map.take([:first_name, :last_name])
+    |> Map.values()
+    |> List.to_string()
+  end
+
+  def render("jwt.json-api", %{token: jwt}) do
+    %{token: jwt}
+  end
 end

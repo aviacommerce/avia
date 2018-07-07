@@ -34,6 +34,10 @@ config :ja_serializer,
   page_number_origin: 1,
   page_size: 2
 
+config :snitch_api, SnitchApi.Guardian,
+  issuer: "snitch_api",
+  secret_key: "V4h+IQskKPefHzO58nDlKRz/ZAWZ1KpM2PBt0Tp3ozexHDE8JQ4dkwblH7PZvZOm"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"

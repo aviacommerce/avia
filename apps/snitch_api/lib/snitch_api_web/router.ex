@@ -9,6 +9,12 @@ defmodule SnitchApiWeb.Router do
   scope "/api/v1", SnitchApiWeb do
     pipe_through(:api)
 
+    # user sign_in_out_up
+    post("/register", UserController, :create)
+    get("/users/:id", UserController, :show)
+    post("/login", UserController, :login)
+    post("/logout", UserController, :logout)
+
     resources("/orders", OrderController, only: [:index])
     resources("/taxonomies", TaxonomyController, only: [:index, :show])
     resources("/taxons", TaxonController, only: [:index, :show])
