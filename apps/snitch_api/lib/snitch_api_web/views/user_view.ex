@@ -20,4 +20,8 @@ defmodule SnitchApiWeb.UserView do
   def render("logout.json-api", _data) do
     %{status: "logged out"}
   end
+
+  def render("current_user.json-api", %{data: user}) do
+    %{data: Map.take(user, [:email, :first_name, :last_name, :id])}
+  end
 end

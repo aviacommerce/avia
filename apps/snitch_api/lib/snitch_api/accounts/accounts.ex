@@ -1,7 +1,5 @@
 defmodule SnitchApi.Accounts do
-  import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
 
-  alias Snitch.Data.Model.User, as: UserModel
   alias Snitch.Data.Schema.User
   alias Snitch.Domain.Account
   alias SnitchApi.Guardian
@@ -80,6 +78,7 @@ defmodule SnitchApi.Accounts do
     {new_token, new_claims}
   end
 
+  # checks the validity of the token
   def verify_token(token) do
     Guardian.decode_and_verify(token)
   end

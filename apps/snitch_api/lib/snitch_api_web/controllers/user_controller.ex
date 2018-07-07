@@ -15,7 +15,7 @@ defmodule SnitchApiWeb.UserController do
   def create(conn, %{"user" => user_params}) do
     with {:ok, %User{} = user} <- Accounts.create_user(user_params) do
       conn
-      |> put_status(:created)
+      |> put_status(200)
       |> put_resp_header("location", user_path(conn, :show, user))
       |> render("show.json-api", data: user)
     end
@@ -31,7 +31,7 @@ defmodule SnitchApiWeb.UserController do
     end
   end
 
-  def login(conn, _params) do
+  def login(_conn, _params) do
     {:error, :no_credentials}
   end
 
@@ -44,6 +44,11 @@ defmodule SnitchApiWeb.UserController do
     conn
     |> Guardian.Plug.sign_out()
     |> put_status(204)
-    |> render(conn, "logut.json-api", nil)
+    |> render("logout.json-api", data: nil)
+  end
+
+  def current_user(conn, _params) do
+    user = Guardian.Plug.current_resource(conn)
+    render(conn, "current_user.json-api", data: user)
   end
 end
