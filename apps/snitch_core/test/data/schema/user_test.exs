@@ -3,6 +3,7 @@ defmodule Snitch.Data.Schema.UserTest do
   use Snitch.DataCase
 
   import Ecto.Changeset, only: [apply_changes: 1]
+  import Snitch.Factory
 
   alias Snitch.Data.Schema.User
 
@@ -12,7 +13,7 @@ defmodule Snitch.Data.Schema.UserTest do
     email: "john@domain.com",
     password: "password123",
     password_confirmation: "password123",
-    role_id: 1
+    role: 1
   }
 
   describe "Create User" do

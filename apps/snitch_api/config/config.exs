@@ -28,6 +28,10 @@ config :mime, :types, %{
 # Configures Key Format
 config :ja_serializer, key_format: :underscored
 
+config :snitch_api, SnitchApi.Guardian,
+  issuer: "snitch_api",
+  secret_key: "V4h+IQskKPefHzO58nDlKRz/ZAWZ1KpM2PBt0Tp3ozexHDE8JQ4dkwblH7PZvZOm"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"

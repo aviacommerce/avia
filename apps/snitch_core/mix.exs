@@ -33,7 +33,7 @@ defmodule Snitch.Core.Mixfile do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(:test), do: ["lib", "test/support", "priv/repo/seed"]
   defp elixirc_paths(_), do: ["lib", "priv/repo/seed"]
 
   # Specifies your project dependencies.

@@ -2,8 +2,6 @@ defmodule SnitchApiWeb.TaxonomyView do
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
 
-  alias Snitch.Data.Schema.User
-
   location("/taxonomies/:id")
 
   attributes([

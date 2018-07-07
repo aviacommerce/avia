@@ -4,6 +4,7 @@
   "aruspex": {:git, "https://github.com/oyeb/aruspex.git", "5ca5ca6057b61b2bc19a58abd3a5a656c39d0249", [branch: "tweaks"]},
   "as_nested_set": {:git, "https://github.com/SagarKarwande/as_nested_set.git", "fb1f481dad83602eca68b7a8ca95cfca71075d25", []},
   "base64url": {:hex, :base64url, "0.0.1", "36a90125f5948e3afd7be97662a1504b934dd5dac78451ca6e9abf85a10286be", [:rebar], [], "hexpm"},
+  "bcrypt_elixir": {:hex, :bcrypt_elixir, "1.0.7", "e79d84b666bfad0e461ed217860e1c7de6bc4a1ae919cdb39d473ca784817653", [:make, :mix], [{:elixir_make, "~> 0.4", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm"},
   "beepbop": {:git, "https://github.com/oyeb/beepbop.git", "221c04e597fda726b3d36c92603096e05787b46d", [branch: "develop"]},
   "blankable": {:hex, :blankable, "0.0.1", "2e0b4667fee684f0614620d31a34bb2731341cccb27ed903e330195819ba3ba0", [:mix], [], "hexpm"},
   "bunt": {:hex, :bunt, "0.2.0", "951c6e801e8b1d2cbe58ebbd3e616a869061ddadcc4863d0a2182541acae9a38", [:mix], [], "hexpm"},

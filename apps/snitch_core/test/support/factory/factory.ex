@@ -150,8 +150,8 @@ defmodule Snitch.Factory do
 
   def role_factory do
     %Role{
-      name: "admin",
-      description: "can manage all"
+      name: sequence(:name, ["admin", "user"]),
+      description: sequence(:description, ["can manage all", "can manage few"])
     }
   end
 
