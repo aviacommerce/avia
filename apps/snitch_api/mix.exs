@@ -45,7 +45,11 @@ defmodule SnitchApi.Mixfile do
       {:corsica, "~> 1.0"},
       {:uuid, "~> 1.1"},
       {:ja_serializer, "~> 0.13.0"},
-      {:recase, "~> 0.2"}
+      {:recase, "~> 0.2"},
+
+      # Authentication
+      {:guardian, "~> 1.0"},
+      {:inflex, "~> 1.10.0"}
     ]
   end
 end

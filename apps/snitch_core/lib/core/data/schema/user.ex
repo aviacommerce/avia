@@ -83,6 +83,7 @@ defmodule Snitch.Data.Schema.User do
   @spec common_changeset(Ecto.Changeset.t()) :: Ecto.Changeset.t()
   defp common_changeset(user_changeset) do
     user_changeset
+    |> foreign_key_constraint(:role_id)
     |> validate_confirmation(:password)
     |> validate_length(:password, min: @password_min_length)
     |> validate_format(:email, ~r/@/)
