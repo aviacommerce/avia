@@ -1,8 +1,9 @@
 defmodule SnitchApiWeb.UserController do
   use SnitchApiWeb, :controller
 
-  alias SnitchApi.Accounts
   alias Snitch.Data.Schema.User
+  alias SnitchApi.Accounts
+  alias SnitchApi.Guardian
 
   action_fallback(SnitchApiWeb.FallbackController)
 
@@ -36,22 +37,13 @@ defmodule SnitchApiWeb.UserController do
 
   def show(conn, %{"id" => id}) do
     user = Accounts.get_user!(id)
-    render(conn, "show.json-api", user: user)
+    render(conn, "show.json-api", data: user)
   end
 
-  def update(conn, %{"id" => id, "user" => user_params}) do
-    user = Accounts.get_user!(id)
-
-    with {:ok, %User{} = user} <- Accounts.update_user(user, user_params) do
-      render(conn, "show.json-api", user: user)
-    end
-  end
-
-  def delete(conn, %{"id" => id}) do
-    user = Accounts.get_user!(id)
-
-    with {:ok, %User{}} <- Accounts.delete_user(user) do
-      send_resp(conn, :no_content, "")
-    end
+  def logout(conn, _params) do
+    conn
+    |> Guardian.Plug.sign_out()
+    |> put_status(204)
+    |> render(conn, "logut.json-api", nil)
   end
 end

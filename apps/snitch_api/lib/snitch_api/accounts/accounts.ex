@@ -58,78 +58,29 @@ defmodule SnitchApi.Accounts do
   def token_sign_in(email, password) do
     case Account.authenticate(email, password) do
       {:ok, user} ->
-        Guardian.encode_and_sign(user, %{}, ttl: {1, :minute})
+        Guardian.encode_and_sign(user, %{}, ttl: {10, :minute})
 
       _ ->
         {:error, :unauthorized}
     end
   end
 
-  # defp email_password_auth(email, password) when is_binary(email) and is_binary(password) do
-  #   with {:ok, user} <- get_by_email(email),
-  #     do: verify_password(password, user)
-  # end
-  #
-  # defp get_by_email(email) when is_binary(email) do
-  #   case Repo.get_by(User, email: email) do
-  #     nil ->
-  #       dummy_checkpw()
-  #       {:error, "Login error."}
-  #     user ->
-  #       {:ok, user}
-  #   end
-  # end
-  #
-  # defp verify_password(password, %User{} = user) when is_binary(password) do
-  #   if checkpw(password, user.password_hash) do
-  #     {:ok, user}
-  #   else
-  #     {:error, :invalid_password}
-  #   end
-  # end
+  def resource_from_token(token) do
+    case Guardian.resource_from_token(token) do
+      {:ok, resource, _claims} ->
+        resource
 
-  @doc """
-  Updates a user.
-
-  ## Examples
-
-  iex> update_user(user, %{field: new_value})
-  {:ok, %User{}}
-
-  iex> update_user(user, %{field: bad_value})
-  {:error, ...}
-
-  """
-  def update_user(%User{} = user, attrs) do
-    raise "TODO"
+      {:error, :token_expired} ->
+        :expired
+    end
   end
 
-  @doc """
-  Deletes a User.
-
-  ## Examples
-
-  iex> delete_user(user)
-  {:ok, %User{}}
-
-  iex> delete_user(user)
-  {:error, ...}
-
-  """
-  def delete_user(%User{} = user) do
-    raise "TODO"
+  def refresh_token(token) do
+    {:ok, _old_stuff, {new_token, new_claims}} = Guardian.refresh(token)
+    {new_token, new_claims}
   end
 
-  @doc """
-  Returns a datastructure for tracking user changes.
-
-  ## Examples
-
-  iex> change_user(user)
-  %Todo{...}
-
-  """
-  def change_user(%User{} = user) do
-    raise "TODO"
+  def verify_token(token) do
+    Guardian.decode_and_verify(token)
   end
 end

@@ -16,4 +16,8 @@ defmodule SnitchApiWeb.UserView do
   def render("token.json-api", %{data: token}) do
     %{token: token}
   end
+
+  def render("logout.json-api", _data) do
+    %{status: "logged out"}
+  end
 end
