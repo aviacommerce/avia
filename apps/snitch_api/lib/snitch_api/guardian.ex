@@ -10,10 +10,11 @@ defmodule SnitchApi.Guardian do
     {:error, :reason_for_error}
   end
 
-  def resource_from_claims(claims) do
-    id = claims["sub"]
-    resource = SnitchApi.Accounts.get_user!(id)
-    {:ok, resource}
+  def resource_from_claims(%{"sub" => id}) do
+    case SnitchApi.Accounts.get_user!(id) do
+      nil -> {:error, :resource_not_found}
+      resource -> {:ok, resource}
+    end
   end
 
   def resource_from_claims(_claims) do

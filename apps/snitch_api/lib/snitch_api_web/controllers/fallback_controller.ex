@@ -17,4 +17,16 @@ defmodule SnitchApiWeb.FallbackController do
     |> put_status(:not_found)
     |> render(SnitchApiWeb.ErrorView, :"404")
   end
+
+  def call(conn, {:error, :unauthorized}) do
+    conn
+    |> put_status(:not_found)
+    |> render(SnitchApiWeb.ErrorView, :unauthorized)
+  end
+
+  def call(conn, {:error, :no_credentials}) do
+    conn
+    |> put_status(:not_found)
+    |> render(SnitchApiWeb.ErrorView, :no_credentials)
+  end
 end

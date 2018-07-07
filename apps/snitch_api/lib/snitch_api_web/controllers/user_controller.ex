@@ -20,6 +20,20 @@ defmodule SnitchApiWeb.UserController do
     end
   end
 
+  def login(conn, %{"email" => email, "password" => password}) do
+    case Accounts.token_sign_in(email, password) do
+      {:ok, token, _claims} ->
+        render(conn, "token.json-api", data: token)
+
+      _ ->
+        {:error, :unauthorized}
+    end
+  end
+
+  def login(conn, _params) do
+    {:error, :no_credentials}
+  end
+
   def show(conn, %{"id" => id}) do
     user = Accounts.get_user!(id)
     render(conn, "show.json-api", user: user)

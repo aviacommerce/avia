@@ -13,7 +13,7 @@ defmodule SnitchApiWeb.UserView do
     |> List.to_string()
   end
 
-  def render("jwt.json-api", %{token: jwt}) do
-    %{token: jwt}
+  def render("token.json-api", %{data: token}) do
+    %{token: token}
   end
 end
