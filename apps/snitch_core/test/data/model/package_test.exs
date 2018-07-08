@@ -119,34 +119,12 @@ defmodule Snitch.Data.Model.PackageTest do
       assert [_] = package.shipping_methods
 
       params = %{
-        shipping_method_id: sm.id,
-        cost: Money.new(1, :USD),
-        total: Money.new(1, :USD),
-        tax_total: Money.zero(:USD),
-        promo_total: Money.zero(:USD),
-        adjustment_total: Money.zero(:USD)
+        shipping_method_id: sm.id
       }
 
       {:ok, updated_package} = Package.update(package, params)
 
       {:ok, _} = Package.update(updated_package, %{shipping_methods: []})
-    end
-
-    @tag variant_count: 1,
-         shipping_category_count: 1,
-         state_zone_count: 1
-    test "fails with invalid params", %{package: package} do
-      bad_params = %{cost: Money.new(-1, :USD), tax_total: Money.new(-1, :USD)}
-      {:error, cs} = Package.update(package, bad_params)
-
-      assert %{
-               adjustment_total: ["can't be blank"],
-               promo_total: ["can't be blank"],
-               shipping_method_id: ["can't be blank"],
-               total: ["can't be blank"],
-               cost: ["must be equal or greater than 0"],
-               tax_total: ["must be equal or greater than 0"]
-             } == errors_on(cs)
     end
   end
 end

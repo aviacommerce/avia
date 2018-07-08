@@ -24,8 +24,7 @@ defmodule Snitch.Data.Model.Package do
   @doc """
   Updates the `package` with supplied `params`.
 
-  To add, update, or remove individual `PackageItem`s, please use
-  `Snitch.Data.Model.PackageItem`.
+  To update the `:items` of the `package`, use `Snitch.Data.Model.PackageItem`.
   """
   @spec update(Package.t(), map) :: {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
   def update(package, params) do

@@ -120,7 +120,7 @@ defmodule Snitch.Data.Schema.Package do
   def shipping_changeset(package, params) do
     package
     |> update_changeset(params)
-    |> validate_required(@shipping_preferences_fields)
+    |> validate_required(@shipping_fields)
   end
 
   defp common_changeset(package_changeset) do

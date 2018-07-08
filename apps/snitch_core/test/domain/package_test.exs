@@ -24,10 +24,7 @@ defmodule Snitch.Domain.PackageTest do
       assert {:ok, package} = Package.set_shipping_method(package, sm.id)
       assert package.shipping_method_id
       assert package.cost
-      assert package.tax_total
-      assert package.promo_total
-      assert package.adjustment_total
-      assert package.total
+      assert package.shipping_tax
     end
 
     @tag shipping_method_count: 1

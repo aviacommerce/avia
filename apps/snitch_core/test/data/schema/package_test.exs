@@ -58,11 +58,8 @@ defmodule Snitch.Data.Schema.PackageTest do
     shipping_methods: [],
     tracking: %{id: "some_tracking_id"},
     state: "ready!",
-    cost: Money.new(0, :USD),
-    tax_total: Money.new(0, :USD),
-    adjustment_total: Money.new(0, :USD),
-    promo_total: Money.new(0, :USD),
-    total: Money.new(0, :USD),
+    cost: Money.zero(:USD),
+    shipping_tax: Money.zero(:USD),
     origin_id: -1,
     order_id: -1,
     shipping_method_id: 1,
@@ -70,28 +67,20 @@ defmodule Snitch.Data.Schema.PackageTest do
     number: "WHAT",
     shipped_at: DateTime.utc_now()
   }
+  @shipping_params @update_params
 
-  @update_fields MapSet.new(
-                   ~w(state shipped_at tracking)a ++
-                     ~w(cost tax_total adjustment_total promo_total total)a ++
-                     ~w(shipping_methods shipping_method_id)a
-                 )
-
-  describe "update_changeset/2" do
+  describe "shipping_changeset/2" do
     test "fails with missing params" do
       assert cs = %{valid?: true} = Package.create_changeset(%Package{}, @params)
       package = apply_changes(cs)
 
-      cs = Package.update_changeset(package, %{})
+      cs = Package.shipping_changeset(package, %{})
       refute cs.valid?
 
       assert %{
-               adjustment_total: ["can't be blank"],
+               shipping_tax: ["can't be blank"],
                cost: ["can't be blank"],
-               promo_total: ["can't be blank"],
-               shipping_method_id: ["can't be blank"],
-               tax_total: ["can't be blank"],
-               total: ["can't be blank"]
+               shipping_method_id: ["can't be blank"]
              } == errors_on(cs)
     end
 
@@ -99,13 +88,18 @@ defmodule Snitch.Data.Schema.PackageTest do
       assert cs = %{valid?: true} = Package.create_changeset(%Package{}, @params)
       package = apply_changes(cs)
 
-      assert cs = %{valid?: true} = Package.update_changeset(package, @update_params)
+      cs = Package.shipping_changeset(package, @shipping_params)
+      assert cs.valid?
+    end
+  end
 
-      assert cs.changes
-             |> Map.keys()
-             |> MapSet.new()
-             |> MapSet.equal?(@update_fields)
+  describe "update_changeset/2" do
+    test "with valid params" do
+      assert cs = %{valid?: true} = Package.create_changeset(%Package{}, @params)
+      package = apply_changes(cs)
 
+      cs = Package.update_changeset(package, @update_params)
+      assert cs.valid?
       assert apply_changes(cs).shipping_methods == []
     end
 
