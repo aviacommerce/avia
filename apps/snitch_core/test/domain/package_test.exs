@@ -38,4 +38,9 @@ defmodule Snitch.Domain.PackageTest do
       assert %{shipping_method_id: ["can't be blank"]} == errors_on(cs)
     end
   end
+
+  test "shipping_tax/1" do
+    expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :INR} end)
+    assert Package.shipping_tax(nil) == Money.zero(:INR)
+  end
 end
