@@ -10,11 +10,11 @@ defmodule Snitch.Domain.PackageItemTest do
 
   test "tax/1" do
     expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :INR} end)
-    assert PackageItem.tax(nil) == Money.zero(:INR)
+    assert PackageItem.tax(nil, nil) == Money.zero(:INR)
   end
 
   test "shipping_tax/1" do
     expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :INR} end)
-    assert PackageItem.shipping_tax(nil) == Money.zero(:INR)
+    assert PackageItem.shipping_tax(nil, nil) == Money.zero(:INR)
   end
 end
