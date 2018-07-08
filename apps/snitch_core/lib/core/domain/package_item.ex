@@ -3,17 +3,16 @@ defmodule Snitch.Domain.PackageItem do
   PackageItem helpers.
   """
 
-  alias Ecto.Changeset
-  alias Snitch.Data.Schema.PackageItem
+  alias Snitch.Data.Schema.{PackageItem, StockLocation}
   alias Snitch.Tools.Money, as: MoneyTools
 
-  @spec tax(PackageItem.t()) :: Money.t()
-  def tax(package_item) do
+  @spec tax(PackageItem.t(), StockLocation.t()) :: Money.t()
+  def tax(_package_item, _stock_location) do
     MoneyTools.zero!()
   end
 
-  @spec shipping_tax(PackageItem.t()) :: Money.t()
-  def shipping_tax(package_item) do
+  @spec shipping_tax(PackageItem.t(), StockLocation.t()) :: Money.t()
+  def shipping_tax(_package_item, _stock_location) do
     MoneyTools.zero!()
   end
 end

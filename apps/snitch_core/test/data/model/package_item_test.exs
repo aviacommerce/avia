@@ -22,7 +22,8 @@ defmodule Snitch.Data.Model.PackageItemTest do
     backordered?: true,
     variant_id: nil,
     line_item_id: nil,
-    package_id: nil
+    package_id: nil,
+    tax: Money.zero(:INR)
   }
 
   describe "create/1" do
@@ -37,7 +38,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
                PackageItem.create(%{@params | line_item_id: -1, variant_id: -1, package_id: -1})
 
       refute changeset.valid?
-      assert %{line_item_id: ["does not exist"]} = errors_on(changeset)
+      assert %{line_item_id: ["does not exist"]} == errors_on(changeset)
 
       assert {:error, changeset} =
                PackageItem.create(%{
@@ -48,7 +49,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
                })
 
       refute changeset.valid?
-      assert %{variant_id: ["does not exist"]} = errors_on(changeset)
+      assert %{variant_id: ["does not exist"]} == errors_on(changeset)
 
       assert {:error, changeset} =
                PackageItem.create(%{
@@ -59,7 +60,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
                })
 
       refute changeset.valid?
-      assert %{package_id: ["does not exist"]} = errors_on(changeset)
+      assert %{package_id: ["does not exist"]} == errors_on(changeset)
     end
 
     @tag variant_count: 1,

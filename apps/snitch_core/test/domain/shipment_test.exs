@@ -2,6 +2,7 @@ defmodule Snitch.Domain.ShipmentTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
+  import Mox, only: [expect: 3, expect: 4, verify_on_exit!: 1]
   import Snitch.Factory
   import Snitch.Tools.Helper.{Order, Stock, Zone, Shipment}
 
@@ -108,6 +109,7 @@ defmodule Snitch.Domain.ShipmentTest do
     end
 
     setup :stock_items
+    setup :verify_on_exit!
 
     @tag variant_count: 1, state_zone_count: 2
     test "force backorder package", context do
@@ -129,6 +131,8 @@ defmodule Snitch.Domain.ShipmentTest do
       address = %Address{state_id: up.id, country_id: india.id}
       line_items = line_items_with_price(vs, [4])
       order = %Order{id: 42, line_items: line_items, shipping_address: address}
+
+      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :USD} end)
       packages = Shipment.default_packages(order)
 
       assert length(packages) == 1
@@ -199,6 +203,8 @@ defmodule Snitch.Domain.ShipmentTest do
       address = %Address{state_id: tn.id, country_id: india.id}
       line_items = line_items_with_price(vs, [0, 0, 6])
       order = %Order{id: 42, line_items: line_items, shipping_address: address}
+
+      expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
       packages = Shipment.default_packages(order)
 
       assert length(packages) == 2
@@ -274,6 +280,7 @@ defmodule Snitch.Domain.ShipmentTest do
       line_items = line_items_with_price(vs, [4, 0, 4])
       order = %Order{id: 42, line_items: line_items, shipping_address: address}
 
+      expect(Snitch.Tools.DefaultsMock, :fetch, 3, fn :currency -> {:ok, :USD} end)
       packages = Shipment.default_packages(order)
 
       Enum.map(packages, fn %{items: items, category: c} ->
@@ -375,6 +382,8 @@ defmodule Snitch.Domain.ShipmentTest do
       address = %Address{state_id: ka.id, country_id: india.id}
       line_items = line_items_with_price(vs, [3])
       order = %Order{id: 42, line_items: line_items, shipping_address: address}
+
+      expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
       packages = Shipment.default_packages(order)
 
       assert length(packages) == 2
@@ -461,12 +470,13 @@ defmodule Snitch.Domain.ShipmentTest do
 
       assert item.line_item_id == shipment_item.line_item.id
       assert item.variant_id == shipment_item.line_item.variant_id
+      assert item.tax
       assert package.shipping_category_id == shipment.category.id
       assert package.origin_id == shipment.origin.id
       assert package.order_id == order.id
 
       assert method.id == shipping_method.id
-      assert method.cost == Money.new(0, :USD)
+      assert method.cost == Money.zero(:USD)
 
       cs = Package.create_changeset(%Package{}, package)
       assert cs.valid?

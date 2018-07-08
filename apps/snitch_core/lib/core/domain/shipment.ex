@@ -32,7 +32,7 @@ defmodule Snitch.Domain.Shipment do
 
   alias Snitch.Data.Model.StockLocation
   alias Snitch.Data.Schema.{Order}
-  alias Snitch.Domain.{ShippingMethod, Zone}
+  alias Snitch.Domain.{PackageItem, ShippingMethod, Zone}
 
   @doc """
   Returns a list of potentially shippable packages.
@@ -75,7 +75,8 @@ defmodule Snitch.Domain.Shipment do
     items =
       stock_location.stock_items
       |> Stream.map(&make_item(&1, line_items))
-      |> Enum.reject(fn x -> is_nil(x) end)
+      |> Stream.reject(fn x -> is_nil(x) end)
+      |> Enum.map(&attach_item_tax(&1, stock_location))
 
     if items == [],
       do: nil,
@@ -110,6 +111,11 @@ defmodule Snitch.Domain.Shipment do
     else
       if stock_item.backorderable, do: :backordered, else: nil
     end
+  end
+
+  defp attach_item_tax(item, stock_location) do
+    tax = PackageItem.tax(item, stock_location)
+    Map.put(item, :tax, tax)
   end
 
   defp attach_zones(package, shipping_address) do

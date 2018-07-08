@@ -25,6 +25,7 @@ defmodule Snitch.Data.Schema.PackageTest do
     backordered?: false,
     variant_id: 0,
     line_item_id: 0,
+    tax: Money.zero(:USD),
     package_id: 0
   }
 
@@ -33,16 +34,15 @@ defmodule Snitch.Data.Schema.PackageTest do
       assert cs = %{valid?: true} = Package.create_changeset(%Package{}, @params)
       assert :error = fetch_change(cs, :items)
 
-      assert cs =
-               %{valid?: true} =
-               Package.create_changeset(%Package{}, Map.put(@params, :items, [@item_params]))
-
+      cs = Package.create_changeset(%Package{}, Map.put(@params, :items, [@item_params]))
+      assert cs.valid?
       assert {:ok, items} = fetch_change(cs, :items)
       assert Enum.all?(items, fn %{action: :insert} -> true end)
     end
 
     test "fails with missing params" do
-      assert cs = %{valid?: false} = Package.create_changeset(%Package{}, %{})
+      cs = Package.create_changeset(%Package{}, %{})
+      refute cs.valid?
 
       assert %{
                order_id: ["can't be blank"],
@@ -50,7 +50,7 @@ defmodule Snitch.Data.Schema.PackageTest do
                shipping_category_id: ["can't be blank"],
                shipping_methods: ["can't be blank"],
                state: ["can't be blank"]
-             } = errors_on(cs)
+             } == errors_on(cs)
     end
   end
 
@@ -71,7 +71,8 @@ defmodule Snitch.Data.Schema.PackageTest do
 
   describe "shipping_changeset/2" do
     test "fails with missing params" do
-      assert cs = %{valid?: true} = Package.create_changeset(%Package{}, @params)
+      cs = Package.create_changeset(%Package{}, @params)
+      assert cs.valid?
       package = apply_changes(cs)
 
       cs = Package.shipping_changeset(package, %{})
@@ -85,7 +86,8 @@ defmodule Snitch.Data.Schema.PackageTest do
     end
 
     test "with valid params" do
-      assert cs = %{valid?: true} = Package.create_changeset(%Package{}, @params)
+      cs = Package.create_changeset(%Package{}, @params)
+      assert cs.valid?
       package = apply_changes(cs)
 
       cs = Package.shipping_changeset(package, @shipping_params)
@@ -95,7 +97,8 @@ defmodule Snitch.Data.Schema.PackageTest do
 
   describe "update_changeset/2" do
     test "with valid params" do
-      assert cs = %{valid?: true} = Package.create_changeset(%Package{}, @params)
+      cs = Package.create_changeset(%Package{}, @params)
+      assert cs.valid?
       package = apply_changes(cs)
 
       cs = Package.update_changeset(package, @update_params)
@@ -104,7 +107,8 @@ defmodule Snitch.Data.Schema.PackageTest do
     end
 
     test "with invalid params" do
-      assert cs = %{valid?: true} = Package.create_changeset(%Package{}, @params)
+      cs = Package.create_changeset(%Package{}, @params)
+      assert cs.valid?
       package = apply_changes(cs)
 
       bad_params = %{
@@ -112,10 +116,11 @@ defmodule Snitch.Data.Schema.PackageTest do
         tracking: 1
       }
 
-      assert cs = %{valid?: false} = Package.update_changeset(package, bad_params)
-      assert {"is invalid", [type: :map, validation: :cast]} = cs.errors[:tracking]
+      cs = Package.update_changeset(package, bad_params)
+      refute cs.valid?
+      assert {"is invalid", [type: :map, validation: :cast]} == cs.errors[:tracking]
 
-      assert {"is invalid", [type: {:array, :map}]} = cs.errors[:shipping_methods]
+      assert {"is invalid", [type: {:array, :map}]} == cs.errors[:shipping_methods]
     end
   end
 end

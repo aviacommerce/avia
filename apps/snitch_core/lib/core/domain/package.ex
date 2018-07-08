@@ -5,7 +5,6 @@ defmodule Snitch.Domain.Package do
 
   use Snitch.Domain
 
-  alias Ecto.Changeset
   alias Snitch.Data.Schema.Package
   alias Snitch.Tools.Money, as: MoneyTools
 

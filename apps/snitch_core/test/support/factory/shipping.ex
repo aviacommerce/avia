@@ -83,7 +83,8 @@ defmodule Snitch.Factory.Shipping do
                 variant: v,
                 delta: 0,
                 quantity: 4,
-                state: :fulfilled
+                state: :fulfilled,
+                tax: Money.zero(:USD)
               }
             ],
             origin: insert(:stock_location),

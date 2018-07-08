@@ -90,7 +90,7 @@ defmodule Snitch.Data.Schema.PackageItem do
   end
 
   @create_fields ~w(state delta quantity line_item_id variant_id package_id tax shipping_tax)a
-  @required_fields ~w(state quantity line_item_id variant_id)a
+  @required_fields ~w(state quantity line_item_id variant_id tax)a
   @update_fields ~w(state quantity delta tax shipping_tax)a
 
   @doc """
