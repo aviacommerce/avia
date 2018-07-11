@@ -10,6 +10,7 @@ defmodule Snitch.Factory do
     CardPayment,
     LineItem,
     Order,
+    Permission
     Payment,
     PaymentMethod,
     Role,
@@ -17,8 +18,6 @@ defmodule Snitch.Factory do
     TaxRate,
     User,
     Variant,
-    Role,
-    Permission
   }
 
   alias Snitch.Repo
