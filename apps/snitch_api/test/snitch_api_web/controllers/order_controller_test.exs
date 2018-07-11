@@ -12,7 +12,7 @@ defmodule SnitchApiWeb.OrderControllerTest do
   end
 
   test "Empty order creation for guest user", %{conn: conn} do
-    conn = post(conn, order_path(conn, :guest_user))
+    conn = post(conn, order_path(conn, :guest_order))
     assert json_response(conn, 200)["data"]
   end
 end
