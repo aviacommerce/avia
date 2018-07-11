@@ -48,7 +48,7 @@ defmodule SnitchApi.Accounts do
 
   """
   def create_user(attrs \\ %{}) do
-    role_id=
+    role_id =
       "user"
       |> RoleModel.get_role_by_name()
       |> Map.get(:id)

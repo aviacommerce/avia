@@ -2,6 +2,7 @@ defmodule SnitchApiWeb.UserControllerTest do
   use SnitchApiWeb.ConnCase, async: true
 
   alias SnitchApi.Accounts
+  import Snitch.Factory
 
   @create_attrs %{
     email: "mama@email.com",
@@ -14,23 +15,26 @@ defmodule SnitchApiWeb.UserControllerTest do
   @invalid_attrs %{email: nil, password: nil}
 
   setup %{conn: conn} do
+    build(:role, name: "user")
+    user = build(:user_with_no_role)
+
     conn =
       conn
       |> put_req_header("accept", "application/vnd.api+json")
       |> put_req_header("content-type", "application/vnd.api+json")
 
-    {:ok, conn: conn}
+    {:ok, conn: conn, user: user}
   end
 
-  describe "Register user" do
-    test "renders user when data is valid", %{conn: conn} do
-      conn = post(conn, user_path(conn, :create), user: @create_attrs)
+  describe "User Registration" do
+    test "creation and sign in with valid data", %{conn: conn, user: user} do
+      conn = post(conn, user_path(conn, :create), user: user)
       assert %{"id" => _id} = json_response(conn, 200)["data"]
 
       conn =
         post(
           conn,
-          user_path(conn, :login, %{"email" => "mama@email.com", "password" => "letmehackyou"})
+          user_path(conn, :login, %{"email" => user["email"], "password" => user["password"]})
         )
 
       assert json_response(conn, 200)["token"]
@@ -43,26 +47,18 @@ defmodule SnitchApiWeb.UserControllerTest do
   end
 
   describe "Authenticated routing" do
-    setup %{conn: conn} do
+    setup %{conn: conn, user: user} do
       # create a user
-      {:ok, user} =
-        Accounts.create_user(%{
-          "first_name" => "foo",
-          "last_name" => "boo",
-          "password" => "fooboofoo",
-          "password_confirmation" => "fooboofoo",
-          "email" => "user@email.com",
-          "username" => "username"
-        })
+      {:ok, registered_user} = Accounts.create_user(user)
 
       # create the token
-      {:ok, token, _claims} = SnitchApi.Guardian.encode_and_sign(user)
+      {:ok, token, _claims} = SnitchApi.Guardian.encode_and_sign(registered_user)
 
       # add authorization header to request
       conn = conn |> put_req_header("authorization", "Bearer #{token}")
 
       # pass the connection and the user to the test
-      {:ok, conn: conn, user: user}
+      {:ok, conn: conn, user: registered_user}
     end
 
     test "fetching logged in user", %{conn: conn, user: user} do
@@ -70,9 +66,9 @@ defmodule SnitchApiWeb.UserControllerTest do
 
       assert %{
                "id" => Map.get(user, :id),
-               "email" => "user@email.com",
-               "first_name" => "foo",
-               "last_name" => "boo"
+               "email" => user.email,
+               "first_name" => user.first_name,
+               "last_name" => user.last_name
              } == json_response(conn, 200)["data"]
     end
 

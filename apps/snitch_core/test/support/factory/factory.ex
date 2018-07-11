@@ -37,6 +37,16 @@ defmodule Snitch.Factory do
     }
   end
 
+  def user_with_no_role_factory do
+    %{
+      "first_name" => sequence(:first_name, &"Snitch-#{&1}"),
+      "last_name" => sequence(:last_name, &"Elixir-#{&1}"),
+      "email" => sequence(:email, &"minion-#{&1}@snitch.com"),
+      "password" => "NOTASECRET",
+      "password_confirmation" => "NOTASECRET"
+    }
+  end
+
   def random_variant_factory do
     %Variant{
       sku: sequence(:sku, &"shoes-nike-#{&1}"),
