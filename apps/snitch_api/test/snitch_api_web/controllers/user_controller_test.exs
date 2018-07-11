@@ -1,22 +1,24 @@
 defmodule SnitchApiWeb.UserControllerTest do
   use SnitchApiWeb.ConnCase, async: true
 
-  alias SnitchApi.Accounts
   import Snitch.Factory
 
-  @create_attrs %{
-    email: "mama@email.com",
-    password: "letmehackyou",
-    password_confirmation: "letmehackyou",
-    first_name: "foo",
-    last_name: "boo"
-  }
+  alias SnitchApi.Accounts
+  alias Snitch.Repo
 
   @invalid_attrs %{email: nil, password: nil}
 
   setup %{conn: conn} do
-    build(:role, name: "user")
     user = build(:user_with_no_role)
+    role = build(:role, name: "user")
+
+    Repo.insert(role, on_conflict: :nothing)
+
+    user = %{
+      "data" => %{
+        "attributes" => build(:user_with_no_role)
+      }
+    }
 
     conn =
       conn
@@ -28,13 +30,13 @@ defmodule SnitchApiWeb.UserControllerTest do
 
   describe "User Registration" do
     test "creation and sign in with valid data", %{conn: conn, user: user} do
-      conn = post(conn, user_path(conn, :create), user: user)
-      assert %{"id" => _id} = json_response(conn, 200)["data"]
+      conn = post(conn, user_path(conn, :create), user)
+      assert %{"id" => id} = json_response(conn, 200)["data"]
 
       conn =
         post(
           conn,
-          user_path(conn, :login, %{"email" => user["email"], "password" => user["password"]})
+          user_path(conn, :login, user)
         )
 
       assert json_response(conn, 200)["token"]
@@ -48,7 +50,7 @@ defmodule SnitchApiWeb.UserControllerTest do
 
   describe "Authenticated routing" do
     setup %{conn: conn, user: user} do
-      # create a user
+      user = JaSerializer.Params.to_attributes(user)
       {:ok, registered_user} = Accounts.create_user(user)
 
       # create the token
@@ -64,12 +66,7 @@ defmodule SnitchApiWeb.UserControllerTest do
     test "fetching logged in user", %{conn: conn, user: user} do
       conn = get(conn, user_path(conn, :current_user))
 
-      assert %{
-               "id" => Map.get(user, :id),
-               "email" => user.email,
-               "first_name" => user.first_name,
-               "last_name" => user.last_name
-             } == json_response(conn, 200)["data"]
+      assert Map.get(user, :id) == json_response(conn, 200)["data"]["id"]
     end
 
     test "logging out user", %{conn: conn} do

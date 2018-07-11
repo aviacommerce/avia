@@ -48,7 +48,8 @@ defmodule SnitchApi.Mixfile do
       {:recase, "~> 0.2"},
 
       # Authentication
-      {:guardian, "~> 1.0"}
+      {:guardian, "~> 1.0"},
+      {:inflex, "~> 1.10.0"}
     ]
   end
 end

@@ -16,7 +16,7 @@ defmodule SnitchApiWeb.TaxonController do
       conn,
       "index.json-api",
       data: taxons,
-      opts: [include: "parent"]
+      opts: [include: "parent,taxonomy"]
     )
   end
 

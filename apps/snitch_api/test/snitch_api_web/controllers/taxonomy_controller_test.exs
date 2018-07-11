@@ -1,19 +1,22 @@
 defmodule SnitchApiWeb.TaxonomyControllerTest do
   use SnitchApiWeb.ConnCase, async: true
 
+  import Snitch.Factory
+
+  alias Snitch.Data.Schema.Role
+  alias Snitch.Repo
+  alias SnitchApi.Accounts
+
   setup %{conn: conn} do
-    # create a user
-    {:ok, user} =
-      SnitchApi.Accounts.create_user(%{
-        "first_name" => "foo",
-        "last_name" => "boo",
-        "password" => "fooboofoo",
-        "password_confirmation" => "fooboofoo",
-        "email" => "user@email.com"
-      })
+    user = build(:user_with_no_role)
+    role = build(:role, name: "user")
+
+    Repo.insert(role, on_conflict: :nothing)
+
+    {:ok, registered_user} = Accounts.create_user(user)
 
     # create the token
-    {:ok, token, _claims} = SnitchApi.Guardian.encode_and_sign(user)
+    {:ok, token, _claims} = SnitchApi.Guardian.encode_and_sign(registered_user)
 
     # add authorization header to request
     conn =
