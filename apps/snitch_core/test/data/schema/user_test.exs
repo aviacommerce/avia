@@ -13,7 +13,7 @@ defmodule Snitch.Data.Schema.UserTest do
     email: "john@domain.com",
     password: "password123",
     password_confirmation: "password123",
-    role: 1
+    role_id: 1
   }
 
   describe "Create User" do
