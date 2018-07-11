@@ -7,7 +7,7 @@ defmodule Snitch.Data.Model.Product do
   alias Snitch.Data.Schema.Product
 
   @doc """
-  Returns all Property
+  Returns all Products
   """
   @spec get_all() :: [Product.t()]
   def get_all do

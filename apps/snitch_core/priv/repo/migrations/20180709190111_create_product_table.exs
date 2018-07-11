@@ -20,7 +20,7 @@ defmodule Snitch.Repo.Migrations.CreateProductTable do
     create unique_index("snitch_products", [:slug])
 
     alter table("snitch_variants") do
-      add :product_id, references("snitch_products")
+      add :product_id, references("snitch_products", on_delete: :delete_all)
     end
   end
 end
