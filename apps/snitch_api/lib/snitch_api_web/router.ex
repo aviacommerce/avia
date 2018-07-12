@@ -17,6 +17,7 @@ defmodule SnitchApiWeb.Router do
     # user sign_in_up
     post("/register", UserController, :create)
     post("/login", UserController, :login)
+    post("/orders/blank", OrderController, :guest_order)
   end
 
   scope "/api/v1", SnitchApiWeb do
