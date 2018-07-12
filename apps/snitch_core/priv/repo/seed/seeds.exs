@@ -11,7 +11,18 @@
 # and so on) as they will fail if something goes wrong.
 
 alias Snitch.Repo
-alias Snitch.Seed.{CountryState, PaymentMethods, Orders, Users, Stocks, Taxonomy, Role, Shipping}
+
+alias Snitch.Seed.{
+  CountryState,
+  PaymentMethods,
+  Orders,
+  Users,
+  Stocks,
+  Taxonomy,
+  Role,
+  Shipping,
+  Product
+}
 
 variant_count = 9
 
@@ -41,3 +52,6 @@ Taxonomy.seed()
 
 # seed roles
 Role.seed()
+
+# seed products
+Product.seed()

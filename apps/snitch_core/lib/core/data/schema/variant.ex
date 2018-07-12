@@ -6,7 +6,7 @@ defmodule Snitch.Data.Schema.Variant do
   use Snitch.Data.Schema
 
   alias Money.Ecto.Composite.Type, as: MoneyType
-  alias Snitch.Data.Schema.{ShippingCategory, StockItem}
+  alias Snitch.Data.Schema.{Image, Product, ShippingCategory, StockItem}
 
   @type t :: %__MODULE__{}
 
@@ -24,6 +24,9 @@ defmodule Snitch.Data.Schema.Variant do
 
     has_many(:stock_items, StockItem)
     belongs_to(:shipping_category, ShippingCategory)
+    belongs_to(:product, Product)
+
+    many_to_many(:images, Image, join_through: "snitch_variant_images")
 
     timestamps()
   end
