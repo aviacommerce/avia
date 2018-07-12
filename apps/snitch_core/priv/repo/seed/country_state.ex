@@ -10,13 +10,13 @@ defmodule Snitch.Seed.CountryState do
 
   require Logger
 
-  def seed_countries! do
+  def seed_countries!() do
     countries = Enum.map(Country.fetch_all(), &to_country_params/1)
     {count, _} = Repo.insert_all(CountrySchema, countries, on_conflict: :nothing)
     Logger.info("Inserted #{count} countries.")
   end
 
-  def seed_states! do
+  def seed_states!() do
     query = from(CountrySchema, select: [:id, :iso])
 
     countries =
