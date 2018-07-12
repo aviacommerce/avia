@@ -33,6 +33,12 @@ defmodule Snitch.Data.Model.Order do
     QH.create(Order, update_in(params, [:line_items], &update_line_item_costs/1), Repo)
   end
 
+  def create_guest_order() do
+    %Order{}
+    |> Order.create_guest_changeset(%{})
+    |> Repo.insert()
+  end
+
   @doc """
   Creates an order with supplied `params` and `line_items`.
 
