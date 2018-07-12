@@ -17,6 +17,7 @@ defmodule SnitchApiWeb.Router do
     # user sign_in_up
     post("/register", UserController, :create)
     post("/login", UserController, :login)
+     post("/orders/blank", OrderController, :guest_order)
   end
 
   scope "/api/v1", SnitchApiWeb do
@@ -27,8 +28,6 @@ defmodule SnitchApiWeb.Router do
     post("/logout", UserController, :logout)
     get("/current_user", UserController, :current_user)
     resources("/orders", OrderController, only: [:index, :show])
-    post("/orders/blank", OrderController, :guest_order)
-
     resources("/taxonomies", TaxonomyController, only: [:index, :show])
     resources("/taxons", TaxonController, only: [:index, :show])
   end
