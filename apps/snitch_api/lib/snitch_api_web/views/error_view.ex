@@ -10,7 +10,7 @@ defmodule SnitchApiWeb.ErrorView do
   end
 
   def render("no_credentials.json-api", _assigns) do
-    %{errors: %{detail: "no loging credentials"}}
+    %{errors: %{detail: "no login credentials"}}
   end
 
   def render("500.json-api", _assigns) do
