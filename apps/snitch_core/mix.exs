@@ -50,6 +50,7 @@ defmodule Snitch.Core.Mixfile do
       {:as_nested_set, git: "https://github.com/SagarKarwande/as_nested_set.git"},
       {:ecto_atom, "~> 1.0.0"},
       {:ecto_identifier, "~> 0.1.0"},
+      {:ecto_autoslug_field, "~> 0.5"},
 
       # state machine
       {:beepbop, github: "oyeb/beepbop", branch: "develop"},
