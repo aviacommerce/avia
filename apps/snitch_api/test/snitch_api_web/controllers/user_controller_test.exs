@@ -42,9 +42,25 @@ defmodule SnitchApiWeb.UserControllerTest do
       assert json_response(conn, 200)["token"]
     end
 
-    test "renders errors when data is invalid", %{conn: conn} do
+    test "render errors when data is invalid", %{conn: conn} do
       conn = post(conn, user_path(conn, :create), user: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
+    end
+
+    test "login with empty parameters", %{conn: conn} do
+      conn = post(conn, user_path(conn, :login))
+      assert json_response(conn, 404)["errors"] == %{"detail" => "no login credentials"}
+    end
+
+    test "missing parameter in user registration", %{conn: conn} do
+      user = %{
+        "data" => %{
+          "attributes" => build(:user_with_no_role) |> Map.delete("email")
+        }
+      }
+
+      conn = post(conn, user_path(conn, :create), user)
+      assert json_response(conn, 422)["errors"] == %{"email" => ["can't be blank"]}
     end
   end
 

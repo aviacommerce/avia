@@ -25,7 +25,6 @@ defmodule SnitchApiWeb.Router do
     # user sign_in_out_up
     get("/users/:id", UserController, :show)
     post("/logout", UserController, :logout)
-    get("/users/:id", UserController, :show)
     get("/current_user", UserController, :current_user)
     resources("/orders", OrderController, only: [:index])
     resources("/taxonomies", TaxonomyController, only: [:index, :show])
