@@ -83,6 +83,20 @@ defmodule SnitchApiWeb.OrderController do
     end
   end
 
+  def fetch_guest_order(conn, %{"order_number" => order_number}) do
+    with %Order{} = order <- OrderModel.get(%{number: order_number}) do
+      conn
+      |> put_status(200)
+      |> put_resp_header("location", order_path(conn, :show, order))
+      |> render("show.json-api", data: order)
+    else
+      nil ->
+        conn
+        |> put_status(200)
+        |> render("empty.json-api", data: %{})
+    end
+  end
+
   def current(conn, _params) do
     user_id = Map.get(conn.assigns[:current_user], :id)
 

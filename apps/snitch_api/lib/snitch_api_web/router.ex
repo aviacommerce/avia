@@ -18,8 +18,12 @@ defmodule SnitchApiWeb.Router do
     post("/register", UserController, :create)
     post("/login", UserController, :login)
     post("/orders/blank", OrderController, :guest_order)
+<<<<<<< HEAD
     get("/variants/favorites", VariantController, :favorite_variants)
     resources("/products", ProductController, except: [:new, :edit], param: "product_slug")
+=======
+    get("/orders/:order_number", OrderController, :fetch_guest_order)
+>>>>>>> added route to get guest_order by order number
   end
 
   scope "/api/v1", SnitchApiWeb do
