@@ -2,7 +2,18 @@ defmodule Snitch.Factory do
   @moduledoc false
 
   use ExMachina.Ecto, repo: Snitch.Repo
-  use Snitch.Factory.{Address, Shipping, Stock, Taxonomy, Zone, Rating}
+
+  use Snitch.Factory.{
+    Address,
+    Product,
+    Shipping,
+    Stock,
+    Taxonomy,
+    OptionType,
+    Zone,
+    Rating,
+    VariationTheme
+  }
 
   alias Snitch.Data.Schema.{
     Address,

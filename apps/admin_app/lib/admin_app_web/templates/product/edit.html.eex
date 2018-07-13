@@ -1,0 +1,8 @@
+<h4>Edit Product</h4>
+<%= render "form.html",
+    changeset: @changeset,
+    conn: @conn,
+    action: product_path(@conn, :update, @changeset.data),
+    prototype: @prototype,
+    parent_product: @parent_product
+%>

@@ -38,8 +38,7 @@ defmodule AdminAppWeb.InputHelpers do
     wrapper_opts = [class: "form-group #{validate_required}"]
     label_opts = [class: ""]
 
-    input_opts =
-      [class: "form-control  #{state_class(form, field)}", "data-init-plugin": "select2"] ++ opts
+    input_opts = [class: "form-control  #{state_class(form, field)}"] ++ opts
 
     content_tag :div, wrapper_opts do
       label = label(form, field, humanize(field_name), label_opts)

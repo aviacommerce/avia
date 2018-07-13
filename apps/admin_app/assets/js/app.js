@@ -25,7 +25,48 @@ import select2Selector from './form-helpers/select2-selector';
 
 $(document).ready(() => {
   select2Selector();
+  setup_product();
 })
 
 const elmDiv = document.getElementById("elm-main");
 Elm.Main.embed(elmDiv);
+
+function setup_product(){
+  // This handle the variation theme selection
+  $('#product_theme_id').on('change', function (e) {
+    $('#theme_change_modal').modal(`show`);
+  })
+
+  $("#theme_change_confirm").click(function(e){
+      var optionSelected = $("option:selected");
+      var valueSelected = optionSelected.val();
+      const product_id = $(this)
+        .parents()
+        .find('#product_id');
+      const new_variant = $(this)
+        .parents()
+        .find('#new_variant');
+      var link = "/products/" + product_id.val() + "/variant/new?theme_id=" + valueSelected
+      new_variant.attr("href", link)
+
+      get_variation_options(valueSelected, product_id.val())
+  })
+
+  var product_id = $("#product_id").val();
+  var theme_id = $("#product_theme_id").val();
+  get_variation_options(theme_id, product_id)
+}
+
+function get_variation_options(theme_id, product_id)
+{
+  fetch('http://localhost:4000/api/option_types?theme_id=' + theme_id + "&product_id=" + product_id)
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(myJson) {
+    $('#variation_options')
+    .empty()
+    .append(myJson.html)
+  });
+  $('#theme_change_modal').modal('hide');
+}

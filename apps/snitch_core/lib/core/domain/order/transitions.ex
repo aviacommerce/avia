@@ -41,10 +41,10 @@ defmodule Snitch.Domain.Order.Transitions do
         } = context
       ) do
     changeset =
-      Order.partial_update_changeset(
-        order,
-        %{billing_address: billing, shipping_address: shipping}
-      )
+      Order.partial_update_changeset(order, %{
+        billing_address: billing,
+        shipping_address: shipping
+      })
 
     struct(context, multi: Multi.update(multi, :order, changeset))
   end

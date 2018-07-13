@@ -1,0 +1,18 @@
+<h3>Add variant using following options</h3>
+  <form accept-charset="UTF-8" action="/products/variants/new" method="post">
+    <input name="product_id" type="hidden" value="<%= @product_id %>" >
+    <input name="theme_id" type="hidden" value="<%= @theme.id %>" >
+    <div class="row">
+    <%= for {item, idx} <- Enum.with_index(@theme.option_types) do %>
+    <div class="col-4">
+      <div class="form-group required">
+        <label><%= item.display_name %></label>
+        <input name="options[<%= idx %>][option_type_id]" type="hidden" value="<%= item.id %>" required>
+        <input name="options[<%= idx %>][value]", type="text" class="form-control" required>
+        <small class="form-text text-muted">You can enter comma separated values <strong>red,gree,blue</strong></small>
+      </div>
+    </div>
+    <% end %>
+  </div>
+  <button class="btn btn-primary submit-btn" type="submit">Add Variant</button>
+  </form>
