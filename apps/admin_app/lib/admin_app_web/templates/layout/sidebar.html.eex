@@ -10,6 +10,8 @@
           <ul id="drilldown-2" class="nav nav-pills nav-stacked collapse pl-3">
             <li><a class="nav-link" href="/option_types">Option Types</a></li>
             <li><a class="nav-link" href="/properties">Properties</a></li>
+            <li><a class="nav-link" href="/variation_themes">Variation Themes</a></li>
+            <li><a class="nav-link" href="/prototypes">Prototypes</a></li>
           </ul>
         </li>
         <li><a class="nav-link" href="#">Reports</a></li>

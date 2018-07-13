@@ -49,6 +49,13 @@ defmodule AdminAppWeb.InputHelpers do
     end
   end
 
+  def multi_select(form, field, list, name \\ nil, opts \\ []) do
+    input_opts = [class: "full-width w-100", "data-init-plugin": "select2"] ++ opts
+    input = Form.multiple_select(form, field, list, input_opts)
+    hidden_input = hidden_input(form, field, value: "")
+    base_input(form, field, name, [hidden_input, input])
+  end
+
   def textarea_input(form, field, name \\ nil, opts \\ []) do
     field_name = name || field
 
@@ -121,4 +128,28 @@ defmodule AdminAppWeb.InputHelpers do
   def check_required(required: false), do: nil
   def check_required(required: false, minlength: _), do: nil
   def check_required([]), do: nil
+
+  defp validate_required(form, field) do
+    form
+    |> input_validations(field)
+    |> check_required
+  end
+
+  defp form_label(form, field, name) do
+    if name == "" do
+      []
+    else
+      label_opts = [class: "d-block control-label position-relative"]
+      [label(form, field, humanize(name || field), label_opts)]
+    end
+  end
+
+  defp base_input(form, field, name, inputs) do
+    wrapper_opts = [class: "form-group #{validate_required(form, field)}"]
+    error = EH.error_tag(form, field) || ""
+
+    content_tag :div, wrapper_opts do
+      form_label(form, field, name) ++ inputs ++ [error]
+    end
+  end
 end

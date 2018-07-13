@@ -37,6 +37,8 @@ defmodule AdminAppWeb.Router do
     resources("/users", UserController)
     resources("/roles", RoleController)
     resources("/permissions", PermissionController)
+    resources("/variation_themes", VariationThemeController, except: [:show])
+    resources("/prototypes", PrototypeController, except: [:show])
   end
 
   scope "/", AdminAppWeb do

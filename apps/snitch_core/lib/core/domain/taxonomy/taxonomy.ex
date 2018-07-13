@@ -8,7 +8,7 @@ defmodule Snitch.Domain.Taxonomy do
   import AsNestedSet.Modifiable
   import AsNestedSet.Queriable, only: [dump_one: 2]
 
-  alias Snitch.Data.Schema.Taxon
+  alias Snitch.Data.Schema.{Taxon, Taxonomy}
 
   @doc """
   Adds child taxon to left, right or child of parent taxon.
@@ -77,5 +77,21 @@ defmodule Snitch.Domain.Taxonomy do
     Taxon
     |> dump_one(%{taxonomy_id: id})
     |> AsNestedSet.execute(Repo)
+  end
+
+  @doc """
+  Get all leaf Taxons for a Taxonomy
+  """
+  def get_leaves(%Taxonomy{} = taxonomy) do
+    Taxon
+    |> AsNestedSet.leaves(%{taxonomy_id: taxonomy.id})
+    |> AsNestedSet.execute(Repo)
+  end
+
+  @doc """
+  Get taxonomy by name
+  """
+  def get_taxonomy(name) do
+    Repo.get_by(Taxonomy, name: name)
   end
 end
