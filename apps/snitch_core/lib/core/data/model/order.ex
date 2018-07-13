@@ -162,6 +162,21 @@ defmodule Snitch.Data.Model.Order do
   @spec get_all() :: [Order.t()]
   def get_all, do: Repo.all(Order)
 
+  @doc """
+    Order related to user.
+  """
+
+  @spec user_orders(String.t()) :: [Order.t()]
+  def user_orders(user_id) do
+    query =
+      from(
+        u in Order,
+        where: u.user_id == ^user_id
+      )
+
+    Repo.all(query)
+  end
+
   defp update_line_item_costs(line_items) when is_list(line_items) do
     LineItemModel.update_unit_price(line_items)
   end

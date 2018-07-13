@@ -15,4 +15,9 @@ defmodule SnitchApiWeb.OrderControllerTest do
     conn = post(conn, order_path(conn, :guest_order))
     assert json_response(conn, 200)["data"]
   end
+
+  test "User order", %{conn: conn} do
+    conn = post(conn, order_path(conn, :order))
+    assert json_response(conn, 200)["data"]
+  end
 end
