@@ -5,6 +5,10 @@ defmodule SnitchApiWeb.OrderController do
   alias Snitch.Data.Schema.Order
   alias Snitch.Repo
 
+  action_fallback(SnitchApiWeb.FallbackController)
+  plug(SnitchApiWeb.Plug.DataToAttributes)
+  plug(SnitchApiWeb.Plug.LoadUser)
+
   def index(conn, params) do
     orders = Repo.preload(OrderModel.get_all(), :line_items)
 

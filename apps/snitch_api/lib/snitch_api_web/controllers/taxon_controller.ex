@@ -4,6 +4,11 @@ defmodule SnitchApiWeb.TaxonController do
   alias Snitch.Data.Schema.Taxon
   alias Snitch.Repo
 
+  action_fallback(SnitchApiWeb.FallbackController)
+
+  plug(SnitchApiWeb.Plug.DataToAttributes)
+  plug(SnitchApiWeb.Plug.LoadUser)
+
   def index(conn, _params) do
     taxons =
       Taxon
@@ -14,7 +19,7 @@ defmodule SnitchApiWeb.TaxonController do
       conn,
       "index.json-api",
       data: taxons,
-      opts: [include: "parent"]
+      opts: [include: "parent,taxonomy"]
     )
   end
 

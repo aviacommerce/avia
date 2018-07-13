@@ -101,6 +101,14 @@ defmodule Snitch.Data.Model.Role do
   end
 
   @doc """
+  Returns the role for the given roll_name.
+  """
+  @spec get_role_by_name(string) :: Role.t()
+  def get_role_by_name(name) do
+    Repo.get_by!(Role, name: name)
+  end
+
+  @doc """
   Returns a list of roles in the format {role.name, role.id}
   """
   @spec formatted_list() :: [{String.t(), non_neg_integer}]
