@@ -89,5 +89,10 @@ defmodule SnitchApiWeb.UserControllerTest do
       conn = post(conn, user_path(conn, :logout))
       assert %{"status" => "logged out"} = json_response(conn, 204)
     end
+
+    test "authenticated user details", %{conn: conn, user: user} do
+      conn = get(conn, user_path(conn, :authenticated))
+      assert json_response(conn, 200)["data"]
+    end
   end
 end
