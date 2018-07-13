@@ -100,4 +100,31 @@ defmodule SnitchApiWeb.OrderControllerTest do
       assert json_response(conn, 200)["data"]
     end
   end
+
+  describe "User Orders" do
+    setup %{conn: conn, user: user} do
+      user = JaSerializer.Params.to_attributes(user)
+      {:ok, registered_user} = Accounts.create_user(user)
+
+      # create the token
+      {:ok, token, _claims} = Guardian.encode_and_sign(registered_user)
+
+      # add authorization header to request
+      conn = put_req_header(conn, "authorization", "Bearer #{token}")
+
+      # pass the connection and the user to the test
+      {:ok, conn: conn, user: registered_user}
+    end
+
+    test "creating new", %{conn: conn, user: user} do
+      conn = post(conn, order_path(conn, :current))
+      assert json_response(conn, 200)["data"]
+    end
+
+    test "fetching existing order", %{conn: conn, user: %{id: user_id}} do
+      order = insert(:order, user_id: user_id)
+      conn = post(conn, order_path(conn, :current))
+      assert Integer.to_string(order.id) == json_response(conn, 200)["data"]["id"]
+    end
+  end
 end
