@@ -1,0 +1,7 @@
+<%= form_for @changeset, @action, fn f ->  %>
+  <%= input f, :name%>
+  <%= select_input f, :taxon_id, get_options(@taxons), "Product Category" %>
+  <%= multi_select f, :variation_theme_ids, get_options(@themes), "Variation themes" %>
+  <%= multi_select f, :property_ids, get_options(@properties), "Properties" %>
+  <%= submit "Submit", class: "btn btn-primary submit-btn" %>
+<% end %>

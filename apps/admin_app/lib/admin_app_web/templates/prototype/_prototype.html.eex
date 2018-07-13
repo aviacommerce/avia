@@ -1,0 +1,10 @@
+<tr>
+  <th scope="row" class="ui-state-default"></th>
+  <td><%= @prototype.name %></td>
+  <td>
+    <div class="float-right">
+    <%= link("Edit", to: prototype_path(@conn, :edit, @prototype.id), class: "btn btn-primary")%>
+    <%= link("Delete", to: prototype_path(@conn, :delete, @prototype.id), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger")%>
+  </div>
+  </td>
+</tr>

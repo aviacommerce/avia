@@ -1,0 +1,5 @@
+<%= form_for @changeset, @action, fn f ->  %>
+  <%= input f, :name%>
+  <%= multi_select f, :option_type_ids, get_option_types(@option_types), "Option Types" %>
+  <%= submit "Submit", class: "btn btn-primary submit-btn" %>
+<% end %>

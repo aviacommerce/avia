@@ -1,0 +1,7 @@
+<h4>Edit Variation Theme</h4>
+<%= render "form.html",
+    changeset: @changeset,
+    conn: @conn,
+    action: variation_theme_path(@conn, :update, @changeset.data.id),
+    option_types: @option_types
+%>

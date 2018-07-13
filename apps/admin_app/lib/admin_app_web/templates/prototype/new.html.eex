@@ -1,0 +1,9 @@
+<h4>New Product Protoype</h4>
+<%= render "form.html",
+    changeset: @changeset,
+    conn: @conn,
+    action: prototype_path(@conn, :create),
+    themes: @themes,
+    properties: @properties,
+    taxons: @taxons
+%>
