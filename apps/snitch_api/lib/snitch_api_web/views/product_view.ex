@@ -23,6 +23,7 @@ defmodule SnitchApiWeb.ProductView do
     include: true
   )
 
+<<<<<<< HEAD
   def render("rating_summary.json-api", %{data: data, id: id}) do
     %{
       links: %{
@@ -30,5 +31,13 @@ defmodule SnitchApiWeb.ProductView do
       },
       data: data
     }
+=======
+  def variants(product, _conn) do
+    Map.get(product, :variants)
+  end
+
+  def images(product, _conn) do
+    get_in(product, [:variants, :images])
+>>>>>>> Products API list/search/filter/pagination/sort
   end
 end
