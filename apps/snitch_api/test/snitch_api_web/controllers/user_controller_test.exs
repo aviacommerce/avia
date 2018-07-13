@@ -74,6 +74,7 @@ defmodule SnitchApiWeb.UserControllerTest do
 
       # add authorization header to request
       conn = conn |> put_req_header("authorization", "Bearer #{token}")
+      conn = Plug.Conn.assign(conn, :current_user, registered_user)
 
       # pass the connection and the user to the test
       {:ok, conn: conn, user: registered_user}

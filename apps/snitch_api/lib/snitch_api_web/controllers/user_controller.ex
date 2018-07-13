@@ -56,7 +56,7 @@ defmodule SnitchApiWeb.UserController do
   end
 
   def authenticated(conn, _params) do
-    user = Guardian.Plug.current_resource(conn)
+    user = conn.assigns[:current_user]
     render(conn, "show.json-api", data: user)
   end
 end
