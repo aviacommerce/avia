@@ -31,7 +31,7 @@ defmodule AdminAppWeb.OrderController do
     current_user = Guardian.Plug.current_resource(conn)
     {:ok, order} = Order.create(%{line_items: [], user_id: current_user.id})
 
-    redirect(to: order_path(conn, :show, order.id))
+    redirect(conn, to: order_path(conn, :show, order.id))
   end
 
   def edit(conn, params) do
@@ -54,12 +54,12 @@ defmodule AdminAppWeb.OrderController do
 
     case Order.update(%{line_items: updated_list}, order) do
       {:ok, order} ->
-        redirect(to: order_path(conn, :show, order.id))
+        redirect(conn, to: order_path(conn, :show, order.id))
 
       {:error, error} ->
         %{errors: [line_items: {error_text, _}]} = error
         conn = put_flash(conn, :error, error_text)
-        redirect(to: order_path(conn, :show, order.id))
+        redirect(conn, to: order_path(conn, :show, order.id))
     end
 
     render(conn, "edit.html", %{order: order, search: [], update_item: update_item})
@@ -75,12 +75,12 @@ defmodule AdminAppWeb.OrderController do
 
     case Order.update(%{line_items: new_item_list}, order) do
       {:ok, order} ->
-        redirect(to: order_path(conn, :show, order.id))
+        redirect(conn, to: order_path(conn, :show, order.id))
 
       {:error, error} ->
         %{errors: [line_items: {error_text, _}]} = error
         conn = put_flash(conn, :error, error_text)
-        redirect(to: order_path(conn, :show, order.id))
+        redirect(conn, to: order_path(conn, :show, order.id))
     end
   end
 
@@ -98,7 +98,7 @@ defmodule AdminAppWeb.OrderController do
         order
       )
 
-    redirect(to: order_path(conn, :show, order.id))
+    redirect(conn, to: order_path(conn, :show, order.id))
   end
 
   def address_add_index(conn, params) do
@@ -142,7 +142,7 @@ defmodule AdminAppWeb.OrderController do
 
     case transition.valid? do
       true ->
-        redirect(to: order_path(conn, :show, order.id))
+        redirect(conn, to: order_path(conn, :show, order.id))
 
       false ->
         conn = put_flash(conn, :error, transition.errors[:error])
