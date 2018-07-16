@@ -1,5 +1,8 @@
 <div>
   <h2 class="text-center">Listing Orders</h2>
+  <form action="orders" method="post">
+    <button type="submit" formmethod="post">Create New Order</button>
+  </form>
   <table class="table table-striped">
     <thead class="thead-light">
       <tr>
@@ -15,7 +18,7 @@
       <tr class="<%= colorize(order) %>">
         <th scope="row"><%= index+1 %></th>
         <td>
-          <a href="orders/<%= order.slug %>" rel="nofollow"><%= order.slug %></a>
+          <a href="orders/<%= order.number %>" rel="nofollow"><%= order.number %></a>
         </td>
         <td><%= order.inserted_at %></td>
         <td><%= order.user.email %></td>

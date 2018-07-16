@@ -1,0 +1,20 @@
+<%= if @search != [] do %>
+  <div class="card-header text-center">Search List</div>
+  <div class="card-body">
+    <table class="table">
+      <thead class="thead-light">
+        <tr>
+          <th scope="col">Item Description</th>
+          <th scope="col">Price</th>
+          <th scope="col">Quantity</th>
+          <th scope="col"> Add </th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= for item <- @search do %>
+          <%= render_search_item(item, @order) %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

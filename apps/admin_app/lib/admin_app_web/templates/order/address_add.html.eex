@@ -1,0 +1,84 @@
+<div class="container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/orders">Orders</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><%= @order.number %></li>
+    </ol>
+  </nav>
+
+  <h2>
+    Order #<%= @order.id %>
+    <%= state_badge(@order.state) %>
+  </h2>
+  <div class="row">
+    <div class="col-8">
+      <!-- The real deal  -->
+      <div class="card">
+        <h3>Add Address </h3>
+        <div class="card-body">
+          <form action=<%= "/orders/#{@order.number}/address" %> method="post">
+            <div class="panel-body">
+
+  <div class="form-group billing-row field" id=": _firstname_field">
+    <label for="order_address_attributes_firstname">First Name</label>
+    <input class="form-control" name="address[first_name]" id="order_address_attributes_firstname" type="text">
+
+</div>
+  <div class="form-group billing-row field">
+    <label for="order_address_attributes_lastname">Last Name</label>
+    <input class="form-control" name="address[last_name]" id="order_address_attributes_lastname" type="text">
+
+</div>
+
+  <div class="form-group billing-row field">
+    <label for="order_address_attributes_address1">Street Address</label>
+    <input class="form-control" name="address[address_line_1]" id="order_address_attributes_address1" type="text">
+
+</div>
+  <div class="form-group billing-row field">
+    <label for="order_address_attributes_address2">Street Address (cont'd)</label>
+    <input class="form-control" name="address[address_line_2]" id="order_address_attributes_address2" type="text">
+
+</div>
+  <div class="form-group billing-row field">
+    <label for="order_address_attributes_city">City</label>
+    <input class="form-control" name="address[city]" id="order_address_attributes_city" type="text">
+
+</div>
+  <div class="form-group billing-row field">
+    <label for="order_address_attributes_zipcode">Zip</label>
+    <input class="form-control" name="address[zip_code]" id="order_address_attributes_zipcode" type="text">
+</div>
+
+</div>
+  <div class="form-group billing-row field">
+    <label for="order_address_attributes_phone">Phone</label>
+    <input class="form-control" name="address[phone]" id="order_address_attributes_phone" type="tel">
+  </div>
+
+  <div class="form-group billing-row field">
+    <label for="order_address_attributes_phone">State</label>
+    <input class="form-control" name="address[state_id]" id="order_address_attributes_state" type="text">
+  </div>
+  <div class="form-group billing-row field">
+    <label for="order_address_attributes_phone">Country</label>
+    <input class="form-control" name="address[country_id]" id="order_address_attributes_country" type="text">
+  </div>
+<button type="submit">add</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-4">
+      <h3>Order Summary</h3>
+      <table class="table table-sm">
+        <caption class="sr-only">order summary</caption>
+        <tbody>
+          <%= summary(@order) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </div>
+</div>
