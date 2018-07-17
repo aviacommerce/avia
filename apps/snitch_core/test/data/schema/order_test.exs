@@ -26,54 +26,12 @@ defmodule Snitch.Data.Schema.OrderTest do
   }
 
   setup :variants
-  setup :user_with_address
 
-  test "both order and line_items are inserted to DB", context do
-    %{user: user, variants: variants} = context
-    line_items = line_item_params(variants)
+  describe "create_changeset/2" do
+    setup :user_with_address
 
-    params = %{
-      @order_params
-      | user_id: user.id,
-        line_items: line_items
-    }
-
-    cs = Order.create_changeset(build(:order), params)
-
-    assert cs.valid?
-    assert %{line_items: _, user_id: _} = cs.changes
-    assert Enum.all?(cs.changes.line_items, fn %{action: action} -> action == :insert end)
-    assert {:ok, _} = Repo.insert(cs)
-  end
-
-  test "order can handle duplicate line_items", %{user: user, variants: [v | _]} do
-    params = %{
-      @order_params
-      | user_id: user.id,
-        line_items: line_item_params([v, v])
-    }
-
-    cs = Order.create_changeset(build(:order), params)
-
-    refute cs.valid?
-    assert %{line_items: line_item_changesets, user_id: _} = cs.changes
-    assert Enum.all?(line_item_changesets, fn %{valid?: validity} -> validity end)
-    assert %{line_items: ["line_items must have unique variant_ids"]} = errors_on(cs)
-  end
-
-  test "order can be created without line_items", %{user: user} do
-    params = %{
-      @order_params
-      | user_id: user.id,
-        line_items: []
-    }
-
-    cs = Order.create_changeset(build(:order), params)
-    assert cs.valid?
-  end
-
-  describe "order updates" do
-    setup %{user: user, variants: variants} do
+    test "both order and line_items are inserted to DB", context do
+      %{user: user, variants: variants} = context
       line_items = line_item_params(variants)
 
       params = %{
@@ -82,12 +40,70 @@ defmodule Snitch.Data.Schema.OrderTest do
           line_items: line_items
       }
 
+      cs = Order.create_changeset(build(:order), params)
+
+      assert cs.valid?
+      assert %{line_items: _, user_id: _} = cs.changes
+      assert Enum.all?(cs.changes.line_items, fn %{action: action} -> action == :insert end)
+      assert {:ok, _} = Repo.insert(cs)
+    end
+
+    test "order can handle duplicate line_items", %{user: user, variants: [v | _]} do
+      params = %{
+        @order_params
+        | user_id: user.id,
+          line_items: line_item_params([v, v])
+      }
+
+      cs = Order.create_changeset(build(:order), params)
+
+      refute cs.valid?
+      assert %{line_items: line_item_changesets, user_id: _} = cs.changes
+      assert Enum.all?(line_item_changesets, fn %{valid?: validity} -> validity end)
+      assert %{line_items: ["line_items must have unique variant_ids"]} = errors_on(cs)
+    end
+
+    test "order can be created without line_items", %{user: user} do
+      params = %{
+        @order_params
+        | user_id: user.id,
+          line_items: []
+      }
+
+      cs = Order.create_changeset(build(:order), params)
+      assert cs.valid?
+    end
+  end
+
+  describe "create_for_guest_changeset/2" do
+    test "with no params" do
+      cs = Order.create_for_guest_changeset(build(:order), %{})
+      assert cs.valid?
+    end
+
+    test "fails without state" do
+      cs = Order.create_for_guest_changeset(%Order{state: nil}, %{})
+      refute cs.valid?
+      assert %{state: ["can't be blank"]} == errors_on(cs)
+    end
+  end
+
+  describe "update_changeset/2" do
+    setup %{variants: variants} do
+      line_items = line_item_params(variants)
+
+      params = %{
+        @order_params
+        | user_id: -1,
+          line_items: line_items
+      }
+
       [
         persisted:
           :order
-          |> build()
-          |> Order.create_changeset(params)
-          |> Repo.insert!()
+          |> insert(line_items: [])
+          |> Order.update_changeset(params)
+          |> Repo.update!()
       ]
     end
 
@@ -142,8 +158,11 @@ defmodule Snitch.Data.Schema.OrderTest do
   end
 
   describe "partial_update_changeset" do
-    setup %{user: u} do
-      [persisted: insert(:order, user: u, shipping_address: nil, billing_address: nil)]
+    setup do
+      [
+        persisted: insert(:order, shipping_address: nil, billing_address: nil),
+        address: insert(:address)
+      ]
     end
 
     test "fails with bad address params", %{persisted: persisted, address: address} do

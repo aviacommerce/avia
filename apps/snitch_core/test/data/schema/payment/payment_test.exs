@@ -6,8 +6,10 @@ defmodule Snitch.Data.Schema.PaymentTest do
 
   alias Snitch.Data.Schema.Payment
 
-  setup :user_with_address
-  setup :an_order
+  setup do
+    [order: insert(:order)]
+  end
+
   setup :payment_methods
 
   test "Payments invalidate bad type", context do

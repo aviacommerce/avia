@@ -65,12 +65,24 @@ defmodule Snitch.Data.Schema.Order do
     |> ensure_unique_line_items()
   end
 
-  @spec create_guest_changeset(t, map) :: Ecto.Changeset.t()
-  def create_guest_changeset(%__MODULE__{} = order, params) do
+  @doc """
+  Returns a Order changeset for a "new" order without a user.
+
+  A list of `LineItem` params can be provided under the `:line_items` key, and
+  each of those must include price fields, use
+  `Snitch.Data.Model.LineItem.update_unit_price/1` if needed.
+  > Note that `variant_id`s must be unique in each line item.
+
+  Suitable for creating orders for guest users.
+  """
+  @spec create_for_guest_changeset(t, map) :: Ecto.Changeset.t()
+  def create_for_guest_changeset(%__MODULE__{} = order, params) do
     order
-    |> cast(params, [])
+    |> cast(params, [:state])
+    |> validate_required([:state])
     |> unique_constraint(:number)
-    |> common_changeset()
+    |> cast_assoc(:line_items)
+    |> ensure_unique_line_items()
   end
 
   @doc """

@@ -7,8 +7,10 @@ defmodule Snitch.Data.Model.PackageTest do
   alias Snitch.Data.Model.Package
   alias Snitch.Data.Schema.ShippingMethod
 
-  setup :user_with_address
-  setup :an_order
+  setup do
+    [order: insert(:order)]
+  end
+
   setup :variants
   setup :line_items
   setup :shipping_categories

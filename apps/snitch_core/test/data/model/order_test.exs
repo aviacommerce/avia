@@ -27,6 +27,22 @@ defmodule Snitch.Data.Model.OrderTest do
     end
   end
 
+  describe "create_for_guest/3" do
+    test "with valid data", %{order_params: params, variants: vs} do
+      {:ok, order} = Order.create(params)
+      assert length(order.line_items) == length(vs)
+    end
+
+    test "without line_items", %{order_params: params} do
+      {:ok, order} =
+        params
+        |> Map.put(:line_items, [])
+        |> Order.create()
+
+      assert [] = order.line_items
+    end
+  end
+
   describe "update/3" do
     test "add some line_items", %{order_params: order_params} do
       {:ok, order} = Order.create(order_params)

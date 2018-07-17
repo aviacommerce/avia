@@ -205,9 +205,9 @@ defmodule Snitch.Factory do
     [variants: insert_list(count, :random_variant)]
   end
 
-  def an_order(context) do
-    %{user: user} = context
-    [order: insert(:order, user_id: user.id)]
+  def orders(context) do
+    count = Map.get(context, :order_count, 1)
+    [orders: insert_list(count, :order)]
   end
 
   def payment_methods(_context) do
