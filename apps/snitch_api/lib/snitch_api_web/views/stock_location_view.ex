@@ -11,7 +11,7 @@ defmodule SnitchApiWeb.StockLocationView do
     :city,
     :zip_code,
     :phone,
-    :propagate_all_ariants,
+    :propagate_all_variants,
     :backorderable_default,
     :active
   ])

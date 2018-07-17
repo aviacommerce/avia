@@ -44,7 +44,7 @@ defmodule SnitchApiWeb.ProductController do
     )
   end
 
-  def show(conn, %{"product_slug" => slug}) do
+  def show(conn, %{"product_slug" => slug} = params) do
     product = Context.product_by_slug!(slug)
 
     render(

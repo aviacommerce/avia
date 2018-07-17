@@ -10,13 +10,11 @@ defmodule SnitchApi.ProductsContext do
   @doc """
   List out the all products
   """
-
-  def list_products(conn) do
-    with query <- from(p in Product, select: p),
-         page = create_page(query, %{}, conn),
-         products <- paginate_collection(query, %{}) do
-      {products, page}
-    end
+  def list_products(conn, params) do
+    query = define_query(params)
+    page = create_page(query, %{}, conn)
+    products = paginate_collection(query, params)
+    {products, page}
   end
 
   @doc """
@@ -26,44 +24,6 @@ defmodule SnitchApi.ProductsContext do
     Product
     |> Repo.get_by!(slug: slug)
     |> Repo.preload(variants: [:images])
-  end
-
-  def products_by_date_inserted(params, conn) do
-    with query <- from(p in Product, order_by: [desc: p.inserted_at]),
-         page = create_page(query, params, conn),
-         products <- paginate_collection(query, params) do
-      {products, page}
-    end
-  end
-
-  def products_by_name_search(name, params, conn) do
-    with query <- from(p in Product, where: ilike(p.name, ^"%#{name}%")),
-         page = create_page(query, params, conn),
-         products <- paginate_collection(query, params) do
-      {products, page}
-    end
-  end
-
-  @doc """
-  Fetches the products, order by `name` in ascending order.
-  """
-  def products_by_asc(params, conn) do
-    with query <- order_by(Product, asc: :name),
-         page = create_page(query, params, conn),
-         products <- paginate_collection(query, params) do
-      {products, page}
-    end
-  end
-
-  @doc """
-  Fetches the products, order by `name` in descending order.
-  """
-  def products_by_desc(params, conn) do
-    with query <- order_by(Product, desc: :name),
-         page = create_page(query, params, conn),
-         products <- paginate_collection(query, params) do
-      {products, page}
-    end
   end
 
   @doc """
@@ -136,5 +96,42 @@ defmodule SnitchApi.ProductsContext do
       {_, base_url} -> base_url
       _ -> ""
     end
+  end
+
+  @doc """
+  Develops the query based on the giver params. At least sorting the 
+  products in Ascending orders of their names is considered as priority.
+  This supports the following api calling...
+  - /products
+  - /products/slug
+  - /products?sort=Z-A
+  - /products?sort=A-Z
+  - /products?sort=date
+  - /products?sort=A-Z&filter[name]=Hill's
+  - /products?sort=A-Z&filter[name]=Hill's&page[limit]=2&page[offset]=2
+  - /products?sort=A-Z&filter[name]=Hill's&page[limit]=2
+  """
+
+  def define_query(params) do
+    query =
+      case params["sort"] do
+        "Z-A" ->
+          order_by(Product, desc: :name)
+
+        "date" ->
+          order_by(Product, desc: :inserted_at)
+
+        _ ->
+          order_by(Product, asc: :name)
+      end
+
+    query =
+      case params["filter"] do
+        %{"name" => filter} ->
+          from(p in query, where: ilike(p.name, ^"%#{filter}%"))
+
+        _ ->
+          query
+      end
   end
 end
