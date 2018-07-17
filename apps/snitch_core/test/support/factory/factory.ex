@@ -13,6 +13,7 @@ defmodule Snitch.Factory do
     Payment,
     PaymentMethod,
     Permission,
+    Product,
     Role,
     TaxCategory,
     TaxRate,
@@ -272,5 +273,13 @@ defmodule Snitch.Factory do
   def permissions(context) do
     count = Map.get(context, :permission_count, 2)
     [permissions: insert_list(count, :permission)]
+  end
+
+  def product_factory do
+    %Product{
+      name: sequence(:name, &"Hill's-#{&1}"),
+      description: sequence(:description, &"description-#{&1}"),
+      slug: sequence(:slug, &"Hill's-#{&1}")
+    }
   end
 end
