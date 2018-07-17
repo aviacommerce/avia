@@ -30,8 +30,8 @@ defmodule Snitch.Data.Schema.LineItem do
     line_item
     |> cast(params, @cast_fields)
     |> validate_required(@cast_fields)
-    |> foreign_key_constraint(:order_id)
-    |> foreign_key_constraint(:variant_id)
+    |> assoc_constraint(:order)
+    |> assoc_constraint(:variant)
     |> common_changeset()
   end
 
@@ -43,8 +43,8 @@ defmodule Snitch.Data.Schema.LineItem do
     line_item
     |> cast(params, @create_fields)
     |> validate_required(@create_fields)
-    |> foreign_key_constraint(:order_id)
-    |> foreign_key_constraint(:variant_id)
+    |> assoc_constraint(:order)
+    |> assoc_constraint(:variant)
     |> common_changeset()
   end
 

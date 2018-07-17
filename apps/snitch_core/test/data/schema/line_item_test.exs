@@ -30,7 +30,7 @@ defmodule Snitch.Data.Schema.LineItemTest do
                quantity: ["can't be blank"],
                unit_price: ["can't be blank"],
                variant_id: ["can't be blank"]
-             } = errors_on(cs)
+             } == errors_on(cs)
     end
 
     test "fails without price fields", %{order: order, variants: [variant | _]} do
@@ -41,7 +41,7 @@ defmodule Snitch.Data.Schema.LineItemTest do
             order_id: order.id
         })
 
-      assert %{unit_price: ["can't be blank"]} = errors_on(cs)
+      assert %{unit_price: ["can't be blank"]} == errors_on(cs)
     end
 
     test "fails with bad price fields", %{order: order, variants: [variant | _]} do
@@ -53,7 +53,7 @@ defmodule Snitch.Data.Schema.LineItemTest do
             unit_price: Money.new(-1, :USD)
         })
 
-      assert %{unit_price: ["must be equal or greater than 0"]} = errors_on(cs)
+      assert %{unit_price: ["must be equal or greater than 0"]} == errors_on(cs)
     end
 
     test "with price fields", %{order: order, variants: [variant | _]} do

@@ -4,11 +4,11 @@ defmodule Snitch.Data.Model.LineItem do
   """
   use Snitch.Data.Model
 
-  alias Ecto.Multi
-  alias Snitch.Data.Model.Order, as: OrderModel
+  import Ecto.Changeset, only: [change: 1]
+
   alias Snitch.Data.Model.Variant
-  alias Snitch.Data.Schema.{LineItem}
-  alias Snitch.Domain.Order, as: OrderDomain
+  alias Snitch.Data.Schema.LineItem
+  alias Snitch.Domain.Order
   alias Snitch.Tools.Money, as: MoneyTools
 
   @doc """
@@ -22,11 +22,10 @@ defmodule Snitch.Data.Model.LineItem do
   """
   @spec create(map) :: LineItem.t()
   def create(params) do
-    Multi.new()
-    |> Multi.insert(:line_item, LineItem.create_changeset(%LineItem{}, params))
-    |> fetch_order([:line_items])
-    |> update_order(&OrderDomain.add_line_item/2)
-    |> do_operation()
+    %LineItem{}
+    |> LineItem.create_changeset(params)
+    |> Order.validate_change()
+    |> Repo.insert()
   end
 
   @doc """
@@ -37,11 +36,10 @@ defmodule Snitch.Data.Model.LineItem do
   """
   @spec update(LineItem.t(), map) :: LineItem.t()
   def update(%LineItem{} = line_item, params) do
-    Multi.new()
-    |> Multi.update(:line_item, LineItem.update_changeset(line_item, params))
-    |> fetch_order([:line_items])
-    |> update_order(&OrderDomain.update_line_item/2)
-    |> do_operation()
+    line_item
+    |> LineItem.update_changeset(params)
+    |> Order.validate_change()
+    |> Repo.update()
   end
 
   @doc """
@@ -54,11 +52,10 @@ defmodule Snitch.Data.Model.LineItem do
   """
   @spec delete(LineItem.t()) :: LineItem.t()
   def delete(%LineItem{} = line_item) do
-    Multi.new()
-    |> Multi.delete(:line_item, line_item)
-    |> fetch_order([:line_items])
-    |> update_order(&OrderDomain.remove_line_item/2)
-    |> do_operation()
+    line_item
+    |> change()
+    |> Order.validate_change()
+    |> Repo.delete()
   end
 
   @spec get(map) :: LineItem.t() | nil
@@ -136,31 +133,6 @@ defmodule Snitch.Data.Model.LineItem do
       Map.put(line_item, :unit_price, unit_price)
     else
       _ -> line_item
-    end
-  end
-
-  defp fetch_order(multi, preloads \\ []) do
-    Multi.run(multi, :fetch_order, fn %{line_item: li} ->
-      {:ok, Repo.preload(OrderModel.get(li.order_id), preloads)}
-    end)
-  end
-
-  defp update_order(multi, updater_fn) do
-    Multi.run(multi, :order, fn %{line_item: line_item, fetch_order: order} ->
-      updater_fn.(order, line_item)
-    end)
-  end
-
-  @spec do_operation(Ecto.Multi.t()) :: LineItem.t()
-  defp do_operation(multi) do
-    multi
-    |> Repo.transaction()
-    |> case do
-      {:ok, %{line_item: line_item, order: order}} ->
-        {:ok, struct(line_item, order: order)}
-
-      error ->
-        error
     end
   end
 end
