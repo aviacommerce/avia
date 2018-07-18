@@ -58,7 +58,6 @@ defmodule Snitch.Data.Model.LineItemTest do
 
   describe "create/1" do
     setup :variants
-    setup :user_with_address
 
     @tag variant_count: 1
     test "fails without an existing order", %{variants: [v]} do
@@ -75,11 +74,11 @@ defmodule Snitch.Data.Model.LineItemTest do
 
   describe "create/1 for order in `cart` state" do
     setup :variants
-    setup :user_with_address
+    setup :orders
 
     @tag variant_count: 1
-    test "which is empty", %{variants: [v], user: user} do
-      order = insert(:order, line_items: [], user: user)
+    test "which is empty", %{variants: [v], orders: [order]} do
+      order = struct(order, line_items: [])
 
       {:ok, li} = LineItem.create(%{line_item_params(v) | order_id: order.id})
       assert Ecto.assoc_loaded?(li.order)
@@ -88,8 +87,7 @@ defmodule Snitch.Data.Model.LineItemTest do
     end
 
     @tag variant_count: 2
-    test "with existing line_items", %{variants: [v1, v2], user: user} do
-      order = insert(:order, user: user)
+    test "with existing line_items", %{variants: [v1, v2], orders: [order]} do
       order = struct(order, line_items(%{order: order, variants: [v1]}))
 
       assert length(order.line_items) == 1
@@ -105,11 +103,10 @@ defmodule Snitch.Data.Model.LineItemTest do
 
   describe "update/1 for order in `cart` state" do
     setup :variants
-    setup :user_with_address
+    setup :orders
 
     @tag variant_count: 1
-    test "with valid params", %{variants: [v], user: user} do
-      order = insert(:order, user: user)
+    test "with valid params", %{variants: [v], orders: [order]} do
       order = struct(order, line_items(%{order: order, variants: [v]}))
 
       [li] = order.line_items
@@ -125,11 +122,10 @@ defmodule Snitch.Data.Model.LineItemTest do
 
   describe "delete/1 for order in `cart` state" do
     setup :variants
-    setup :user_with_address
+    setup :orders
 
     @tag variant_count: 1
-    test "with valid params", %{variants: [v], user: user} do
-      order = insert(:order, user: user)
+    test "with valid params", %{variants: [v], orders: [order]} do
       order = struct(order, line_items(%{order: order, variants: [v]}))
 
       [line_item] = order.line_items

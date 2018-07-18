@@ -18,12 +18,7 @@ defmodule Snitch.Data.Schema.LineItemTest do
   setup :variants
 
   setup do
-    user = insert(:user)
-
-    [
-      user: user,
-      order: insert(:order, user_id: user.id)
-    ]
+    [order: insert(:order)]
   end
 
   describe "create_changeset/2" do

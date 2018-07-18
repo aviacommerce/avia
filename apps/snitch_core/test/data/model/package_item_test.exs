@@ -4,8 +4,10 @@ defmodule Snitch.Data.Model.PackageItemTest do
   import Snitch.Factory
   alias Snitch.Data.Model.PackageItem
 
-  setup :user_with_address
-  setup :an_order
+  setup do
+    [order: insert(:order)]
+  end
+
   setup :variants
   setup :line_items
   setup :shipping_categories

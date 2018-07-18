@@ -3,7 +3,6 @@ defmodule Snitch.Data.Schema.UserTest do
   use Snitch.DataCase
 
   import Ecto.Changeset, only: [apply_changes: 1]
-  import Snitch.Factory
 
   alias Snitch.Data.Schema.User
 

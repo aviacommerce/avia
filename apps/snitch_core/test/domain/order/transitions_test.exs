@@ -31,7 +31,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
       [
         patna: patna,
-        order: struct(insert(:order, user: build(:user)))
+        order: insert(:order)
       ]
     end
 
@@ -139,7 +139,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
   describe "persist_shipment" do
     setup do
-      [order: insert(:order, user: build(:user))]
+      [order: insert(:order)]
     end
 
     test "when shipment is empty", %{order: order} do
@@ -169,7 +169,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     setup :embedded_shipping_methods
 
     setup %{embedded_shipping_methods: methods} do
-      order = insert(:order, user: build(:user))
+      order = insert(:order)
 
       [order: order, packages: [insert(:package, shipping_methods: methods, order: order)]]
     end

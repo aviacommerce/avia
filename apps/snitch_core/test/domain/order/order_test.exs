@@ -28,7 +28,7 @@ defmodule Snitch.Domain.OrderTest do
 
   describe "compute_taxes_changeset/1" do
     setup do
-      [order: insert(:order, state: "foo", user: build(:user))]
+      [order: insert(:order, state: "foo")]
     end
 
     setup :variants
