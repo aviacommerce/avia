@@ -432,7 +432,7 @@ defmodule Snitch.Domain.ShipmentTest do
 
   describe "to_package/1" do
     setup do
-      [order: insert(:order, user: build(:user))]
+      [order: insert(:order)]
     end
 
     setup :variants

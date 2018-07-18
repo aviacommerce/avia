@@ -21,100 +21,89 @@ defmodule Snitch.Data.Schema.OrderTest do
   }
 
   @order_params %{
-    adjustment_total: nil,
-    promo_total: nil,
-    item_total: nil,
-    total: nil,
     line_items: nil,
     user_id: nil
   }
 
   setup :variants
-  setup :user_with_address
 
-  test "both order and line_items are inserted to DB", context do
-    %{user: user, variants: variants} = context
-    line_items = line_item_params(variants)
-    item_total = LineItem.compute_total(line_items)
+  describe "create_changeset/2" do
+    setup :user_with_address
 
-    params = %{
-      @order_params
-      | item_total: item_total,
-        total: item_total,
-        user_id: user.id,
-        line_items: line_items
-    }
-
-    cs = Order.create_changeset(build(:order), params)
-
-    %{
-      valid?: validity,
-      changes: %{
-        item_total: _,
-        total: _,
-        line_items: _line_item_changesets
-      }
-    } = cs
-
-    assert validity
-    assert cs.changes.item_total == item_total
-    assert cs.changes.total == item_total
-    assert {:ok, _} = Repo.insert(cs)
-  end
-
-  test "order can handle duplicate line_items", %{user: user, variants: [v | _]} do
-    params = %{
-      @order_params
-      | user_id: user.id,
-        line_items: line_item_params([v, v])
-    }
-
-    cs = Order.create_changeset(build(:order), params)
-
-    %{
-      valid?: validity,
-      changes: %{
-        line_items: line_item_changesets
-      }
-    } = cs
-
-    refute validity
-    assert Enum.all?(line_item_changesets, fn %{valid?: validity} -> validity end)
-    assert %{line_items: ["line_items must have unique variant_ids"]} = errors_on(cs)
-  end
-
-  test "order can be created without line_items", %{user: user} do
-    params = %{
-      @order_params
-      | user_id: user.id,
-        line_items: []
-    }
-
-    cs = Order.create_changeset(build(:order), params)
-    assert cs.valid?
-  end
-
-  describe "order updates" do
-    setup %{user: user, variants: variants} do
+    test "both order and line_items are inserted to DB", context do
+      %{user: user, variants: variants} = context
       line_items = line_item_params(variants)
-      item_total = LineItem.compute_total(line_items)
 
       params = %{
         @order_params
         | user_id: user.id,
-          line_items: line_items,
-          item_total: item_total,
-          total: item_total,
-          promo_total: Money.zero(:USD),
-          adjustment_total: Money.zero(:USD)
+          line_items: line_items
+      }
+
+      cs = Order.create_changeset(build(:order), params)
+
+      assert cs.valid?
+      assert %{line_items: _, user_id: _} = cs.changes
+      assert Enum.all?(cs.changes.line_items, fn %{action: action} -> action == :insert end)
+      assert {:ok, _} = Repo.insert(cs)
+    end
+
+    test "order can handle duplicate line_items", %{user: user, variants: [v | _]} do
+      params = %{
+        @order_params
+        | user_id: user.id,
+          line_items: line_item_params([v, v])
+      }
+
+      cs = Order.create_changeset(build(:order), params)
+
+      refute cs.valid?
+      assert %{line_items: line_item_changesets, user_id: _} = cs.changes
+      assert Enum.all?(line_item_changesets, fn %{valid?: validity} -> validity end)
+      assert %{line_items: ["line_items must have unique variant_ids"]} = errors_on(cs)
+    end
+
+    test "order can be created without line_items", %{user: user} do
+      params = %{
+        @order_params
+        | user_id: user.id,
+          line_items: []
+      }
+
+      cs = Order.create_changeset(build(:order), params)
+      assert cs.valid?
+    end
+  end
+
+  describe "create_for_guest_changeset/2" do
+    test "with no params" do
+      cs = Order.create_for_guest_changeset(build(:order), %{})
+      assert cs.valid?
+    end
+
+    test "fails without state" do
+      cs = Order.create_for_guest_changeset(%Order{state: nil}, %{})
+      refute cs.valid?
+      assert %{state: ["can't be blank"]} == errors_on(cs)
+    end
+  end
+
+  describe "update_changeset/2" do
+    setup %{variants: variants} do
+      line_items = line_item_params(variants)
+
+      params = %{
+        @order_params
+        | user_id: -1,
+          line_items: line_items
       }
 
       [
         persisted:
           :order
-          |> build()
-          |> Order.create_changeset(params)
-          |> Repo.insert!()
+          |> insert(line_items: [])
+          |> Order.update_changeset(params)
+          |> Repo.update!()
       ]
     end
 
@@ -128,9 +117,7 @@ defmodule Snitch.Data.Schema.OrderTest do
       assert validity
       # 3 old LIs replaced (aka deleted) and 3 new inserted.
       assert Enum.all?(changes.line_items, fn x -> x.action in [:insert, :replace] end)
-      assert {:ok, order} = Repo.update(cs)
-      assert order.total == persisted.total
-      assert order.item_total == persisted.item_total
+      assert {:ok, _order} = Repo.update(cs)
     end
 
     test "quantity, variant", context do
@@ -144,22 +131,13 @@ defmodule Snitch.Data.Schema.OrderTest do
           %{id: three.id, variant_id: one.variant_id, quantity: three.quantity}
         ])
 
-      item_total = LineItem.compute_total(line_items)
-
-      params = %{
-        line_items: line_items,
-        item_total: item_total,
-        total: item_total
-      }
-
+      params = %{line_items: line_items}
       cs = Order.update_changeset(persisted, params)
       %{valid?: validity, changes: changes} = cs
 
       assert validity
       assert Enum.all?(changes.line_items, fn x -> x.action == :update end)
-      assert {:ok, order} = Repo.update(cs)
-      assert order.item_total == item_total
-      assert order.total == item_total
+      assert {:ok, _order} = Repo.update(cs)
     end
 
     test "no changes, bud!", context do
@@ -168,28 +146,23 @@ defmodule Snitch.Data.Schema.OrderTest do
 
       line_items = LineItem.update_unit_price([%{id: one.id}, %{id: two.id}, %{id: three.id}])
 
-      item_total = LineItem.compute_total(persisted.line_items)
-
-      params = %{
-        line_items: line_items,
-        item_total: item_total,
-        total: item_total
-      }
+      params = %{line_items: line_items}
 
       cs = Order.update_changeset(persisted, params)
 
       %{valid?: validity, changes: changes} = cs
       assert validity
       assert changes == %{}
-      assert {:ok, order} = Repo.update(cs)
-      assert order.item_total == persisted.item_total
-      assert order.total == persisted.total
+      assert {:ok, _order} = Repo.update(cs)
     end
   end
 
   describe "partial_update_changeset" do
-    setup %{user: u} do
-      [persisted: insert(:order, user: u, shipping_address: nil, billing_address: nil)]
+    setup do
+      [
+        persisted: insert(:order, shipping_address: nil, billing_address: nil),
+        address: insert(:address)
+      ]
     end
 
     test "fails with bad address params", %{persisted: persisted, address: address} do
@@ -228,7 +201,6 @@ defmodule Snitch.Data.Schema.OrderTest do
 
       cs = Order.partial_update_changeset(persisted, params)
       assert cs.valid?
-      assert {:ok, Money.zero(:INR)} == Map.fetch(cs.changes, :promo_total)
       assert {:ok, _} = Repo.update(cs)
     end
   end

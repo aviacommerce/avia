@@ -18,6 +18,6 @@ defmodule Snitch.Seed.Role do
         [value | acc]
       end)
 
-    Repo.insert_all(Role, data)
+    Repo.insert_all(Role, data, on_conflict: :nothing, conflict_target: :name)
   end
 end

@@ -7,8 +7,12 @@ defmodule Snitch.Data.Model.PaymentTest do
   alias Snitch.Data.Model
   alias Snitch.Data.Schema
 
-  setup :user_with_address
-  setup :an_order
+  setup do
+    [
+      order: insert(:order)
+    ]
+  end
+
   setup :payment_methods
   setup :payments
 

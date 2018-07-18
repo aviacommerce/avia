@@ -4,6 +4,8 @@ defmodule AdminAppWeb.OrderView do
 
   alias Snitch.Data.Model.Order, as: OrderModel
 
+  alias Snitch.Data.Model.LineItem
+
   @bootstrap_contextual_class %{
     "cart" => "light",
     "address" => "light",
@@ -15,7 +17,7 @@ defmodule AdminAppWeb.OrderView do
     "completed" => "success"
   }
 
-  @summary_fields ~w(item_total adjustment_total promo_total total)a
+  @summary_fields ~w(item_total tax_total adjustment_total promo_total total)a
   @summary_fields_capitalized Enum.map(@summary_fields, fn field ->
                                 field
                                 |> Atom.to_string()
@@ -104,12 +106,23 @@ defmodule AdminAppWeb.OrderView do
     )
   end
 
+  defp make_summary_row({field, field_capitalized}, order) when field in ~w(item_total total)a do
+    content_tag(
+      :tr,
+      [
+        content_tag(:th, field_capitalized, scope: "row"),
+        content_tag(:td, LineItem.compute_total(order.line_items))
+      ],
+      class: Map.get(@summary_field_classes, field)
+    )
+  end
+
   defp make_summary_row({field, field_capitalized}, order) do
     content_tag(
       :tr,
       [
         content_tag(:th, field_capitalized, scope: "row"),
-        content_tag(:td, Map.fetch!(order, field))
+        content_tag(:td, Snitch.Tools.Money.zero!())
       ],
       class: Map.get(@summary_field_classes, field)
     )

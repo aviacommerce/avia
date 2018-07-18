@@ -33,9 +33,31 @@ defmodule Snitch.Data.Model.Order do
     QH.create(Order, update_in(params, [:line_items], &update_line_item_costs/1), Repo)
   end
 
-  def create_guest_order() do
+  @doc """
+  Creates an order with supplied `params` and `line_items`.
+
+  Suitable for creating orders for guest users. The `order.user_id` cannot be
+  set using this function.
+
+  > * `line_items` is not a list of `LineItem` schema structs, but just a list
+  >   of maps with the keys `:variant_id` and `:quantity`.
+  > * These `LineItem`s will be created (casted, to be precise) along with the
+  >   `Order` in a DB transaction.
+
+  ## Example
+  ```
+  line_items = [%{variant_id: 1, quantity: 42}, %{variant_id: 2, quantity: 42}]
+  params = %{user_id: 1}
+  {:ok, order} = Snitch.Data.Model.Order.create(params, line_items)
+  ```
+
+  ## See also
+  `Ecto.Changeset.cast_assoc/3`
+  """
+  @spec create_for_guest(map) :: {:ok, Order.t()} | {:error, Ecto.Changeset.t()}
+  def create_for_guest(params) do
     %Order{}
-    |> Order.create_guest_changeset(%{})
+    |> Order.create_for_guest_changeset(params)
     |> Repo.insert()
   end
 
