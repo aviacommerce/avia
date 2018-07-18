@@ -11,7 +11,8 @@ defmodule Snitch.Application do
 
     Supervisor.start_link(
       [
-        supervisor(Snitch.Repo, [])
+        supervisor(Snitch.Repo, []),
+        supervisor(Snitch.Service.Analytics.Supervisor, [])
       ],
       strategy: :one_for_one,
       name: Snitch.Supervisor

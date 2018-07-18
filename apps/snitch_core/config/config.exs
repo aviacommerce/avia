@@ -13,3 +13,7 @@ config :snitch_core, Snitch.Tools.Mailer,
   sendgrid_sender_mail: System.get_env("SENDGRID_SENDER_EMAIL")
 
 import_config "#{Mix.env()}.exs"
+
+config :hydrus,
+  repo: Snitch.Repo,
+  app: Snitch
