@@ -20,7 +20,10 @@
     associated address.
   </p>
   <div class="card-footer">
-    <button class="btn btn-primary" onclick="foo()">Add address</button>
+    <a href=<%= "#{@order.number}/address/search" %>
+      <button> Select Address </button></a>
+    <a href=<%= "#{@order.number}/address/add" %>
+      <button> Add Address </button></a>
   </div>
 </div>
 <% end %>

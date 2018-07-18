@@ -2,21 +2,21 @@
   <div class="card-header text-center">Cart</div>
   <div class="card-body">
     <table class="table">
-      <caption class="sr-only">items added to the cart in with id <%= @order.slug %></caption>
+      <caption class="sr-only">items added to the cart in with id <%= @order.number %></caption>
       <thead class="thead-light">
         <tr>
           <th scope="col" colspan="2">Item Description</th>
           <th scope="col">Price</th>
           <th scope="col">Quantity</th>
-          <th scope="col">Total</th>
           <%= if is_editable?(@order) do %>
-          <th scope="col"></th><!-- action buttons -->
+          <th scope="col"></th>
+          <th scope="col"></th>
           <% end %>
         </tr>
       </thead>
       <tbody>
         <%= for line_item <- @order.line_items do %>
-            <%= render_line_item(line_item, @order.state) %>
+            <%= render_line_item(line_item, @order) %>
             <% end %>
       </tbody>
     </table>
