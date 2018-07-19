@@ -1,6 +1,7 @@
 defmodule SnitchApiWeb.AddressControllerTest do
   use SnitchApiWeb.ConnCase, async: true
   import Snitch.Factory
+  alias SnitchApi.Guardian
 
   setup :states
   # setup :countries
@@ -28,10 +29,16 @@ defmodule SnitchApiWeb.AddressControllerTest do
   }
 
   setup %{conn: conn} do
+    insert(:role, name: "user")
+    user = build(:user_with_no_role)
+    {:ok, registered_user} = SnitchApi.Accounts.create_user(user)
+    {_, token, _} = Guardian.encode_and_sign(registered_user, %{})
+
     conn =
       conn
       |> put_req_header("accept", "application/vnd.api+json")
       |> put_req_header("content-type", "application/vnd.api+json")
+      |> put_req_header("authorization", "Bearer #{token}")
 
     {:ok, conn: conn}
   end
