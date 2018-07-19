@@ -53,6 +53,7 @@ defmodule SnitchApiWeb.Router do
     patch("/orders/:id/add-shipment", OrderController, :add_shipments)
     post("/orders/current", OrderController, :current)
     resources("/reviews", ReviewController, only: [:create, :update, :delete])
+    get("/product/:id/reviews", ProductController, :reviews)
     get("/product/:id/rating-summary", ProductController, :rating_summary)
     get("/product/:id/reviews", ProductController, :reviews)
     resources("/addresses", AddressController, only: [:index, :show, :create, :update])

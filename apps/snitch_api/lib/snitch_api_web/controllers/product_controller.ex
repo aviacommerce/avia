@@ -4,6 +4,7 @@ defmodule SnitchApiWeb.ProductController do
   alias Snitch.Data.Model.{Product, ProductReview}
   alias Snitch.Repo
   alias SnitchApi.ProductsContext, as: Context
+  alias SnitchApi.UserActivity
 
   plug(SnitchApiWeb.Plug.DataToAttributes)
   action_fallback(SnitchApiWeb.FallbackController)
@@ -59,6 +60,12 @@ defmodule SnitchApiWeb.ProductController do
 
   def show(conn, %{"product_slug" => slug} = params) do
     product = Context.product_by_slug!(slug)
+
+    if conn.assigns[:current_user] do
+      user = conn.assigns[:current_user]
+      product_properties = %{product_id: product.id}
+      UserActivity.product_detail_event(user, product_properties)
+    end
 
     render(
       conn,

@@ -164,6 +164,31 @@ defmodule Snitch.Data.Model.Product do
     |> persist()
   end
 
+  def get_selling_prices(product_ids) do
+    query = from(p in Product, select: {p.id, p.selling_price}, where: p.id in ^product_ids)
+
+    query
+    |> Repo.all()
+    |> Enum.reduce(%{}, fn {v_id, sp}, acc ->
+      Map.put(acc, v_id, sp)
+    end)
+  end
+
+  @doc """
+  Returns a a query.
+
+  The query on execution generates a list
+  of products from the supplied `product_ids`.
+  """
+  @spec get_by_id_list([non_neg_integer]) :: [Product.t()]
+  def get_by_id_list(product_ids) do
+    from(
+      product in Product,
+      where: product.id in ^product_ids,
+      select: product
+    )
+  end
+
   ####################### Private Functions ########################
 
   defp persist(multi) do
@@ -233,20 +258,6 @@ defmodule Snitch.Data.Model.Product do
         _ ->
           {:error, "not found"}
       end
-    end)
-  end
-
-  def image_url(name, product) do
-    ImageUploader.url({name, product})
-  end
-
-  def get_selling_prices(product_ids) do
-    query = from(p in Product, select: {p.id, p.selling_price}, where: p.id in ^product_ids)
-
-    query
-    |> Repo.all()
-    |> Enum.reduce(%{}, fn {v_id, sp}, acc ->
-      Map.put(acc, v_id, sp)
     end)
   end
 end
