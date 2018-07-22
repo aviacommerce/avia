@@ -10,21 +10,21 @@ defmodule SnitchApiWeb.LineItemController do
   plug(SnitchApiWeb.Plug.LoadUser)
 
   def create(conn, %{"variant_id" => variant_id} = params) do
-    [line_item] = LineItemModel.update_unit_price([params])
+    %{cost_price: cost_price} = Repo.get(Variant, variant_id)
+    line_item = Map.put(params, "unit_price", cost_price)
 
     with {:ok, line_item} <- LineItemModel.create(line_item) do
       conn
       |> put_status(200)
-      |> put_resp_header("location", line_item_path(conn, :show, line_item))
+      |> put_resp_header("location", line_item_path(conn, :show, line_item.id))
       |> render("show.json-api", data: line_item)
-    else
-      error ->
-        IO.puts(error.changes, "failed in the insertion.....")
     end
   end
 
-  def update(conn, params) do
-    with {:ok, line_item} <- LineItemModel.update(%LineItem{}, params) do
+  def update(conn, %{"id" => id} = params) do
+    line_item = Repo.get(LineItem, id)
+
+    with {:ok, line_item} <- LineItemModel.update(line_item, params) do
       conn
       |> put_status(200)
       |> put_resp_header("location", line_item_path(conn, :show, line_item))
