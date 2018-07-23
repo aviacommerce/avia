@@ -1,5 +1,4 @@
 defmodule SnitchApiWeb.AddressView do
-
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
 

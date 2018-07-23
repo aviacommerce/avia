@@ -3,7 +3,6 @@ defmodule SnitchApiWeb.TaxonomyControllerTest do
 
   import Snitch.Factory
 
-  alias Snitch.Data.Schema.Role
   alias Snitch.Repo
   alias SnitchApi.Accounts
 

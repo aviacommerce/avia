@@ -3,8 +3,6 @@ defmodule SnitchApiWeb.AddressController do
 
   alias SnitchApi.Checkout
   alias Snitch.Data.Schema.Address
-  alias SnitchApi.Guardian
-  alias SnitchApi.API
 
   action_fallback(SnitchApiWeb.FallbackController)
 
@@ -26,7 +24,7 @@ defmodule SnitchApiWeb.AddressController do
       conn
       |> put_status(200)
       |> put_resp_header("location", address_path(conn, :show, address))
-      |> render("show.json", data: address)
+      |> render("show.json-api", data: address)
     end
   end
 
@@ -40,7 +38,7 @@ defmodule SnitchApiWeb.AddressController do
     address_params = JaSerializer.Params.to_attributes(address_params)
 
     with {:ok, %Address{} = address} <- Checkout.update_address(address, address_params) do
-      render(conn, "show.json", address: address)
+      render(conn, "show.json-api", address: address)
     end
   end
 

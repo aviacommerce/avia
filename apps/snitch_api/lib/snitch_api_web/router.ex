@@ -38,12 +38,9 @@ defmodule SnitchApiWeb.Router do
     post("/orders/current", OrderController, :current)
     resources("/taxonomies", TaxonomyController, only: [:index, :show])
     resources("/taxons", TaxonController, only: [:index, :show])
-<<<<<<< HEAD
     resources("/ratings", RatingController, only: [:index, :show])
     resources("/reviews", ReviewController, only: [:create, :update, :delete])
     get("/product/:id/rating-summary", ProductController, :rating_summary)
-=======
     resources("/addresses", AddressController, only: [:index, :show, :create, :update])
->>>>>>> Address add and list and update
   end
 end
