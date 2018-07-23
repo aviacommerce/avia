@@ -1,0 +1,8 @@
+<html>
+  <head>
+    <title>Welcome Snitch!!!</title>
+  </head>
+  <body>
+    <%= render @view_module, @view_template, assigns %>
+  </body>
+</html>

@@ -6,5 +6,8 @@ fn f -> %>
     <%= input f, :email %>
     <%= input f, :password %>
     <%= submit "Submit", class: "btn btn-primary submit-btn" %>
+    <p class="text-lowercase">
+      <%= link "Forgot your password?", to: session_path(@conn, :password_reset) %>
+    </p>
   <% end %>
 </div>

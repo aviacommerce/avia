@@ -50,7 +50,10 @@ defmodule AdminAppWeb.Router do
 
   scope "/", AdminAppWeb do
     pipe_through(:browser)
-    resources("/session", SessionController, only: [:new, :create])
+    resources("/session", SessionController, only: [:new, :create, :edit, :update])
+    get("/password_reset", SessionController, :password_reset)
+    get("/password_recovery", SessionController, :verify)
+    post("/check_email", SessionController, :check_email)
   end
 
   # Other scopes may use custom stacks.

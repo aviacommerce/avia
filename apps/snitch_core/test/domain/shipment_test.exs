@@ -33,7 +33,7 @@ defmodule Snitch.Domain.ShipmentTest do
   }
 
   describe "default_packages/1" do
-    setup(context) do
+    setup context do
       [india] = countries_with_manifest(~w(IN))
 
       [ka, ap, tn, kl, _up, _mh] =
@@ -86,7 +86,7 @@ defmodule Snitch.Domain.ShipmentTest do
       ]
     end
 
-    setup(context) do
+    setup context do
       %{states: [ka, _, _, _, _, mh], india: india} = context
 
       manifest = %{

@@ -24,11 +24,13 @@ defmodule Snitch.Data.Schema.User do
 
     field(:sign_in_count, :integer, default: 0)
     field(:failed_attempts, :integer, default: 0)
+    field(:reset_password_token, :string)
+    field(:reset_password_sent_at, :naive_datetime)
     # field :snitch_api_key,         :string
     # field :remember_token,         :string
 
     # field :persistence_token,      :string
-    # field :reset_password_token,   :string
+
     # field :perishable_token,       :string
     # field :authentication_token,   :string
     # field :unlock_token,           :string
@@ -44,8 +46,6 @@ defmodule Snitch.Data.Schema.User do
     # field :login,                  :string
 
     # field :locked_at,              :string
-
-    # field :reset_password_sent_at, :naive_datetime
     # field :remember_created_at,    :naive_datetime
     # field :deleted_at,             :naive_datetime
     # field :confirmed_at,           :naive_datetime
@@ -55,7 +55,9 @@ defmodule Snitch.Data.Schema.User do
 
   @required_fields ~w(first_name last_name email password password_confirmation role_id)a
   @create_fields [:is_admin | @required_fields]
-  @update_fields ~w(sign_in_count failed_attempts is_admin)a ++ @create_fields
+  @password_fields ~w(reset_password_token reset_password_sent_at)
+  @update_fields ~w(sign_in_count failed_attempts is_admin )a ++
+                   @create_fields ++ @password_fields
 
   @doc """
   Returns a `User` changeset to create a new `user`.

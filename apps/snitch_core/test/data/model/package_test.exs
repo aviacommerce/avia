@@ -89,10 +89,10 @@ defmodule Snitch.Data.Model.PackageTest do
   end
 
   describe "update/1" do
-    setup(%{
+    setup %{
       order: order,
       shipping_categories: [sc]
-    }) do
+    } do
       origin = insert(:stock_location)
 
       {:ok, package} =
