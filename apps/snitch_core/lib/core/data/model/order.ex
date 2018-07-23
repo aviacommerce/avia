@@ -39,6 +39,21 @@ defmodule Snitch.Data.Model.Order do
     |> Repo.insert()
   end
 
+  def user_order(user_id) do
+    Order
+    |> Repo.get_by(user_id: user_id, state: "cart")
+    |> case do
+      nil ->
+        %Order{}
+        |> Order.create_guest_changeset(%{})
+        |> Ecto.Changeset.put_change(:user_id, user_id)
+        |> Repo.insert()
+
+      order ->
+        {:ok, order}
+    end
+  end
+
   @doc """
   Creates an order with supplied `params` and `line_items`.
 
@@ -84,7 +99,7 @@ defmodule Snitch.Data.Model.Order do
   ```
   order # this is the order you wish to update, and `:line_items` are preloaded
   line_items = Enum.reduce(order.line_items, [], fn x, acc ->
-    [%{id: x.id} | acc]
+  [%{id: x.id} | acc]
   end)
   params = %{} # All changes except line-items
   all_params = Map.put(params, :line_items, line_items)
@@ -116,11 +131,11 @@ defmodule Snitch.Data.Model.Order do
 
   ```
   line_items = [
-    %{id: 1, quantity: 42},        # updates quantity of first
-    %{id: 2}                       # retains second
-    %{variant_id: 4, quantity: 42} # adds a new line-item (no `:id`)
+  %{id: 1, quantity: 42},        # updates quantity of first
+  %{id: 2}                       # retains second
+  %{variant_id: 4, quantity: 42} # adds a new line-item (no `:id`)
   ]                                # since there is no mention of `id: 3`,
-                                   # it gets removed!
+  # it gets removed!
 
   params = %{line_items: line_items}
   {:ok, updated_order} = Snitch.Data.Model.Order.update(params, order)
