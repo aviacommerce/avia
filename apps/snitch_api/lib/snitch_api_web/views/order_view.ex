@@ -56,4 +56,8 @@ defmodule SnitchApiWeb.OrderView do
         |> Map.delete(:__meta__)
     end
   end
+
+  def render("empty.json-api", %{data: %{}}) do
+    %{data: nil}
+  end
 end

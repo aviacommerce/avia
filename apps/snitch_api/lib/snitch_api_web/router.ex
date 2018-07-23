@@ -20,6 +20,7 @@ defmodule SnitchApiWeb.Router do
     post("/orders/blank", OrderController, :guest_order)
     get("/variants/favorites", VariantController, :favorite_variants)
     resources("/products", ProductController, except: [:new, :edit], param: "product_slug")
+    get("/orders/:order_number", OrderController, :fetch_guest_order)
   end
 
   scope "/api/v1", SnitchApiWeb do
@@ -34,6 +35,7 @@ defmodule SnitchApiWeb.Router do
     resources("/orders", OrderController, only: [:index, :show])
     resources("/line_items", LineItemController, only: [:create, :update, :show])
     post("/orders/:id/select_address", OrderController, :select_address)
+    post("/orders/current", OrderController, :current)
     resources("/taxonomies", TaxonomyController, only: [:index, :show])
     resources("/taxons", TaxonController, only: [:index, :show])
     resources("/ratings", RatingController, only: [:index, :show])
