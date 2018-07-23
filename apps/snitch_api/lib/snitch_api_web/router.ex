@@ -18,7 +18,6 @@ defmodule SnitchApiWeb.Router do
     post("/register", UserController, :create)
     post("/login", UserController, :login)
     post("/orders/blank", OrderController, :guest_order)
-    get("/variants/favorites", VariantController, :favorite_variants)
   end
 
   scope "/api/v1", SnitchApiWeb do
@@ -29,8 +28,8 @@ defmodule SnitchApiWeb.Router do
     get("/authenticated", UserController, :authenticated)
     post("/logout", UserController, :logout)
     get("/current_user", UserController, :current_user)
-    resources("/wishlist_items", WishListItemController, only: [:index, :create, :delete])
     resources("/orders", OrderController, only: [:index, :show])
+    resources("/line_items", LineItemController, only: [:show, :update, :create])
     resources("/taxonomies", TaxonomyController, only: [:index, :show])
     resources("/taxons", TaxonController, only: [:index, :show])
     resources("/ratings", RatingController, only: [:index, :show])

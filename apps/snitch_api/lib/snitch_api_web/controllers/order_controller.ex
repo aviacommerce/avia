@@ -42,4 +42,13 @@ defmodule SnitchApiWeb.OrderController do
       |> render("show.json-api", data: order)
     end
   end
+
+  def update(conn, %{line_item: line_item} = params) do
+    with {:ok, order} <- OrderModel.update(line_item) do
+      conn
+      |> put_status(200)
+      |> put_resp_header("location", order_path(conn, :show, order))
+      |> render("show.json-api", data: order)
+    end
+  end
 end
