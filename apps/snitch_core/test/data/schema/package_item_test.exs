@@ -14,39 +14,56 @@ defmodule Snitch.Data.Schema.PackageItemTest do
     backordered?: false,
     variant_id: 0,
     line_item_id: 0,
-    package_id: 0
+    package_id: 0,
+    tax: Money.zero(:INR),
+    shipping_tax: nil
   }
 
   describe "create_changeset/2" do
     test "with valid params, and backorder is computed correctly" do
       assert cs = %{valid?: true} = PackageItem.create_changeset(%PackageItem{}, @params)
-      assert {:ok, true} = fetch_change(cs, :backordered?)
+      assert {:ok, true} == fetch_change(cs, :backordered?)
 
-      assert cs =
-               %{valid?: true} =
-               PackageItem.create_changeset(%PackageItem{}, %{@params | delta: 0})
-
-      assert {:ok, false} = fetch_change(cs, :backordered?)
+      cs = PackageItem.create_changeset(%PackageItem{}, %{@params | delta: 0})
+      assert cs.valid?
+      assert {:ok, false} == fetch_change(cs, :backordered?)
     end
 
     test "with missing params" do
-      assert cs = %{valid?: false} = PackageItem.create_changeset(%PackageItem{}, %{})
+      cs = PackageItem.create_changeset(%PackageItem{}, %{})
+      refute cs.valid?
 
       assert %{
                line_item_id: ["can't be blank"],
                state: ["can't be blank"],
-               variant_id: ["can't be blank"]
-             } = errors_on(cs)
+               variant_id: ["can't be blank"],
+               tax: ["can't be blank"]
+             } == errors_on(cs)
     end
 
     test "with invalid quantity, delta" do
-      assert cs =
-               %{valid?: false} =
-               PackageItem.create_changeset(%PackageItem{}, %{@params | quantity: -2, delta: -1})
+      cs = PackageItem.create_changeset(%PackageItem{}, %{@params | quantity: -2, delta: -1})
+      refute cs.valid?
 
       assert %{
                delta: ["must be greater than -1"],
                quantity: ["must be greater than -1"]
+             } = errors_on(cs)
+    end
+
+    test "with invalid tax, shipping_tax" do
+      bad_money = Money.new(-1, :USD)
+
+      cs =
+        PackageItem.create_changeset(%PackageItem{}, %{
+          @params
+          | tax: bad_money,
+            shipping_tax: bad_money
+        })
+
+      assert %{
+               shipping_tax: ["must be equal or greater than 0"],
+               tax: ["must be equal or greater than 0"]
              } = errors_on(cs)
     end
   end

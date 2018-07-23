@@ -46,25 +46,18 @@ defmodule Snitch.Domain.Order.TransitionsTest do
         )
         |> Transitions.associate_address()
 
-      refute result.valid?
+      assert result.valid?
+      assert {:error, :order, cs, _} = Repo.transaction(result.multi)
 
-      assert [
-               order: %{
-                 valid?: false,
-                 changes: %{
-                   shipping_address: %{
-                     action: :insert,
-                     valid?: false,
-                     errors: [state_id: {"state is explicitly required for this country", _}]
-                   }
-                 }
+      assert %{
+               shipping_address: %{
+                 state_id: ["state is explicitly required for this country"]
                }
-             ] = result.errors
+             } == errors_on(cs)
     end
 
     test "with an order that has no addresses", %{patna: patna, order: order} do
       assert is_nil(order.billing_address) and is_nil(order.shipping_address)
-      expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
 
       result =
         order
@@ -82,8 +75,6 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
       state = insert(:state, country: nil, country_id: patna.country_id)
       not_patna = %{patna | state_id: state.id}
-
-      expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
 
       result =
         order

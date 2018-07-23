@@ -5,7 +5,7 @@ defmodule Snitch.Data.Model.LineItemTest do
   import Mox, only: [expect: 3, verify_on_exit!: 1]
   import Snitch.Factory
 
-  alias Snitch.Data.Model.LineItem
+  alias Snitch.Data.Model.{LineItem, Order}
 
   describe "with valid params" do
     setup :variants
@@ -60,48 +60,36 @@ defmodule Snitch.Data.Model.LineItemTest do
     setup :variants
 
     @tag variant_count: 1
-    test "fails without an existing order", %{variants: [v]} do
-      assert {:error, :line_item, changeset, %{}} =
-               LineItem.create(%{line_item_params(v) | order_id: -1})
+    test "fails without an existing order or variant", %{variants: [v]} do
+      assert {:error, changeset} = LineItem.create(%{line_item_params(v) | order_id: -1})
 
-      assert %{order_id: ["does not exist"]} = errors_on(changeset)
+      assert %{order: ["does not exist"]} == errors_on(changeset)
 
-      assert {:error, :line_item, changeset, %{}} = LineItem.create(line_item_params(v))
+      assert {:error, changeset} = LineItem.create(line_item_params(v))
+      assert %{order_id: ["can't be blank"]} == errors_on(changeset)
 
-      assert %{order_id: ["can't be blank"]} = errors_on(changeset)
+      order = insert(:order)
+
+      assert {:error, changeset} =
+               LineItem.create(%{line_item_params(v) | variant_id: -1, order_id: order.id})
+
+      assert %{variant: ["does not exist"]} == errors_on(changeset)
+
+      assert {:error, changeset} =
+               LineItem.create(%{line_item_params(v) | variant_id: nil, order_id: order.id})
+
+      assert %{variant_id: ["can't be blank"]} == errors_on(changeset)
     end
-  end
-
-  describe "create/1 for order in `cart` state" do
-    setup :variants
-    setup :orders
 
     @tag variant_count: 1
-    test "which is empty", %{variants: [v], orders: [order]} do
-      order = struct(order, line_items: [])
+    test "for an empty order", %{variants: [v]} do
+      order = insert(:order, line_items: [])
 
-      {:ok, li} = LineItem.create(%{line_item_params(v) | order_id: order.id})
-      assert Ecto.assoc_loaded?(li.order)
-      assert Ecto.assoc_loaded?(li.order.line_items)
-      assert length(li.order.line_items) == 1
-    end
-
-    @tag variant_count: 2
-    test "with existing line_items", %{variants: [v1, v2], orders: [order]} do
-      order = struct(order, line_items(%{order: order, variants: [v1]}))
-
-      assert length(order.line_items) == 1
-      [li] = order.line_items
-      assert li.variant_id == v1.id
-
-      {:ok, li} = LineItem.create(%{line_item_params(v2) | order_id: order.id})
-      assert Ecto.assoc_loaded?(li.order)
-      assert Ecto.assoc_loaded?(li.order.line_items)
-      assert length(li.order.line_items) == 2
+      assert {:ok, _} = LineItem.create(%{line_item_params(v) | order_id: order.id})
     end
   end
 
-  describe "update/1 for order in `cart` state" do
+  describe "update/1" do
     setup :variants
     setup :orders
 
@@ -113,10 +101,7 @@ defmodule Snitch.Data.Model.LineItemTest do
 
       params = %{quantity: li.quantity + 1}
 
-      {:ok, li} = LineItem.update(li, params)
-      assert Ecto.assoc_loaded?(li.order)
-      assert Ecto.assoc_loaded?(li.order.line_items)
-      assert length(li.order.line_items) == 1
+      assert {:ok, _} = LineItem.update(li, params)
     end
   end
 
@@ -130,10 +115,13 @@ defmodule Snitch.Data.Model.LineItemTest do
 
       [line_item] = order.line_items
 
-      {:ok, li} = LineItem.delete(line_item)
-      assert Ecto.assoc_loaded?(li.order)
-      assert Ecto.assoc_loaded?(li.order.line_items)
-      assert [] = li.order.line_items
+      {:ok, _} = LineItem.delete(line_item)
+
+      assert [] =
+               order.id
+               |> Order.get()
+               |> Repo.preload(:line_items)
+               |> Map.fetch!(:line_items)
     end
   end
 

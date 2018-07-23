@@ -1,4 +1,5 @@
 defmodule Snitch.Domain.Shipment do
+  # TODO: migrate to the Package schema.
   @moduledoc """
   The coordinator, packer, estimator and prioritizer -- all in one.
 
@@ -31,8 +32,25 @@ defmodule Snitch.Domain.Shipment do
 
   alias Snitch.Data.Model.StockLocation
   alias Snitch.Data.Schema.{Order}
-  alias Snitch.Domain.{ShippingMethod, Zone}
+  alias Snitch.Domain.{PackageItem, ShippingMethod, Zone}
 
+  @doc """
+  Returns a list of potentially shippable packages.
+
+  The function fetches all the stock information (from all stock locations) that
+  is relevant to this order and attempts to fulfill the order separately from
+  each stock location.
+
+  The final result is a "flattened" list of maps, each representing a
+  `Package.t` struct.
+
+  ## Note
+  Some `Package.t` fields are not computed, like: `package.tax`.
+
+  Similarily, some fields of the constituent `PackageItem` are not computed as
+  well, like: `package_item.tax`, `package_item.shipping_tax`.
+  """
+  @spec default_packages(Order.t()) :: [map]
   def default_packages(%Order{} = order) do
     order = Repo.preload(order, line_items: [])
     variant_ids = Enum.map(order.line_items, fn %{variant_id: id} -> id end)
@@ -57,7 +75,8 @@ defmodule Snitch.Domain.Shipment do
     items =
       stock_location.stock_items
       |> Stream.map(&make_item(&1, line_items))
-      |> Enum.reject(fn x -> is_nil(x) end)
+      |> Stream.reject(fn x -> is_nil(x) end)
+      |> Enum.map(&attach_item_tax(&1, stock_location))
 
     if items == [],
       do: nil,
@@ -92,6 +111,11 @@ defmodule Snitch.Domain.Shipment do
     else
       if stock_item.backorderable, do: :backordered, else: nil
     end
+  end
+
+  defp attach_item_tax(item, stock_location) do
+    tax = PackageItem.tax(item, stock_location)
+    Map.put(item, :tax, tax)
   end
 
   defp attach_zones(package, shipping_address) do

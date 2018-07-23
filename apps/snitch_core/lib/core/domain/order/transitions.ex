@@ -14,7 +14,6 @@ defmodule Snitch.Domain.Order.Transitions do
   alias Snitch.Data.Model.Package
   alias Snitch.Data.Schema.Order
 
-  alias Snitch.Domain.Order, as: OrderDomain
   alias Snitch.Domain.Package, as: PackageDomain
   alias Snitch.Domain.{Shipment, ShipmentEngine, Splitters.Weight}
 
@@ -42,15 +41,12 @@ defmodule Snitch.Domain.Order.Transitions do
         } = context
       ) do
     changeset =
-      order
-      |> Order.partial_update_changeset(%{billing_address: billing, shipping_address: shipping})
-      |> OrderDomain.compute_taxes_changeset()
+      Order.partial_update_changeset(
+        order,
+        %{billing_address: billing, shipping_address: shipping}
+      )
 
-    if changeset.valid? do
-      struct(context, multi: Multi.update(multi, :order, changeset))
-    else
-      struct(context, valid?: false, errors: [order: changeset])
-    end
+    struct(context, multi: Multi.update(multi, :order, changeset))
   end
 
   def associate_address(%Context{} = context), do: struct(context, valid?: false)
