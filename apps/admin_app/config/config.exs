@@ -8,7 +8,8 @@ use Mix.Config
 # General application configuration
 config :admin_app, namespace: AdminApp
 
-# Configures the endpoint config :admin_app, AdminAppWeb.Endpoint,
+# Configures the endpoint 
+config :admin_app, AdminAppWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "o7U+x3aM3mqN1vY+PGIbxEN+QBeMP7rwgCpyrbYfEUkAY6I12cxKvwEt/zJeGjgR",
   render_errors: [view: AdminAppWeb.ErrorView, accepts: ~w(html json)],

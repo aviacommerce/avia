@@ -13,10 +13,7 @@ defmodule Snitch.Factory do
     Permission,
     Payment,
     PaymentMethod,
-<<<<<<< HEAD
     Permission,
-=======
->>>>>>> Revert "Merge branch 'develop' into add-upadate-line-item-to-order"
     Product,
     Role,
     TaxCategory,
