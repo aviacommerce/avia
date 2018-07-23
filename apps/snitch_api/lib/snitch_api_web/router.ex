@@ -19,6 +19,7 @@ defmodule SnitchApiWeb.Router do
     post("/login", UserController, :login)
     post("/orders/blank", OrderController, :guest_order)
     get("/variants/favorites", VariantController, :favorite_variants)
+    resources("/products", ProductController, except: [:new, :edit], param: "product_slug")
   end
 
   scope "/api/v1", SnitchApiWeb do
