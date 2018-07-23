@@ -13,4 +13,9 @@ defmodule Snitch.Data.Model.Product do
   def get_all do
     Repo.all(Product)
   end
+
+  @spec get(map | non_neg_integer) :: Product.t() | nil
+  def get(query_params) do
+    QH.get(Product, query_params, Repo)
+  end
 end

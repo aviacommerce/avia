@@ -12,7 +12,7 @@ defmodule Snitch.Data.Model.ProductReview do
   @review_detail %{
     average_rating: Decimal.new(0),
     review_count: 0,
-    rating_summary: []
+    rating_summary: %{}
   }
 
   @doc """
@@ -59,12 +59,12 @@ defmodule Snitch.Data.Model.ProductReview do
   %{
     average_rating: 3.5 #average rating for the product
     review_count: 10 # number of reviews for a product
-    rating_detail: [
+    rating_detail: %{
       value_1: # values are rating_option codes corresponding to
                 "product" rating
       value_2:
       value_n:
-    ]
+    }
   }
 
   ## See
@@ -89,26 +89,38 @@ defmodule Snitch.Data.Model.ProductReview do
   defp calculate_aggregate(reviews, count, review_detail) do
     {rating_detail, sum} =
       Enum.reduce(reviews, {review_detail.rating_summary, 0}, fn review,
-                                                                 {rating_detail_list, rating_sum} ->
+                                                                 {rating_detail, rating_sum} ->
         code = String.to_atom(review.rating_option_vote.rating_option.code)
         position = review.rating_option_vote.rating_option.position
-        rating_value = get_rating_value(Keyword.get(rating_detail_list, code)) || 0
+        rating_value = get_rating_value(Map.get(rating_detail, code)) || 0
         rating_value = rating_value + 1
         params = %{value: rating_value, position: position}
-        rating_detail_list = Keyword.put(rating_detail_list, code, params)
-        {rating_detail_list, review.rating_option_vote.rating_option.value + rating_sum}
+        rating_detail = Map.put(rating_detail, code, params)
+        {rating_detail, review.rating_option_vote.rating_option.value + rating_sum}
       end)
 
-    rating_percent_list =
-      Enum.map(rating_detail, fn {code, params} ->
-        {code, %{params | value: params.value / count * 100}}
-      end)
+    create_review_summary(rating_detail, sum, count, review_detail)
+  end
+
+  def create_review_summary(rating_detail, sum, count, review_detail) do
+    rating_summary =
+      for {code, params} <- rating_detail, into: %{} do
+        {code,
+         %{
+           params
+           | value:
+               params.value
+               |> Decimal.div(count)
+               |> Decimal.mult(100)
+               |> Decimal.round(1)
+         }}
+      end
 
     %{
       review_detail
       | average_rating: sum |> Decimal.div(count) |> Decimal.round(1),
         review_count: count,
-        rating_summary: rating_percent_list
+        rating_summary: rating_summary
     }
   end
 

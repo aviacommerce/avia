@@ -4,9 +4,7 @@ defmodule SnitchApiWeb.Plug.DataToAttributes do
   @moduledoc ~S"""
   Converts params in the JSON api format into flat params convient for
   changeset casting.
-
   For base parameters, this is done using `JaSerializer.Params.to_attributes/1`
-
   For included records, this is done using custom code.
   """
 

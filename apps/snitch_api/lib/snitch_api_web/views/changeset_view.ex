@@ -15,4 +15,8 @@ defmodule SnitchApiWeb.ChangesetView do
     # as a JSON object. So we just pass it forward.
     %{errors: translate_errors(changeset)}
   end
+
+  def render("error.json", %{message: message}) do
+    %{errors: %{message: message}}
+  end
 end
