@@ -35,7 +35,8 @@ defmodule SnitchApiWeb.ProductController do
 
   @include "variants,variants.images"
   def index(conn, params) do
-    {products, page} = Context.list_products(conn)
+    {products, page} = Context.list_products(conn, params)
+
     render(
       conn,
       "index.json-api",

@@ -22,9 +22,7 @@ defmodule SnitchApiWeb.ProductView do
     serializer: SnitchApiWeb.VariantView,
     include: true
   )
-<<<<<<< HEAD
 
-<<<<<<< HEAD
   def render("rating_summary.json-api", %{data: data, id: id}) do
     %{
       links: %{
@@ -32,15 +30,5 @@ defmodule SnitchApiWeb.ProductView do
       },
       data: data
     }
-=======
-  def variants(product, _conn) do
-    Map.get(product, :variants)
   end
-
-  def images(product, _conn) do
-    get_in(product, [:variants, :images])
->>>>>>> Products API list/search/filter/pagination/sort
-  end
-=======
->>>>>>> Generalized query results based on request params
 end

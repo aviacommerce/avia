@@ -1,16 +1,14 @@
 defmodule SnitchApiWeb.VariantController do
   use SnitchApiWeb, :controller
 
-<<<<<<< HEAD
   alias Snitch.Data.Model.WishListItem
+  alias Snitch.Data.Schema.Variant
   alias Snitch.Repo
 
   def favorite_variants(conn, _params) do
     variants = Repo.all(WishListItem.most_favorited_variants())
     render(conn, "index.json-api", data: variants)
-=======
-  alias Snitch.Repo
-  alias Snitch.Data.Schema.Variant
+  end
 
   def index(conn, %{"product_id" => id}) do
     variants =
@@ -24,6 +22,5 @@ defmodule SnitchApiWeb.VariantController do
       data: variants,
       opts: [include: "images,stock_items,stock_items,shipping_category,product"]
     )
->>>>>>> Products API list/search/filter/pagination/sort
   end
 end

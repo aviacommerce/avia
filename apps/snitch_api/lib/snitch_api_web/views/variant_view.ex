@@ -11,16 +11,11 @@ defmodule SnitchApiWeb.VariantView do
     :width,
     :depth,
     :selling_price,
-<<<<<<< HEAD
-=======
     :cost_price,
->>>>>>> Products API list/search/filter/pagination/sort
     :position,
     :track_inventory,
     :discontinue_on
   ])
-<<<<<<< HEAD
-=======
 
   has_one(
     :shipping_category,
@@ -45,13 +40,4 @@ defmodule SnitchApiWeb.VariantView do
     field: :image_id,
     type: :image
   )
-
-  def stock_items(variant, _conn) do
-    Map.get(variant, :stock_items)
-  end
-
-  def images(variant, _conn) do
-    Map.get(variant, :images)
-  end
->>>>>>> Products API list/search/filter/pagination/sort
 end
