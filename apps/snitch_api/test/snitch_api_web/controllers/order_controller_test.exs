@@ -21,22 +21,32 @@ defmodule SnitchApiWeb.OrderControllerTest do
     {:ok, conn: conn, user: user}
   end
 
-<<<<<<< HEAD
   describe "un_authorized users accessing api" do
-=======
-  describe "Guest Orders" do
->>>>>>> added route to get guest_order by order number
     test "Empty order creation for guest user", %{conn: conn} do
       conn = post(conn, order_path(conn, :guest_order))
       assert json_response(conn, 200)["data"]
     end
 
-<<<<<<< HEAD
     test "error on accessing orders api", %{conn: conn} do
       resp = get(conn, order_path(conn, :index))
       assert resp.status == 403
       resp_body = Jason.decode!(resp.resp_body)
       assert resp_body["error"] == "unauthenticated"
+    end
+
+    test "Fetching Guest Order matcing order number", %{conn: conn} do
+      conn = post(conn, order_path(conn, :guest_order))
+      order = json_response(conn, 200)["data"]
+
+      conn =
+        get(conn, order_path(conn, :fetch_guest_order, get_in(order, ["attributes", "number"])))
+
+      assert Map.get(order, "id") == json_response(conn, 200)["data"]["id"]
+    end
+
+    test "Fetching Guest Order non matching order number", %{conn: conn} do
+      conn = get(conn, order_path(conn, :fetch_guest_order, "i don't match"))
+      assert nil == json_response(conn, 200)["data"]
     end
   end
 
@@ -44,8 +54,19 @@ defmodule SnitchApiWeb.OrderControllerTest do
     setup %{conn: conn, user: user} do
       {:ok, registered_user} = Accounts.create_user(user)
       {:ok, token, _claims} = SnitchApi.Guardian.encode_and_sign(registered_user)
-      conn = conn |> put_req_header("authorization", "Bearer #{token}")
+      conn = put_req_header(conn, "authorization", "Bearer #{token}")
       {:ok, conn: conn, reg_user: registered_user}
+    end
+
+    test "creating new order when current order is not existed", %{conn: conn, reg_user: user} do
+      conn = post(conn, order_path(conn, :current))
+      assert json_response(conn, 200)["data"]
+    end
+
+    test "fetching existing order of the logged in user", %{conn: conn, reg_user: %{id: user_id}} do
+      order = insert(:order, user_id: user_id)
+      conn = post(conn, order_path(conn, :current))
+      assert Integer.to_string(order.id) == json_response(conn, 200)["data"]["id"]
     end
 
     test "Listing out the orders", %{conn: conn} do
@@ -103,48 +124,6 @@ defmodule SnitchApiWeb.OrderControllerTest do
 
       conn = post(conn, order_path(conn, :select_address, order.id, params))
       assert json_response(conn, 200)["data"]
-=======
-    test "Fetching Guest Order matcing order number", %{conn: conn} do
-      conn = post(conn, order_path(conn, :guest_order))
-      order = json_response(conn, 200)["data"]
-
-      conn =
-        get(conn, order_path(conn, :fetch_guest_order, get_in(order, ["attributes", "number"])))
-
-      assert Map.get(order, "id") == json_response(conn, 200)["data"]["id"]
-    end
-
-    test "Fetching Guest Order non matching order number", %{conn: conn} do
-      conn = get(conn, order_path(conn, :fetch_guest_order, "i don't match"))
-      assert nil == json_response(conn, 200)["data"]
->>>>>>> added route to get guest_order by order number
-    end
-  end
-
-  describe "User Orders" do
-    setup %{conn: conn, user: user} do
-      user = JaSerializer.Params.to_attributes(user)
-      {:ok, registered_user} = Accounts.create_user(user)
-
-      # create the token
-      {:ok, token, _claims} = Guardian.encode_and_sign(registered_user)
-
-      # add authorization header to request
-      conn = put_req_header(conn, "authorization", "Bearer #{token}")
-
-      # pass the connection and the user to the test
-      {:ok, conn: conn, user: registered_user}
-    end
-
-    test "creating new", %{conn: conn, user: user} do
-      conn = post(conn, order_path(conn, :current))
-      assert json_response(conn, 200)["data"]
-    end
-
-    test "fetching existing order", %{conn: conn, user: %{id: user_id}} do
-      order = insert(:order, user_id: user_id)
-      conn = post(conn, order_path(conn, :current))
-      assert Integer.to_string(order.id) == json_response(conn, 200)["data"]["id"]
     end
   end
 end

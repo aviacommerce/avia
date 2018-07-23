@@ -29,7 +29,6 @@ defmodule SnitchApiWeb.OrderView do
     |> Map.get(:line_items)
   end
 
-<<<<<<< HEAD
   def shipping_address(struct, conn) do
     struct
     |> Map.get(:shipping_address)
@@ -56,9 +55,9 @@ defmodule SnitchApiWeb.OrderView do
         |> Map.from_struct()
         |> Map.delete(:__meta__)
     end
-=======
+  end
+
   def render("empty.json-api", %{data: %{}}) do
     %{data: nil}
->>>>>>> added route to get guest_order by order number
   end
 end
