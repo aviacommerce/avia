@@ -31,6 +31,7 @@ defmodule SnitchApiWeb.Router do
     get("/current_user", UserController, :current_user)
     resources("/wishlist_items", WishListItemController, only: [:index, :create, :delete])
     resources("/orders", OrderController, only: [:index, :show])
+    resources("/line_items", LineItemController, only: [:create, :update, :show])
     resources("/taxonomies", TaxonomyController, only: [:index, :show])
     resources("/taxons", TaxonController, only: [:index, :show])
     resources("/ratings", RatingController, only: [:index, :show])
