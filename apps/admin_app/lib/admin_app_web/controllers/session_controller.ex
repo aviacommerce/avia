@@ -98,15 +98,18 @@ defmodule AdminAppWeb.SessionController do
 
   defp update_user_with_token(token, user, conn) do
     sent_at = DateTime.utc_now()
+
     password_reset_params = %{
       reset_password_token: token,
       reset_password_sent_at: sent_at
     }
+
     user =
       UserModel.update(
         password_reset_params,
         user
       )
+
     update_user_result(user, conn)
   end
 
@@ -140,7 +143,7 @@ defmodule AdminAppWeb.SessionController do
   end
 
   defp verify_password_token(token) do
-    max_age = System.get_env("token_maximum_age") |> String.to_integer
+    max_age = System.get_env("token_maximum_age") |> String.to_integer()
 
     Token.verify(
       Endpoint,
