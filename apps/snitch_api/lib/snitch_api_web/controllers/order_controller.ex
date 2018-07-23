@@ -10,7 +10,8 @@ defmodule SnitchApiWeb.OrderController do
   plug(SnitchApiWeb.Plug.LoadUser)
 
   def index(conn, params) do
-    orders = Repo.preload(OrderModel.get_all(), :line_items)
+    user = conn.assigns.current_user
+    orders = Repo.preload(OrderModel.user_orders(user.id), :line_items)
 
     render(
       conn,

@@ -105,6 +105,18 @@ defmodule Snitch.Data.Model.OrderTest do
       {:ok, %{line_items: new_items}} = Order.update(params, order)
       assert Enum.map(new_items, &Map.fetch!(&1, :quantity)) == [42, 2, 3]
     end
+
+    test "orders related to user", %{order_params: order_params} do
+      {:ok, order} = Order.create(order_params)
+      user = order.user_id
+
+      user_order =
+        user
+        |> Order.user_orders()
+        |> List.first()
+
+      assert order.id == user_order.id
+    end
   end
 
   describe "partial_update/2" do
