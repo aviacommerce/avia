@@ -28,4 +28,32 @@ defmodule SnitchApiWeb.OrderView do
     |> Snitch.Repo.preload(:line_items)
     |> Map.get(:line_items)
   end
+
+  def shipping_address(struct, conn) do
+    struct
+    |> Map.get(:shipping_address)
+    |> case do
+      nil ->
+        nil
+
+      address ->
+        address
+        |> Map.from_struct()
+        |> Map.delete(:__meta__)
+    end
+  end
+
+  def billing_address(struct, conn) do
+    struct
+    |> Map.get(:billing_address)
+    |> case do
+      nil ->
+        nil
+
+      address ->
+        address
+        |> Map.from_struct()
+        |> Map.delete(:__meta__)
+    end
+  end
 end
