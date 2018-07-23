@@ -26,7 +26,13 @@ config :mime, :types, %{
 }
 
 # Configures Key Format
-config :ja_serializer, key_format: :underscored
+config :ja_serializer,
+  key_format: :underscored,
+  page_key: "page",
+  page_number_key: "offset",
+  page_size_key: "limit",
+  page_number_origin: 1,
+  page_size: 2
 
 config :snitch_api, SnitchApi.Guardian,
   issuer: "snitch_api",

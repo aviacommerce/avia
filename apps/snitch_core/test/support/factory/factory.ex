@@ -27,6 +27,14 @@ defmodule Snitch.Factory do
     :USD
   end
 
+  def product_factory do
+    %Product{
+      name: sequence(:name, &"Hill's-#{&1}"),
+      description: sequence(:description, &"description-#{&1}"),
+      slug: sequence(:slug, &"Hill's-#{&1}")
+    }
+  end
+
   def user_factory do
     %User{
       first_name: sequence(:first_name, &"Tony-#{&1}"),
