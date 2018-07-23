@@ -9,10 +9,10 @@ defmodule Snitch.Data.Schema.Package do
   alias Snitch.Data.Schema.{Order, PackageItem, ShippingCategory, ShippingMethod, StockLocation}
 
   @typedoc """
-  A Package gets shipped to a user.
+  A Package that gets shipped to a user.
 
-  The money fields are used to accurately determine taxes and generate shipping
-  labels.
+  Note that both `Package` and `PackageItem` have the `:shipping_tax` field and
+  `package.shipping_tax` is NOT the sum of package_item.shipping_tax`.
 
   ## Fields
 
@@ -31,8 +31,20 @@ defmodule Snitch.Data.Schema.Package do
   #### `:cost`
   The shipping cost for the chosen `:shipping_method`.
 
-  #### `:*_total`
-  These totals are shipping related, and are applied _over the_ `:cost`.
+  #### `:shipping_tax`
+  The shipping tax on this package. This is different from the taxes on the
+  constituent package items. The total shipping tax for a package is thus:
+  ```
+  total_tax_on_shipping_of_items =
+    package.items
+    |> Stream.map(fn %{shipping_tax: tax} -> tax end)
+    |> Enum.reduce(&Money.add!/2)
+
+  total_shipping_tax = Money.add!(
+    package.shipping_tax, 
+    total_tax_on_shipping_of_items
+  )
+  ```
 
   #### `:origin`
   The `StockLocation` where this package originates from.
@@ -47,10 +59,7 @@ defmodule Snitch.Data.Schema.Package do
     embeds_many(:shipping_methods, EmbeddedShippingMethod, on_replace: :delete)
 
     field(:cost, Money.Ecto.Composite.Type)
-    field(:total, Money.Ecto.Composite.Type)
-    field(:tax_total, Money.Ecto.Composite.Type)
-    field(:adjustment_total, Money.Ecto.Composite.Type)
-    field(:promo_total, Money.Ecto.Composite.Type)
+    field(:shipping_tax, Money.Ecto.Composite.Type)
 
     belongs_to(:order, Order)
     belongs_to(:origin, StockLocation)
@@ -62,11 +71,11 @@ defmodule Snitch.Data.Schema.Package do
     timestamps()
   end
 
-  @price_fields ~w(cost tax_total adjustment_total promo_total total)a
+  @price_fields ~w(cost shipping_tax)a
   @update_fields ~w(state shipped_at tracking shipping_method_id)a ++ @price_fields
-  @shipping_preferences_fields [:shipping_method_id | @price_fields]
-  @create_fields ~w(order_id origin_id shipping_category_id)a ++ @update_fields
+  @shipping_fields [:shipping_method_id | @price_fields]
 
+  @create_fields ~w(order_id origin_id shipping_category_id)a ++ @update_fields
   @required_fields ~w(state order_id origin_id shipping_category_id)a
 
   @doc """
@@ -92,23 +101,32 @@ defmodule Snitch.Data.Schema.Package do
 
   @doc """
   Returns a `Package` changeset to update the `package`.
-
-  The `shipping_method` and totals of the `package` must either be changed or
-  already set previously.
   """
   @spec update_changeset(t, map) :: Ecto.Changeset.t()
-  def update_changeset(%__MODULE__{} = package, params) do
+  def update_changeset(package, params) do
     package
     |> cast(params, @update_fields)
-    |> validate_required(@shipping_preferences_fields)
     |> cast_embed(:shipping_methods)
     |> common_changeset()
+  end
+
+  @doc """
+  Returns a `Package` changeset to update the `package`.
+
+  The `:shipping_method`, `:cost` and `shipping_tax` must either be changed via
+  `params` or already set previously in the `package`.
+  """
+  @spec shipping_changeset(t, map) :: Ecto.Changeset.t()
+  def shipping_changeset(package, params) do
+    package
+    |> update_changeset(params)
+    |> validate_required(@shipping_fields)
   end
 
   defp common_changeset(package_changeset) do
     package_changeset
     |> foreign_key_constraint(:shipping_method_id)
     |> validate_amount(:cost)
-    |> validate_amount(:tax_total)
+    |> validate_amount(:shipping_tax)
   end
 end

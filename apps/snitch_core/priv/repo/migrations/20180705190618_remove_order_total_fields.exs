@@ -9,7 +9,7 @@ defmodule Snitch.Repo.Migrations.RemoveOrderTotalFields do
       remove :adjustment_total
     end
   end
-  
+
   def down do
     alter table("snitch_orders") do
       add :total, :money_with_currency

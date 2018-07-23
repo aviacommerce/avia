@@ -2,6 +2,9 @@ defmodule Snitch.Domain.Splitter.WeightTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
+  # TODO: Build the packages by hand, possibly using `Factory.Shipping.shipment!`
+  # not using `Shipment.default_packages/1`
+  import Mox, only: [expect: 4, verify_on_exit!: 1]
   import Snitch.Tools.Helper.{Order, Shipment, Stock, Zone}
 
   alias Snitch.Data.Schema.{Address, Order, StockItem, StockLocation, Variant}
@@ -110,6 +113,7 @@ defmodule Snitch.Domain.Splitter.WeightTest do
   end
 
   setup :stock_items
+  setup :verify_on_exit!
 
   describe "split/1" do
     # Default Packages
@@ -137,6 +141,8 @@ defmodule Snitch.Domain.Splitter.WeightTest do
       address = %Address{state_id: up.id, country_id: india.id}
       line_items = line_items_with_price(vs, [1])
       order = %Order{id: 42, line_items: line_items, shipping_address: address}
+
+      expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
 
       packages =
         order
@@ -194,6 +200,8 @@ defmodule Snitch.Domain.Splitter.WeightTest do
     line_items = line_items_with_price(vs, [3, 3])
     order = %Order{id: 42, line_items: line_items, shipping_address: address}
 
+    expect(Snitch.Tools.DefaultsMock, :fetch, 4, fn :currency -> {:ok, :USD} end)
+
     packages =
       order
       |> Shipment.default_packages()
@@ -247,6 +255,8 @@ defmodule Snitch.Domain.Splitter.WeightTest do
     address = %Address{state_id: up.id, country_id: india.id}
     line_items = line_items_with_price(vs, [2, 6])
     order = %Order{id: 42, line_items: line_items, shipping_address: address}
+
+    expect(Snitch.Tools.DefaultsMock, :fetch, 3, fn :currency -> {:ok, :USD} end)
 
     packages =
       order

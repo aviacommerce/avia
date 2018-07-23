@@ -41,11 +41,6 @@ defmodule Snitch.Factory.Shipping do
           shipped_at: nil,
           tracking: %{id: "some_tracking_id"},
           shipping_methods: [],
-          cost: Money.new(0, :USD),
-          total: Money.new(0, :USD),
-          tax_total: Money.new(0, :USD),
-          adjustment_total: Money.new(0, :USD),
-          promo_total: Money.new(0, :USD),
           order: build(:order, user: build(:user)),
           origin: build(:stock_location),
           shipping_category: build(:shipping_category)
@@ -88,7 +83,8 @@ defmodule Snitch.Factory.Shipping do
                 variant: v,
                 delta: 0,
                 quantity: 4,
-                state: :fulfilled
+                state: :fulfilled,
+                tax: Money.zero(:USD)
               }
             ],
             origin: insert(:stock_location),

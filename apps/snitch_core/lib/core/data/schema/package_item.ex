@@ -47,7 +47,6 @@ defmodule Snitch.Data.Schema.PackageItem do
   ## Fields
 
   ### `:quantity`
-
   The number of units (of this item) that are currently "on hand" at the stock
   location. The package can be shipped only when this becomes equal to the
   quantity ordered.
@@ -57,19 +56,29 @@ defmodule Snitch.Data.Schema.PackageItem do
   origin stock location.
 
   ### `:delta`
-
   The difference between the `:quantity` and the number of units "on
   hand".
+
+  ### `:tax`
+  The tax levied over (or included in) the cost of the line item, as applicable
+  when the line item is sold from the `:origin` stock location.
+  This does not include any shipping tax components.
+
+  ### `:shipping_tax`
+  The sum of all shipping taxes that apply for the shipping of this item from
+  the `origin` stock location.
   """
   @type t :: %__MODULE__{}
 
-  # TODO: :backordered can be made a virtual field
+  # TODO: :backordered could be made a virtual field...
   schema "snitch_package_items" do
     field(:number, Nanoid, autogenerate: true)
     field(:state, :string)
     field(:quantity, :integer, default: 0)
     field(:delta, :integer, default: 0)
     field(:backordered?, :boolean)
+    field(:tax, Money.Ecto.Composite.Type)
+    field(:shipping_tax, Money.Ecto.Composite.Type)
 
     belongs_to(:variant, Variant)
     belongs_to(:line_item, LineItem)
@@ -80,9 +89,9 @@ defmodule Snitch.Data.Schema.PackageItem do
     timestamps()
   end
 
-  @create_fields ~w(state delta quantity line_item_id variant_id package_id)a
-  @required_fields ~w(state quantity line_item_id variant_id)a
-  @update_fields ~w(state quantity delta)a
+  @create_fields ~w(state delta quantity line_item_id variant_id package_id tax shipping_tax)a
+  @required_fields ~w(state quantity line_item_id variant_id tax)a
+  @update_fields ~w(state quantity delta tax shipping_tax)a
 
   @doc """
   Returns a `PackageItem` changeset to create a new `package_item`.
@@ -113,10 +122,12 @@ defmodule Snitch.Data.Schema.PackageItem do
     package_item_changeset
     |> validate_number(:quantity, greater_than: -1)
     |> validate_number(:delta, greater_than: -1)
-    |> validate_backorder_and_delta()
+    |> validate_amount(:tax)
+    |> validate_amount(:shipping_tax)
+    |> set_backordered()
   end
 
-  defp validate_backorder_and_delta(%Ecto.Changeset{valid?: true} = changeset) do
+  defp set_backordered(%Ecto.Changeset{valid?: true} = changeset) do
     case fetch_field(changeset, :delta) do
       {_, delta} when delta == 0 ->
         put_change(changeset, :backordered?, false)
@@ -129,5 +140,5 @@ defmodule Snitch.Data.Schema.PackageItem do
     end
   end
 
-  defp validate_backorder_and_delta(%Ecto.Changeset{} = cs), do: cs
+  defp set_backordered(%Ecto.Changeset{} = cs), do: cs
 end

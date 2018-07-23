@@ -1,5 +1,5 @@
-defmodule Snitch.Tools.Helpers.Taxonomy do
-  use ExUnit.Case, async: false
+defmodule Snitch.Tools.Helpers.TaxonomyTest do
+  use ExUnit.Case, async: true
   use Snitch.DataCase
 
   alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
