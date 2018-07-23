@@ -3,6 +3,8 @@ defmodule SnitchApiWeb.OrderController do
 
   alias Snitch.Data.Model.Order, as: OrderModel
   alias Snitch.Data.Schema.Order
+  alias Snitch.Data.Schema.OrderAddress
+  alias SnitchApi.Order, as: OrderContext
   alias Snitch.Repo
 
   action_fallback(SnitchApiWeb.FallbackController)
@@ -35,11 +37,49 @@ defmodule SnitchApiWeb.OrderController do
   end
 
   def guest_order(conn, _params) do
-    with {:ok, %Order{} = order} <- OrderModel.create_for_guest(%{}) do
+    with {:ok, %Order{} = order} <- OrderModel.create_guest_order() do
       conn
       |> put_status(200)
-      |> put_resp_header("location", order_path(conn, :show, order))
+      |> put_resp_header("location", order_path(conn, :show, Map.get(order, :id)))
       |> render("show.json-api", data: order)
+    end
+  end
+
+  def select_address(conn, %{"id" => order_id} = params) do
+    order = OrderModel.get(order_id)
+
+    shipping_address =
+      for {key, val} <- params["shipping_address"], into: %{}, do: {String.to_atom(key), val}
+
+    billing_address =
+      for {key, val} <- params["shipping_address"], into: %{}, do: {String.to_atom(key), val}
+
+    shipping_address =
+      shipping_address
+      |> Map.update!(:country_id, &String.to_integer/1)
+      |> Map.update!(:state_id, &String.to_integer/1)
+
+    billIntegerIntegering_address =
+      billing_address
+      |> Map.update!(:country_id, &String.to_integer/1)
+      |> Map.update!(:state_id, &String.to_integer/1)
+
+    order_address = %{
+      shipping_address: shipping_address,
+      billing_address: billing_address
+    }
+
+    with {:ok, %Order{} = order} <- OrderModel.partial_update(order, order_address) do
+      conn
+      |> put_status(200)
+      |> render(
+        "show.json-api",
+        data: order,
+        opts: [
+          include: params["include"],
+          fields: conn.query_params["fields"]
+        ]
+      )
     end
   end
 end

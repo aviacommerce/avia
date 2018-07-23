@@ -85,6 +85,14 @@ defmodule Snitch.Data.Schema.Order do
     |> ensure_unique_line_items()
   end
 
+  @spec create_guest_changeset(t, map) :: Ecto.Changeset.t()
+  def create_guest_changeset(%__MODULE__{} = order, params) do
+    order
+    |> cast(params, [])
+    |> unique_constraint(:number)
+    |> common_changeset()
+  end
+
   @doc """
   Returns a Order changeset that does not update line items.
 
@@ -97,6 +105,15 @@ defmodule Snitch.Data.Schema.Order do
     |> cast(params, @partial_update_fields)
     |> cast_embed(:billing_address)
     |> cast_embed(:shipping_address)
+  end
+
+  @spec common_changeset(Ecto.Changeset.t()) :: Ecto.Changeset.t()
+  defp common_changeset(order_changeset) do
+    order_changeset
+    |> validate_amount(:item_total)
+    |> validate_amount(:promo_total)
+    |> validate_amount(:adjustment_total)
+    |> validate_amount(:total)
   end
 
   @spec ensure_unique_line_items(Ecto.Changeset.t()) :: Ecto.Changeset.t()
