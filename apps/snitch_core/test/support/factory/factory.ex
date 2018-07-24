@@ -180,6 +180,14 @@ defmodule Snitch.Factory do
     }
   end
 
+  def product_factory do
+    %Product{
+      name: sequence(:product, &"shoes-nike-#{&1}"),
+      description: "awesome products",
+      slug: sequence(:slug, &"nike-#{&1}")
+    }
+  end
+
   # Associates the address with the user once user schema is corrected
   def user_with_address(_context) do
     %{
