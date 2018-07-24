@@ -26,10 +26,11 @@ defmodule Snitch.Data.Schema.Address do
 
     belongs_to(:state, State, on_replace: :nilify)
     belongs_to(:country, Country, on_replace: :nilify)
+    belongs_to(:user, User)
     timestamps()
   end
 
-  @required_fields ~w(first_name last_name address_line_1 city zip_code country_id)a
+  @required_fields ~w(first_name last_name address_line_1 city zip_code country_id user_id)a
   @cast_fields ~w(phone alternate_phone state_id)a ++ @required_fields
 
   @doc """

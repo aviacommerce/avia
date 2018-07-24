@@ -35,7 +35,8 @@ defmodule Snitch.Factory.Address do
           city: "Malibu",
           phone: "1234567890",
           state: state,
-          country: state.country
+          country: state.country,
+          user: nil
         }
       end
 
