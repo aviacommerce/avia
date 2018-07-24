@@ -1,6 +1,6 @@
 defmodule SnitchApiWeb.Plug.LoadUser do
   import Plug.Conn
-  import SnitchApi.Guardian
+  alias SnitchApi.Guardian
 
   def init(opts), do: opts
 
