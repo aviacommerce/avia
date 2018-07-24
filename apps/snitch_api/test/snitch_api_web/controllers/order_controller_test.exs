@@ -2,11 +2,9 @@ defmodule SnitchApiWeb.OrderControllerTest do
   use SnitchApiWeb.ConnCase, async: true
   import Snitch.Factory
 
-  alias SnitchApi.Accounts
-  alias Snitch.Repo
   alias Snitch.Data.Model.Order, as: OrderModel
-  alias Snitch.Data.Schema.{Address, Order}
   alias Snitch.Repo
+  alias SnitchApi.Accounts
   alias SnitchApi.{Accounts, Guardian}
 
   setup %{conn: conn} do
@@ -53,12 +51,12 @@ defmodule SnitchApiWeb.OrderControllerTest do
   describe "Authorized User Accessing Order API" do
     setup %{conn: conn, user: user} do
       {:ok, registered_user} = Accounts.create_user(user)
-      {:ok, token, _claims} = SnitchApi.Guardian.encode_and_sign(registered_user)
+      {:ok, token, _claims} = Guardian.encode_and_sign(registered_user)
       conn = put_req_header(conn, "authorization", "Bearer #{token}")
       {:ok, conn: conn, reg_user: registered_user}
     end
 
-    test "creating new order when current order is not existed", %{conn: conn, reg_user: user} do
+    test "creating new order when current order is not existed", %{conn: conn} do
       conn = post(conn, order_path(conn, :current))
       assert json_response(conn, 200)["data"]
     end

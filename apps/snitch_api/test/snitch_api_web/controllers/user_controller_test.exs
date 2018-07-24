@@ -31,7 +31,7 @@ defmodule SnitchApiWeb.UserControllerTest do
   describe "User Registration" do
     test "creation and sign in with valid data", %{conn: conn, user: user} do
       conn = post(conn, user_path(conn, :create), user)
-      assert %{"id" => id} = json_response(conn, 200)["data"]
+      assert %{"id" => _id} = json_response(conn, 200)["data"]
 
       conn =
         post(
@@ -91,7 +91,7 @@ defmodule SnitchApiWeb.UserControllerTest do
       assert %{"status" => "logged out"} = json_response(conn, 204)
     end
 
-    test "authenticated user details", %{conn: conn, user: user} do
+    test "authenticated user details", %{conn: conn} do
       conn = get(conn, user_path(conn, :authenticated))
       assert json_response(conn, 200)["data"]
     end
