@@ -1,6 +1,7 @@
 defmodule SnitchApiWeb.AddressControllerTest do
   use SnitchApiWeb.ConnCase, async: true
   import Snitch.Factory
+  import Plug.Conn
   alias SnitchApi.Guardian
 
   setup :states
@@ -39,8 +40,9 @@ defmodule SnitchApiWeb.AddressControllerTest do
       |> put_req_header("accept", "application/vnd.api+json")
       |> put_req_header("content-type", "application/vnd.api+json")
       |> put_req_header("authorization", "Bearer #{token}")
+      |> assign(:current_user, registered_user)
 
-    {:ok, conn: conn}
+    {:ok, conn: conn, user: registered_user}
   end
 
   describe "Add Address" do
@@ -49,9 +51,15 @@ defmodule SnitchApiWeb.AddressControllerTest do
       assert json_response(conn, 200)["data"]
     end
 
-    test "Add address with vaild data", %{conn: conn, states: states} do
+    test "Add address with vaild data", %{conn: conn, states: states, user: user} do
       state = List.first(states)
-      params = Map.merge(@create_attrs, %{state_id: state.id, country_id: state.country.id})
+
+      params =
+        Map.merge(@create_attrs, %{
+          state_id: state.id,
+          country_id: state.country.id,
+          user_id: user.id
+        })
 
       conn =
         post(conn, address_path(conn, :create), %{data: %{type: "address", attributes: params}})
@@ -59,14 +67,19 @@ defmodule SnitchApiWeb.AddressControllerTest do
       assert json_response(conn, 200)["data"]
     end
 
-    test "Add address with out vaild data", %{conn: conn, states: states} do
+    test "Add address with in-vaild data", %{conn: conn, states: states} do
       state = List.first(states)
       params = Map.merge(@false_address, %{state_id: state.id, country_id: state.country.id})
 
       conn =
         post(conn, address_path(conn, :create), %{data: %{type: "address", attributes: params}})
 
-      assert json_response(conn, 422) == %{"errors" => %{"address_line_1" => ["can't be blank"]}}
+      assert json_response(conn, 422) == %{
+               "errors" => %{
+                 "address_line_1" => ["can't be blank"],
+                 "user_id" => ["can't be blank"]
+               }
+             }
     end
   end
 end

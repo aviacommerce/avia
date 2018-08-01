@@ -5,6 +5,8 @@ defmodule SnitchApiWeb.AddressController do
   alias Snitch.Data.Schema.Address
 
   action_fallback(SnitchApiWeb.FallbackController)
+  plug(SnitchApiWeb.Plug.DataToAttributes)
+  plug(SnitchApiWeb.Plug.LoadUser)
 
   def index(conn, params) do
     addresses = Checkout.list_addresses(conn, params)
@@ -17,9 +19,7 @@ defmodule SnitchApiWeb.AddressController do
     )
   end
 
-  def create(conn, params) do
-    address_params = JaSerializer.Params.to_attributes(params)
-
+  def create(conn, address_params) do
     with {:ok, %Address{} = address} <- Checkout.create_address(address_params) do
       conn
       |> put_status(200)

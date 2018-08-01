@@ -19,7 +19,8 @@ defmodule SnitchApi.Checkout do
 
   """
   def list_addresses(conn, _params) do
-    Repo.all(Address)
+    current_user = conn.assigns[:current_user]
+    Repo.all(Address, where: [user_id: current_user.id])
   end
 
   @doc """

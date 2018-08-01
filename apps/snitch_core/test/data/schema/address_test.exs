@@ -14,7 +14,8 @@ defmodule Snitch.Data.Schema.AddressTest do
     city: "Malibu",
     phone: "1234567890",
     state_id: nil,
-    country_id: nil
+    country_id: nil,
+    user_id: nil
   }
 
   describe "changeset/3 for creation" do
@@ -28,7 +29,8 @@ defmodule Snitch.Data.Schema.AddressTest do
                first_name: ["can't be blank"],
                last_name: ["can't be blank"],
                zip_code: ["can't be blank"],
-               country_id: ["can't be blank"]
+               country_id: ["can't be blank"],
+               user_id: ["can't be blank"]
              } = errors_on(cs)
     end
 
@@ -40,41 +42,50 @@ defmodule Snitch.Data.Schema.AddressTest do
 
       assert %{
                address_line_1: ["should be at least 10 character(s)"],
-               country_id: ["can't be blank"]
+               country_id: ["can't be blank"],
+               user_id: ["can't be blank"]
              } = errors_on(cs)
     end
   end
 
   describe "changeset/3 for creation (state, country)" do
-    test "succeeds with valid params" do
+    setup do
+      user = insert(:user)
+      {:ok, user: user}
+    end
+
+    test "succeeds with valid params", %{user: user} do
       state = insert(:state)
 
       params = %{
         @params
         | country_id: state.country_id,
-          state_id: state.id
+          state_id: state.id,
+          user_id: user.id
       }
 
       %{valid?: validity} = Address.changeset(%Address{}, params)
       assert validity
     end
 
-    test "succeeds w/o state/state_id if it is not needed in country" do
+    test "succeeds w/o state/state_id if it is not needed in country", %{user: user} do
       country = insert(:country, states_required: false)
 
       params = %{
         @params
-        | country_id: country.id
+        | country_id: country.id,
+          user_id: user.id
       }
 
       cs = Address.changeset(%Address{}, params)
       assert cs.valid?
     end
 
-    test "fails with bad country_id" do
+    test "fails with bad country_id", %{user: user} do
       params = %{
         @params
-        | country_id: -1
+        | country_id: -1,
+          user_id: user.id
       }
 
       cs = Address.changeset(%Address{}, params)
@@ -82,12 +93,13 @@ defmodule Snitch.Data.Schema.AddressTest do
       assert %{country_id: ["does not exist"]} = errors_on(cs)
     end
 
-    test "fails with bad state_id" do
+    test "fails with bad state_id", %{user: user} do
       country = insert(:country)
 
       params = %{
         @params
         | country_id: country.id,
+          user_id: user.id,
           state_id: -1
       }
 
@@ -96,13 +108,14 @@ defmodule Snitch.Data.Schema.AddressTest do
       assert %{state_id: ["does not exist"]} = errors_on(cs)
     end
 
-    test "fails without state if it was needed by country" do
+    test "fails without state if it was needed by country", %{user: user} do
       state = insert(:state)
       assert state.country.states_required
 
       params = %{
         @params
-        | country_id: state.country.id
+        | country_id: state.country.id,
+          user_id: user.id
       }
 
       cs = Address.changeset(%Address{}, params)
@@ -110,14 +123,15 @@ defmodule Snitch.Data.Schema.AddressTest do
       assert %{state_id: ["state is explicitly required for this country"]} = errors_on(cs)
     end
 
-    test "fails if state.country different from country" do
+    test "fails if state.country different from country", %{user: user} do
       state = insert(:state)
       country = insert(:country)
 
       params = %{
         @params
         | country_id: country.id,
-          state_id: state.id
+          state_id: state.id,
+          user_id: user.id
       }
 
       cs = Address.changeset(%Address{}, params)
@@ -129,7 +143,8 @@ defmodule Snitch.Data.Schema.AddressTest do
 
   describe "changeset/3 for update" do
     setup do
-      [address: insert(:address)]
+      user = insert(:user)
+      [address: insert(:address, user_id: user.id), user: user]
     end
 
     test "succeeds even when there is no 'change'", %{address: a} do
@@ -141,11 +156,13 @@ defmodule Snitch.Data.Schema.AddressTest do
     test "succeeds with 'change' in both country and state", %{address: a} do
       state = insert(:state)
 
-      params = %{
-        @params
-        | country_id: state.country.id,
-          state_id: state.id
-      }
+      params =
+        %{
+          @params
+          | country_id: state.country.id,
+            state_id: state.id
+        }
+        |> Map.delete(:user_id)
 
       cs = Address.changeset(a, params)
       assert cs.valid?
@@ -159,6 +176,7 @@ defmodule Snitch.Data.Schema.AddressTest do
         @params
         |> Map.put(:state_id, state.id)
         |> Map.delete(:country_id)
+        |> Map.delete(:user_id)
 
       cs = Address.changeset(a, params)
       assert cs.valid?
@@ -172,6 +190,7 @@ defmodule Snitch.Data.Schema.AddressTest do
         @params
         |> Map.put(:state_id, state.id)
         |> Map.delete(:country_id)
+        |> Map.delete(:user_id)
 
       cs = Address.changeset(a, params)
       refute cs.valid?
@@ -180,7 +199,7 @@ defmodule Snitch.Data.Schema.AddressTest do
 
     test "fails with 'change' in only country that has states", %{address: a} do
       country = insert(:country)
-      params = %{@params | country_id: country.id}
+      params = %{@params | country_id: country.id, user_id: a.id}
 
       cs = Address.changeset(a, params)
       refute cs.valid?
@@ -189,7 +208,7 @@ defmodule Snitch.Data.Schema.AddressTest do
 
     test "succeds with 'change' in only country that has no states", %{address: a} do
       country = insert(:country, states_required: false)
-      params = %{@params | country_id: country.id, state_id: -1}
+      params = %{@params | country_id: country.id, state_id: -1, user_id: a.id}
 
       cs = Address.changeset(a, params)
       assert cs.valid?
