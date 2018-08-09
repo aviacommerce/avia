@@ -15,6 +15,8 @@ defmodule Snitch.Data.Schema.Product do
     ProductBrand
   }
 
+  alias Money.Ecto.Composite.Type, as: MoneyType
+
   @type t :: %__MODULE__{}
 
   schema "snitch_products" do
@@ -28,6 +30,8 @@ defmodule Snitch.Data.Schema.Product do
     field(:meta_keywords, :string)
     field(:meta_title, :string)
     field(:promotionable, :boolean)
+    field(:selling_price, MoneyType)
+    field(:max_retail_price, MoneyType)
     timestamps()
 
     has_many(:variations, Variation, foreign_key: :parent_product_id, on_replace: :delete)
@@ -42,7 +46,7 @@ defmodule Snitch.Data.Schema.Product do
     belongs_to(:brand, ProductBrand)
   end
 
-  @required_fields ~w(name)a
+  @required_fields ~w(name selling_price max_retail_price)a
   @optional_fields ~w(description meta_description meta_keywords meta_title brand_id)a
 
   def create_changeset(model, params \\ %{}) do
@@ -72,6 +76,7 @@ defmodule Snitch.Data.Schema.Product do
     model
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+    |> validate_amount(:selling_price)
     |> NameSlug.maybe_generate_slug()
     |> NameSlug.unique_constraint()
   end

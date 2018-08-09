@@ -9,7 +9,9 @@ defmodule Snitch.Data.Schema.ProductTest do
   test "test valid data create_changeset/2" do
     params = %{
       name: "HTC Desire 620",
-      description: "HTC desire 620"
+      description: "HTC desire 620",
+      selling_price: Money.new("12.99", currency()),
+      max_retail_price: Money.new("14.99", currency())
     }
 
     changeset = Product.create_changeset(%Product{}, params)
@@ -44,7 +46,9 @@ defmodule Snitch.Data.Schema.ProductTest do
             "options" => [
               %{"option_type_id" => ot1.id, "value" => "red"},
               %{"option_type_id" => ot2.id, "value" => "S"}
-            ]
+            ],
+            "selling_price" => Money.new("12.99", currency()),
+            "max_retail_price" => Money.new("14.99", currency())
           }
         },
         %{
@@ -53,7 +57,9 @@ defmodule Snitch.Data.Schema.ProductTest do
             "options" => [
               %{"option_type_id" => ot1.id, "value" => "yellow"},
               %{"option_type_id" => ot2.id, "value" => "S"}
-            ]
+            ],
+            "selling_price" => Money.new("12.99", currency()),
+            "max_retail_price" => Money.new("14.99", currency())
           }
         }
       ]
@@ -80,7 +86,9 @@ defmodule Snitch.Data.Schema.ProductTest do
             "options" => [
               %{"option_type_id" => ot1.id, "value" => "red"},
               %{"option_type_id" => ot2.id, "value" => "S"}
-            ]
+            ],
+            "selling_price" => Money.new("12.99", currency()),
+            "max_retail_price" => Money.new("14.99", currency())
           }
         },
         %{
@@ -89,7 +97,9 @@ defmodule Snitch.Data.Schema.ProductTest do
             "options" => [
               %{"option_type_id" => ot1.id, "value" => "yellow"},
               %{"option_type_id" => ot2.id, "value" => "S"}
-            ]
+            ],
+            "selling_price" => Money.new("12.99", currency()),
+            "max_retail_price" => Money.new("14.99", currency())
           }
         }
       ]
@@ -107,7 +117,9 @@ defmodule Snitch.Data.Schema.ProductTest do
             "options" => [
               %{"option_type_id" => ot1.id, "value" => "blue"},
               %{"option_type_id" => ot2.id, "value" => "S"}
-            ]
+            ],
+            "selling_price" => Money.new("12.99", currency()),
+            "max_retail_price" => Money.new("14.99", currency())
           }
         }
       ]
@@ -134,7 +146,9 @@ defmodule Snitch.Data.Schema.ProductTest do
             "options" => [
               %{"option_type_id" => ot1.id, "value" => "red"},
               %{"option_type_id" => ot2.id, "value" => "S"}
-            ]
+            ],
+            "selling_price" => Money.new("12.99", currency()),
+            "max_retail_price" => Money.new("14.99", currency())
           }
         },
         %{
@@ -143,7 +157,9 @@ defmodule Snitch.Data.Schema.ProductTest do
             "options" => [
               %{"option_type_id" => ot1.id, "value" => "yellow"},
               %{"option_type_id" => ot2.id, "value" => "S"}
-            ]
+            ],
+            "selling_price" => Money.new("12.99", currency()),
+            "max_retail_price" => Money.new("14.99", currency())
           }
         }
       ]
@@ -164,7 +180,9 @@ defmodule Snitch.Data.Schema.ProductTest do
             "options" => [
               %{"option_type_id" => ot1.id, "value" => "blue"},
               %{"option_type_id" => ot2.id, "value" => "S"}
-            ]
+            ],
+            "selling_price" => Money.new("12.99", currency()),
+            "max_retail_price" => Money.new("14.99", currency())
           }
         }
       ]

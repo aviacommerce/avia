@@ -6,6 +6,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Data.Model.ProductPrototype, as: PrototypeModel
   alias Snitch.Data.Schema.ProductBrand
+  alias Snitch.Tools.Money
 
   plug(:scrub_referer_query_params when action in [:create])
   plug(:load_resources when action in [:new, :edit])
@@ -66,24 +67,26 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def generate_variant_params(parent_product, options) do
-    t =
+    options =
       options
       |> Map.to_list()
       |> Enum.map(fn {index, map} ->
         map["value"]
         |> String.trim()
         |> String.split(",")
-        |> Enum.map(fn v ->
-          %{option_type_id: map["option_type_id"], value: v}
+        |> Enum.map(fn option_value ->
+          %{option_type_id: map["option_type_id"], value: option_value}
         end)
       end)
 
-    generate_option_combinations(t, [])
-    |> Enum.map(fn o ->
+    generate_option_combinations(options, [])
+    |> Enum.map(fn options ->
       %{
         "child_product" => %{
-          name: product_name_from_options(parent_product, o),
-          options: o
+          name: product_name_from_options(parent_product, options),
+          options: options,
+          selling_price: parent_product.selling_price,
+          max_retail_price: parent_product.max_retail_price
         }
       }
     end)
@@ -94,9 +97,9 @@ defmodule AdminAppWeb.ProductController do
     |> Enum.reduce(product.name, fn x, acc -> "#{acc} #{x.value}" end)
   end
 
-  def generate_option_combinations([h | tail], []) do
+  def generate_option_combinations([head | tail], []) do
     acc =
-      h
+      head
       |> Enum.map(&[&1])
 
     generate_option_combinations(tail, acc)
@@ -106,11 +109,11 @@ defmodule AdminAppWeb.ProductController do
     acc
   end
 
-  def generate_option_combinations([h | tail], acc) do
+  def generate_option_combinations([head | tail], acc) do
     result =
       acc
       |> Enum.flat_map(fn v ->
-        h
+        head
         |> Enum.map(fn x -> v ++ [x] end)
       end)
 

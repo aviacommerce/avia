@@ -22,6 +22,12 @@ defmodule SnitchApiWeb.UserView do
   end
 
   def render("current_user.json-api", %{data: user}) do
-    %{data: Map.take(user, [:email, :first_name, :last_name, :id])}
+    %{
+      data: %{
+        type: "user",
+        id: user.id,
+        attributes: Map.take(user, [:email, :first_name, :last_name, :id])
+      }
+    }
   end
 end
