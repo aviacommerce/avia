@@ -24,5 +24,7 @@ defmodule Snitch.Data.Schema.RolePermission do
     role_permisssion
     |> cast(params, [:role_id, :permission_id])
     |> validate_required([:role_id, :permission_id])
+    |> foreign_key_constraint(:role)
+    |> foreign_key_constraint(:permission)
   end
 end

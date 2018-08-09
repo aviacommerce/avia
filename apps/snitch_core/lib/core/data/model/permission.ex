@@ -32,14 +32,22 @@ defmodule Snitch.Data.Model.Permission do
   @doc """
   Deletes a `permission`  in the system.
 
-  Takes as input `id` or `struct` of the Permission  to be deleted.
+  Takes as input `id` of the Permission  to be deleted.
   """
-  @spec delete(integer | Permission.t()) ::
+  @spec delete(integer) ::
           {:ok, Permission.t()}
           | {:error, Ecto.ChangeSet.t()}
           | {:error, :not_found}
-  def delete(param) do
-    QH.delete(Permission, param, Repo)
+  def delete(id) do
+    case QH.get(Permission, id, Repo) do
+      nil ->
+        {:error, :not_found}
+
+      permission ->
+        permission
+        |> Permission.changeset()
+        |> Repo.delete()
+    end
   end
 
   @doc """

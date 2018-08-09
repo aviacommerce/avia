@@ -110,7 +110,8 @@ defmodule Snitch.Factory do
     %PaymentMethod{
       name: "card",
       code: "ccd",
-      active?: true
+      active?: true,
+      provider: CreditCard
     }
   end
 
@@ -118,7 +119,8 @@ defmodule Snitch.Factory do
     %PaymentMethod{
       name: "check",
       code: "chk",
-      active?: true
+      active?: true,
+      provider: Check
     }
   end
 

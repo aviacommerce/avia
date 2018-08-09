@@ -1,0 +1,21 @@
+<div class="card container text-uppercase">
+  <h4><a href="/payment_methods">Payment Method</a> / Edit </h4>
+  <hr/>
+  <%= form_for @changeset, payment_method_path(@conn, :update, @payment_method), [as: :payment_method], 
+    fn f -> %>
+    <%= select_input(f, :provider, providers(),
+        "provider", value: @payment_method.provider, id: "payment-provider",
+        prompt: "Choose provider") %>
+    <%= input(f, :name)%>
+    <%= input(f, :description) %>
+    <div id="preferences">
+      <%= render "preferences_input.html", credentials: @payment_method.preferences %>
+    </div>
+    <%= checkbox_input(f, :active?, "Active") %>
+    <%= checkbox_input(f, :live_mode?, "Live Mode") %>
+
+    <br><br>
+    <%= submit "Submit", class: "btn btn-primary submit-btn" %>
+    <%= link("Cancel", to: payment_method_path(@conn, :index), class: "btn btn-primary") %>
+  <% end %>
+</div>

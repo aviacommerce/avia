@@ -1,5 +1,5 @@
 <div class="card container text-uppercase">
-    <h4><a href="/permission">Permissions</a> / New Role</h4>
+    <h4><a href="/permission">Permissions</a> / New Permission</h4>
     <hr/>
     <%= render "_form.html", changeset: @changeset,
       conn: @conn, action: permission_path(@conn, :create) %>

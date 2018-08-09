@@ -2,6 +2,7 @@ defmodule AdminAppWeb.PermissionController do
   use AdminAppWeb, :controller
   alias Snitch.Data.Model.Permission
   alias Snitch.Data.Schema.Permission, as: PermissionSchema
+  alias AdminAppWeb.Helpers
 
   def index(conn, _params) do
     permissions = Permission.get_all()
@@ -55,7 +56,7 @@ defmodule AdminAppWeb.PermissionController do
 
       {:error, changeset} ->
         conn
-        |> put_flash(:error, "Sorry some error occured!!")
+        |> put_flash(:error, "Sorry some error occured!")
         |> render("edit.html", changeset: %{changeset | action: :update}, permission: permission)
     end
   end
@@ -63,17 +64,21 @@ defmodule AdminAppWeb.PermissionController do
   def delete(conn, %{"id" => id}) do
     id = String.to_integer(id)
 
-    case Permission.delete(id) do
-      {:ok, _} ->
-        conn
-        |> put_flash(:info, "Permission deleted successfully!")
-        |> redirect(to: permission_path(conn, :index))
+    conn =
+      case Permission.delete(id) do
+        {:ok, _} ->
+          put_flash(conn, :info, "Permission deleted successfully!")
 
-      {:error, _} ->
-        conn
-        |> put_flash(:error, "Permission not found!")
-        |> redirect(to: permission_path(conn, :index))
-    end
+        {:error, :not_found} ->
+          put_flash(conn, :error, "Permission not found!")
+
+        {:error, changeset} ->
+          errors = Helpers.extract_changeset_errors(changeset)
+          error = stringify_error(errors)
+          put_flash(conn, :error, "Error! #{error}")
+      end
+
+    redirect(conn, to: permission_path(conn, :index))
   end
 
   ################ Private Functions ###############
@@ -82,5 +87,12 @@ defmodule AdminAppWeb.PermissionController do
       code: permission["code"],
       description: permission["description"]
     }
+  end
+
+  defp stringify_error(error_map) do
+    Enum.reduce(error_map, "", fn {key, value}, acc ->
+      value = Enum.join(value, ",")
+      "#{acc} #{key}: #{value}"
+    end)
   end
 end

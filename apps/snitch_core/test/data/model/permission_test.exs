@@ -31,7 +31,7 @@ defmodule Snitch.Data.Model.PermissionTest do
 
   test "delete a permission" do
     permission = insert(:permission)
-    assert {:ok, _} = Permission.delete(permission)
+    assert {:ok, _} = Permission.delete(permission.id)
     assert Repo.get(PermissionSchema, permission.id) == nil
   end
 
@@ -39,7 +39,7 @@ defmodule Snitch.Data.Model.PermissionTest do
     permission = insert(:permission)
     assert permission_returned = Permission.get(permission.id)
     assert permission_returned == permission
-    assert {:ok, _} = Permission.delete(permission)
+    assert {:ok, _} = Permission.delete(permission.id)
     assert Permission.get(permission.id) == nil
   end
 

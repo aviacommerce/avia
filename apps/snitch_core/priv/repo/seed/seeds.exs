@@ -34,7 +34,7 @@ Repo.transaction(fn ->
 end)
 
 # seed payment methods
-PaymentMethods.seed!()
+# PaymentMethods.seed!()
 
 Users.seed_address!()
 Users.seed_users!()
