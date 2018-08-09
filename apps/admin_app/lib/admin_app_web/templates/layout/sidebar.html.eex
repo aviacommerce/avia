@@ -28,6 +28,7 @@
             <li><a class="nav-link" href="#">Stock Movements</a></li>
             <li> <a class="nav-link" href="/roles"> Roles</a> </li>
             <li> <a class="nav-link" href="/permissions">Permission</a></li>
+            <li> <a class="nav-link" href="/payment_methods">Payment Methods</a></li>
           </ul>
           </div>
         </li>

@@ -3,6 +3,7 @@ defmodule Snitch.Data.Schema.Permission do
   Models User Permissions in the system.
   """
   use Snitch.Data.Schema
+  alias Snitch.Data.Schema.RolePermission
 
   @typedoc """
   Permissions limit access to a resource in the system.
@@ -16,6 +17,7 @@ defmodule Snitch.Data.Schema.Permission do
   schema "snitch_permissions" do
     field(:code, :string)
     field(:description, :string)
+    has_many(:role_permissions, RolePermission)
 
     timestamps()
   end
@@ -42,5 +44,15 @@ defmodule Snitch.Data.Schema.Permission do
     permission
     |> cast(params, @update_fields)
     |> unique_constraint(:code)
+  end
+
+  @spec changeset(t) :: Ecto.Changeset.t()
+  def changeset(%__MODULE__{} = permission) do
+    permission
+    |> cast(%{}, @update_fields ++ @update_fields)
+    |> no_assoc_constraint(
+      :role_permissions,
+      message: "Association with role"
+    )
   end
 end

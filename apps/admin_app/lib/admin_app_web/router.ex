@@ -55,9 +55,10 @@ defmodule AdminAppWeb.Router do
     resources("/permissions", PermissionController)
     resources("/variation_themes", VariationThemeController, except: [:show])
     resources("/prototypes", PrototypeController, except: [:show])
-
     resources("/products", ProductController)
     resources("/product_brands", ProductBrandController)
+    resources("/payment_methods", PaymentMethodController)
+    post("/payment-provider-inputs", PaymentMethodController, :payment_preferences)
   end
 
   scope "/", AdminAppWeb do
