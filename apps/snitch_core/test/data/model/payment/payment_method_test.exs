@@ -7,17 +7,20 @@ defmodule Snitch.Data.Model.PaymentMethodTest do
   alias Snitch.Data.Model.PaymentMethod
 
   test "successful create" do
-    assert {:ok, ccd} = PaymentMethod.create("card-payments", "ccd")
+    params = %{name: "card payment", code: "ccd", provider: CreditCard}
+    assert {:ok, ccd} = PaymentMethod.create(params)
 
     assert %{
-             name: "card-payments",
+             name: "card payment",
              code: "ccd",
-             active?: true
+             active?: true,
+             provider: CreditCard
            } = ccd
   end
 
   test "create with bad code fails" do
-    assert {:error, changeset} = PaymentMethod.create("card-payments", "not-a-code")
+    params = %{name: "card payment", code: "not-a-code", provider: CreditCard}
+    assert {:error, changeset} = PaymentMethod.create(params)
     assert %{code: ["should be 3 character(s)"]} = errors_on(changeset)
   end
 

@@ -1,6 +1,6 @@
 <div class="card container">
   <h2>
-    Roles
+    Permissions
     <%= link("New Permission+", to: permission_path(@conn, :new), class: "btn btn-primary float-right") %>
   </h2>
   <table class="table">
