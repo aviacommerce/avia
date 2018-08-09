@@ -25,9 +25,9 @@ import select2Selector from './form-helpers/select2-selector';
 import { getPaymentMethod } from './payment_method'
 
 $(document).ready(() => {
+  setup_product();
   getPaymentMethod();
   select2Selector();
-  setup_product();
 })
 
 const elmDiv = document.getElementById("elm-main");
@@ -40,7 +40,7 @@ function setup_product(){
   })
 
   $("#theme_change_confirm").click(function(e){
-      var optionSelected = $("option:selected");
+      var optionSelected = $('#product_theme_id');
       var valueSelected = optionSelected.val();
       const product_id = $(this)
         .parents()

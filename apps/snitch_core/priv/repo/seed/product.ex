@@ -101,7 +101,9 @@ defmodule Snitch.Seed.Product do
       slug: Slugger.slugify(p["name"]),
       available_on: DateTime.utc(),
       inserted_at: DateTime.utc(),
-      updated_at: DateTime.utc()
+      updated_at: DateTime.utc(),
+      selling_price: Money.new("14.99", :USD),
+      max_retail_price: Money.new("12.99", :USD)
     }
   end
 

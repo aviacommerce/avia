@@ -31,8 +31,7 @@ defmodule SnitchApiWeb.ProductControllerTest do
   end
 
   test "Products in Descending Order", %{conn: conn} do
-    string = "ZZZZZ-I-Love-Night-Coding"
-    Repo.insert(%Product{name: string, slug: string}, on_conflict: :nothing)
+    product = insert(:product)
 
     params = %{"sort" => "Z-A"}
 
@@ -41,16 +40,12 @@ defmodule SnitchApiWeb.ProductControllerTest do
     response =
       json_response(conn, 200)["data"]
       |> List.first()
-      |> JaSerializer.Params.to_attributes()
-      |> Map.take(["name"])
 
-    assert %{"name" => ^string} = response
+    assert response["attributes"]["name"] == product.name
   end
 
   test "Products in Ascending Order", %{conn: conn} do
-    string = "AAAAA-I-Love-Night-Coding"
-
-    Repo.insert(%Product{name: string, slug: string}, on_conflict: :nothing)
+    product = insert(:product)
 
     params = %{"sort" => "A-Z"}
 
@@ -59,23 +54,17 @@ defmodule SnitchApiWeb.ProductControllerTest do
     response =
       json_response(conn, 200)["data"]
       |> List.first()
-      |> JaSerializer.Params.to_attributes()
-      |> Map.take(["name"])
 
-    assert %{"name" => ^string} = response
+    assert response["attributes"]["name"] == product.name
   end
 
   test "Products, search contains name and pagination", %{conn: conn} do
-    string = "XXXXX-I-Love-Night-Coding"
-    string2 = "XXXXX-I-Love-Day-Coding"
-    string3 = "XXXXX-I-Love-Coding-In-Vim"
-
-    Repo.insert(%Product{name: string, slug: string}, on_conflict: :nothing)
-    Repo.insert(%Product{name: string2, slug: string2}, on_conflict: :nothing)
-    Repo.insert(%Product{name: string3, slug: string3}, on_conflict: :nothing)
+    product1 = insert(:product)
+    product2 = insert(:product)
+    product3 = insert(:product)
 
     params = %{
-      "filter" => %{"name" => "XXXXX"},
+      "filter" => %{"name" => "product"},
       "page" => %{"limit" => 3, "offset" => "1"}
     }
 
@@ -89,9 +78,7 @@ defmodule SnitchApiWeb.ProductControllerTest do
   end
 
   test "Products, sort by newly inserted", %{conn: conn} do
-    string = "WOW-I-Love-Night-Coding"
-
-    Repo.insert(%Product{name: string, slug: string}, on_conflict: :nothing)
+    product = insert(:product)
 
     params = %{
       "sort" => "date"
@@ -102,9 +89,7 @@ defmodule SnitchApiWeb.ProductControllerTest do
     response =
       json_response(conn, 200)["data"]
       |> List.first()
-      |> JaSerializer.Params.to_attributes()
-      |> Map.take(["name"])
 
-    assert %{"name" => ^string} = response
+    assert response["attributes"]["name"] == product.name
   end
 end

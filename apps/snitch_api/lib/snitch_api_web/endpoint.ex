@@ -44,6 +44,7 @@ defmodule SnitchApiWeb.Endpoint do
     signing_salt: "39wcx/Xj"
   )
 
+  plug(ApiWeb.CORS)
   plug(SnitchApiWeb.Router)
 
   @doc """

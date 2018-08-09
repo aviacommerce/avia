@@ -1,6 +1,8 @@
 defmodule AdminAppWeb.ProductView do
   use AdminAppWeb, :view
 
+  @currencies ["USD", "INR"]
+
   def get_image_url(images) do
     image = images |> List.first()
     image.url
@@ -23,5 +25,20 @@ defmodule AdminAppWeb.ProductView do
 
   def get_brand_options(brands) do
     Enum.map(brands, fn brand -> {brand.name, brand.id} end)
+  end
+
+  def get_amount(nil) do
+    "0"
+  end
+
+  def get_amount(money) do
+    money.amount
+    |> Decimal.to_string(:normal)
+    |> Decimal.round(2)
+  end
+
+  # TODO This needs to fetched from config
+  def get_currency() do
+    @currencies
   end
 end

@@ -3,7 +3,7 @@ defmodule SnitchApi.ProductsContext do
   The JSON-API context.
   """
   alias Snitch.Repo
-  alias Snitch.Data.Schema.Product
+  alias Snitch.Data.Schema.{Product, Review}
 
   import Ecto.Query, only: [from: 2, order_by: 2]
 
@@ -21,9 +21,16 @@ defmodule SnitchApi.ProductsContext do
   Gives the product, with matched `slug` or raise an error :not_found
   """
   def product_by_slug!(slug) do
+    review_query = from(c in Review, limit: 5, preload: [rating_option_vote: :rating_option])
+
     Product
     |> Repo.get_by!(slug: slug)
-    |> Repo.preload(variants: [:images])
+    |> Repo.preload(
+      reviews: review_query,
+      variants: [:images, options: :option_type, theme: [:option_types]],
+      theme: [:option_types],
+      options: :option_type
+    )
   end
 
   @doc """
@@ -41,14 +48,21 @@ defmodule SnitchApi.ProductsContext do
   def paginate_collection(query, params) do
     {page_number, size} = extract_page_params(params)
 
+    review_query = from(c in Review, limit: 5, preload: [rating_option_vote: :rating_option])
+
     query
     |> paginate(page_number, size)
     |> Repo.all()
-    |> Repo.preload(variants: [:images])
+    |> Repo.preload(
+      reviews: review_query,
+      variants: [:images, options: :option_type, theme: [:option_types]],
+      theme: [:option_types],
+      options: :option_type
+    )
   end
 
   @doc """
-  Generates the pagination links like `prev` `self` `next` `last` using 
+  Generates the pagination links like `prev` `self` `next` `last` using
   data-collection and params-page
   """
   def gen_page_links(collection, params, conn) do
@@ -99,7 +113,7 @@ defmodule SnitchApi.ProductsContext do
   end
 
   @doc """
-  Develops the query based on the giver params. At least sorting the 
+  Develops the query based on the giver params. At least sorting the
   products in Ascending orders of their names is considered as priority.
   This supports the following api calling...
   - /products

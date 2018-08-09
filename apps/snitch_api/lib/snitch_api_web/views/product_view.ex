@@ -14,12 +14,32 @@ defmodule SnitchApiWeb.ProductView do
     :meta_description,
     :meta_keywords,
     :meta_title,
-    :promotionable
+    :promotionable,
+    :selling_price,
+    :max_retail_price
   ])
 
   has_many(
     :variants,
-    serializer: SnitchApiWeb.VariantView,
+    serializer: SnitchApiWeb.ProductView,
+    include: true
+  )
+
+  has_many(
+    :options,
+    serializer: SnitchApiWeb.ProductOptionValueView,
+    include: true
+  )
+
+  has_many(
+    :reviews,
+    serializer: SnitchApiWeb.ReviewView,
+    include: true
+  )
+
+  has_one(
+    :theme,
+    serializer: SnitchApiWeb.VariationThemeView,
     include: true
   )
 

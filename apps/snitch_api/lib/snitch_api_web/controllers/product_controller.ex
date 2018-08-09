@@ -33,7 +33,9 @@ defmodule SnitchApiWeb.ProductController do
     end
   end
 
-  @include "variants,variants.images"
+  @include ~s(reviews,reviews.rating_option_vote,
+  reviews.rating_option_vote.rating_option,variants,variants.images,
+  variants.options,variants.options.option_type,theme,theme.option_types)
   def index(conn, params) do
     {products, page} = Context.list_products(conn, params)
 
