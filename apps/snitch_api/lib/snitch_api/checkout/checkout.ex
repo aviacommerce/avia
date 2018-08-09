@@ -9,6 +9,7 @@ defmodule SnitchApi.Checkout do
   alias SnitchApi.API
   alias Snitch.Data.Schema.Address
 
+  # TODO Remove connection coupling
   @doc """
   Returns the list of addresses.
 
@@ -20,7 +21,8 @@ defmodule SnitchApi.Checkout do
   """
   def list_addresses(conn, _params) do
     current_user = conn.assigns[:current_user]
-    Repo.all(Address, where: [user_id: current_user.id])
+    query = from(a in Address, where: a.user_id == ^current_user.id)
+    Repo.all(query)
   end
 
   @doc """

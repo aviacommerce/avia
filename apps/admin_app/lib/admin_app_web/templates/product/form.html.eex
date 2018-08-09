@@ -17,6 +17,30 @@
       <%= hidden_input f, :id %>
       <%= input f, :name%>
       <%= textarea_input f, :description%>
+      <div class="row">
+        <div class="col-6">
+          <div class="form-group required">
+            <label>Selling Price</label>
+            <div class="input-group mb-3">
+              <%= text_input :selling_price, :amount, value: get_amount(f.data.selling_price), class: "form-control", name: "product[selling_price][amount]" %>
+              <div class="input-group-append">
+                <%= select :selling_price, :currency, get_currency(), class: "form-control", name: "product[selling_price][currency]" %>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="form-group required">
+            <label>Maximum Retail Price</label>
+            <div class="input-group mb-3">
+              <%= text_input :max_retail_price, :amount, value: get_amount(f.data.max_retail_price), class: "form-control", name: "product[max_retail_price][amount]" %>
+              <div class="input-group-append">
+                <%= select :max_retail_price, :currency, get_currency(), class: "form-control", name: "product[max_retail_price][currency]" %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <%= textarea_input f, :meta_description%>
       <%= select_input f, :brand_id, get_brand_options(@brands) %>
       <%= input f, :meta_keywords%>

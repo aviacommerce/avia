@@ -24,6 +24,8 @@ defmodule SnitchApiWeb.Router do
     post("/hosted-payment/payubiz-request", HostedPaymentController, :payubiz_request_url)
     post("/hosted-payment/:source/success", HostedPaymentController, :payment_success)
     post("/hosted-payment/:source/error", HostedPaymentController, :payment_error)
+    resources("/taxonomies", TaxonomyController, only: [:index, :show])
+    resources("/taxons", TaxonController, only: [:index, :show])
   end
 
   scope "/api/v1", SnitchApiWeb do
@@ -39,11 +41,10 @@ defmodule SnitchApiWeb.Router do
     resources("/line_items", LineItemController, only: [:create, :update, :show])
     post("/orders/:id/select_address", OrderController, :select_address)
     post("/orders/current", OrderController, :current)
-    resources("/taxonomies", TaxonomyController, only: [:index, :show])
-    resources("/taxons", TaxonController, only: [:index, :show])
     resources("/ratings", RatingController, only: [:index, :show])
     resources("/reviews", ReviewController, only: [:create, :update, :delete])
     get("/product/:id/rating-summary", ProductController, :rating_summary)
+    get("/product/:id/reviews", ProductController, :reviews)
     resources("/addresses", AddressController, only: [:index, :show, :create, :update])
   end
 end

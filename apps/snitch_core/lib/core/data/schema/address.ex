@@ -31,7 +31,7 @@ defmodule Snitch.Data.Schema.Address do
   end
 
   @required_fields ~w(first_name last_name address_line_1 city zip_code country_id user_id)a
-  @cast_fields ~w(phone alternate_phone state_id)a ++ @required_fields
+  @cast_fields ~w(phone alternate_phone state_id address_line_2)a ++ @required_fields
 
   @doc """
   Returns an `Address` changeset to create OR update `address`.
