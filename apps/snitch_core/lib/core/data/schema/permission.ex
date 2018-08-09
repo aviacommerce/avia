@@ -50,7 +50,9 @@ defmodule Snitch.Data.Schema.Permission do
   def changeset(%__MODULE__{} = permission) do
     permission
     |> cast(%{}, @update_fields ++ @update_fields)
-    |> no_assoc_constraint(:role_permissions,
-      message: "Association with role")
+    |> no_assoc_constraint(
+      :role_permissions,
+      message: "Association with role"
+    )
   end
 end

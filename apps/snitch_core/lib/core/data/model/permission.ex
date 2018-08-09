@@ -42,6 +42,7 @@ defmodule Snitch.Data.Model.Permission do
     case QH.get(Permission, id, Repo) do
       nil ->
         {:error, :not_found}
+
       permission ->
         permission
         |> Permission.changeset()
