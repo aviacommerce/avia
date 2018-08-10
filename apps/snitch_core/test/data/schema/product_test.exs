@@ -1,4 +1,4 @@
-defmodule Snitch.Data.Schema.RoleTest do
+defmodule Snitch.Data.Schema.ProductTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
