@@ -5,7 +5,16 @@ defmodule AdminAppWeb.Router do
     plug(:accepts, ["html"])
     plug(:fetch_session)
     plug(:fetch_flash)
-    # plug(:protect_from_forgery)
+    plug(:protect_from_forgery)
+    plug(:put_secure_browser_headers)
+  end
+
+  # This pipeline is just to avoid CSRF token.
+  # TODO: This needs to be remove when the token issue gets fixed in custom form
+  pipeline :avoid_csrf do
+    plug(:accepts, ["html"])
+    plug(:fetch_session)
+    plug(:fetch_flash)
     plug(:put_secure_browser_headers)
   end
 
@@ -46,6 +55,13 @@ defmodule AdminAppWeb.Router do
     resources("/permissions", PermissionController)
     resources("/variation_themes", VariationThemeController, except: [:show])
     resources("/prototypes", PrototypeController, except: [:show])
+
+    resources("/products", ProductController)
+  end
+
+  scope "/", AdminAppWeb do
+    pipe_through(:avoid_csrf)
+    post("/products/variants/new", ProductController, :new_variant)
   end
 
   scope "/", AdminAppWeb do
@@ -61,5 +77,11 @@ defmodule AdminAppWeb.Router do
     pipe_through(:api)
 
     resources("/stock_locations", StockLocationController)
+  end
+
+  scope "/api", AdminAppWeb.TemplateApi do
+    pipe_through(:api)
+
+    resources("/option_types", OptionTypeController)
   end
 end

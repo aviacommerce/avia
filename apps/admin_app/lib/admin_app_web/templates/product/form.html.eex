@@ -1,0 +1,89 @@
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link active" href="#tab1default" data-toggle="tab">Product Detail</a>
+  </li>
+  <%= if  @conn.request_path != product_path(@conn, :new) do %>
+  <li class="nav-item">
+    <a class="nav-link" href="#tab2default" data-toggle="tab">Variants</a>
+  </li>
+  <% end %>
+  <li class="nav-item">
+    <a class="nav-link" href="#tab3default" data-toggle="tab">Images</a>
+  </li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane fade in active show" id="tab1default">
+    <%= form_for @changeset, @action, fn f ->  %>
+      <%= hidden_input f, :id %>
+      <%= input f, :name%>
+      <%= textarea_input f, :description%>
+      <%= textarea_input f, :meta_description%>
+      <%= input f, :meta_keywords%>
+      <%= input f, :meta_title%>
+      <%= submit "Submit", class: "btn btn-primary submit-btn" %>
+    <% end %>
+    </div>
+    <%= if  @conn.request_path != product_path(@conn, :new) do %>
+    <div class="tab-pane fade" id="tab2default" style="padding:10px">
+
+      <div style="padding: 10px; background: #f8f9fa; border-radius: 10px">
+        <div class="form-group required">
+          <label>Variation Theme</label>
+          <%= select :theme, :theme_id, themes_options(@prototype.variation_themes), selected: @parent_product.theme_id ,prompt: "", class: "form-control", id: "product_theme_id" %>
+        </div>
+        <div id="variation_options" style="padding: 10px 0px 10px 0px;"></div>
+        <div class="modal fade" id="theme_change_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Warning</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="alert alert-danger" role="alert">
+                  Changing theme will remove all the associated variants.
+                  Are you sure you want to do this?
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <button id="theme_change_confirm" type="button" class="btn btn-primary">Yes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <%= if has_variants(@parent_product) do %>
+        <div>
+        <h3>Product Variants</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Product ID</th>
+              <%= for option_type <- get_option_types(@parent_product) do %>
+                <th><%= option_type.display_name %></th>
+              <% end %>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+              <%= for variant <- @parent_product.variants do %>
+                <tr>
+                  <td><%= variant.id %></td>
+                  <%= for option <- variant.options do %>
+                    <td contenteditable="true"><%= option.value %></td>
+                  <% end %>
+                  <td><%= link("Edit", to: product_path(@conn, :edit, variant.id, "prototype_id": 1), class: "btn btn-primary")%></td>
+                </tr>
+              <% end %>
+          </tbody>
+        </table>
+      </div>
+        </div>
+      <% end %>
+    <% end %>
+    <div class="tab-pane fade" id="tab3default">Images</div>
+</div>
