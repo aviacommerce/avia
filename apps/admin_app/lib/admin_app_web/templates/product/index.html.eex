@@ -1,0 +1,53 @@
+<div class="row">
+  <div class="col-5">
+    <h2>Products</h2>
+  </div>
+  <div class="col-6" align="right">
+    <%= link("Create New", to: product_path(@conn, :new, "prototype_id": 1), class: "btn btn-primary")%>
+  </div>
+  <div class="col-1"></div>
+</div>
+<div class="row">
+  <div class="col-12">
+    <div class="panel-group">
+      <%= for item <- @products do %>
+  	  <div style="border:1px solid #ddd; padding: 0.5rem">
+
+          <div class="d-flex flex-row align-items-center">
+            <div class="p-2">
+              <a data-toggle="collapse" href="#<%= item.id %>">
+                <img src="https://res.cloudinary.com/dnnqvqxz0/image/upload/v1532452255/empty-img.png" height="100px" >
+                 <%= item.name %>
+               </a>
+            </div>
+            <%= if has_variants(item) do %>
+            <div class="p-2">
+                <span style="background: #17a2b8; padding: 5px; color: white; border-radius: 10px">  <%= item.variants |> length %> Variants </span>
+            </div>
+            <% end %>
+            <div class="p-2" style="margin-left: auto">
+              <%= link("Edit", to: product_path(@conn, :edit, item.id, "prototype_id": 1), class: "btn btn-primary")%>
+            </div>
+          </div>
+
+
+  	  	<div class="panel-collapse collapse" id="<%= item.id %>">
+  	  		<div class="panel-body" style="margin-right: 1rem">
+            <%= for variant <- item.variants do %>
+            <div class="d-flex flex-row align-items-center" style="border: 1px solid #ddd; border-radius: 2px">
+              <div class="p-2">
+                <img src="https://res.cloudinary.com/dnnqvqxz0/image/upload/v1532452255/empty-img.png" height="100px" >
+                <a href="#"><%= variant.name %></a>
+              </div>
+              <div class="p-2" style="margin-left: auto">
+                <%= link("Edit", to: product_path(@conn, :edit, variant.id, "prototype_id": 1), class: "btn btn-primary")%>
+              </div>
+            </div>
+            <%= end %>
+  	  		</div>
+  	  	</div>
+  	  </div>
+      <%= end %>
+    </div>
+  </div>
+</div>
