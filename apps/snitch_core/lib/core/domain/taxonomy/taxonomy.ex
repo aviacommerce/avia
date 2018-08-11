@@ -7,6 +7,7 @@ defmodule Snitch.Domain.Taxonomy do
 
   import AsNestedSet.Modifiable
   import AsNestedSet.Queriable, only: [dump_one: 2]
+  import Ecto.Query
 
   alias Snitch.Data.Schema.{Taxon, Taxonomy}
   alias Snitch.Tools.Helper.Taxonomy, as: Helper
@@ -103,5 +104,9 @@ defmodule Snitch.Domain.Taxonomy do
     |> Repo.preload(:root)
     |> Enum.map(fn taxonomy -> %{taxonomy | taxons: dump_taxonomy(taxonomy.id)} end)
     |> Enum.map(&Helper.convert_to_map/1)
+  end
+
+  def get_child_taxons(taxon_id) do
+    Repo.all(from(taxon in Taxon, where: taxon.parent_id == ^taxon_id))
   end
 end

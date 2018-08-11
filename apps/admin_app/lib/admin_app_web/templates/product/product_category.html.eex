@@ -1,0 +1,64 @@
+<h3>Select product category</h3>
+<div>
+  <section id="category_selection" class="card1"></section>
+  <div id="category_loader" class="loader"></div>
+</div>
+
+<style>
+.card1 {
+  display: flex;
+  min-height: 400px;
+  overflow-x: auto;
+}
+
+.list-group-item:hover {
+  cursor: pointer;
+}
+
+.card--content {
+  min-width: 300px;
+  box-shadow: 3px 5px rgba(255,255,255,0.05);
+}
+
+.list-group{
+  height: 400px;
+  overflow-y: scroll;
+}
+
+.add-product{
+  position: relative;
+  top: 50%;
+  transform: perspective(1px) translateY(-50%);
+  text-align: center;
+}
+
+#category_loader{
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background-color: white;
+  opacity: 0.8;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #9ed1fa;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #2196f3;
+}
+</style>

@@ -66,6 +66,10 @@ defmodule AdminAppWeb.ProductController do
     end
   end
 
+  def select_category(conn, params) do
+    render(conn, "product_category.html")
+  end
+
   def generate_variant_params(parent_product, options) do
     options =
       options
