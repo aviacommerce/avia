@@ -26,12 +26,58 @@ import { getPaymentMethod } from './payment_method'
 
 $(document).ready(() => {
   setup_product();
+  get_categories(1)
+  handle_category_click()
   getPaymentMethod();
   select2Selector();
 })
 
 const elmDiv = document.getElementById("elm-main");
 Elm.Main.embed(elmDiv);
+
+// --------------------------------------------------
+// Functions for product category selection page
+// --------------------------------------------------
+function get_categories(id)
+{
+  $(`#category_loader`).addClass(`loader`).show();
+  fetch('http://localhost:4000/api/categories/' + id)
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(json){
+    $(`#category_selection`)
+    .append(json.html)
+    $(`#category_loader`).removeClass(`loader`).hide();
+  })
+}
+
+function handle_category_click(){
+  $(`#category_selection`)
+  .on("click", "li", function(e){
+    let clicked_li = $(e.target);
+
+    //clear existing active li
+    var ul =  clicked_li.closest("ul");
+
+    ul
+    .children()
+    .each(function(){
+      $(this).removeClass(`active`);
+    });
+
+    //remove all categories after
+    var card = ul.closest('.card--content');
+    card.nextAll().remove();
+
+    var next_taxon_id = clicked_li.data('taxon_id');
+    clicked_li.addClass('active')
+
+    get_categories(next_taxon_id);
+  })
+}
+
+// ----------------------------------------------------------
 
 function setup_product(){
   // This handle the variation theme selection

@@ -59,6 +59,7 @@ defmodule AdminAppWeb.Router do
     resources("/product_brands", ProductBrandController)
     resources("/payment_methods", PaymentMethodController)
     post("/payment-provider-inputs", PaymentMethodController, :payment_preferences)
+    get("/product/category", ProductController, :select_category)
   end
 
   scope "/", AdminAppWeb do
@@ -85,5 +86,6 @@ defmodule AdminAppWeb.Router do
     pipe_through(:api)
 
     resources("/option_types", OptionTypeController)
+    get("/categories/:taxon_id", TaxonomyController, :index)
   end
 end
