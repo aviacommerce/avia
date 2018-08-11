@@ -1,0 +1,7 @@
+<div class="card--content">
+  <ul class="list-group">
+    <%= for taxon <- @taxons do %>
+      <li class="list-group-item" data-taxon_id="<%= taxon.id %>"><%= taxon.name %></li>
+    <% end %>
+  </ul>
+</div>
