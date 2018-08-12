@@ -24,7 +24,10 @@ matrix:
 
 addons:
   postgresql: "9.5"
-  
+
+services:
+  - postgresql
+
 notifications:
   email:
     recipients:

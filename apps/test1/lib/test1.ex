@@ -1,6 +1,6 @@
-defmodule Dummy do
+defmodule Test1 do
   @moduledoc """
-  Documentation for Dummy.
+  Documentation for Test1.
   """
 
   @doc """
@@ -8,7 +8,7 @@ defmodule Dummy do
 
   ## Examples
 
-      iex> Dummy.hello
+      iex> Test1.hello
       :world
 
   """

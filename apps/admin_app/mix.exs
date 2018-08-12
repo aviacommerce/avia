@@ -50,8 +50,8 @@ defmodule AdminApp.Mixfile do
       # email
       {:swoosh, "~> 0.15"},
       {:phoenix_swoosh, "~> 0.2"},
-      {:gen_smtp, "~> 0.12"}
-      # {:snitch_payments, in_umbrella: true}
+      {:gen_smtp, "~> 0.12"},
+      {:test1, in_umbrella: true}
     ]
   end
 end
