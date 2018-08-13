@@ -4,17 +4,8 @@ defmodule Snitch.Data.Schema.PaymentMethodTest do
 
   alias Snitch.Data.Schema.PaymentMethod
 
-  test "PaymentMethods must have unique code" do
-    params = %{name: "card-payments", code: "ccd"}
-    card_method = PaymentMethod.create_changeset(%PaymentMethod{}, params)
-    assert %Ecto.Changeset{valid?: true} = card_method
-    assert {:ok, _} = Repo.insert(card_method)
-    assert {:error, %Ecto.Changeset{errors: errors}} = Repo.insert(card_method)
-    assert errors == [code: {"has already been taken", []}]
-  end
-
   test "PaymentMethod `:update` ignores changes to `:code`" do
-    create_params = %{name: "card-payments", code: "ccd"}
+    create_params = %{name: "card-payments", code: "ccd", provider: PayuBiz}
     card_method = PaymentMethod.create_changeset(%PaymentMethod{}, create_params)
     assert {:ok, _} = Repo.insert(card_method)
 

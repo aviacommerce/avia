@@ -22,10 +22,12 @@ import "phoenix_html"
 
 import "bootstrap";
 import select2Selector from './form-helpers/select2-selector';
+import {getPaymentMethod} from './payment_method'
 
 $(document).ready(() => {
   select2Selector();
   setup_product();
+  getPaymentMethod();
 })
 
 const elmDiv = document.getElementById("elm-main");

@@ -7,6 +7,8 @@ config :snitch_core, Snitch.Repo,
   password: "postgres",
   database: "snitch_test",
   hostname: "localhost",
+  ownership_timeout: 60_000,
+  pool_timeout: 60_000,
   pool: Ecto.Adapters.SQL.Sandbox
 
 config :snitch_core, :defaults_module, Snitch.Tools.DefaultsMock
