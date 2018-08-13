@@ -1,9 +1,9 @@
-defmodule Test1.MixProject do
+defmodule SnitchPayments.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :test1,
+      app: :snitch_payments,
       version: "0.1.0",
       build_path: "../../_build",
       config_path: "../../config/config.exs",

@@ -10,11 +10,11 @@ use Mix.Config
 
 # You can configure your application as:
 #
-#     config :test1, key: :value
+#     config :snitch_payments, key: :value
 #
 # and access this configuration in your application as:
 #
-#     Application.get_env(:test1, :key)
+#     Application.get_env(:snitch_payments, :key)
 #
 # You can also configure a 3rd-party app:
 #

@@ -1,6 +1,6 @@
-defmodule Test1 do
+defmodule SnitchPayments do
   @moduledoc """
-  Documentation for Test1.
+  Documentation for SnitchPayments.
   """
 
   @doc """
@@ -8,7 +8,7 @@ defmodule Test1 do
 
   ## Examples
 
-      iex> Test1.hello
+      iex> SnitchPayments.hello
       :world
 
   """
