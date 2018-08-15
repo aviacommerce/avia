@@ -49,7 +49,14 @@ defmodule SnitchApi.Mixfile do
 
       # Authentication
       {:guardian, "~> 1.0"},
-      {:inflex, "~> 1.10.0"}
+      {:inflex, "~> 1.10.0"},
+
+      # http client
+      {:httpoison, "~> 1.0"},
+      {:snitch_payments, github: "aviabird/snitch_payments", branch: "develop"},
+
+      # html parser
+      {:floki, "~> 0.20.0"}
     ]
   end
 end

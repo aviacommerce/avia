@@ -71,7 +71,10 @@ defmodule Snitch.Core.Mixfile do
       {:inch_ex, "~> 0.5.6", only: [:docs, :dev]},
 
       # csp
-      {:aruspex, github: "oyeb/aruspex", branch: "tweaks"}
+      {:aruspex, github: "oyeb/aruspex", branch: "tweaks"},
+
+      # payments
+      {:snitch_payments, github: "aviabird/snitch_payments", branch: "develop"}
     ]
   end
 

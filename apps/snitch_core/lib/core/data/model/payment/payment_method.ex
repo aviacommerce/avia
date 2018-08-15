@@ -17,6 +17,7 @@ defmodule Snitch.Data.Model.PaymentMethod do
   use Snitch.Data.Model
 
   alias Snitch.Data.Schema.PaymentMethod
+  alias SnitchPayments.PaymentMethodCode, as: Codes
 
   @spec create(map) :: {:ok, PaymentMethod.t()} | {:error, Ecto.Changeset.t()}
   def create(params) do
