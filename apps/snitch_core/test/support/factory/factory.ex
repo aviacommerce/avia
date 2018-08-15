@@ -19,6 +19,7 @@ defmodule Snitch.Factory do
     Address,
     Card,
     CardPayment,
+    HostedPayment,
     LineItem,
     Order,
     Payment,
@@ -124,6 +125,15 @@ defmodule Snitch.Factory do
     }
   end
 
+  def payment_method_hosted_factory do
+    %PaymentMethod{
+      name: "payubiz",
+      code: "hpm",
+      active?: true,
+      provider: PayuBiz
+    }
+  end
+
   def payment_ccd_factory do
     %Payment{
       slug: sequence("card-payment"),
@@ -138,10 +148,25 @@ defmodule Snitch.Factory do
     }
   end
 
+  def payment_hosted_factory do
+    %Payment{
+      slug: sequence("hosted-payment"),
+      payment_type: "hpm"
+    }
+  end
+
   def card_payment_factory do
     %CardPayment{
       cvv_response: "V",
       avs_response: "Z"
+    }
+  end
+
+  def hosted_payment_factory do
+    %HostedPayment{
+      transaction_id: "abc1234",
+      raw_response: %{},
+      payment_source: "payubiz"
     }
   end
 
@@ -243,16 +268,18 @@ defmodule Snitch.Factory do
   def payment_methods(_context) do
     [
       card_method: insert(:payment_method_card),
-      check_method: insert(:payment_method_check)
+      check_method: insert(:payment_method_check),
+      hosted_method: insert(:payment_method_hosted)
     ]
   end
 
   def payments(context) do
-    %{card_method: card_m, check_method: check_m, order: order} = context
+    %{card_method: card_m, check_method: check_m, order: order, hosted_method: hosted_m} = context
 
     [
       ccd: insert(:payment_ccd, payment_method_id: card_m.id, order_id: order.id),
-      chk: insert(:payment_chk, payment_method_id: check_m.id, order_id: order.id)
+      chk: insert(:payment_chk, payment_method_id: check_m.id, order_id: order.id),
+      hpm: insert(:payment_hosted, payment_method_id: hosted_m.id, order_id: order.id)
     ]
   end
 

@@ -21,6 +21,9 @@ defmodule SnitchApiWeb.Router do
     get("/variants/favorites", VariantController, :favorite_variants)
     resources("/products", ProductController, except: [:new, :edit], param: "product_slug")
     get("/orders/:order_number", OrderController, :fetch_guest_order)
+    post("/hosted-payment/payubiz-request", HostedPaymentController, :payubiz_request_url)
+    post("/hosted-payment/:source/success", HostedPaymentController, :payment_success)
+    post("/hosted-payment/:source/error", HostedPaymentController, :payment_error)
   end
 
   scope "/api/v1", SnitchApiWeb do

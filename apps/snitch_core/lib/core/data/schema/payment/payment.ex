@@ -6,10 +6,11 @@ defmodule Snitch.Data.Schema.Payment do
   use Snitch.Data.Schema
 
   alias Snitch.Data.Schema.{Order, PaymentMethod}
+  alias SnitchPayments.PaymentMethodCode
 
   @type t :: %__MODULE__{}
 
-  @payment_types ["chk", "ccd"]
+  @payment_types PaymentMethodCode.payment_types()
 
   schema "snitch_payments" do
     field(:slug, :string)
