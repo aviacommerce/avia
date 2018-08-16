@@ -109,4 +109,33 @@ defmodule Snitch.Domain.Taxonomy do
   def get_child_taxons(taxon_id) do
     Repo.all(from(taxon in Taxon, where: taxon.parent_id == ^taxon_id))
   end
+
+  @doc """
+  Get taxon by id
+  """
+  def get_taxon(id) do
+    Repo.get_by(Taxon, id: id)
+    |> Repo.preload(:taxonomy)
+  end
+
+  @doc """
+  Update the given taxon by name.
+  """
+  def update_taxon(taxon, params) do
+    taxon |> Taxon.update_changeset(params) |> Repo.update()
+  end
+
+  @doc """
+  Create a taxonomy with given name.
+  """
+  def create_taxonomy(name) do
+    %Taxonomy{name: name} |> Repo.insert()
+  end
+
+  @doc """
+  Delete a taxon
+  """
+  def delete_taxon(taxon) do
+    taxon |> Repo.delete()
+  end
 end

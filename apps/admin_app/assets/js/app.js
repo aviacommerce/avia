@@ -24,16 +24,38 @@ import "bootstrap";
 import select2Selector from './form-helpers/select2-selector';
 import { getPaymentMethod } from './payment_method'
 import {handleImageSelect, deleteImage} from './product_file_upload'
+import { createTaxon } from './create_taxon';
+import { editTaxon } from './edit_taxon' ;
 
 $(document).ready(() => {
   get_categories(1)
   handle_category_click()
+  createTaxon();
+  editTaxon();
   handleImageSelect();
   deleteImage();
   select2Selector();
   setup_product();
   getPaymentMethod();
-  select2Selector();
+
+  const sortable = new Draggable.Sortable(document.querySelectorAll(".mycontainer"), {
+    draggable: ".draggable",
+    mirror: {
+      constrainDimensions: true
+    }
+  })
+
+  let dropcontainer;
+
+  sortable.on(`drag:over:container`, (evt) => {
+    dropcontainer = evt.overContainer
+  })
+
+  sortable.on(`drag:stop`, (evt) => {
+    $(dropcontainer)
+    .css("background", "yellow")
+  })
+
 })
 
 const elmDiv = document.getElementById("elm-main");

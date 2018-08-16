@@ -1,0 +1,3 @@
+<div class="item draggable"> 
+  <span> <%= @name %> </span>
+</div>

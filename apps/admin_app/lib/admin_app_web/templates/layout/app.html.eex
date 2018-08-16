@@ -9,8 +9,9 @@
 
     <title>Snitch | Admin</title>
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
-  </head>
 
+    <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.7/lib/draggable.bundle.js"></script>
+  </head>
   <body>
     <%= render "header.html", conn: @conn%>
     <%= render "flash.html", conn: @conn%>
