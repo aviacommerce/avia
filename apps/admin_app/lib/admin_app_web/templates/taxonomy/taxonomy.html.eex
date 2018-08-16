@@ -1,0 +1,82 @@
+<h2>Taxonomy</h2>
+<div class="mycontainer">
+  <%= render "list.html", conn: @conn, taxonomy: @taxonomy, token: @token %>
+</div>
+<div class="modal" id="taxon-modal" role="dialog" >
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Add Taxon</h2>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="/taxonomy" method="post" class="taxonform">
+          <input type="hidden" value="<%= @token %>" name="_csrf_token"/>
+          <div class="form-group">
+            <input type="hidden" name="id" class="form-control" id="form-taxon-id" />
+          </div>
+          <div class="form-group">
+            <input type="text" name="taxon" class="form-control" />
+          </div>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal" id="edittaxon-modal" role="dialog" >
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Taxon</h2>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <%= form_for @conn, taxonomy_path(@conn, :update_taxon),[as: :taxon, class: "edittaxonform", id: "taxon-form", method: "put"], fn f -> %>
+          <%= hidden_input f, :taxon_id, class: "form-control", id: "editform-taxon-id", value: ""  %>
+          <div class="form-group">
+            <%= label f, :taxon, class: "control-label" %>
+            <%= text_input f, :taxon, class: "form-control", id: "editform-taxon-name" %>
+            <%= submit "Save", class: "btn btn-primary"%>
+          </div>
+        <% end %>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .draggable {
+  cursor: move;
+}
+
+.mycontainer {
+  padding: 5px ;
+  background: powderblue;
+  border: 2px solid steelblue;
+}
+
+.mycontainer>* {
+  margin-top: 3px;
+}
+
+.item {
+  padding: 2px;
+  background: mistyrose;
+  border: 1px solid steelblue;
+}
+
+.mycontainer .draggable-source--is-dragging {
+  background: #666;
+  color: #666;
+}
+
+.mycontainer .draggable-source--is-dragging>* {
+  visibility: hidden;
+}
+</style>

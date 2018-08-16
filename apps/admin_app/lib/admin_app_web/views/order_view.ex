@@ -57,7 +57,7 @@ defmodule AdminAppWeb.OrderView do
     if is_editable?(order.state) do
       content_tag(
         :td,
-        form_tag("/orders/#{order.number}/cart/edit?update=#{item}", method: "post") do
+        form_tag "/orders/#{order.number}/cart/edit?update=#{item}", method: "post" do
           content_tag(:button, ["update"], class: "btn btn-primary", type: "submit")
         end
       )
@@ -68,7 +68,7 @@ defmodule AdminAppWeb.OrderView do
     if is_editable?(order.state) do
       content_tag(
         :td,
-        form_tag("/orders/#{order.number}/cart?edit=#{item}", method: "post") do
+        form_tag "/orders/#{order.number}/cart?edit=#{item}", method: "post" do
           content_tag(:button, ["remove"], class: "btn btn-primary", type: "submit")
         end
       )
@@ -139,7 +139,7 @@ defmodule AdminAppWeb.OrderView do
     ]
 
     list =
-      form_tag("/orders/#{order.number}/cart?add=#{item.id}", method: "put") do
+      form_tag "/orders/#{order.number}/cart?add=#{item.id}", method: "put" do
         List.flatten(content)
       end
 
@@ -156,7 +156,7 @@ defmodule AdminAppWeb.OrderView do
     ]
 
     list =
-      form_tag("/orders/#{order.number}/cart/update?update=#{item.id}", method: "put") do
+      form_tag "/orders/#{order.number}/cart/update?update=#{item.id}", method: "put" do
         List.flatten(content)
       end
 
@@ -177,10 +177,7 @@ defmodule AdminAppWeb.OrderView do
     ]
 
     list =
-      form_tag(
-        "/orders/#{order.number}/address/search?address_id=#{address.id}",
-        method: "put"
-      ) do
+      form_tag "/orders/#{order.number}/address/search?address_id=#{address.id}", method: "put" do
         List.flatten(content)
       end
 

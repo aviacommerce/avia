@@ -104,7 +104,7 @@ defmodule Snitch.Data.Schema.Product do
     variant_changes =
       get_change(changeset, :variations)
       |> Enum.map(fn c ->
-        if(c.action == :replace) do
+        if c.action == :replace do
           Map.update(c, :action, nil, fn x -> nil end)
         else
           c
