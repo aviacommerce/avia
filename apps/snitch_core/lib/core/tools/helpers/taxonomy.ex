@@ -55,4 +55,30 @@ defmodule Snitch.Tools.Helper.Taxonomy do
       create_taxon(taxon, root)
     end
   end
+
+  def convert_to_map(taxonomy) do
+    root = convert_taxon(taxonomy.taxons)
+
+    %{
+      id: taxonomy.id,
+      name: taxonomy.name,
+      root: root
+    }
+  end
+
+  def convert_taxon([]) do
+    []
+  end
+
+  def convert_taxon({taxon, children}) do
+    %{
+      id: taxon.id,
+      name: taxon.name,
+      pretty_name: "",
+      permlink: "",
+      parent_id: taxon.parent_id,
+      taxonomy_id: taxon.taxonomy_id,
+      taxons: Enum.map(children, &convert_taxon/1)
+    }
+  end
 end

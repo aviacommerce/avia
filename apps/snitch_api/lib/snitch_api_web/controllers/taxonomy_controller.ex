@@ -4,22 +4,15 @@ defmodule SnitchApiWeb.TaxonomyController do
   alias Snitch.Data.Schema.Taxonomy
   alias Snitch.Repo
 
+  alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
+
   action_fallback(SnitchApiWeb.FallbackController)
   plug(SnitchApiWeb.Plug.DataToAttributes)
   plug(SnitchApiWeb.Plug.LoadUser)
 
   def index(conn, _params) do
-    taxonomies =
-      Taxonomy
-      |> Repo.all()
-      |> Repo.preload([:root])
-
-    render(
-      conn,
-      "index.json-api",
-      data: taxonomies,
-      opts: [include: "root"]
-    )
+    taxonomy = TaxonomyDomain.get_all_taxonomy()
+    json(conn, %{data: taxonomy})
   end
 
   def show(conn, %{"id" => id}) do
