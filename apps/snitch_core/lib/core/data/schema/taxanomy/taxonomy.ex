@@ -8,6 +8,7 @@ defmodule Snitch.Data.Schema.Taxonomy do
 
   schema "snitch_taxonomies" do
     field(:name, :string)
+    field(:taxons, :any, virtual: true)
 
     belongs_to(:root, Taxon)
     timestamps()

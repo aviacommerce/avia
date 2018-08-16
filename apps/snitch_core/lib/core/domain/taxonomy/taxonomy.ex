@@ -9,6 +9,7 @@ defmodule Snitch.Domain.Taxonomy do
   import AsNestedSet.Queriable, only: [dump_one: 2]
 
   alias Snitch.Data.Schema.{Taxon, Taxonomy}
+  alias Snitch.Tools.Helper.Taxonomy, as: Helper
 
   @doc """
   Adds child taxon to left, right or child of parent taxon.
@@ -93,5 +94,14 @@ defmodule Snitch.Domain.Taxonomy do
   """
   def get_taxonomy(name) do
     Repo.get_by(Taxonomy, name: name)
+  end
+
+  @spec get_all_taxonomy :: [map()]
+  def get_all_taxonomy do
+    Taxonomy
+    |> Repo.all()
+    |> Repo.preload(:root)
+    |> Enum.map(fn taxonomy -> %{taxonomy | taxons: dump_taxonomy(taxonomy.id)} end)
+    |> Enum.map(&Helper.convert_to_map/1)
   end
 end
