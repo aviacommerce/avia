@@ -62,6 +62,10 @@ defmodule AdminAppWeb.Router do
     get("/product/category", ProductController, :select_category)
     post("/product-images/:product_id", ProductController, :add_images)
     delete("/product-images/", ProductController, :delete_image)
+
+    resources("/taxonomy", TaxonomyController, except: [:update])
+    post("/taxonomy/create", TaxonomyController, :create_taxonomy)
+    put("/taxonomy/update", TaxonomyController, :update_taxon)
   end
 
   scope "/", AdminAppWeb do

@@ -23,7 +23,7 @@
         <tr>
           <td><%= item.name%></td>
           <td><%= item.description%></td>
-          <td><%= item.is_default?%></td>        
+          <td><%= item.is_default?%></td>
           <td><%= item.tax_code%></td>
         </tr>
       <% end %>

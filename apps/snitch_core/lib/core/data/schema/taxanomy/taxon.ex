@@ -18,8 +18,13 @@ defmodule Snitch.Data.Schema.Taxon do
   end
 
   @cast_fields ~w(name parent_id taxonomy_id lft rgt)
+  @update_fields ~w(name)
 
   def changeset(taxon, params) do
     cast(taxon, params, @cast_fields)
+  end
+
+  def update_changeset(taxon, params) do
+    cast(taxon, params, @update_fields)
   end
 end
