@@ -18,6 +18,7 @@
       <%= input f, :name%>
       <%= textarea_input f, :description%>
       <%= textarea_input f, :meta_description%>
+      <%= select_input f, :brand_id, get_brand_options(@brands) %>
       <%= input f, :meta_keywords%>
       <%= input f, :meta_title%>
       <%= submit "Submit", class: "btn btn-primary submit-btn" %>

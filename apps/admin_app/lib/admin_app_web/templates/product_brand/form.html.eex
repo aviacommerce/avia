@@ -1,0 +1,4 @@
+<%= form_for @changeset, @action, fn f ->  %>
+  <%= input f, :name%>
+  <%= submit "Submit", class: "btn btn-primary submit-btn" %>
+<% end %>
