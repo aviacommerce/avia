@@ -1,0 +1,6 @@
+<h4>Edit Product Brand</h4>
+<%= render "form.html",
+    changeset: @changeset,
+    conn: @conn,
+    action: product_brand_path(@conn, :update, @changeset.data.id)
+%>

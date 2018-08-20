@@ -1,0 +1,34 @@
+<div class="row">
+  <div class="col-5">
+    <h2>Product Brands</h2>
+  </div>
+  <div class="col-6" align="right">
+    <%= link("Create New", to: product_brand_path(@conn, :new), class: "btn btn-primary")%>
+  </div>
+  <div class="col-1"></div>
+</div>
+<div class="row">
+  <div class="col-12">
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th actions="col"></th>
+    </tr>
+  </thead>
+  <tbody class="ui-sortable">
+    <%= for item <- @brands do %>
+    <tr>
+      <td><%= item.name %></td>
+      <td>
+        <div class="float-right">
+        <%= link("Edit", to: product_brand_path(@conn, :edit, item.id), class: "btn btn-primary")%>
+        <%= link("Delete", to: product_brand_path(@conn, :delete, item.id), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger")%>
+      </div>
+      </td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+</div>

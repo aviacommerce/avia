@@ -3,5 +3,6 @@
     changeset: @changeset,
     conn: @conn,
     action: product_path(@conn, :create),
-    prototype: @prototype
+    prototype: @prototype,
+    brands: @brands
 %>

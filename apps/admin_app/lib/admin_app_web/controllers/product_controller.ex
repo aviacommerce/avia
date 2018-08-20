@@ -5,6 +5,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Data.Model.Product, as: ProductModel
   alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Data.Model.ProductPrototype, as: PrototypeModel
+  alias Snitch.Data.Schema.ProductBrand
 
   plug(:scrub_referer_query_params when action in [:create])
   plug(:load_resources when action in [:new, :edit])
@@ -143,6 +144,10 @@ defmodule AdminAppWeb.ProductController do
       PrototypeModel.get(prototype_id)
       |> Repo.preload([:variation_themes])
 
-    assign(conn, :prototype, prototype)
+    brands = Repo.all(ProductBrand)
+
+    conn
+    |> assign(:prototype, prototype)
+    |> assign(:brands, brands)
   end
 end

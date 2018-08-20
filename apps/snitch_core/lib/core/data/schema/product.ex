@@ -5,7 +5,15 @@ defmodule Snitch.Data.Schema.Product do
 
   use Snitch.Data.Schema
   alias Snitch.Data.Schema.Product.NameSlug
-  alias Snitch.Data.Schema.{Variation, Image, ProductOptionValue, VariationTheme, Review}
+
+  alias Snitch.Data.Schema.{
+    Variation,
+    Image,
+    ProductOptionValue,
+    VariationTheme,
+    Review,
+    ProductBrand
+  }
 
   @type t :: %__MODULE__{}
 
@@ -31,10 +39,11 @@ defmodule Snitch.Data.Schema.Product do
     many_to_many(:images, Image, join_through: "snitch_product_images", on_replace: :delete)
 
     belongs_to(:theme, VariationTheme)
+    belongs_to(:brand, ProductBrand)
   end
 
   @required_fields ~w(name)a
-  @optional_fields ~w(description meta_description meta_keywords meta_title)a
+  @optional_fields ~w(description meta_description meta_keywords meta_title brand_id)a
 
   def create_changeset(model, params \\ %{}) do
     common_changeset(model, params)

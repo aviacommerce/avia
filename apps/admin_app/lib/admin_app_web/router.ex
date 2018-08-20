@@ -57,6 +57,7 @@ defmodule AdminAppWeb.Router do
     resources("/prototypes", PrototypeController, except: [:show])
 
     resources("/products", ProductController)
+    resources("/product_brands", ProductBrandController)
   end
 
   scope "/", AdminAppWeb do

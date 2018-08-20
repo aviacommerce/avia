@@ -20,4 +20,8 @@ defmodule AdminAppWeb.ProductView do
     variant.options
     |> Enum.map(fn x -> x.option_type end)
   end
+
+  def get_brand_options(brands) do
+    Enum.map(brands, fn brand -> {brand.name, brand.id} end)
+  end
 end
