@@ -94,25 +94,23 @@
 
       <%= if has_variants(@parent_product) do %>
         <div>
-          <h3>Product Variants</h3>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Product ID</th>
-                <%= for option_type <- get_option_types(@parent_product) do %>
-                  <th><%= option_type.display_name %></th>
-                <% end %>
-              <th></th>
-              </tr>
-            </thead>
-            <tbody>
+        <h3>Product Variants</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Product ID</th>
+              <%= for option_type <- get_option_types(@parent_product) do %>
+                <th><%= option_type.display_name %></th>
+              <% end %>
+            </tr>
+          </thead>
+          <tbody>
               <%= for variant <- @parent_product.variants do %>
                 <tr>
                   <td><%= variant.id %></td>
                   <%= for option <- variant.options do %>
-                    <td contenteditable="true"><%= option.value %></td>
+                    <td class="option-value" contenteditable="true" data-option_value_id="<%= option.id %>"><%= option.value %></td>
                   <% end %>
-                  <td><%= link("Edit", to: product_path(@conn, :edit, variant.id, "prototype_id": 1), class: "btn btn-primary")%></td>
                 </tr>
               <% end %>
             </tbody>

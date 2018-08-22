@@ -28,13 +28,13 @@ import { createTaxon } from './create_taxon';
 import { editTaxon } from './edit_taxon' ;
 
 $(document).ready(() => {
+  select2Selector();
   get_categories(1)
   handle_category_click()
   createTaxon();
   editTaxon();
   handleImageSelect();
   deleteImage();
-  select2Selector();
   setup_product();
   getPaymentMethod();
 
@@ -106,6 +106,8 @@ function handle_category_click(){
 // ----------------------------------------------------------
 
 function setup_product(){
+  let previousOptionValue = ""
+
   // This handle the variation theme selection
   $('#product_theme_id').on('change', function (e) {
     $('#theme_change_modal').modal(`show`);
@@ -126,9 +128,38 @@ function setup_product(){
       get_variation_options(valueSelected, product_id.val())
   })
 
+  $(".option-value")
+  .blur(function(evt){
+    var td = $(evt.target)
+    let option_value_id = td.data("option_value_id")
+    let value = td[0].innerText
+    if(value !== "")
+      update_option_value(option_value_id, value)
+    else {
+      td.text(previousOptionValue)
+    }
+  })
+
+  $(".option-value")
+  .focusin(function(evt){
+    var td = $(evt.target)
+    previousOptionValue = td[0].innerText
+  })
+
   var product_id = $("#product_id").val();
   var theme_id = $("#product_theme_id").val();
   get_variation_options(theme_id, product_id)
+}
+
+function update_option_value(id, value){
+  $.ajax({
+    type: "POST",
+    url: 'http://localhost:3000/api/v1/product_option_values/' + id,
+    crossDomain: true,
+    data: {value: value},
+    success: function(response){
+    }
+  })
 }
 
 function get_variation_options(theme_id, product_id)
