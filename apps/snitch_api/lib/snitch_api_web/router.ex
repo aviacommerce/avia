@@ -29,6 +29,7 @@ defmodule SnitchApiWeb.Router do
     get("/countries", AddressController, :countries)
     get("/countries/:id/states/", AddressController, :country_states)
     get("/brands", ProductBrandController, :index)
+    post("/product_option_values/:id", ProductOptionValueController, :update)
   end
 
   scope "/api/v1", SnitchApiWeb do
