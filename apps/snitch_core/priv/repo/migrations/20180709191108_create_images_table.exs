@@ -3,7 +3,7 @@ defmodule Snitch.Repo.Migrations.CreateImagesTable do
 
   def change do
     create table("snitch_images") do
-      add :url, :string, null: false
+      add :name, :string, null: false
       timestamps()
     end
 

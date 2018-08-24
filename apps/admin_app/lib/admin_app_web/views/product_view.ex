@@ -1,5 +1,6 @@
 defmodule AdminAppWeb.ProductView do
   use AdminAppWeb, :view
+  alias Snitch.Data.Model.Product
 
   @currencies ["USD", "INR"]
 
@@ -40,5 +41,9 @@ defmodule AdminAppWeb.ProductView do
   # TODO This needs to fetched from config
   def get_currency() do
     @currencies
+  end
+
+  def get_image_url(image, product) do
+    Product.image_url(image.name, product)
   end
 end

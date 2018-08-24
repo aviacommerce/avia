@@ -60,6 +60,8 @@ defmodule AdminAppWeb.Router do
     resources("/payment_methods", PaymentMethodController)
     post("/payment-provider-inputs", PaymentMethodController, :payment_preferences)
     get("/product/category", ProductController, :select_category)
+    post("/product-images/:product_id", ProductController, :add_images)
+    delete("/product-images/", ProductController, :delete_image)
   end
 
   scope "/", AdminAppWeb do

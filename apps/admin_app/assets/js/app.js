@@ -23,8 +23,12 @@ import "phoenix_html"
 import "bootstrap";
 import select2Selector from './form-helpers/select2-selector';
 import { getPaymentMethod } from './payment_method'
+import {handleImageSelect, deleteImage} from './product_file_upload'
 
 $(document).ready(() => {
+  handleImageSelect();
+  deleteImage();
+  select2Selector();
   setup_product();
   get_categories(1)
   handle_category_click()

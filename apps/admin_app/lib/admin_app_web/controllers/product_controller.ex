@@ -34,7 +34,7 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def edit(conn, %{"id" => id} = params) do
-    preloads = [variants: [options: :option_type]]
+    preloads = [variants: [options: :option_type], images: []]
 
     with %ProductSchema{} = product <- ProductModel.get(id) |> Repo.preload(preloads) do
       changeset = ProductSchema.create_changeset(product, params)
@@ -47,6 +47,54 @@ defmodule AdminAppWeb.ProductController do
          {:ok, product} <- ProductModel.update(product, params) do
       redirect(conn, to: product_path(conn, :index))
     end
+  end
+
+  def add_images(conn, %{"product_images" => product_images, "product_id" => id}) do
+    product =
+      id
+      |> String.to_integer()
+      |> ProductModel.get()
+      |> Repo.preload(:images)
+
+    images = (product_images["images"] ++ product.images) |> parse_images()
+
+    params = %{"images" => images}
+
+    case ProductModel.add_images(product, params) do
+      {:ok, _} ->
+        redirect(conn, to: product_path(conn, :index))
+
+      {:error, _} ->
+        redirect(conn, to: product_path(conn, :index))
+    end
+  end
+
+  def delete_image(conn, %{"image_id" => image_id, "product_id" => product_id}) do
+    image_id = String.to_integer(image_id)
+    product_id = String.to_integer(product_id)
+
+    case ProductModel.delete_image(product_id, image_id) do
+      {:ok, _} ->
+        conn
+        |> put_status(200)
+        |> json(%{data: "success"})
+
+      {:error, reason} ->
+        conn
+        |> put_status(500)
+        |> json(%{data: reason})
+    end
+  end
+
+  defp parse_images(image_list) do
+    Enum.reduce(image_list, [], fn
+      %Plug.Upload{} = image, acc ->
+        [%{"image" => image} | acc]
+
+      image, acc ->
+        %{id: id, name: name} = Map.from_struct(image)
+        [%{"id" => id, "name" => name} | acc]
+    end)
   end
 
   def delete(conn, params) do

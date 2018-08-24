@@ -37,31 +37,32 @@ defmodule Snitch.Seed.Product do
 
       {_, variants} = Repo.insert_all(Variant, variants, returning: [:id])
 
-      variant_images =
-        products_json["products"]
-        |> Enum.flat_map(fn products_json -> products_json["variants"] end)
-        |> Enum.zip(variants)
-        |> Enum.map(fn {variant_json, variant} ->
-          Enum.map(variant_json["images"], fn url -> variant_image(url, variant.id) end)
-        end)
-        |> List.flatten()
+      # Removed images section to be handled separately.
+      # variant_images =
+      #   products_json["products"]
+      #   |> Enum.flat_map(fn products_json -> products_json["variants"] end)
+      #   |> Enum.zip(variants)
+      #   |> Enum.map(fn {variant_json, variant} ->
+      #     Enum.map(variant_json["images"], fn url -> variant_image(url, variant.id) end)
+      #   end)
+      #   |> List.flatten()
 
-      filtered_images = Enum.map(variant_images, &Map.drop(&1, [:variant_id]))
+      # filtered_images = Enum.map(variant_images, &Map.drop(&1, [:variant_id]))
 
-      {_, images} = Repo.insert_all(Image, filtered_images, returning: [:id])
+      # {_, images} = Repo.insert_all(Image, filtered_images, returning: [:id])
 
-      variant_image_middle_entries =
-        variant_images
-        |> Enum.zip(images)
-        |> Enum.map(fn {variant_image, image} ->
-          %{variant_id: variant_image.variant_id, image_id: image.id}
-        end)
+      # variant_image_middle_entries =
+      #   variant_images
+      #   |> Enum.zip(images)
+      #   |> Enum.map(fn {variant_image, image} ->
+      #     %{variant_id: variant_image.variant_id, image_id: image.id}
+      #   end)
 
-      Snitch.Repo.insert_all(
-        "snitch_variant_images",
-        variant_image_middle_entries,
-        returning: [:id]
-      )
+      # Snitch.Repo.insert_all(
+      #   "snitch_variant_images",
+      #   variant_image_middle_entries,
+      #   returning: [:id]
+      # )
 
       stock_location = Repo.all(StockLocation)
 
@@ -87,7 +88,6 @@ defmodule Snitch.Seed.Product do
 
   def variant_image(url, variant_id) do
     %{
-      url: url,
       inserted_at: Ecto.DateTime.utc(),
       updated_at: Ecto.DateTime.utc(),
       variant_id: variant_id
