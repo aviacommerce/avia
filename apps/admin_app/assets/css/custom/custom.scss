@@ -43,4 +43,39 @@ body {
     background-repeat: no-repeat;
     background-position: center;
   }
+
+  #selectedProductImages img {
+    max-width: 125px;
+    max-height: 125px;
+    float: left;
+    margin-bottom:10px;
+  }
+
+  .img-wrap {
+    position: relative;
+    display: inline-block;
+    font-size: 0;
+  }
+
+  .img-wrap .product-delete {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    z-index: 100;
+    background-color: #FFF;
+    padding: 5px 2px 2px;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    opacity: .2;
+    text-align: center;
+    font-size: 22px;
+    line-height: 10px;
+    border-radius: 50%;
+  }
+
+  .img-wrap:hover .product-delete {
+    opacity: 1;
+  }
+
 }

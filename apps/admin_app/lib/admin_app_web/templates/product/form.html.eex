@@ -13,7 +13,7 @@
 </ul>
 <div class="tab-content">
     <div class="tab-pane fade in active show" id="tab1default">
-    <%= form_for @changeset, @action, fn f ->  %>
+    <%= form_for @changeset, @action, [multipart: true], fn f ->  %>
       <%= hidden_input f, :id %>
       <%= input f, :name%>
       <%= textarea_input f, :description%>
@@ -48,6 +48,7 @@
       <%= submit "Submit", class: "btn btn-primary submit-btn" %>
     <% end %>
     </div>
+
     <%= if  @conn.request_path != product_path(@conn, :new) do %>
     <div class="tab-pane fade" id="tab2default" style="padding:10px">
 
@@ -83,18 +84,18 @@
 
       <%= if has_variants(@parent_product) do %>
         <div>
-        <h3>Product Variants</h3>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Product ID</th>
-              <%= for option_type <- get_option_types(@parent_product) do %>
-                <th><%= option_type.display_name %></th>
-              <% end %>
+          <h3>Product Variants</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Product ID</th>
+                <%= for option_type <- get_option_types(@parent_product) do %>
+                  <th><%= option_type.display_name %></th>
+                <% end %>
               <th></th>
-            </tr>
-          </thead>
-          <tbody>
+              </tr>
+            </thead>
+            <tbody>
               <%= for variant <- @parent_product.variants do %>
                 <tr>
                   <td><%= variant.id %></td>
@@ -104,11 +105,41 @@
                   <td><%= link("Edit", to: product_path(@conn, :edit, variant.id, "prototype_id": 1), class: "btn btn-primary")%></td>
                 </tr>
               <% end %>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+          </div>
+        <% end %>
       </div>
-        </div>
-      <% end %>
     <% end %>
-    <div class="tab-pane fade" id="tab3default">Images</div>
+
+  <div class="tab-pane fade" id="tab3default">
+    <div style="padding: 10px; background: #f8f9fa; border-radius: 10px">
+      <input id="product-id" name="product-id" type="hidden" value="<%= @parent_product.id %>" >
+      <%= if length(@parent_product.images) > 0 do %>
+        <%= for image <- @parent_product.images do %>
+        <div class="img-wrap">
+          <span class="product-delete">&times;
+            <input name="delete-image-id" type="hidden" value="<%= image.id %>" >
+          </span>
+          <%= img_tag(get_image_url(image, @parent_product), class: "image") %>
+        </div>
+        <% end %>
+      <% end %>
+      <%= form_for @conn, product_path(@conn, :add_images, @parent_product.id),
+        [as: :product_images, multipart: true], fn f -> %>
+        <%= file_input f, :images, multiple: true, class: "form-control",
+          id: "product-images" %>
+        <div id="selectedProductImages">
+        </div>
+        <hr>
+        <%= submit "Save Images", class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  </div>
 </div>
+
+<html>
+  <head>
+    <%= csrf_meta_tag %>
+  </head>
+</html>

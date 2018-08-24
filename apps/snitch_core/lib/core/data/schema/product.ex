@@ -54,7 +54,9 @@ defmodule Snitch.Data.Schema.Product do
   end
 
   def update_changeset(model, params \\ %{}) do
-    common_changeset(model, params)
+    model
+    |> common_changeset(params)
+    |> cast_assoc(:images, with: &Image.changeset/2)
   end
 
   def variant_create_changeset(parent_product, params) do

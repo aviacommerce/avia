@@ -74,7 +74,13 @@ defmodule Snitch.Core.Mixfile do
       {:aruspex, github: "oyeb/aruspex", branch: "tweaks"},
 
       # payments
-      {:snitch_payments, github: "aviabird/snitch_payments", branch: "develop"}
+      {:snitch_payments, github: "aviabird/snitch_payments", branch: "develop"},
+
+      # image uploading
+      {:arc, "~> 0.10.0"},
+      {:arc_ecto, "~> 0.10.0"},
+      {:cowboy, "~> 1.0"},
+      {:plug, "~> 1.0"}
     ]
   end
 
