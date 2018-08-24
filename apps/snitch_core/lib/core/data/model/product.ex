@@ -4,8 +4,12 @@ defmodule Snitch.Data.Model.Product do
   """
   use Snitch.Data.Model
 
-  alias Snitch.Data.Schema.{Product, Variation}
   import Ecto.Query
+  alias Ecto.Multi
+  alias Snitch.Data.Schema.{Product, Variation}
+  alias Snitch.Repo
+  alias Snitch.Tools.Helper.ImageUploader
+  alias Snitch.Data.Schema.Image
 
   @doc """
   Returns all Products
@@ -59,5 +63,163 @@ defmodule Snitch.Data.Model.Product do
   @spec get(integer) :: Product.t() | nil
   def get(id) do
     QH.get(Product, id, Repo)
+  end
+
+  @doc """
+  Handles creating new images and associating them with the product.
+
+  The function stores the name of the image in the `snitch_images` table
+  and stores the image file at a location specified in `Arc` Configuartion.
+
+  #### See
+  `Snitch.Tools.Helper.ImageUploader`
+
+  The functions expects a `Product.t()` struct and a `params` map.
+  To add new images the `params` map expects a list of images as a `%Plug.Upload{}`
+  struct under the "images" key.
+  ```
+  %{"images" => [
+      "image" => %Plug.Upload{},
+      "image" => %Plug.UPload{}
+  ]}
+  ```
+
+  ## Caution!
+  In case some images are added to the product and you wish to retain them then
+  they need to be passed in the map in the following format.
+  The images if not included would be deleted and would lead to inconsistencies.
+  ```
+    %{"images" => [
+      "image" => %Plug.Upload{},
+      %{id: 1, name: "abc.png"}
+  ]}
+  ```
+  In case you want to delete the images associated with the product,
+  consider using the `delete_image/2` method.
+
+  ## TODO
+  Handle return properly for `product`.
+  """
+  @spec add_images(Product.t(), map) :: {:ok, map} | {:error, any()}
+  def add_images(product, params) do
+    Multi.new()
+    |> Multi.run(:product, fn _ ->
+      QH.update(Product, params, product, Repo)
+    end)
+    |> Multi.run(:store_image, fn %{product: product} ->
+      store_images(product, params)
+    end)
+    |> persist()
+  end
+
+  @doc """
+  Returns the url of the location where image is stored.
+
+  Takes as input `name` of the image and the `Product.t()`
+  struct.
+  """
+  @spec image_url(String.t(), Product.t()) :: String.t()
+  def image_url(name, product) do
+    ImageUploader.url({name, product})
+  end
+
+  @doc """
+  Delete an image associated with a product.
+
+  Takes as input id of the `image` to be deleted and the `product` id.
+
+  Removes the image from the "snitch_images" table and removes the association
+  between the product and the image from the assocation table.
+  Also, removes the image file from the location where it is stored.
+  """
+  @spec delete_image(non_neg_integer(), non_neg_integer()) :: {:ok, map} | {:error, any()}
+  def delete_image(product_id, image_id) do
+    query =
+      from(
+        assoc in "snitch_product_images",
+        where: assoc.product_id == ^product_id and assoc.image_id == ^image_id
+      )
+
+    Multi.new()
+    |> get_product(product_id)
+    |> get_image(image_id)
+    |> Multi.run(:delete_image, fn _ ->
+      QH.delete(Image, image_id, Repo)
+    end)
+    |> Multi.delete_all(:delete, query)
+    |> remove_image_from_store()
+    |> persist()
+  end
+
+  ####################### Private Functions ########################
+
+  defp persist(multi) do
+    case Repo.transaction(multi) do
+      {:ok, _} ->
+        {:ok, "success"}
+
+      {:error, _, failed_value, _} ->
+        {:error, failed_value}
+    end
+  end
+
+  defp store_images(product, params) do
+    uploads = params["images"]
+
+    uploads =
+      Enum.map(uploads, fn
+        %{"image" => %Plug.Upload{} = upload} ->
+          ImageUploader.store({upload, product})
+
+        _ ->
+          {:ok, "success"}
+      end)
+
+    if Enum.any?(uploads, fn upload ->
+         case upload do
+           {:error, _} -> true
+           _ -> false
+         end
+       end) do
+      {:error, "upload error"}
+    else
+      {:ok, "upload success"}
+    end
+  end
+
+  defp get_image(multi, image_id) do
+    Multi.run(multi, :image, fn _ ->
+      case QH.get(Image, image_id, Repo) do
+        nil ->
+          {:error, "image not found"}
+
+        image ->
+          {:ok, image}
+      end
+    end)
+  end
+
+  defp get_product(multi, product_id) do
+    Multi.run(multi, :product, fn _ ->
+      case get(product_id) do
+        nil ->
+          {:error, "prodcut not found"}
+
+        product ->
+          {:ok, product}
+      end
+    end)
+  end
+
+  defp remove_image_from_store(multi) do
+    Multi.run(multi, :remove_from_upload, fn %{image: image, product: product} ->
+      case ImageUploader.delete({image.name, product}) do
+        :ok ->
+          {:ok, "success"}
+
+        _ ->
+          {:error, "not found"}
+      end
+    end)
   end
 end
