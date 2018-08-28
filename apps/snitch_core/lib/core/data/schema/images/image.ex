@@ -22,6 +22,16 @@ defmodule Snitch.Data.Schema.Image do
     |> put_name()
   end
 
+  @doc """
+  Returns an `image` changeset.
+  """
+  @spec changeset(t, map) :: Ecto.Changeset.t()
+  def create_changeset(%__MODULE__{} = image, params) do
+    image
+    |> cast(params, [:image])
+    |> put_name()
+  end
+
   def put_name(changeset) do
     case changeset do
       %Ecto.Changeset{

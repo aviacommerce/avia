@@ -32,7 +32,17 @@ defmodule Snitch.Tools.Helper.ImageUploader do
   @doc """
   Overrides the storage directory where images would be stored.
   """
-  def storage_dir(version, {file, scope}) do
-    "uploads/images/products/#{scope.id}/images/"
+  def storage_dir(_version, {_file, scope}) do
+    scope_dir = get_scope_name(scope)
+    "uploads/images/#{scope_dir}/#{scope.id}/images/"
+  end
+
+  defp get_scope_name(scope) do
+    scope.__struct__
+    |> to_string()
+    |> String.split(".")
+    |> Enum.reverse()
+    |> hd
+    |> String.downcase()
   end
 end

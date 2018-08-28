@@ -1,4 +1,13 @@
 <h4>Edit Product Brand</h4>
+<hr>
+<%= if @brand.image do %>
+  <div class="card" style="width: 15rem;">
+  <%= img_tag(get_image_url(@brand.image, @brand), class: "card-img-top") %>
+  <div class="card-body">
+    <h5 class="card-title"><%= @brand.name %></h5>
+  </div>
+</div>
+<% end %>
 <%= render "form.html",
     changeset: @changeset,
     conn: @conn,
