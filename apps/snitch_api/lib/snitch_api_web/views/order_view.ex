@@ -11,10 +11,10 @@ defmodule SnitchApiWeb.OrderView do
     :shipping_address,
     :number,
     :state,
-    :total,
+    :order_total_amount,
     :promot_total,
     :adjustment_total,
-    :item_total
+    :item_count
   ])
 
   has_many(
@@ -23,10 +23,20 @@ defmodule SnitchApiWeb.OrderView do
     include: true
   )
 
-  def line_items(struct, _conn) do
-    struct
-    |> Snitch.Repo.preload(:line_items)
-    |> Map.get(:line_items)
+  def item_count(order, _) do
+    order.line_items
+    |> Enum.reduce(0, fn line_item, acc ->
+      acc = acc + line_item.quantity
+    end)
+  end
+
+  def order_total_amount(order, _) do
+    order.line_items
+    |> Enum.reduce(Money.new(:USD, 0), fn line_item, acc ->
+      {:ok, total} = Money.mult(line_item.unit_price, line_item.quantity)
+      {:ok, acc} = Money.add(acc, total)
+      acc
+    end)
   end
 
   def shipping_address(struct, conn) do

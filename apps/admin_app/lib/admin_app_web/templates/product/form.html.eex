@@ -10,6 +10,11 @@
   <li class="nav-item">
     <a class="nav-link" href="#tab3default" data-toggle="tab">Images</a>
   </li>
+  <%= if  @conn.request_path != product_path(@conn, :new) do %>
+    <li class="nav-item">
+      <a class="nav-link" href="#tab4default" data-toggle="tab">Stock</a>
+    </li>
+  <% end %>
 </ul>
 <div class="tab-content">
     <div class="tab-pane fade in active show" id="tab1default">
@@ -24,7 +29,7 @@
             <div class="input-group mb-3">
               <%= text_input :selling_price, :amount, value: get_amount(f.data.selling_price), class: "form-control", name: "product[selling_price][amount]" %>
               <div class="input-group-append">
-                <%= select :selling_price, :currency, get_currency(), class: "form-control", name: "product[selling_price][currency]" %>
+                <%= select :selling_price, :currency, get_currency(),value: get_currency_value(f.data.selling_price), class: "form-control", name: "product[selling_price][currency]" %>
               </div>
             </div>
           </div>
@@ -35,7 +40,7 @@
             <div class="input-group mb-3">
               <%= text_input :max_retail_price, :amount, value: get_amount(f.data.max_retail_price), class: "form-control", name: "product[max_retail_price][amount]" %>
               <div class="input-group-append">
-                <%= select :max_retail_price, :currency, get_currency(), class: "form-control", name: "product[max_retail_price][currency]" %>
+                <%= select :max_retail_price, :currency, get_currency(),value: get_currency_value(f.data.max_retail_price), class: "form-control", name: "product[max_retail_price][currency]" %>
               </div>
             </div>
           </div>
@@ -45,12 +50,17 @@
       <%= select_input f, :brand_id, get_brand_options(@brands) %>
       <%= input f, :meta_keywords%>
       <%= input f, :meta_title%>
+      <%= input f, :height %>
+      <%= input f, :width %>
+      <%= input f, :depth %>
+      <%= input f, :weight %>
+
       <%= submit "Submit", class: "btn btn-primary submit-btn" %>
     <% end %>
     </div>
 
     <%= if  @conn.request_path != product_path(@conn, :new) do %>
-    <div class="tab-pane fade" id="tab2default" style="padding:10px">
+      <div class="tab-pane fade" id="tab2default" style="padding:10px">
 
       <div style="padding: 10px; background: #f8f9fa; border-radius: 10px">
         <div class="form-group required">
@@ -123,21 +133,40 @@
           </span>
           <%= img_tag(get_image_url(image, @parent_product), class: "img-thumbnail") %>
         </div>
-        <% end %>
-      <% end %>
-      <%= form_for @conn, product_path(@conn, :add_images, @parent_product.id),
-        [as: :product_images, multipart: true], fn f -> %>
-        <%= file_input f, :images, multiple: true, class: "form-control",
-          id: "product-images" %>
-        <div id="selectedProductImages">
-        </div>
-        <hr>
-        <%= submit "Save Images", class: "btn btn-primary" %>
-      <% end %>
+     <% end %>
+   <% end %>
+   <%= form_for @conn, product_path(@conn, :add_images, @parent_product.id),
+     [as: :product_images, multipart: true], fn f -> %>
+     <%= file_input f, :images, multiple: true, class: "form-control",
+       id: "product-images" %>
+     <div id="selectedProductImages">
+     </div>
+     <hr>
+     <%= submit "Save Images", class: "btn btn-primary" %>
+     <% end %>
     </div>
   </div>
-</div>
 
+  <%= if  @conn.request_path != product_path(@conn, :new) do %>
+   <div class="tab-pane fade" id="tab4default">
+   <form accept-charset="UTF-8" action="/product/stock" method="post">
+     <div class="form-group required">
+       <label>Variant</label>
+       <%= select :stock, :product_id, get_variant_option(@parent_product.variants), class: "form-control"%>
+     </div>
+     <div class="form-group required">
+       <label>Stock Location</label>
+       <%= select :stock, :location_id, get_stock_locations_option(@stock_locations), class: "form-control"%>
+     </div>
+     <div class="form-group required">
+       <label>Count</label>
+         <%= text_input :stock, :count_on_hand , class: "form-control"%>
+     </div>
+     <button class="btn btn-primary submit-btn" type="submit">Add Stock</button>
+   </form>
+ </div>
+ <% end %>
+</div>
 <html>
   <head>
     <%= csrf_meta_tag %>

@@ -13,6 +13,6 @@ defmodule SnitchApiWeb.ProductOptionValueView do
   has_one(
     :option_type,
     serializer: OptionTypeView,
-    include: true
+    include: false
   )
 end

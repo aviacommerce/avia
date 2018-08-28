@@ -26,12 +26,12 @@ import { getPaymentMethod } from './payment_method'
 import {handleImageSelect, deleteImage} from './product_file_upload'
 
 $(document).ready(() => {
+  get_categories(1)
+  handle_category_click()
   handleImageSelect();
   deleteImage();
   select2Selector();
   setup_product();
-  get_categories(1)
-  handle_category_click()
   getPaymentMethod();
   select2Selector();
 })

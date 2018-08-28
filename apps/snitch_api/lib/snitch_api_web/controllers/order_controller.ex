@@ -38,6 +38,8 @@ defmodule SnitchApiWeb.OrderController do
 
   def guest_order(conn, _params) do
     with {:ok, %Order{} = order} <- OrderModel.create_guest_order() do
+      order = order |> Repo.preload(line_items: [product: [:theme, [options: :option_type]]])
+
       conn
       |> put_status(200)
       |> put_resp_header("location", order_path(conn, :show, Map.get(order, :id)))
@@ -70,6 +72,8 @@ defmodule SnitchApiWeb.OrderController do
     }
 
     with {:ok, %Order{} = order} <- OrderModel.partial_update(order, order_address) do
+      order = order |> Repo.preload(:line_items)
+
       conn
       |> put_status(200)
       |> render(
@@ -85,10 +89,19 @@ defmodule SnitchApiWeb.OrderController do
 
   def fetch_guest_order(conn, %{"order_number" => order_number}) do
     with %Order{} = order <- OrderModel.get(%{number: order_number}) do
+      order = order |> Repo.preload(line_items: [product: [:theme, [options: :option_type]]])
+
       conn
       |> put_status(200)
       |> put_resp_header("location", order_path(conn, :show, order))
-      |> render("show.json-api", data: order)
+      |> render(
+        "show.json-api",
+        data: order,
+        opts: [
+          include:
+            "line_items,line_items.product,line_items.product.options,line_items.product.options.option_type"
+        ]
+      )
     else
       nil ->
         conn
@@ -101,6 +114,7 @@ defmodule SnitchApiWeb.OrderController do
     user_id = Map.get(conn.assigns[:current_user], :id)
 
     {:ok, order} = OrderModel.user_order(user_id)
+    order = order |> Repo.preload(line_items: [product: [:theme, [options: :option_type]]])
 
     conn
     |> put_status(200)

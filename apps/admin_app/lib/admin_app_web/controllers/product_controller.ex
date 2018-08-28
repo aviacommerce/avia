@@ -5,8 +5,10 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Data.Model.Product, as: ProductModel
   alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Data.Model.ProductPrototype, as: PrototypeModel
-  alias Snitch.Data.Schema.ProductBrand
+  alias Snitch.Data.Schema.{ProductBrand, StockLocation}
   alias Snitch.Tools.Money
+  alias Snitch.Data.Model.StockItem, as: StockModel
+  alias Snitch.Data.Schema.StockItem, as: StockSchema
 
   plug(:scrub_referer_query_params when action in [:create])
   plug(:load_resources when action in [:new, :edit])
@@ -118,6 +120,22 @@ defmodule AdminAppWeb.ProductController do
     render(conn, "product_category.html")
   end
 
+  def add_stock(conn, %{"stock" => params}) do
+    with {:ok, stock} <- check_stock(params["product_id"], params["location_id"]),
+         {:ok, updated_stock} <- StockModel.update(params, stock) do
+      redirect(conn, to: product_path(conn, :index))
+    end
+  end
+
+  defp check_stock(product_id, location_id) do
+    query_fields = %{product_id: product_id, stock_location_id: location_id}
+
+    case StockModel.get(query_fields) do
+      %StockSchema{} = stock_item -> {:ok, stock_item}
+      nil -> StockModel.create(product_id, location_id, 0, false)
+    end
+  end
+
   def generate_variant_params(parent_product, options) do
     options =
       options
@@ -201,8 +219,11 @@ defmodule AdminAppWeb.ProductController do
 
     brands = Repo.all(ProductBrand)
 
+    stock_locations = Repo.all(StockLocation)
+
     conn
     |> assign(:prototype, prototype)
+    |> assign(:stock_locations, stock_locations)
     |> assign(:brands, brands)
   end
 end

@@ -5,5 +5,6 @@
     action: product_path(@conn, :update, @changeset.data),
     prototype: @prototype,
     parent_product: @parent_product,
-    brands: @brands
+    brands: @brands,
+    stock_locations: @stock_locations
 %>

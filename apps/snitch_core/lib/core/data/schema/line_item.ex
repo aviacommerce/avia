@@ -5,7 +5,7 @@ defmodule Snitch.Data.Schema.LineItem do
 
   use Snitch.Data.Schema
 
-  alias Snitch.Data.Schema.{Order, Variant}
+  alias Snitch.Data.Schema.{Order, Product}
 
   @type t :: %__MODULE__{}
 
@@ -13,12 +13,12 @@ defmodule Snitch.Data.Schema.LineItem do
     field(:quantity, :integer)
     field(:unit_price, Money.Ecto.Composite.Type)
 
-    belongs_to(:variant, Variant)
+    belongs_to(:product, Product)
     belongs_to(:order, Order)
     timestamps()
   end
 
-  @cast_fields ~w(quantity variant_id unit_price)a
+  @cast_fields ~w(quantity product_id unit_price)a
   @update_fields ~w(quantity unit_price)a
   @create_fields [:order_id | @cast_fields]
 
@@ -31,7 +31,7 @@ defmodule Snitch.Data.Schema.LineItem do
     |> cast(params, @cast_fields)
     |> validate_required(@cast_fields)
     |> assoc_constraint(:order)
-    |> assoc_constraint(:variant)
+    |> assoc_constraint(:product)
     |> common_changeset()
   end
 
@@ -44,7 +44,7 @@ defmodule Snitch.Data.Schema.LineItem do
     |> cast(params, @create_fields)
     |> validate_required(@create_fields)
     |> assoc_constraint(:order)
-    |> assoc_constraint(:variant)
+    |> assoc_constraint(:product)
     |> common_changeset()
   end
 

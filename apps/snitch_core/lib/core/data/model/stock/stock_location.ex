@@ -62,10 +62,10 @@ defmodule Snitch.Data.Model.StockLocation do
       from(
         sl in active_locations(),
         join: si in assoc(sl, :stock_items),
-        join: v in assoc(si, :variant),
+        join: v in assoc(si, :product),
         left_join: sc in assoc(v, :shipping_category),
         where: v.id in ^variant_ids,
-        preload: [stock_items: {si, variant: {v, shipping_category: sc}}]
+        preload: [stock_items: {si, product: {v, shipping_category: sc}}]
       )
     )
   end

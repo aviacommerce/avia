@@ -15,7 +15,7 @@ defmodule Snitch.Data.Schema.WishListItemTest do
   @tag variant_count: 1
   test "creation successful", context do
     {user, variant} = prepare_user_variant(context)
-    params = %{user_id: user.id, variant_id: variant.id}
+    params = %{user_id: user.id, product_id: variant.id}
     %{valid?: valid} = changeset = WishListItem.create_changeset(%WishListItem{}, params)
     assert valid
     assert {:ok, _} = Repo.insert(changeset)
@@ -25,7 +25,7 @@ defmodule Snitch.Data.Schema.WishListItemTest do
     params = %{}
     %{valid?: validity} = changeset = WishListItem.create_changeset(%WishListItem{}, params)
     refute validity
-    assert %{user_id: ["can't be blank"], variant_id: ["can't be blank"]} = errors_on(changeset)
+    assert %{user_id: ["can't be blank"], product_id: ["can't be blank"]} = errors_on(changeset)
   end
 
   defp prepare_user_variant(context) do

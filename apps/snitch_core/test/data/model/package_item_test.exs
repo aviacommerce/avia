@@ -20,7 +20,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
     quantity: 3,
     delta: 2,
     backordered?: true,
-    variant_id: nil,
+    product_id: nil,
     line_item_id: nil,
     package_id: nil,
     tax: Money.zero(:INR)
@@ -35,7 +35,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
       %{line_items: [line_item]} = context
 
       assert {:error, changeset} =
-               PackageItem.create(%{@params | line_item_id: -1, variant_id: -1, package_id: -1})
+               PackageItem.create(%{@params | line_item_id: -1, product_id: -1, package_id: -1})
 
       refute changeset.valid?
       assert %{line_item_id: ["does not exist"]} == errors_on(changeset)
@@ -44,18 +44,18 @@ defmodule Snitch.Data.Model.PackageItemTest do
                PackageItem.create(%{
                  @params
                  | line_item_id: line_item.id,
-                   variant_id: -1,
+                   product_id: -1,
                    package_id: -1
                })
 
       refute changeset.valid?
-      assert %{variant_id: ["does not exist"]} == errors_on(changeset)
+      assert %{package_id: ["does not exist"]} == errors_on(changeset)
 
       assert {:error, changeset} =
                PackageItem.create(%{
                  @params
                  | line_item_id: line_item.id,
-                   variant_id: line_item.variant_id,
+                   product_id: line_item.product_id,
                    package_id: -1
                })
 
@@ -74,7 +74,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
                PackageItem.create(%{
                  @params
                  | line_item_id: line_item.id,
-                   variant_id: line_item.variant_id,
+                   product_id: line_item.product_id,
                    package_id: make_package(context).id
                })
 
@@ -95,7 +95,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
                PackageItem.create(%{
                  @params
                  | line_item_id: line_item.id,
-                   variant_id: line_item.variant_id,
+                   product_id: line_item.product_id,
                    package_id: make_package(context).id
                })
 

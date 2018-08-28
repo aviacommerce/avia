@@ -12,7 +12,7 @@ defmodule Snitch.Data.Schema.PackageItemTest do
     quantity: 3,
     delta: 2,
     backordered?: false,
-    variant_id: 0,
+    product_id: 0,
     line_item_id: 0,
     package_id: 0,
     tax: Money.zero(:INR),
@@ -36,7 +36,7 @@ defmodule Snitch.Data.Schema.PackageItemTest do
       assert %{
                line_item_id: ["can't be blank"],
                state: ["can't be blank"],
-               variant_id: ["can't be blank"],
+               product_id: ["can't be blank"],
                tax: ["can't be blank"]
              } == errors_on(cs)
     end

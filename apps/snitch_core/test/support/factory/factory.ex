@@ -68,33 +68,29 @@ defmodule Snitch.Factory do
   end
 
   def random_variant_factory do
-    %Variant{
-      sku: sequence(:sku, &"shoes-nike-#{&1}"),
-      weight: Decimal.new("0.45"),
-      height: Decimal.new("0.15"),
-      depth: Decimal.new("0.1"),
-      width: Decimal.new("0.4"),
-      cost_price: Money.new("9.99", currency()),
-      selling_price: random_price(currency(), 14, 4)
+    %Product{
+      name: sequence(:name, &"Hill's-#{&1}"),
+      description: sequence(:description, &"description-#{&1}"),
+      slug: sequence(:slug, &"Hill's-#{&1}"),
+      selling_price: Money.new("12.99", currency()),
+      max_retail_price: Money.new("14.99", currency())
     }
   end
 
   def variant_factory do
-    %Variant{
-      sku: sequence(:sku, &"shoes-nike-#{&1}"),
-      weight: Decimal.new("0.45"),
-      height: Decimal.new("0.15"),
-      depth: Decimal.new("0.1"),
-      width: Decimal.new("0.4"),
-      cost_price: Money.new("9.99", currency()),
-      selling_price: Money.new("14.99", currency())
+    %Product{
+      name: sequence(:name, &"Hill's-#{&1}"),
+      description: sequence(:description, &"description-#{&1}"),
+      slug: sequence(:slug, &"Hill's-#{&1}"),
+      selling_price: Money.new("12.99", currency()),
+      max_retail_price: Money.new("14.99", currency())
     }
   end
 
   def line_item_factory do
     %LineItem{
       order: build(:order),
-      variant: build(:variant),
+      product: build(:product),
       quantity: 2,
       unit_price: Money.new("9.99", currency())
     }
@@ -244,7 +240,7 @@ defmodule Snitch.Factory do
         struct(
           LineItem,
           order_id: order.id,
-          variant_id: v.id,
+          product_id: v.id,
           quantity: 1,
           unit_price: v.selling_price
         )
@@ -257,7 +253,7 @@ defmodule Snitch.Factory do
 
   def variants(context) do
     count = Map.get(context, :variant_count, 3)
-    [variants: insert_list(count, :random_variant)]
+    [variants: insert_list(count, :product)]
   end
 
   def orders(context) do
