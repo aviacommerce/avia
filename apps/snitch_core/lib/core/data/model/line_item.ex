@@ -6,7 +6,7 @@ defmodule Snitch.Data.Model.LineItem do
 
   import Ecto.Changeset, only: [change: 1]
 
-  alias Snitch.Data.Model.Variant
+  alias Snitch.Data.Model.{Variant, Product}
   alias Snitch.Data.Schema.LineItem
   alias Snitch.Domain.Order
   alias Snitch.Tools.Money, as: MoneyTools
@@ -81,19 +81,19 @@ defmodule Snitch.Data.Model.LineItem do
   ## Example
   When `variant_id` is `nil` or does not exist, no update is made.
   ```
-  iex> Model.LineItem.update_unit_price([%{variant_id: -1, quantity: 2}])
-  [%{variant_id: -1, quantity: 2}]
+  iex> Model.LineItem.update_unit_price([%{product_id: -1, quantity: 2}])
+  [%{product_id: -1, quantity: 2}]
   ```
 
   ```
-  iex> variant = Snitch.Repo.one(Snitch.Data.Schema.Variant)
-  iex> variant.selling_price
-  #Money<:USD, 14.99000000>
+  iex> product = Snitch.Repo.one(Snitch.Data.Schema.Product)
+  iex> product.selling_price
+  #Money<:USD, 12.99000000>
   iex> [priced_item] = Model.LineItem.update_unit_price(
-  ...>   [%{variant_id: variant.id, quantity: 2}]
+  ...>   [%{product_id: product.id, quantity: 2}]
   ...> )
   iex> priced_item.unit_price
-  #Money<:USD, 14.99000000>
+  #Money<:USD, 12.99000000>
   ```
   """
   @spec update_unit_price([map]) :: [map]
@@ -102,9 +102,9 @@ defmodule Snitch.Data.Model.LineItem do
   def update_unit_price(line_items) do
     unit_selling_prices =
       line_items
-      |> Stream.map(&Map.get(&1, :variant_id))
+      |> Stream.map(&Map.get(&1, :product_id))
       |> Enum.reject(fn x -> is_nil(x) end)
-      |> Variant.get_selling_prices()
+      |> Product.get_selling_prices()
 
     Enum.map(line_items, &set_price_and_total(&1, unit_selling_prices))
   end
@@ -128,8 +128,8 @@ defmodule Snitch.Data.Model.LineItem do
 
   @spec set_price_and_total(map, %{non_neg_integer: Money.t()}) :: map
   defp set_price_and_total(line_item, unit_selling_prices) do
-    with {:ok, variant_id} <- Map.fetch(line_item, :variant_id),
-         {:ok, unit_price} <- Map.fetch(unit_selling_prices, variant_id) do
+    with {:ok, product_id} <- Map.fetch(line_item, :product_id),
+         {:ok, unit_price} <- Map.fetch(unit_selling_prices, product_id) do
       Map.put(line_item, :unit_price, unit_price)
     else
       _ -> line_item

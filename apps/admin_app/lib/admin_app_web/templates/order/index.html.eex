@@ -1,6 +1,7 @@
 <div>
   <h2 class="text-center">Listing Orders</h2>
   <form action="orders" method="post">
+    <input type="hidden" value="<%= @token %>" name="_csrf_token"/>
     <button type="submit" formmethod="post">Create New Order</button>
   </form>
   <table class="table table-striped">
@@ -21,7 +22,7 @@
           <a href="orders/<%= order.number %>" rel="nofollow"><%= order.number %></a>
         </td>
         <td><%= order.inserted_at %></td>
-        <td><%= order.user.email %></td>
+        <td><%= display_email(order) %></td>
         <td><%= order.state %></td>
       </tr>
       <% end %>

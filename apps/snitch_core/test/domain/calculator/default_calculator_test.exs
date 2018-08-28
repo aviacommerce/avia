@@ -12,7 +12,7 @@ defmodule Snitch.Domain.DefaultCalculatorTest do
 
   @lineitem %LineItem{
     order_id: 1,
-    variant_id: 1,
+    product_id: 1,
     quantity: 1,
     unit_price: Money.new("15.00", :USD)
   }

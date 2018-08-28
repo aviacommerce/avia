@@ -7,7 +7,7 @@ defmodule Snitch.Domain.Splitter.WeightTest do
   import Mox, only: [expect: 4, verify_on_exit!: 1]
   import Snitch.Tools.Helper.{Order, Shipment, Stock, Zone}
 
-  alias Snitch.Data.Schema.{Address, Order, StockItem, StockLocation, Variant}
+  alias Snitch.Data.Schema.{Address, Order, StockItem, StockLocation, Product}
   alias Snitch.Domain.Shipment
   alias Snitch.Domain.Splitters.Weight, as: WeightSplitter
 
@@ -305,7 +305,7 @@ defmodule Snitch.Domain.Splitter.WeightTest do
       |> Enum.zip(context.weights)
       |> Enum.map(fn {variant, weight} -> %{variant | weight: Decimal.new(weight)} end)
 
-    {_, vs} = Repo.insert_all(Variant, variants, returning: true)
+    {_, vs} = Repo.insert_all(Product, variants, returning: true)
     vs
   end
 

@@ -32,9 +32,9 @@ defmodule Snitch.Data.Model.LineItemTest do
       priced_items = LineItem.update_unit_price(line_items)
 
       assert [
-               %{quantity: 2, variant_id: -1},
-               %{quantity: nil, unit_price: %Money{}, variant_id: _},
-               %{quantity: 2, variant_id: nil}
+               %{quantity: 2, product_id: -1},
+               %{quantity: nil, unit_price: %Money{}, product_id: _},
+               %{quantity: 2, product_id: nil}
              ] = priced_items
     end
   end
@@ -71,14 +71,14 @@ defmodule Snitch.Data.Model.LineItemTest do
       order = insert(:order)
 
       assert {:error, changeset} =
-               LineItem.create(%{line_item_params(v) | variant_id: -1, order_id: order.id})
+               LineItem.create(%{line_item_params(v) | product_id: -1, order_id: order.id})
 
-      assert %{variant: ["does not exist"]} == errors_on(changeset)
+      assert %{product: ["does not exist"]} == errors_on(changeset)
 
       assert {:error, changeset} =
-               LineItem.create(%{line_item_params(v) | variant_id: nil, order_id: order.id})
+               LineItem.create(%{line_item_params(v) | product_id: nil, order_id: order.id})
 
-      assert %{variant_id: ["can't be blank"]} == errors_on(changeset)
+      assert %{product_id: ["can't be blank"]} == errors_on(changeset)
     end
 
     @tag variant_count: 1
@@ -133,7 +133,7 @@ defmodule Snitch.Data.Model.LineItemTest do
       vs
       |> Stream.zip(quantities)
       |> Enum.reduce([], fn {variant, quantity}, acc ->
-        [%{variant_id: variant.id, quantity: quantity} | acc]
+        [%{product_id: variant.id, quantity: quantity} | acc]
       end)
 
     [line_items: line_items]
@@ -148,7 +148,7 @@ defmodule Snitch.Data.Model.LineItemTest do
       variants
       |> Stream.zip(quantities)
       |> Enum.map(fn {variant, quantity} ->
-        %{variant_id: variant.id, quantity: quantity}
+        %{product_id: variant.id, quantity: quantity}
       end)
 
     [line_items: line_items]
@@ -160,7 +160,7 @@ defmodule Snitch.Data.Model.LineItemTest do
       unit_price: variant.selling_price,
       total: variant.selling_price,
       order_id: nil,
-      variant_id: variant.id
+      product_id: variant.id
     }
   end
 end

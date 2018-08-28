@@ -4,5 +4,11 @@ defmodule SnitchApiWeb.LineItemView do
 
   location("/line_items/:id")
 
-  attributes([:id, :variant_id, :quantity, :unit_price])
+  attributes([:id, :product_id, :quantity, :unit_price])
+
+  has_one(
+    :product,
+    serializer: SnitchApiWeb.ProductView,
+    include: true
+  )
 end

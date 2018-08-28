@@ -39,7 +39,7 @@ defmodule Snitch.Data.Schema.PackageItem do
   use Snitch.Data.Schema
 
   alias Ecto.Nanoid
-  alias Snitch.Data.Schema.{LineItem, Package, Variant}
+  alias Snitch.Data.Schema.{LineItem, Package, Product}
 
   @typedoc """
   Every fulfilled `LineItem` get shipped in as `PackageItem` in a `Package`.
@@ -80,7 +80,7 @@ defmodule Snitch.Data.Schema.PackageItem do
     field(:tax, Money.Ecto.Composite.Type)
     field(:shipping_tax, Money.Ecto.Composite.Type)
 
-    belongs_to(:variant, Variant)
+    belongs_to(:product, Product)
     belongs_to(:line_item, LineItem)
     belongs_to(:package, Package)
 
@@ -89,8 +89,8 @@ defmodule Snitch.Data.Schema.PackageItem do
     timestamps()
   end
 
-  @create_fields ~w(state delta quantity line_item_id variant_id package_id tax shipping_tax)a
-  @required_fields ~w(state quantity line_item_id variant_id tax)a
+  @create_fields ~w(state delta quantity line_item_id product_id package_id tax shipping_tax)a
+  @required_fields ~w(state quantity line_item_id product_id tax)a
   @update_fields ~w(state quantity delta tax shipping_tax)a
 
   @doc """
@@ -102,7 +102,7 @@ defmodule Snitch.Data.Schema.PackageItem do
     |> cast(params, @create_fields)
     |> validate_required(@required_fields)
     |> foreign_key_constraint(:line_item_id)
-    |> foreign_key_constraint(:variant_id)
+    |> foreign_key_constraint(:product_id)
     |> foreign_key_constraint(:package_id)
     |> unique_constraint(:number)
     |> common_changeset()

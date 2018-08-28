@@ -4,16 +4,21 @@ defmodule SnitchApiWeb.LineItemController do
   alias Snitch.Data.Model.LineItem, as: LineItemModel
   alias Snitch.Data.Schema.LineItem
   alias Snitch.Data.Schema.Variant
+  alias Snitch.Data.Schema.Product
   alias Snitch.Repo
+  import Ecto.Query
+  alias SnitchApi.Order, as: OrderContext
 
   plug(SnitchApiWeb.Plug.DataToAttributes)
   plug(SnitchApiWeb.Plug.LoadUser)
 
-  def create(conn, %{"variant_id" => variant_id} = params) do
-    %{cost_price: cost_price} = Repo.get(Variant, variant_id)
-    line_item = Map.put(params, "unit_price", cost_price)
+  def create(conn, %{"product_id" => product_id} = params) do
+    %{selling_price: selling_price} = Repo.get(Product, product_id)
+    line_item = Map.put(params, "unit_price", selling_price)
 
-    with {:ok, line_item} <- LineItemModel.create(line_item) do
+    with {:ok, line_item} <- OrderContext.add_to_cart(line_item) do
+      line_item = line_item |> Repo.preload(:product)
+
       conn
       |> put_status(200)
       |> put_resp_header("location", line_item_path(conn, :show, line_item.id))
@@ -25,10 +30,12 @@ defmodule SnitchApiWeb.LineItemController do
     line_item = Repo.get(LineItem, id)
 
     with {:ok, line_item} <- LineItemModel.update(line_item, params) do
+      line_item = line_item |> Repo.preload(:product)
+
       conn
       |> put_status(200)
       |> put_resp_header("location", line_item_path(conn, :show, line_item))
-      |> render("show.json-api", data: line_item)
+      |> render("show.json-api", data: line_item, opts: [include: "product"])
     end
   end
 

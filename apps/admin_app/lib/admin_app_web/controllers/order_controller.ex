@@ -9,7 +9,10 @@ defmodule AdminAppWeb.OrderController do
   import Ecto.Query
 
   def index(conn, _params) do
-    render(conn, "index.html", %{orders: Repo.preload(Order.get_all(), :user)})
+    render(conn, "index.html", %{
+      orders: Repo.preload(Order.get_all(), :user),
+      token: get_csrf_token()
+    })
   end
 
   def show(conn, params) do
@@ -68,9 +71,9 @@ defmodule AdminAppWeb.OrderController do
   def add(conn, params) do
     order = load_order(%{number: params["order_number"]})
 
-    variant_id = String.to_integer(params["add"])
+    product_id = String.to_integer(params["add"])
     quantity = String.to_integer(params["quantity"])
-    add_line_item = %{quantity: quantity, variant_id: variant_id}
+    add_line_item = %{quantity: quantity, product_id: product_id}
     new_item_list = [add_line_item | struct_to_map(order.line_items)]
 
     case Order.update(%{line_items: new_item_list}, order) do
@@ -186,7 +189,7 @@ defmodule AdminAppWeb.OrderController do
   defp search_item_variant(search) do
     query =
       from(
-        u in Variant,
+        u in Product,
         where: ilike(u.sku, ^"%#{search}%")
       )
 
@@ -206,6 +209,6 @@ defmodule AdminAppWeb.OrderController do
   defp load_order(order) do
     order
     |> Order.get()
-    |> Repo.preload(line_items: [:variant])
+    |> Repo.preload(line_items: [:product])
   end
 end

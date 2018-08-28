@@ -9,9 +9,9 @@ defmodule Snitch.Domain.Shipment do
     hash: TBD
     items: [
       %{
-        variant: %Variant{},
+        variant: %Product{},
         line_item: %LineItem{},
-        variant_id: 0,
+        product_id: 0,
         state: :fulfilled | :backorder,
         quantity: 0,
         delta: line_item.quantity - package_quantity
@@ -23,7 +23,7 @@ defmodule Snitch.Domain.Shipment do
     origin: %StockLocation{}, # the `:stock_items` will not be "loaded"
     category: %ShippingCategory{},
     backorders?: true | false,
-    variants: %MapSet{} # set of variant_ids
+    variants: %MapSet{} # set of product_ids
    }
   ```
   """
@@ -53,11 +53,11 @@ defmodule Snitch.Domain.Shipment do
   @spec default_packages(Order.t()) :: [map]
   def default_packages(%Order{} = order) do
     order = Repo.preload(order, line_items: [])
-    variant_ids = Enum.map(order.line_items, fn %{variant_id: id} -> id end)
+    variant_ids = Enum.map(order.line_items, fn %{product_id: id} -> id end)
     stock_locations = StockLocation.get_all_with_items_for_variants(variant_ids)
 
     line_items =
-      Enum.reduce(order.line_items, %{}, fn %{variant_id: v_id} = li, acc ->
+      Enum.reduce(order.line_items, %{}, fn %{product_id: v_id} = li, acc ->
         Map.put(acc, v_id, li)
       end)
 
@@ -89,7 +89,7 @@ defmodule Snitch.Domain.Shipment do
       }
   end
 
-  defp make_item(%{variant: v} = stock_item, line_items) do
+  defp make_item(%{product: v} = stock_item, line_items) do
     li = line_items[v.id]
     state = item_state(stock_item, li)
     package_quantity = min(li.quantity, stock_item.count_on_hand)
@@ -173,7 +173,7 @@ defmodule Snitch.Domain.Shipment do
       Enum.map(package.items, fn %{line_item: li, variant: v} = item ->
         item
         |> Map.put(:line_item_id, li.id)
-        |> Map.put(:variant_id, v.id)
+        |> Map.put(:product_id, v.id)
         |> Map.put(:backordered?, item.delta > 0)
         |> Map.put(:state, Atom.to_string(item.state))
       end)

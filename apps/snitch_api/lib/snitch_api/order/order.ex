@@ -7,8 +7,10 @@ defmodule SnitchApi.Order do
 
   alias Snitch.Repo
   alias SnitchApi.API
-  alias Snitch.Data.Schema.Address
+  alias Snitch.Data.Schema.{Address, LineItem}
   alias Snitch.Data.Model.Order
+  alias Snitch.Data.Model.LineItem, as: LineItemModel
+  import Ecto.Query
 
   @doc """
     Attaching address to order.
@@ -32,5 +34,23 @@ defmodule SnitchApi.Order do
     })
   end
 
+  def add_to_cart(line_item) do
+    case get_line_item(line_item["order_id"], line_item["product_id"]) do
+      [] -> LineItemModel.create(line_item)
+      [l | _] -> update_line_item(l, line_item)
+    end
+  end
+
   defp get_address(id), do: Repo.get(Address, id)
+
+  defp get_line_item(order_id, product_id) do
+    query = from(l in LineItem, where: l.order_id == ^order_id and l.product_id == ^product_id)
+    Repo.all(query)
+  end
+
+  defp update_line_item(line_item, params) do
+    new_count = line_item.quantity + params["quantity"]
+    new_params = %{params | "quantity" => new_count}
+    LineItemModel.update(line_item, new_params)
+  end
 end

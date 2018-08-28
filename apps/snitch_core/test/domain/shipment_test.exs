@@ -6,7 +6,7 @@ defmodule Snitch.Domain.ShipmentTest do
   import Snitch.Factory
   import Snitch.Tools.Helper.{Order, Stock, Zone, Shipment}
 
-  alias Snitch.Data.Schema.{Address, Order, Package, StockItem, StockLocation, Variant}
+  alias Snitch.Data.Schema.{Address, Order, Package, StockItem, StockLocation, Variant, Product}
   alias Snitch.Domain.Shipment
 
   @zone_manifest %{
@@ -469,7 +469,7 @@ defmodule Snitch.Domain.ShipmentTest do
              } = package = Shipment.to_package(shipment, order)
 
       assert item.line_item_id == shipment_item.line_item.id
-      assert item.variant_id == shipment_item.line_item.variant_id
+      assert item.product_id == shipment_item.line_item.product_id
       assert item.tax
       assert package.shipping_category_id == shipment.category.id
       assert package.origin_id == shipment.origin.id
@@ -479,6 +479,7 @@ defmodule Snitch.Domain.ShipmentTest do
       assert method.cost == Money.zero(:USD)
 
       cs = Package.create_changeset(%Package{}, package)
+
       assert cs.valid?
       assert {:ok, _} = Repo.insert(cs)
     end
@@ -505,7 +506,7 @@ defmodule Snitch.Domain.ShipmentTest do
   end
 
   defp variants_with_categories(manifest, context) do
-    {_, vs} = Repo.insert_all(Variant, variants_with_manifest(manifest, context), returning: true)
+    {_, vs} = Repo.insert_all(Product, variants_with_manifest(manifest, context), returning: true)
     vs
   end
 

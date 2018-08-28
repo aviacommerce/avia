@@ -122,7 +122,7 @@ defmodule Snitch.Data.Schema.Order do
 
     items_are_unique? =
       Enum.reduce_while(line_item_changesets, MapSet.new(), fn item, map_set ->
-        v_id = item.variant_id
+        v_id = item.product_id
 
         if MapSet.member?(map_set, v_id) do
           {:halt, false}

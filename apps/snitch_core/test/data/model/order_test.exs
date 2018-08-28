@@ -48,7 +48,7 @@ defmodule Snitch.Data.Model.OrderTest do
       {:ok, order} = Order.create(order_params)
       new_variant = insert(:variant)
       old_line_items = extract_ids(order.line_items)
-      line_items = [%{variant_id: new_variant.id, quantity: 1} | old_line_items]
+      line_items = [%{product_id: new_variant.id, quantity: 1} | old_line_items]
 
       {:ok, %{line_items: new_items}} = Order.update(%{line_items: line_items}, order)
       assert Enum.count(new_items) == 4
@@ -82,7 +82,7 @@ defmodule Snitch.Data.Model.OrderTest do
     test "update few items", %{order_params: order_params} do
       {:ok, order} = Order.create(order_params)
 
-      [one, two, three] = extract_ids(order.line_items, [:quantity, :variant_id])
+      [one, two, three] = extract_ids(order.line_items, [:quantity, :product_id])
 
       params = %{
         line_items: [%{one | quantity: 42}, two, %{three | quantity: 1}]
@@ -96,10 +96,10 @@ defmodule Snitch.Data.Model.OrderTest do
       {:ok, order} = Order.create(order_params)
 
       new_variant = insert(:variant)
-      [_, two, three] = extract_ids(order.line_items, [:quantity, :variant_id])
+      [_, two, three] = extract_ids(order.line_items, [:quantity, :product_id])
 
       params = %{
-        line_items: [%{two | quantity: 42}, three, %{variant_id: new_variant.id, quantity: 3}]
+        line_items: [%{two | quantity: 42}, three, %{product_id: new_variant.id, quantity: 3}]
       }
 
       {:ok, %{line_items: new_items}} = Order.update(params, order)
@@ -133,7 +133,7 @@ defmodule Snitch.Data.Model.OrderTest do
     line_items =
       variants
       |> Enum.reduce([], fn v, acc ->
-        [%{variant_id: v.id, quantity: 2} | acc]
+        [%{product_id: v.id, quantity: 2} | acc]
       end)
       |> LineItem.update_unit_price()
 

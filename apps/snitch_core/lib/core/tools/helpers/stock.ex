@@ -28,7 +28,7 @@ defmodule Snitch.Tools.Helper.Stock do
   @stock_item %{
     backorderable: false,
     count_on_hand: nil,
-    variant_id: nil,
+    product_id: nil,
     stock_location_id: nil,
     inserted_at: DateTime.utc(),
     updated_at: DateTime.utc()
@@ -62,7 +62,7 @@ defmodule Snitch.Tools.Helper.Stock do
       |> Enum.map(fn {v, params} when is_map(v) and is_map(params) ->
         %{
           Map.merge(@stock_item, params)
-          | variant_id: v.id,
+          | product_id: v.id,
             stock_location_id: locations[name].id
         }
       end)
