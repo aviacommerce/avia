@@ -1,4 +1,10 @@
-<%= form_for @changeset, @action, fn f ->  %>
+<%= form_for @changeset, @action,[multipart: true], fn f ->  %>
   <%= input f, :name%>
+  <div class="form-group">
+    <%= label f, :image, class: "control-label" %>
+    <%= file_input f, :image, class: "form-control" %>
+    <%= error_tag f, :body %>
+  </div>
   <%= submit "Submit", class: "btn btn-primary submit-btn" %>
+  <%= link("Cancel", to: product_brand_path(@conn, :index), class: "btn btn-primary") %>
 <% end %>

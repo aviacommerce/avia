@@ -3,8 +3,9 @@ defmodule AdminAppWeb.ProductBrandController do
 
   alias Snitch.Data.Model.ProductBrand, as: ProductBrandModel
   alias Snitch.Data.Schema.ProductBrand, as: ProductBrandSchema
+  alias Snitch.Repo
 
-  def index(conn, params) do
+  def index(conn, _params) do
     product_brands = ProductBrandModel.get_all()
     render(conn, "index.html", brands: product_brands)
   end
@@ -15,18 +16,23 @@ defmodule AdminAppWeb.ProductBrandController do
   end
 
   def create(conn, %{"product_brand" => params}) do
-    with {:ok, brand} <- ProductBrandModel.create(params) do
+    with {:ok, _} <- ProductBrandModel.create(params) do
       redirect(conn, to: product_brand_path(conn, :index))
     else
-      {:error, changeset} ->
+      {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: %{changeset | action: :new})
+
+      {:error, message} ->
+        conn
+        |> put_flash(:error, message)
+        |> redirect(to: product_brand_path(conn, :new))
     end
   end
 
   def edit(conn, %{"id" => id}) do
-    with %ProductBrandSchema{} = brand <- ProductBrandModel.get(id),
+    with %ProductBrandSchema{} = brand <- id |> ProductBrandModel.get() |> Repo.preload(:image),
          changeset <- ProductBrandSchema.update_changeset(brand, %{}) do
-      render(conn, "edit.html", changeset: changeset)
+      render(conn, "edit.html", changeset: changeset, brand: brand)
     else
       nil ->
         conn
@@ -36,7 +42,7 @@ defmodule AdminAppWeb.ProductBrandController do
   end
 
   def update(conn, %{"id" => id, "product_brand" => params}) do
-    with %ProductBrandSchema{} = brand <- ProductBrandModel.get(id),
+    with %ProductBrandSchema{} = brand <- id |> ProductBrandModel.get() |> Repo.preload(:image),
          {:ok, _} <- ProductBrandModel.update(brand, params) do
       conn
       |> put_flash(:info, "Product Brand update successfully")
@@ -54,9 +60,9 @@ defmodule AdminAppWeb.ProductBrandController do
 
   def delete(conn, %{"id" => id}) do
     case ProductBrandModel.delete(id) do
-      {:ok, brand} ->
+      {:ok, _} ->
         conn
-        |> put_flash(:info, "Product Brand #{brand.name} deleted successfully")
+        |> put_flash(:info, "Product Brand deleted successfully")
         |> redirect(to: product_brand_path(conn, :index))
 
       {:error, :not_found} ->
