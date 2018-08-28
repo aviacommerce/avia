@@ -141,7 +141,7 @@ defmodule Snitch.Data.Model.StockLocationTest do
     test "fetch all active stock locations" do
       insert_list(2, :stock_location)
       insert(:stock_location, active: false)
-      assert 2 = Enum.count(StockLocationModel.active())
+      assert Enum.count(StockLocationModel.active()) == 2
     end
   end
 end

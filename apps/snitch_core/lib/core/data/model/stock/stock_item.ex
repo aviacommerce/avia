@@ -15,7 +15,7 @@ defmodule Snitch.Data.Model.StockItem do
     QH.create(
       StockItemSchema,
       %{
-        variant_id: variant_id,
+        product_id: variant_id,
         stock_location_id: stock_location_id,
         count_on_hand: count_on_hand,
         backorderable: backorderable
@@ -83,7 +83,7 @@ defmodule Snitch.Data.Model.StockItem do
   def with_active_stock_location_query(variant_id) do
     from(
       st in StockItemSchema,
-      where: st.variant_id == ^variant_id,
+      where: st.product_id == ^variant_id,
       join: sl in StockLocationSchema,
       on: st.stock_location_id == sl.id and sl.active == true
     )

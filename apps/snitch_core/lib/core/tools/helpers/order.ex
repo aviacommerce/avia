@@ -8,7 +8,7 @@ defmodule Snitch.Tools.Helper.Order do
   @line_item %{
     quantity: nil,
     unit_price: nil,
-    variant_id: nil,
+    product_id: nil,
     order_id: nil,
     inserted_at: DateTime.utc(),
     updated_at: DateTime.utc()
@@ -20,11 +20,12 @@ defmodule Snitch.Tools.Helper.Order do
     height: Decimal.new("0.15"),
     depth: Decimal.new("0.1"),
     width: Decimal.new("0.4"),
-    cost_price: Money.new("9.99", :USD),
     selling_price: nil,
     shipping_category_id: nil,
     inserted_at: DateTime.utc(),
-    updated_at: DateTime.utc()
+    updated_at: DateTime.utc(),
+    slug: "",
+    max_retail_price: nil
   }
 
   @doc """
@@ -50,7 +51,9 @@ defmodule Snitch.Tools.Helper.Order do
         @variant
         | sku: "shoes-nike-#{index}",
           shipping_category_id: sc.id,
-          selling_price: random_price(:USD, 14, 4)
+          selling_price: random_price(:USD, 14, 4),
+          slug: "product_slug-#{index}",
+          max_retail_price: random_price(:USD, 14, 4)
       }
     end)
     |> Enum.take(variant_count)
@@ -93,7 +96,7 @@ defmodule Snitch.Tools.Helper.Order do
       %{
         @line_item
         | quantity: q,
-          variant_id: v.id,
+          product_id: v.id,
           order_id: order_id,
           unit_price: v.selling_price
       }

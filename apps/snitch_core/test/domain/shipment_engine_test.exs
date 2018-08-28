@@ -23,7 +23,7 @@ defmodule Snitch.Domain.ShipmentEngineTest do
 
       line_items_set =
         Enum.reduce(line_items, MapSet.new(), fn item, acc ->
-          MapSet.put(acc, item.variant_id)
+          MapSet.put(acc, item.product_id)
         end)
 
       package_items_set = fulfilled_items(value)
@@ -41,7 +41,7 @@ defmodule Snitch.Domain.ShipmentEngineTest do
 
       line_items_set =
         Enum.reduce(line_items, MapSet.new(), fn item, acc ->
-          MapSet.put(acc, item.variant_id)
+          MapSet.put(acc, item.product_id)
         end)
 
       package_items_set = fulfilled_items(value)

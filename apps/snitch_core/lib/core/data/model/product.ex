@@ -226,4 +226,14 @@ defmodule Snitch.Data.Model.Product do
   def image_url(name, product) do
     ImageUploader.url({name, product})
   end
+
+  def get_selling_prices(product_ids) do
+    query = from(p in Product, select: {p.id, p.selling_price}, where: p.id in ^product_ids)
+
+    query
+    |> Repo.all()
+    |> Enum.reduce(%{}, fn {v_id, sp}, acc ->
+      Map.put(acc, v_id, sp)
+    end)
+  end
 end

@@ -10,7 +10,7 @@ defmodule Snitch.Data.Schema.LineItemTest do
 
   @params %{
     order_id: nil,
-    variant_id: nil,
+    product_id: nil,
     quantity: 1,
     unit_price: nil
   }
@@ -29,7 +29,7 @@ defmodule Snitch.Data.Schema.LineItemTest do
                order_id: ["can't be blank"],
                quantity: ["can't be blank"],
                unit_price: ["can't be blank"],
-               variant_id: ["can't be blank"]
+               product_id: ["can't be blank"]
              } == errors_on(cs)
     end
 
@@ -37,7 +37,7 @@ defmodule Snitch.Data.Schema.LineItemTest do
       cs =
         LineItem.create_changeset(%LineItem{}, %{
           @params
-          | variant_id: variant.id,
+          | product_id: variant.id,
             order_id: order.id
         })
 
@@ -48,7 +48,7 @@ defmodule Snitch.Data.Schema.LineItemTest do
       cs =
         LineItem.create_changeset(%LineItem{}, %{
           @params
-          | variant_id: variant.id,
+          | product_id: variant.id,
             order_id: order.id,
             unit_price: Money.new(-1, :USD)
         })
@@ -60,7 +60,7 @@ defmodule Snitch.Data.Schema.LineItemTest do
       cs =
         LineItem.create_changeset(%LineItem{}, %{
           @params
-          | variant_id: variant.id,
+          | product_id: variant.id,
             order_id: order.id,
             unit_price: Money.new(0, :USD)
         })
@@ -69,7 +69,7 @@ defmodule Snitch.Data.Schema.LineItemTest do
 
       [params_with_price] =
         LineItemModel.update_unit_price([
-          %{@params | variant_id: variant.id, order_id: order.id}
+          %{@params | product_id: variant.id, order_id: order.id}
         ])
 
       cs = LineItem.create_changeset(%LineItem{}, params_with_price)
@@ -82,7 +82,7 @@ defmodule Snitch.Data.Schema.LineItemTest do
       cs =
         LineItem.create_changeset(%LineItem{}, %{
           @params
-          | variant_id: variant.id,
+          | product_id: variant.id,
             order_id: order.id,
             unit_price: Money.new(2, :USD)
         })
@@ -99,12 +99,12 @@ defmodule Snitch.Data.Schema.LineItemTest do
       cs =
         LineItem.update_changeset(line_item, %{
           @params
-          | variant_id: 1,
+          | product_id: 1,
             unit_price: Money.new(2, :USD)
         })
 
       assert cs.valid?
-      refute Map.has_key?(cs.changes, :variant_id)
+      refute Map.has_key?(cs.changes, :product_id)
 
       cs = LineItem.update_changeset(line_item, %{quantity: 5})
       assert cs.valid?

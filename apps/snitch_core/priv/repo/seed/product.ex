@@ -71,7 +71,7 @@ defmodule Snitch.Seed.Product do
         |> Enum.map(fn location ->
           Enum.map(variants, fn variant ->
             %{
-              variant_id: variant.id,
+              product_id: variant.id,
               stock_location_id: location.id,
               count_on_hand: 10,
               backorderable: true,

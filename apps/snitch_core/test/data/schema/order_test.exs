@@ -126,9 +126,9 @@ defmodule Snitch.Data.Schema.OrderTest do
 
       line_items =
         LineItem.update_unit_price([
-          %{id: two.id, variant_id: two.variant_id, quantity: 9},
-          %{id: one.id, variant_id: three.variant_id, quantity: one.quantity},
-          %{id: three.id, variant_id: one.variant_id, quantity: three.quantity}
+          %{id: two.id, product_id: two.product_id, quantity: 9},
+          %{id: one.id, product_id: three.product_id, quantity: one.quantity},
+          %{id: three.id, product_id: one.product_id, quantity: three.quantity}
         ])
 
       params = %{line_items: line_items}
@@ -212,7 +212,7 @@ defmodule Snitch.Data.Schema.OrderTest do
       variants
       |> Stream.map(fn x -> x.id end)
       |> Enum.into([], fn variant_id ->
-        %{variant_id: variant_id, quantity: 2}
+        %{product_id: variant_id, quantity: 2}
       end)
 
     LineItem.update_unit_price(line_items)

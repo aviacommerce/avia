@@ -33,7 +33,7 @@ defmodule Snitch.Factory.Stock do
         %StockItem{
           count_on_hand: 1,
           backorderable: false,
-          variant: build(:variant),
+          product: build(:product),
           stock_location: build(:stock_location)
         }
       end
