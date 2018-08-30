@@ -50,5 +50,11 @@ defmodule Snitch.Data.Model.PaymentMethodTest do
 
       assert nil == PaymentMethod.get_check()
     end
+
+    test "get active payment methods" do
+      methods = PaymentMethod.get_active_payment_methods()
+
+      assert length(methods) == 3
+    end
   end
 end
