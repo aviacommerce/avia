@@ -3,6 +3,8 @@ defmodule SnitchApiWeb.AddressController do
 
   alias SnitchApi.Checkout
   alias Snitch.Data.Schema.Address
+  alias Snitch.Data.Model.Country
+  alias Snitch.Repo
 
   action_fallback(SnitchApiWeb.FallbackController)
   plug(SnitchApiWeb.Plug.DataToAttributes)
@@ -49,6 +51,31 @@ defmodule SnitchApiWeb.AddressController do
       conn
       |> put_status(204)
       |> send_resp(:no_content, "")
+    end
+  end
+
+  def countries(conn, _params) do
+    countries = Country.get_all()
+    render(conn, SnitchApiWeb.CountryView, "index.json-api", data: countries)
+  end
+
+  def country_states(conn, %{"id" => country_id}) do
+    case Country.get(country_id) do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> render(SnitchApiWeb.ErrorView, :"404")
+
+      country ->
+        country_with_states = Repo.preload(country, :states)
+
+        render(
+          conn,
+          SnitchApiWeb.CountryView,
+          "show.json-api",
+          data: country_with_states,
+          opts: [include: "states"]
+        )
     end
   end
 end

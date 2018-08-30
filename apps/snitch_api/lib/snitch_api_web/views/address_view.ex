@@ -35,3 +35,31 @@ defmodule SnitchApiWeb.AddressView do
     }
   end
 end
+
+defmodule SnitchApiWeb.CountryView do
+  use SnitchApiWeb, :view
+  use JaSerializer.PhoenixView
+
+  location("/countries/:id")
+
+  attributes([
+    :name,
+    :iso_name
+  ])
+
+  has_many(
+    :states,
+    serializer: SnitchApiWeb.StateView,
+    include: false
+  )
+end
+
+defmodule SnitchApiWeb.StateView do
+  use SnitchApiWeb, :view
+  use JaSerializer.PhoenixView
+
+  attributes([
+    :name,
+    :code
+  ])
+end

@@ -12,6 +12,11 @@ defmodule Snitch.Data.Model.Country do
     QH.get(Country, query_fields_or_primary_key, Repo)
   end
 
+  @spec get_all() :: [Country.t()]
+  def get_all() do
+    Repo.all(Country)
+  end
+
   @spec formatted_list() :: [{String.t(), non_neg_integer}]
   def formatted_list, do: Repo.all(from(c in Country, select: {c.name, c.id}))
 end

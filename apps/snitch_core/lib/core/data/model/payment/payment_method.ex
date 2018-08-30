@@ -56,4 +56,18 @@ defmodule Snitch.Data.Model.PaymentMethod do
 
   @spec get_all() :: [PaymentMethod.t()]
   def get_all, do: Repo.all(PaymentMethod)
+
+  @doc """
+  Returns all the active payment methods.
+  """
+  @spec get_active_payment_methods() :: [PaymentMethod.t()]
+  def get_active_payment_methods do
+    query =
+      from(
+        payment_method in PaymentMethod,
+        where: payment_method.active? == true
+      )
+
+    Repo.all(query)
+  end
 end
