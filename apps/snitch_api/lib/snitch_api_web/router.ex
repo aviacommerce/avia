@@ -26,6 +26,8 @@ defmodule SnitchApiWeb.Router do
     post("/hosted-payment/:source/error", HostedPaymentController, :payment_error)
     resources("/taxonomies", TaxonomyController, only: [:index, :show])
     resources("/taxons", TaxonController, only: [:index, :show])
+    get("/countries", AddressController, :countries)
+    get("/countries/:id/states/", AddressController, :country_states)
   end
 
   scope "/api/v1", SnitchApiWeb do
@@ -46,5 +48,6 @@ defmodule SnitchApiWeb.Router do
     get("/product/:id/rating-summary", ProductController, :rating_summary)
     get("/product/:id/reviews", ProductController, :reviews)
     resources("/addresses", AddressController, only: [:index, :show, :create, :update])
+    get("/payment/payment-methods", PaymentController, :payment_methods)
   end
 end
