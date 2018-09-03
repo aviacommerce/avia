@@ -222,4 +222,8 @@ defmodule Snitch.Data.Model.Product do
       end
     end)
   end
+
+  def image_url(name, product) do
+    ImageUploader.url({name, product})
+  end
 end

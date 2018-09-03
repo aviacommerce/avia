@@ -33,9 +33,19 @@ defmodule SnitchApiWeb.ProductController do
     end
   end
 
+  def index(conn, %{"product_brand" => brand_id}) do
+    products = Context.product_by_brand(brand_id)
+
+    render(
+      conn,
+      "index.json-api",
+      data: products
+    )
+  end
+
   @include ~s(reviews,reviews.rating_option_vote,
   reviews.rating_option_vote.rating_option,variants,variants.images,
-  variants.options,variants.options.option_type,theme,theme.option_types)
+  variants.options,variants.options.option_type)
   def index(conn, params) do
     {products, page} = Context.list_products(conn, params)
 
@@ -43,7 +53,7 @@ defmodule SnitchApiWeb.ProductController do
       conn,
       "index.json-api",
       data: products,
-      opts: [include: @include, page: page]
+      opts: [page: page]
     )
   end
 

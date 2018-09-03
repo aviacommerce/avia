@@ -33,6 +33,12 @@ defmodule SnitchApi.ProductsContext do
     )
   end
 
+  def product_by_brand(brand_id) do
+    query = from(p in Product, where: p.brand_id == ^brand_id)
+
+    product = Repo.all(query)
+  end
+
   @doc """
   Creates the page. The page comprises all the related pagination links
   """

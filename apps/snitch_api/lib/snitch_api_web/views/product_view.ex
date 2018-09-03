@@ -1,6 +1,7 @@
 defmodule SnitchApiWeb.ProductView do
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
+  alias Snitch.Data.Model.{Product, ProductReview}
 
   location("/products/:slug")
 
@@ -16,31 +17,38 @@ defmodule SnitchApiWeb.ProductView do
     :meta_title,
     :promotionable,
     :selling_price,
-    :max_retail_price
+    :max_retail_price,
+    :images,
+    :rating_summary
   ])
+
+  def images(product, _conn) do
+    product = product |> Snitch.Repo.preload(:images)
+
+    product.images
+    |> Enum.map(fn image -> Product.image_url(image.name, product) end)
+  end
+
+  def rating_summary(product, _conn) do
+    ProductReview.review_aggregate(product)
+  end
 
   has_many(
     :variants,
     serializer: SnitchApiWeb.ProductView,
-    include: true
+    include: false
   )
 
   has_many(
     :options,
     serializer: SnitchApiWeb.ProductOptionValueView,
-    include: true
+    include: false
   )
 
   has_many(
     :reviews,
     serializer: SnitchApiWeb.ReviewView,
-    include: true
-  )
-
-  has_one(
-    :theme,
-    serializer: SnitchApiWeb.VariationThemeView,
-    include: true
+    include: false
   )
 
   def render("rating_summary.json-api", %{data: data, id: id}) do
