@@ -16,6 +16,7 @@ defmodule Snitch.Data.Model.Payment do
 
   alias Snitch.Data.Schema.Payment
   alias Snitch.Data.Model.CardPayment, as: CardPaymentModel
+  alias Snitch.Tools.Money, as: MoneyTools
 
   @doc """
   Updates an existing `Payment`
@@ -53,5 +54,19 @@ defmodule Snitch.Data.Model.Payment do
 
   def to_subtype(%Payment{payment_type: "ccd"} = payment) do
     CardPaymentModel.from_payment(payment.id)
+  end
+
+  def total(order) do
+    payments = Map.fetch!(Repo.preload(order, [:payments]), :payments)
+
+    case payments do
+      [] ->
+        MoneyTools.zero!()
+
+      payments ->
+        payments
+        |> Stream.map(&Map.fetch!(&1, :amount))
+        |> Enum.reduce(&Money.add!/2)
+    end
   end
 end

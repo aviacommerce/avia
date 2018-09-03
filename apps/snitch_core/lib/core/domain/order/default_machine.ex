@@ -68,8 +68,8 @@ defmodule Snitch.Domain.Order.DefaultMachine do
       Transitions.persist_shipping_preferences(context)
     end)
 
-    event(:confirm, %{from: [:payment], to: :processing}, fn context ->
-      context
+    event(:process_payment, %{from: [:delivery], to: :payment}, fn context ->
+      Transitions.save_payment_info(context)
     end)
 
     event(:captured, %{from: [:processing], to: :rts}, fn context ->

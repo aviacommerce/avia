@@ -11,8 +11,11 @@ defmodule Snitch.Domain.Order.Transitions do
   use Snitch.Domain
 
   alias BeepBop.Context
-  alias Snitch.Data.Model.Package
-  alias Snitch.Data.Schema.Order
+  alias Snitch.Data.Model.{Package, Payment, PaymentMethod}
+  alias Snitch.Data.Model.CardPayment, as: CardPaymentModel
+  alias Snitch.Data.Model.CheckPayment, as: CheckPaymentModel
+  alias Snitch.Data.Schema.{Order, CardPayment}
+  alias Snitch.Domain.Package, as: PackageDomain
 
   alias Snitch.Domain.Package, as: PackageDomain
   alias Snitch.Domain.{Shipment, ShipmentEngine, Splitters.Weight}
@@ -192,5 +195,117 @@ defmodule Snitch.Domain.Order.Transitions do
       {:error, _} = error, _ ->
         {:halt, error}
     end)
+  end
+
+  # Guard Class to check negative amount is skipped.
+
+  defp payable_amount(order) do
+    packages_total = Package.compute_packages_total(order)
+    total_amount = Money.add!(packages_total, order.total)
+    amount_paid_before = Payment.total(order)
+    Money.sub!(total_amount, amount_paid_before)
+  end
+
+  defp process_payment("chk", context, multi, payment_method, payment, order, amount_to_pay) do
+    params = %{
+      amount: amount_to_pay,
+      order_id: order.id,
+      number: "check-payment"
+    }
+
+    function = fn _ ->
+      CheckPaymentModel.create(params)
+    end
+
+    struct(context, multi: Multi.run(multi, :checkpayment, function))
+  end
+
+  defp process_payment("ccd", context, multi, payment_method, payment, order, amount_to_pay) do
+    case validate_payment_method(payment) do
+      %{changes: %{card: %{errors: []}}} ->
+        params = %{
+          amount: amount_to_pay,
+          payment_type: "ccd",
+          payment_method_id: payment_method.id
+        }
+
+        function = fn _ ->
+          CardPaymentModel.create("card-payment", order.id, params, %{card: payment})
+        end
+
+        struct(context, multi: Multi.run(multi, :cardpayment, function))
+
+      %{changes: %{card: %{errors: errors}}} ->
+        struct(context, valid?: false, errors: errors)
+    end
+  end
+
+  @doc """
+  Validator for payment method
+
+  Responses
+  {:ok, payment}
+  {:error, errors}
+  """
+
+  defp validate_payment_method(payment) do
+    CardPayment.create_changeset(%CardPayment{}, %{
+      card: payment
+    })
+  end
+
+  @doc """
+  Processing incoming payment.
+
+    ## Schema of the `:state`
+
+    ### card
+
+    ```
+    %{
+      payment:
+        %{
+          payment_method_id: "payment_method_id",
+          month: 12,
+          name_on_card: "Helper",
+          brand: "VISA",
+          number: "411141114114111",
+          card_name: "Rupay",
+          user_id: "Somer user id"
+        }
+    }
+
+    `user_id` needs to be injected into map through webcontoller.
+
+    ### Check
+    %{
+      payment:
+        %{
+          payment_method_id: "payment"
+        }
+    }
+    ```
+
+    ### 3rd party
+
+    * Payubiz
+
+  """
+  @spec save_payment_info(Context.t()) :: Context.t()
+  def save_payment_info(%Context{valid?: true, struct: %Order{id: order_id} = order} = context) do
+    %{state: %{payment: payment}, multi: multi} = context
+
+    amount_to_pay = payable_amount(order)
+    payment_method = PaymentMethod.get(payment.payment_method_id)
+
+    process_payment(
+      payment_method.code,
+      context,
+      multi,
+      payment_method,
+      payment,
+      order,
+      amount_to_pay
+    )
   end
 end
