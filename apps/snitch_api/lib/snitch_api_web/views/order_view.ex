@@ -23,6 +23,12 @@ defmodule SnitchApiWeb.OrderView do
     include: true
   )
 
+  has_many(
+    :payments,
+    serializer: SnitchApiWeb.PaymentView,
+    include: false
+  )
+
   def item_count(order, _) do
     order.line_items
     |> Enum.reduce(0, fn line_item, acc ->
@@ -39,7 +45,13 @@ defmodule SnitchApiWeb.OrderView do
     end)
   end
 
-  def shipping_address(struct, conn) do
+  def line_items(struct, _conn) do
+    struct
+    |> Snitch.Repo.preload(:line_items)
+    |> Map.get(:line_items)
+  end
+
+  def shipping_address(struct, _conn) do
     struct
     |> Map.get(:shipping_address)
     |> case do
@@ -53,7 +65,7 @@ defmodule SnitchApiWeb.OrderView do
     end
   end
 
-  def billing_address(struct, conn) do
+  def billing_address(struct, _conn) do
     struct
     |> Map.get(:billing_address)
     |> case do

@@ -15,7 +15,7 @@ defmodule Snitch.Domain.Order.Transitions do
   alias Snitch.Data.Schema.Order
 
   alias Snitch.Domain.Package, as: PackageDomain
-  alias Snitch.Domain.{Shipment, ShipmentEngine, Splitters.Weight}
+  alias Snitch.Domain.{Payment, Shipment, ShipmentEngine, Splitters.Weight}
 
   @doc """
   Embeds the addresses and computes some totals of the `order`.
@@ -165,6 +165,33 @@ defmodule Snitch.Domain.Order.Transitions do
       struct(context, multi: Multi.run(multi, :packages, function))
     else
       struct(context, valid?: false, errors: [shipping_preferences: "is invalid"])
+    end
+  end
+
+  @doc """
+  Tranistion function to handle payment creation.
+  For more information see.
+  ## See
+  `Snitch.Domain.Payment`
+  """
+  @spec make_payment_record(Context.t()) :: Contex.t()
+  def make_payment_record(
+        %Context{
+          valid?: true,
+          struct: %Order{} = order,
+          state: %{
+            payment_method: payment_method,
+            payment_params: payment_params
+          }
+        } = context
+      ) do
+    case Payment.create_payment(payment_params, payment_method, order) do
+      {:ok, map} ->
+        state = Map.put(context.state, :payment, map)
+        struct(context, state: state)
+
+      {:error, changeset} ->
+        struct(context, valid?: false, errors: changeset.errors)
     end
   end
 

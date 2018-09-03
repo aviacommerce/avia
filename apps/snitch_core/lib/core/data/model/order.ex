@@ -39,17 +39,31 @@ defmodule Snitch.Data.Model.Order do
     |> Repo.insert()
   end
 
+  @doc """
+  Returns an `order` struct for the supplied `user_id`.
+
+  An existing `order` associated with the user is present in either `cart` or
+  `address` state is returned if found. If no order is present for the user
+  in `cart` or `address` state a new order is created returned.
+  """
+  @spec user_order(non_neg_integer) :: Order.t()
   def user_order(user_id) do
-    Order
-    |> Repo.get_by(user_id: user_id, state: "cart")
+    query =
+      from(
+        order in Order,
+        where: order.user_id == ^user_id and order.state in ["cart", "address"]
+      )
+
+    query
+    |> Repo.all()
     |> case do
-      nil ->
+      [] ->
         %Order{}
         |> Order.create_guest_changeset(%{})
         |> Ecto.Changeset.put_change(:user_id, user_id)
         |> Repo.insert()
 
-      order ->
+      [order | _] ->
         {:ok, order}
     end
   end

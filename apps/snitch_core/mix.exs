@@ -80,7 +80,10 @@ defmodule Snitch.Core.Mixfile do
       {:arc, "~> 0.10.0"},
       {:arc_ecto, "~> 0.10.0"},
       {:cowboy, "~> 1.0"},
-      {:plug, "~> 1.0"}
+      {:plug, "~> 1.0"},
+
+      # unique id generator
+      {:nanoid, "~> 1.0.1"}
     ]
   end
 

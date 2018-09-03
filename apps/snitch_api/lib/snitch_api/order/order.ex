@@ -3,35 +3,36 @@ defmodule SnitchApi.Order do
   The Checkout context.
   """
 
-  import Ecto.Query, only: [from: 2, order_by: 2]
-
-  alias Snitch.Repo
-  alias SnitchApi.API
-  alias Snitch.Data.Schema.{Address, LineItem}
-  alias Snitch.Data.Model.Order
-  alias Snitch.Data.Model.LineItem, as: LineItemModel
   import Ecto.Query
 
-  @doc """
-    Attaching address to order.
-    Featch address from using ID.
+  alias Snitch.Repo
+  alias Snitch.Data.Model.LineItem, as: LineItemModel
+  alias BeepBop.Context
+  alias Snitch.Data.Model.Order
+  alias Snitch.Data.Model.PaymentMethod
+  alias Snitch.Data.Schema.LineItem
+  alias Snitch.Domain.Order.DefaultMachine
 
-    Update order embeded address to order using partial_update
+  @doc """
+  Attaching address to order.
+
+  Updates order with the supplied billing and shipping address.
   """
 
-  def attach_address(order_id, address_id) do
-    address =
-      address_id
-      |> get_address()
-      |> Map.from_struct()
+  def attach_address(order_id, shipping_address, billing_address) do
+    order = Order.get(order_id)
 
-    %{id: order_id}
-    |> Order.get()
-    |> Repo.preload(:line_items)
-    |> Order.partial_update(%{
-      billing_address: address,
-      shipping_address: address
-    })
+    context =
+      order
+      |> Context.new(
+        state: %{
+          billing_address: billing_address,
+          shipping_address: shipping_address
+        }
+      )
+
+    transition = DefaultMachine.add_addresses(context)
+    transition_response(transition, order_id)
   end
 
   def add_to_cart(line_item) do
@@ -41,7 +42,30 @@ defmodule SnitchApi.Order do
     end
   end
 
-  defp get_address(id), do: Repo.get(Address, id)
+  def add_payment(order_id, payment_method_id, amount) do
+    with order when not is_nil(order) <- Order.get(order_id),
+         payment_method when not is_nil(payment_method) <- PaymentMethod.get(payment_method_id) do
+      context =
+        order
+        |> Context.new(
+          state: %{
+            payment_method: payment_method,
+            payment_params: %{
+              payment_params: %{
+                amount: amount
+              },
+              subtype_params: %{}
+            }
+          }
+        )
+
+      transition = DefaultMachine.add_payment(context)
+      transition_response(transition, order_id)
+    else
+      nil ->
+        {:error, :not_found}
+    end
+  end
 
   defp get_line_item(order_id, product_id) do
     query = from(l in LineItem, where: l.order_id == ^order_id and l.product_id == ^product_id)
@@ -52,5 +76,17 @@ defmodule SnitchApi.Order do
     new_count = line_item.quantity + params["quantity"]
     new_params = %{params | "quantity" => new_count}
     LineItemModel.update(line_item, new_params)
+  end
+
+  defp transition_response(%Context{errors: nil}, order_id) do
+    order =
+      Order.get(order_id)
+      |> Repo.preload(line_items: [product: [:theme, [options: :option_type]]])
+
+    {:ok, order}
+  end
+
+  defp transition_response(%Context{errors: errors}, _) do
+    errors
   end
 end
