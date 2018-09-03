@@ -41,7 +41,7 @@ defmodule Snitch.Data.Schema.Package do
     |> Enum.reduce(&Money.add!/2)
 
   total_shipping_tax = Money.add!(
-    package.shipping_tax, 
+    package.shipping_tax,
     total_tax_on_shipping_of_items
   )
   ```
