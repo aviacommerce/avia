@@ -121,7 +121,7 @@
           <span class="product-delete">&times;
             <input name="delete-image-id" type="hidden" value="<%= image.id %>" >
           </span>
-          <%= img_tag(get_image_url(image, @parent_product), class: "image") %>
+          <%= img_tag(get_image_url(image, @parent_product), class: "img-thumbnail") %>
         </div>
         <% end %>
       <% end %>

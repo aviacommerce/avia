@@ -62,7 +62,7 @@ defmodule SnitchApi.Accounts do
     case Account.authenticate(email, password) do
       {:ok, user} ->
         user = Snitch.Repo.preload(user, [:role])
-        Guardian.encode_and_sign(user, %{}, ttl: {10, :minute})
+        Guardian.encode_and_sign(user, %{}, ttl: {3, :days})
 
       _ ->
         {:error, :unauthorized}

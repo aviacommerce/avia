@@ -5,12 +5,12 @@ defmodule SnitchApiWeb.VariationThemeView do
   alias SnitchApiWeb.OptionTypeView
 
   attributes([
-    :weight
+    :name
   ])
 
   has_many(
     :option_types,
     serializer: OptionTypeView,
-    include: true
+    include: false
   )
 end

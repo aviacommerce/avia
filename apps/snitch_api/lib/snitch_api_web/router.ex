@@ -28,6 +28,7 @@ defmodule SnitchApiWeb.Router do
     resources("/taxons", TaxonController, only: [:index, :show])
     get("/countries", AddressController, :countries)
     get("/countries/:id/states/", AddressController, :country_states)
+    get("/brands", ProductBrandController, :index)
   end
 
   scope "/api/v1", SnitchApiWeb do
