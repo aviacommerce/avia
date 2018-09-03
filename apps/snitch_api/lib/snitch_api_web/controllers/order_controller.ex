@@ -3,7 +3,6 @@ defmodule SnitchApiWeb.OrderController do
 
   alias Snitch.Data.Model.Order, as: OrderModel
   alias Snitch.Data.Schema.Order
-  alias Snitch.Data.Schema.OrderAddress
   alias SnitchApi.Order, as: OrderContext
   alias Snitch.Repo
 
@@ -48,32 +47,15 @@ defmodule SnitchApiWeb.OrderController do
   end
 
   def select_address(conn, %{"id" => order_id} = params) do
-    order = OrderModel.get(order_id)
-
     shipping_address =
       for {key, val} <- params["shipping_address"], into: %{}, do: {String.to_atom(key), val}
 
     billing_address =
-      for {key, val} <- params["shipping_address"], into: %{}, do: {String.to_atom(key), val}
+      for {key, val} <- params["billing_address"],
+          into: %{},
+          do: {String.to_atom(key), val} || shipping_address
 
-    shipping_address =
-      shipping_address
-      |> Map.update!(:country_id, &String.to_integer/1)
-      |> Map.update!(:state_id, &String.to_integer/1)
-
-    billing_address =
-      billing_address
-      |> Map.update!(:country_id, &String.to_integer/1)
-      |> Map.update!(:state_id, &String.to_integer/1)
-
-    order_address = %{
-      shipping_address: shipping_address,
-      billing_address: billing_address
-    }
-
-    with {:ok, %Order{} = order} <- OrderModel.partial_update(order, order_address) do
-      order = order |> Repo.preload(:line_items)
-
+    with {:ok, order} <- OrderContext.attach_address(order_id, shipping_address, billing_address) do
       conn
       |> put_status(200)
       |> render(
@@ -120,5 +102,24 @@ defmodule SnitchApiWeb.OrderController do
     |> put_status(200)
     |> put_resp_header("location", order_path(conn, :show, order))
     |> render("show.json-api", data: order)
+  end
+
+  def add_payment(conn, %{
+        "payment_method_id" => payment_method_id,
+        "id" => order_id,
+        "amount" => amount
+      }) do
+    amount = Money.new(:USD, amount)
+
+    with {:ok, order} <- OrderContext.add_payment(order_id, payment_method_id, amount) do
+      order = Repo.preload(order, :payments)
+
+      render(
+        conn,
+        "show.json-api",
+        data: order,
+        opts: [include: "payments"]
+      )
+    end
   end
 end

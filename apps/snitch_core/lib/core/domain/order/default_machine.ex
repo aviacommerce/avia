@@ -57,11 +57,16 @@ defmodule Snitch.Domain.Order.DefaultMachine do
   state_machine Order,
                 :state,
                 ~w(cart address payment delivery processing rts shipping complete cancelled)a do
-    event(:add_addresses, %{from: [:cart], to: :address}, fn context ->
+    event(:add_addresses, %{from: [:cart, :address], to: :address}, fn context ->
       context
       |> Transitions.associate_address()
       |> Transitions.compute_shipments()
       |> Transitions.persist_shipment()
+    end)
+
+    event(:add_payment, %{from: [:address], to: :payment}, fn context ->
+      context
+      |> Transitions.make_payment_record()
     end)
 
     event(:save_shipping_preferences, %{from: [:address], to: :delivery}, fn context ->
