@@ -1,9 +1,10 @@
 @import 'variables';
 @import "switch";
 @import "bootstrap";
-@import "login";
 
 body {
+  background-color: #FAF9F5;
+
   .prealative {
     position: relative;
   }

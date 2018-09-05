@@ -1,5 +1,6 @@
-@import './custom/variables';
+@import '../custom/variables';
 @import "font-awesome";
+
 .sidebar {
   border-right: 1px solid $gray-400;
   height: 100vh;

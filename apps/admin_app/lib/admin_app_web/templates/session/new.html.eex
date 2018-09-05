@@ -1,13 +1,22 @@
-<div class="card container text-uppercase login col-5 m-auto pb-3">
-  <h4 class="text-center pt-3">Sign In</h4>
-  <hr/>
-  <%= form_for @changeset, session_path(@conn, :create), [as: :session],
-fn f -> %>
-    <%= input f, :email %>
-    <%= input f, :password %>
-    <p class="text-lowercase text-capitalize mb-0">
-      <%= link "Forgot your password?", to: session_path(@conn, :password_reset) %>
-    </p>
-    <%= submit "Submit", class: "btn btn-primary submit-btn col-12" %>    
-  <% end %>
+<div class="card-wrapper col-5 m-auto pb-3">
+  <div class="brand text-center pb-3">
+    <img src="/images/logo.png">
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Login</h4>
+      <%= form_for @changeset, session_path(@conn, :create), [as: :session], fn f -> %>
+        <%= input f, :email %>
+        <%= input f, :password %>
+        <%= submit "Login", class: "btn btn-primary submit-btn col-12 my-3" %>
+
+        <p class="text-right my-3">
+          <%= link "Forgot your password?", to: session_path(@conn, :password_reset) %>
+        </p>
+      <% end %>
+    </div>
+  </div>
+  <div class="text-center my-5 text-secondary">
+    Copyright © 2018 - Aviabird
+  </div>
 </div>
