@@ -1,5 +1,6 @@
 @import './custom/variables';
 @import "font-awesome";
+
 .sidebar {
   border-right: 1px solid $gray-400;
   height: 100vh;
@@ -9,12 +10,29 @@
       width: 100%;
 
       .nav-link {
-        color:$gray-900;
+        color: $gray-900;
         border-radius: 0;
+        font-size: 1em;
+
+        i {
+          font-size: 1.3em;
+          margin-right: .5em;
+          color: $gray-700;
+        }
+
         &:hover {
           background-color: $gray-300;
         }
       }
     }
+  }
+
+  .abnav {
+    display:inline-block;
+    position: absolute;
+    top: 10px;
+    z-index: 999;
+    height: 100vh;
+    background-color: $white;
   }
 }

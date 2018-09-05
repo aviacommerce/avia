@@ -9441,7 +9441,7 @@ var _user$project$StockLocations_List$view = function (model) {
 		_elm_lang$html$Html$div,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('StockLocations--container card container'),
+			_0: _elm_lang$html$Html_Attributes$class('StockLocations--container card container py-2'),
 			_1: {ctor: '[]'}
 		},
 		{

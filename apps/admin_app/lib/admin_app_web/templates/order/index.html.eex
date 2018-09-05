@@ -1,8 +1,11 @@
-<div>
-  <h2 class="text-center">Listing Orders</h2>
-  <form action="orders" method="post">
-    <button type="submit" formmethod="post">Create New Order</button>
-  </form>
+<div class="card container">
+  <h2>
+    Listing Orders
+    <form action="orders" method="post" class="float-right">
+      <button type="submit" formmethod="post" class="btn btn-primary float-right">Create New Order</button>
+    </form>
+  </h2>
+
   <table class="table table-striped">
     <thead class="thead-light">
       <tr>

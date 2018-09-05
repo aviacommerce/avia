@@ -125,7 +125,7 @@ renderStockLocations stockLocations =
 
 view : Model -> Html Msg
 view model =
-    div [ class "StockLocations--container card container" ]
+    div [ class "StockLocations--container card container py-2" ]
         [ h2 []
             [ text "Stock Location List"
             , a [ href "/stock_locations/new", class "btn btn-primary float-right" ] [ text "Create Stock Location" ]

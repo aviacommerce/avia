@@ -22,6 +22,9 @@ body {
       transform: translateY(-3px);
     }
   }
+  .card{
+    @extend .py-2;
+  }
 
   .form-group.required {
     label::after {

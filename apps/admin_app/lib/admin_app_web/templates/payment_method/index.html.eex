@@ -1,7 +1,7 @@
 <div class="card container">
   <h2>
     Payment Methods
-    <%= link("New PaymentMethod+", to: payment_method_path(@conn, :new),
+    <%= link("New PaymentMethod", to: payment_method_path(@conn, :new),
           class: "btn btn-primary float-right")%>
   </h2>
   <table class="table">

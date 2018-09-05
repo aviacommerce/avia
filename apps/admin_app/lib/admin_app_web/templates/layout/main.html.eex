@@ -4,7 +4,7 @@
       <%= render "sidebar.html" %>
     </div>
   <% end %>
-  <div class="col-10 m-auto prealative" >
+  <div class="col-10 prealative" >
     <%= render @view_module, @view_template, assigns %>
   </div>
 </main>
