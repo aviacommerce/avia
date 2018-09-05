@@ -9,7 +9,7 @@ export function createTaxon() {
   $(".taxonform").on("submit", function(event) {
     event.preventDefault();
     var tid = $("#form-taxon-id").val();
-    let target_div = $(`.item[data-taxon_id=${tid}]`);                                   
+    let target_div = $(`.item[data-taxon_id=${tid}]`);
     // let target_div = $("#taxon-modal").parent();
     $.ajax({
       url: '/taxonomy',

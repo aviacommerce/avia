@@ -3,14 +3,14 @@
     <a class="nav-link active" href="#tab1default" data-toggle="tab">Product Detail</a>
   </li>
   <%= if  @conn.request_path != product_path(@conn, :new) do %>
-  <li class="nav-item">
-    <a class="nav-link" href="#tab2default" data-toggle="tab">Variants</a>
-  </li>
-  <% end %>
+    <%= if has_themes(@parent_product) do %>
+      <li class="nav-item">
+        <a class="nav-link" href="#tab2default" data-toggle="tab">Variants</a>
+      </li>
+    <% end %>
   <li class="nav-item">
     <a class="nav-link" href="#tab3default" data-toggle="tab">Images</a>
   </li>
-  <%= if  @conn.request_path != product_path(@conn, :new) do %>
     <li class="nav-item">
       <a class="nav-link" href="#tab4default" data-toggle="tab">Stock</a>
     </li>
@@ -20,6 +20,9 @@
     <div class="tab-pane fade in active show" id="tab1default">
     <%= form_for @changeset, @action, [multipart: true], fn f ->  %>
       <%= hidden_input f, :id %>
+      <%= if  @conn.request_path == product_path(@conn, :new) do %>
+        <%= hidden_input :taxon_id, :taxon_id, value: get_taxon(@conn), name: "product[taxon_id]" %>
+      <% end %>
       <%= input f, :name%>
       <%= textarea_input f, :description%>
       <div class="row">
@@ -59,13 +62,13 @@
     <% end %>
     </div>
 
-    <%= if  @conn.request_path != product_path(@conn, :new) do %>
+    <%= if  @conn.request_path != product_path(@conn, :new) and has_themes(@parent_product) do %>
       <div class="tab-pane fade" id="tab2default" style="padding:10px">
 
       <div style="padding: 10px; background: #f8f9fa; border-radius: 10px">
         <div class="form-group required">
           <label>Variation Theme</label>
-          <%= select :theme, :theme_id, themes_options(@prototype.variation_themes), selected: @parent_product.theme_id ,prompt: "", class: "form-control", id: "product_theme_id" %>
+          <%= select :theme, :theme_id, themes_options(@parent_product), selected: @parent_product.theme_id ,prompt: "", class: "form-control", id: "product_theme_id" %>
         </div>
         <div id="variation_options" style="padding: 10px 0px 10px 0px;"></div>
         <div class="modal fade" id="theme_change_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -102,6 +105,7 @@
               <%= for option_type <- get_option_types(@parent_product) do %>
                 <th><%= option_type.display_name %></th>
               <% end %>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -111,6 +115,9 @@
                   <%= for option <- variant.options do %>
                     <td class="option-value" contenteditable="true" data-option_value_id="<%= option.id %>"><%= option.value %></td>
                   <% end %>
+                  <td>
+                    <%= link("Edit", to: product_path(@conn, :edit, variant.id), class: "btn btn-primary") %>
+                  </td>
                 </tr>
               <% end %>
             </tbody>
@@ -119,7 +126,7 @@
         <% end %>
       </div>
     <% end %>
-
+    <%= if  @conn.request_path != product_path(@conn, :new) do %>
   <div class="tab-pane fade" id="tab3default">
     <div style="padding: 10px; background: #f8f9fa; border-radius: 10px">
       <input id="product-id" name="product-id" type="hidden" value="<%= @parent_product.id %>" >
@@ -144,14 +151,19 @@
      <% end %>
     </div>
   </div>
-
+  <% end %>
   <%= if  @conn.request_path != product_path(@conn, :new) do %>
    <div class="tab-pane fade" id="tab4default">
    <form accept-charset="UTF-8" action="/product/stock" method="post">
-     <div class="form-group required">
-       <label>Variant</label>
-       <%= select :stock, :product_id, get_variant_option(@parent_product.variants), class: "form-control"%>
-     </div>
+     <%= if is_parent_product(@conn.params["id"]) do %>
+      <div class="form-group required">
+        <label>Variant</label>
+        <%= select :stock, :product_id, get_variant_option(@parent_product.variants), class: "form-control"%>
+      </div>
+     <% else %>
+        <%= hidden_input :stock, :product_id, value: @conn.params["id"] %>
+     <% end %>
+
      <div class="form-group required">
        <label>Stock Location</label>
        <%= select :stock, :location_id, get_stock_locations_option(@stock_locations), class: "form-control"%>

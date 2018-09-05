@@ -1,6 +1,8 @@
 defmodule AdminAppWeb.TaxonomyView do
   use AdminAppWeb, :view
 
+  alias Snitch.Data.Schema.VariationTheme
+
   def get_taxon_name({taxon, list}) do
     taxon.name
   end
@@ -15,5 +17,10 @@ defmodule AdminAppWeb.TaxonomyView do
 
   def get_children({taxon, list}) do
     list
+  end
+
+  def get_themes() do
+    Snitch.Repo.all(VariationTheme)
+    |> Enum.map(fn theme -> {theme.name, theme.id} end)
   end
 end

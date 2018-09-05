@@ -6,6 +6,7 @@ defmodule AdminAppWeb.TaxonomyController do
   alias Snitch.Data.Schema.Taxonomy, as: TaxonomySchema
   alias AdminAppWeb.TaxonomyView
   import Ecto.Query
+  alias Snitch.Repo
   import Phoenix.View, only: [render_to_string: 3]
 
   def index(conn, _params) do
@@ -38,9 +39,9 @@ defmodule AdminAppWeb.TaxonomyController do
     render(conn, "taxonomy.html", taxonomy: taxonomy, token: token)
   end
 
-  def update_taxon(conn, %{"taxon" => %{"taxon" => taxon_name, "taxon_id" => taxon_id}}) do
+  def update_taxon(conn, %{"taxon" => %{"taxon" => taxon_name, "taxon_id" => taxon_id} = params}) do
     taxon = taxon_id |> Taxonomy.get_taxon()
-    params = %{name: taxon_name}
+    params = %{"name" => taxon_name, "variation_theme_ids" => params["themes"]}
 
     case Taxonomy.update_taxon(taxon, params) do
       {:ok, taxon} ->
@@ -57,8 +58,11 @@ defmodule AdminAppWeb.TaxonomyController do
 
   def create(conn, %{"id" => id, "taxon" => taxon}) do
     parent_taxon = Taxonomy.get_taxon(id)
-    taxon_params = %Taxon{name: taxon}
-    Taxonomy.add_taxon(parent_taxon, taxon_params, :child)
+    taxon_params = %Taxon{name: taxon["name"]}
+    new_taxon = Taxonomy.add_taxon(parent_taxon, taxon_params, :child)
+
+    changeset = Taxon.update_changeset(new_taxon, %{"variation_theme_ids" => taxon["themes"]})
+    Repo.update(changeset)
 
     html =
       render_to_string(

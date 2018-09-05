@@ -3,6 +3,8 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
 
   alias Snitch.Domain.Taxonomy
   alias AdminAppWeb.TemplateApi.TaxonomyView
+  alias Snitch.Data.Schema.Taxon
+  alias Snitch.Repo
   import Phoenix.View, only: [render_to_string: 3]
 
   def index(conn, %{"taxon_id" => taxon_id}) do
@@ -21,5 +23,14 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
       |> put_status(200)
       |> json(%{html: html})
     end
+  end
+
+  def taxon_edit(conn, %{"taxon_id" => taxon_id}) do
+    taxon = Repo.get(Taxon, taxon_id) |> Repo.preload(:variation_themes)
+    html = render_to_string(TaxonomyView, "taxon_edit_form.html", %{conn: conn, taxon: taxon})
+
+    conn
+    |> put_status(200)
+    |> json(%{html: html})
   end
 end

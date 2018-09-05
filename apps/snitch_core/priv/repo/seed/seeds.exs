@@ -27,6 +27,9 @@ alias Snitch.Seed.{
 
 variant_count = 9
 
+# seeds the taxonomy
+Taxonomy.seed()
+
 # seeds countries and states entity
 Repo.transaction(fn ->
   CountryState.seed_countries!()
@@ -47,9 +50,6 @@ Repo.transaction(fn ->
 end)
 
 Stocks.seed!()
-
-# seeds the taxonomy
-Taxonomy.seed()
 
 # seed roles
 Role.seed()

@@ -5,12 +5,11 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Data.Model.Product, as: ProductModel
   alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Data.Model.ProductPrototype, as: PrototypeModel
-  alias Snitch.Data.Schema.{ProductBrand, StockLocation}
+  alias Snitch.Data.Schema.{ProductBrand, StockLocation, VariationTheme}
   alias Snitch.Tools.Money
   alias Snitch.Data.Model.StockItem, as: StockModel
   alias Snitch.Data.Schema.StockItem, as: StockSchema
 
-  plug(:scrub_referer_query_params when action in [:create])
   plug(:load_resources when action in [:new, :edit])
 
   def index(conn, _params) do
@@ -28,7 +27,7 @@ defmodule AdminAppWeb.ProductController do
 
   def create(conn, %{"product" => params} = t) do
     with {:ok, product} <- ProductModel.create(params) do
-      redirect(conn, to: product_path(conn, :index))
+      redirect(conn, to: product_path(conn, :edit, product.id))
     else
       {:error, changeset} ->
         render(conn, "new.html", changeset: %{changeset | action: :new})
@@ -36,7 +35,7 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def edit(conn, %{"id" => id} = params) do
-    preloads = [variants: [options: :option_type], images: []]
+    preloads = [variants: [options: :option_type], images: [], taxon: [:variation_themes]]
 
     with %ProductSchema{} = product <- ProductModel.get(id) |> Repo.preload(preloads) do
       changeset = ProductSchema.create_changeset(product, params)
@@ -156,7 +155,8 @@ defmodule AdminAppWeb.ProductController do
           name: product_name_from_options(parent_product, options),
           options: options,
           selling_price: parent_product.selling_price,
-          max_retail_price: parent_product.max_retail_price
+          max_retail_price: parent_product.max_retail_price,
+          taxon_id: parent_product.taxon_id
         }
       }
     end)
@@ -194,36 +194,18 @@ defmodule AdminAppWeb.ProductController do
     load(conn, conn.params)
   end
 
-  def scrub_referer_query_params(conn, _opts) do
-    [{_, url} | tail] =
-      conn.req_headers
-      |> Enum.filter(fn {a, b} ->
-        if a == "referer" do
-          true
-        else
-          false
-        end
-      end)
-
-    [_, query_params] = String.split(url, "?")
-    params = URI.decode_query(query_params)
-    load(conn, params)
-  end
-
   defp load(conn, params) do
-    prototype_id = params["prototype_id"]
-
-    prototype =
-      PrototypeModel.get(prototype_id)
-      |> Repo.preload([:variation_themes])
+    themes = Repo.all(VariationTheme)
 
     brands = Repo.all(ProductBrand)
 
     stock_locations = Repo.all(StockLocation)
 
     conn
-    |> assign(:prototype, prototype)
+    |> assign(:themes, themes)
     |> assign(:stock_locations, stock_locations)
     |> assign(:brands, brands)
+
+    # |> assign(:prototype, prototype)
   end
 end
