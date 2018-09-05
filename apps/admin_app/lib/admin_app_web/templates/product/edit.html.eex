@@ -3,8 +3,8 @@
     changeset: @changeset,
     conn: @conn,
     action: product_path(@conn, :update, @changeset.data),
-    prototype: @prototype,
     parent_product: @parent_product,
     brands: @brands,
-    stock_locations: @stock_locations
+    stock_locations: @stock_locations,
+    themes: @themes
 %>

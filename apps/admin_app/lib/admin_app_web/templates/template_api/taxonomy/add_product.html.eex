@@ -1,7 +1,7 @@
 <div class="card--content">
 <div style="height:100%;width:300px;background:#eee;padding:10px">
   <div class="add-product">
-    <%= link("Add Product", to: "/products/new?prototype_id=1", class: "btn btn-primary")%>
+    <%= link("Add Product", to: "/products/new?taxon=#{@id}", class: "btn btn-primary")%>
     <p>You can now create a product</p>
   </div>
 </div>

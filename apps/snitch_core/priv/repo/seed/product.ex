@@ -11,7 +11,8 @@ defmodule Snitch.Seed.Product do
     ShippingCategory,
     StockItem,
     StockLocation,
-    Variant
+    Variant,
+    Taxon
   }
 
   @base_path Application.app_dir(:snitch_core, "priv/seed_data/pets_shop")
@@ -95,6 +96,8 @@ defmodule Snitch.Seed.Product do
   end
 
   defp product(p) do
+    taxon = Repo.get_by(Taxon, name: "Dry Food")
+
     %{
       name: p["name"],
       description: p["description"],
@@ -103,7 +106,8 @@ defmodule Snitch.Seed.Product do
       inserted_at: DateTime.utc(),
       updated_at: DateTime.utc(),
       selling_price: Money.new("14.99", :USD),
-      max_retail_price: Money.new("12.99", :USD)
+      max_retail_price: Money.new("12.99", :USD),
+      taxon_id: taxon.id
     }
   end
 

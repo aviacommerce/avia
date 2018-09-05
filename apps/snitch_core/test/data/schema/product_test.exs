@@ -7,11 +7,14 @@ defmodule Snitch.Data.Schema.ProductTest do
   import Snitch.Factory
 
   test "test valid data create_changeset/2" do
+    taxon = insert(:taxon)
+
     params = %{
       name: "HTC Desire 620",
       description: "HTC desire 620",
       selling_price: Money.new("12.99", currency()),
-      max_retail_price: Money.new("14.99", currency())
+      max_retail_price: Money.new("14.99", currency()),
+      taxon_id: taxon.id
     }
 
     changeset = Product.create_changeset(%Product{}, params)
@@ -36,6 +39,7 @@ defmodule Snitch.Data.Schema.ProductTest do
     parent_product = insert(:product)
     theme = insert(:variation_theme)
     [ot1, ot2] = insert_list(2, :option_type)
+    taxon = insert(:taxon)
 
     params = %{
       "theme_id" => theme.id,
@@ -48,7 +52,8 @@ defmodule Snitch.Data.Schema.ProductTest do
               %{"option_type_id" => ot2.id, "value" => "S"}
             ],
             "selling_price" => Money.new("12.99", currency()),
-            "max_retail_price" => Money.new("14.99", currency())
+            "max_retail_price" => Money.new("14.99", currency()),
+            "taxon_id" => taxon.id
           }
         },
         %{
@@ -59,7 +64,8 @@ defmodule Snitch.Data.Schema.ProductTest do
               %{"option_type_id" => ot2.id, "value" => "S"}
             ],
             "selling_price" => Money.new("12.99", currency()),
-            "max_retail_price" => Money.new("14.99", currency())
+            "max_retail_price" => Money.new("14.99", currency()),
+            "taxon_id" => taxon.id
           }
         }
       ]
@@ -76,6 +82,7 @@ defmodule Snitch.Data.Schema.ProductTest do
     parent_product = insert(:product)
     theme = insert(:variation_theme)
     [ot1, ot2] = insert_list(2, :option_type)
+    taxon = insert(:taxon)
 
     params = %{
       "theme_id" => theme.id,
@@ -88,7 +95,8 @@ defmodule Snitch.Data.Schema.ProductTest do
               %{"option_type_id" => ot2.id, "value" => "S"}
             ],
             "selling_price" => Money.new("12.99", currency()),
-            "max_retail_price" => Money.new("14.99", currency())
+            "max_retail_price" => Money.new("14.99", currency()),
+            "taxon_id" => taxon.id
           }
         },
         %{
@@ -99,7 +107,8 @@ defmodule Snitch.Data.Schema.ProductTest do
               %{"option_type_id" => ot2.id, "value" => "S"}
             ],
             "selling_price" => Money.new("12.99", currency()),
-            "max_retail_price" => Money.new("14.99", currency())
+            "max_retail_price" => Money.new("14.99", currency()),
+            "taxon_id" => taxon.id
           }
         }
       ]
@@ -119,7 +128,8 @@ defmodule Snitch.Data.Schema.ProductTest do
               %{"option_type_id" => ot2.id, "value" => "S"}
             ],
             "selling_price" => Money.new("12.99", currency()),
-            "max_retail_price" => Money.new("14.99", currency())
+            "max_retail_price" => Money.new("14.99", currency()),
+            "taxon_id" => taxon.id
           }
         }
       ]
@@ -136,6 +146,7 @@ defmodule Snitch.Data.Schema.ProductTest do
     parent_product = insert(:product)
     theme = insert(:variation_theme)
     [ot1, ot2] = insert_list(2, :option_type)
+    taxon = insert(:taxon)
 
     params = %{
       "theme_id" => theme.id,
@@ -148,7 +159,8 @@ defmodule Snitch.Data.Schema.ProductTest do
               %{"option_type_id" => ot2.id, "value" => "S"}
             ],
             "selling_price" => Money.new("12.99", currency()),
-            "max_retail_price" => Money.new("14.99", currency())
+            "max_retail_price" => Money.new("14.99", currency()),
+            "taxon_id" => taxon.id
           }
         },
         %{
@@ -159,7 +171,8 @@ defmodule Snitch.Data.Schema.ProductTest do
               %{"option_type_id" => ot2.id, "value" => "S"}
             ],
             "selling_price" => Money.new("12.99", currency()),
-            "max_retail_price" => Money.new("14.99", currency())
+            "max_retail_price" => Money.new("14.99", currency()),
+            "taxon_id" => taxon.id
           }
         }
       ]
@@ -182,7 +195,8 @@ defmodule Snitch.Data.Schema.ProductTest do
               %{"option_type_id" => ot2.id, "value" => "S"}
             ],
             "selling_price" => Money.new("12.99", currency()),
-            "max_retail_price" => Money.new("14.99", currency())
+            "max_retail_price" => Money.new("14.99", currency()),
+            "taxon_id" => taxon.id
           }
         }
       ]

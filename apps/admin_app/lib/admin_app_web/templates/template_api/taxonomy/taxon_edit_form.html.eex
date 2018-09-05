@@ -1,0 +1,14 @@
+<%= form_for @conn, taxonomy_path(@conn, :update_taxon),[as: :taxon, class: "edittaxonform", id: "taxon-form", method: "put"], fn f -> %>
+  <%= hidden_input f, :taxon_id, class: "form-control", id: "editform-taxon-id", value: @taxon.id %>
+  <div class="form-group">
+    <div class="form-group">
+      <label class="control-label">Name</label>
+      <%= text_input f, :taxon, class: "form-control", id: "editform-taxon-name", value: @taxon.name%>
+    </div>
+    <div class="form-group">
+      <label class="control-label">Variation Theme</label>
+      <%= multiple_select :taxons, :taxons, get_themes(), selected: get_selected_values(@taxon), "data-init-plugin": "select2", name: "taxon[themes][]" %>
+    </div>
+    <%= submit "Save", class: "btn btn-primary"%>
+  </div>
+<% end %>
