@@ -1,6 +1,6 @@
-<main role="main" class="row my-3 mx-0">
+<main role="main" class="row mt-3 mx-0">
   <%= if Guardian.Plug.authenticated?(@conn) do %>
-    <div class="col-2">
+    <div class="col-2 p-0 sidebar">
       <%= render "sidebar.html" %>
     </div>
   <% end %>

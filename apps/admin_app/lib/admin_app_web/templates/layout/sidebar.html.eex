@@ -1,37 +1,35 @@
-<div class="container">
-  <div class="row">
-    <ul id="drilldown" class="nav nav-pills nav-stacked col-3">
-        <li><a class="nav-link" href="/orders">Orders</a></li>
-        <li><a class="nav-link" href="#">Returns</a></li>
-        <li>
-          <a class="nav-link" href="#" data-toggle="collapse" data-target="#drilldown-2">
-            Products
-          </a>
-          <ul id="drilldown-2" class="nav nav-pills nav-stacked collapse pl-3">
-            <li><a class="nav-link" href="/products">Product Catalogue</a></li>
-            <li><a class="nav-link" href="/option_types">Option Types</a></li>
-            <li><a class="nav-link" href="/properties">Properties</a></li>
-            <li><a class="nav-link" href="/variation_themes">Variation Themes</a></li>
-            <li><a class="nav-link" href="/prototypes">Prototypes</a></li>
-            <li><a class="nav-link" href="/product_brands">Product Brands</a></li>
-          </ul>
-        </li>
-        <li><a class="nav-link" href="#">Reports</a></li>
-        <li><a class="nav-link" href="/users"</a>Users</li>
-        <li>
-          <a class="nav-link" href="#" data-toggle="collapse" data-target="#drilldown-1">
-            Configurations
-          </a>
-          <ul id="drilldown-1" class="nav nav-pills nav-stacked collapse pl-3">
-            <li><a class="nav-link" href="#">Stock Items</a></li>
-            <li><a class="nav-link" href="/stock_locations">Stock Locations</a></li>
-            <li><a class="nav-link" href="#">Stock Movements</a></li>
-            <li> <a class="nav-link" href="/roles"> Roles</a> </li>
-            <li> <a class="nav-link" href="/permissions">Permission</a></li>
-            <li> <a class="nav-link" href="/payment_methods">Payment Methods</a></li>
-          </ul>
-          </div>
-        </li>
+
+<ul id="drilldown" class="nav nav-pills nav-stacked">
+    <li><a class="nav-link" href="/orders"><i class="fa fa-first-order" aria-hidden="true"></i> Orders</a></li>
+    <li><a class="nav-link" href="#">Returns</a></li>
+    <li>
+      <a class="nav-link" href="#" data-toggle="collapse" data-target="#drilldown-2">
+        Products
+      </a>
+      <ul id="drilldown-2" class="nav nav-pills nav-stacked collapse pl-3">
+        <li><a class="nav-link" href="/products"><i class="fa fa-home" aria-hidden="true"></i>Product Catalogue</a></li>
+        <li><a class="nav-link" href="/option_types">Option Types</a></li>
+        <li><a class="nav-link" href="/properties">Properties</a></li>
+        <li><a class="nav-link" href="/variation_themes">Variation Themes</a></li>
+        <li><a class="nav-link" href="/prototypes">Prototypes</a></li>
+        <li><a class="nav-link" href="/product_brands">Product Brands</a></li>
       </ul>
-  </div>
-</div>
+    </li>
+    <li><a class="nav-link" href="#">Reports</a></li>
+    <li><a class="nav-link" href="/users"</a>Users</li>
+    <li>
+      <a class="nav-link" href="#" data-toggle="collapse" data-target="#drilldown-1">
+        Configurations
+      </a>
+      <ul id="drilldown-1" class="nav nav-pills nav-stacked collapse pl-3">
+        <li><a class="nav-link" href="#">Stock Items</a></li>
+        <li><a class="nav-link" href="/stock_locations">Stock Locations</a></li>
+        <li><a class="nav-link" href="#">Stock Movements</a></li>
+        <li> <a class="nav-link" href="/roles"> Roles</a> </li>
+        <li> <a class="nav-link" href="/permissions">Permission</a></li>
+        <li> <a class="nav-link" href="/payment_methods">Payment Methods</a></li>
+      </ul>
+      </div>
+    </li>
+  </ul>
+
