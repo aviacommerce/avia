@@ -1,6 +1,7 @@
 defmodule AdminAppWeb.ProductView do
   use AdminAppWeb, :view
   alias Snitch.Data.Model.Product
+  import Ecto.Query
 
   @currencies ["USD", "INR"]
 
@@ -9,8 +10,26 @@ defmodule AdminAppWeb.ProductView do
     image.url
   end
 
-  def themes_options(themes) do
-    Enum.map(themes, fn theme -> {theme.name, theme.id} end)
+  def themes_options(parent_product) do
+    Enum.map(parent_product.taxon.variation_themes, fn theme -> {theme.name, theme.id} end)
+  end
+
+  # TODO This needs to be replaced and we need a better system to identify
+  # the type of product.
+  def is_parent_product(product_id) when is_binary(product_id) do
+    q =
+      from(
+        p in "snitch_product_variants",
+        where: p.parent_product_id == ^(product_id |> String.to_integer()),
+        select: fragment("count(*)")
+      )
+
+    count = Snitch.Repo.one(q)
+    count > 0
+  end
+
+  def has_themes(parent_product) do
+    length(parent_product.taxon.variation_themes) > 0
   end
 
   def has_variants(parent_product) do
@@ -36,6 +55,10 @@ defmodule AdminAppWeb.ProductView do
     money.amount
     |> Decimal.to_string(:normal)
     |> Decimal.round(2)
+  end
+
+  def get_taxon(conn) do
+    conn.params["taxon"]
   end
 
   def get_currency_value(nil) do

@@ -4,7 +4,7 @@
 <%= form_for @conn, taxonomy_path(@conn, :create_taxonomy),[as: :taxonomy, id: "taxonomy-form"], fn f -> %>
   <input type="hidden" value="<%= @token %>" name="_csrf_token"/>
   <div class="form-group">
-    <%= text_input f, :name, placeholder: "name", class: "form-control" %> 
+    <%= text_input f, :name, placeholder: "name", class: "form-control" %>
     <%= submit "Send", class: "btn btn-primary"%>
   </div>
 <% end %>

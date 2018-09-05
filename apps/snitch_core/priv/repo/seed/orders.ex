@@ -4,7 +4,7 @@ defmodule Snitch.Seed.Orders do
   import Snitch.Tools.Helper.Order, only: [line_items_with_price: 2]
 
   alias Ecto.DateTime
-  alias Snitch.Data.Schema.{LineItem, Order, ShippingCategory, User, Product}
+  alias Snitch.Data.Schema.{LineItem, Order, ShippingCategory, User, Product, Taxon}
   alias Snitch.Repo
 
   require Logger
@@ -119,10 +119,12 @@ defmodule Snitch.Seed.Orders do
 
   def random_variant do
     price = random_price(9, 19)
+    taxon = Repo.get_by(Taxon, name: "Dry Food")
 
     %{
       sku: nil,
       slug: nil,
+      name: "nike",
       weight: Decimal.new("0.45"),
       height: Decimal.new("0.15"),
       depth: Decimal.new("0.1"),
@@ -131,7 +133,8 @@ defmodule Snitch.Seed.Orders do
       max_retail_price: price,
       shipping_category_id: nil,
       inserted_at: DateTime.utc(),
-      updated_at: DateTime.utc()
+      updated_at: DateTime.utc(),
+      taxon_id: taxon.id
     }
   end
 
