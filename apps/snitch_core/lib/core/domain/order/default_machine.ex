@@ -54,9 +54,7 @@ defmodule Snitch.Domain.Order.DefaultMachine do
   alias Snitch.Data.Schema.Order
   alias Snitch.Domain.Order.Transitions
 
-  state_machine Order,
-                :state,
-                ~w(cart address payment delivery processing rts shipping
+  state_machine Order, :state, ~w(cart address payment delivery processing rts shipping
                   complete cancelled)a do
     event(:add_addresses, %{from: [:cart], to: :address}, fn context ->
       context

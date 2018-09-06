@@ -12,7 +12,7 @@ defmodule SnitchApiWeb.TaxonomyController do
 
   def index(conn, _params) do
     taxonomy = TaxonomyDomain.get_all_taxonomy()
-    json(conn, %{data: taxonomy})
+    json(conn, %{taxonomies: taxonomy})
   end
 
   def show(conn, %{"id" => id}) do

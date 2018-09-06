@@ -3,8 +3,10 @@ defmodule SnitchApiWeb.OrderController do
 
   alias Snitch.Data.Model.Order, as: OrderModel
   alias Snitch.Data.Schema.Order
+  alias Snitch.Data.Schema.LineItem
   alias SnitchApi.Order, as: OrderContext
   alias Snitch.Repo
+  import Ecto.Query
 
   action_fallback(SnitchApiWeb.FallbackController)
   plug(SnitchApiWeb.Plug.DataToAttributes)
@@ -12,15 +14,15 @@ defmodule SnitchApiWeb.OrderController do
 
   def index(conn, params) do
     user = conn.assigns.current_user
-    orders = Repo.preload(OrderModel.user_orders(user.id), :line_items)
+    line_item_query = from(LineItem, order_by: [desc: :inserted_at], preload: [product: :theme])
+    orders = Repo.preload(OrderModel.user_orders(user.id), line_items: line_item_query)
 
     render(
       conn,
       "index.json-api",
       data: orders,
       opts: [
-        include: params["include"],
-        fields: conn.query_params["fields"]
+        include: "line_items,line_items.product"
       ]
     )
   end
@@ -37,7 +39,7 @@ defmodule SnitchApiWeb.OrderController do
 
   def guest_order(conn, _params) do
     with {:ok, %Order{} = order} <- OrderModel.create_guest_order() do
-      order = order |> Repo.preload(line_items: [product: [:theme, [options: :option_type]]])
+      order = OrderContext.load_order(order.id)
 
       conn
       |> put_status(200)
@@ -62,8 +64,7 @@ defmodule SnitchApiWeb.OrderController do
         "show.json-api",
         data: order,
         opts: [
-          include: params["include"],
-          fields: conn.query_params["fields"]
+          include: "line_items"
         ]
       )
     end
@@ -71,7 +72,14 @@ defmodule SnitchApiWeb.OrderController do
 
   def fetch_guest_order(conn, %{"order_number" => order_number}) do
     with %Order{} = order <- OrderModel.get(%{number: order_number}) do
-      order = order |> Repo.preload(line_items: [product: [:theme, [options: :option_type]]])
+      line_item_query =
+        from(
+          LineItem,
+          order_by: [desc: :inserted_at],
+          preload: [product: [:theme, [options: :option_type]]]
+        )
+
+      order = order |> Repo.preload(line_items: line_item_query)
 
       conn
       |> put_status(200)
@@ -101,7 +109,14 @@ defmodule SnitchApiWeb.OrderController do
     conn
     |> put_status(200)
     |> put_resp_header("location", order_path(conn, :show, order))
-    |> render("show.json-api", data: order)
+    |> render(
+      "show.json-api",
+      data: order,
+      opts: [
+        include:
+          "line_items,line_items.product,line_items.product.options,line_items.product.options.option_type"
+      ]
+    )
   end
 
   def add_payment(conn, %{
@@ -118,7 +133,7 @@ defmodule SnitchApiWeb.OrderController do
         conn,
         "show.json-api",
         data: order,
-        opts: [include: "payments"]
+        opts: [include: "payments,line_items"]
       )
     end
   end
