@@ -1,9 +1,13 @@
-<div class="card container">
-  <h2>
-    Roles
+<div class="row m-0 list-header">
+  <div class="col-10 p-0">
+    <h2>Roles</h2>
+   </div>
+   <div class="col-2 p-0 float-right text-right">
     <%= link("New Role+", to: role_path(@conn, :new), class: "btn btn-primary float-right") %>
-  </h2>
-  <table class="table">
+   </div> 
+ </div> 
+<div class="row m-0 list">
+ <table class="table">
     <thead class="thead-light">
       <tr>
         <th>Role</th>
@@ -15,10 +19,12 @@
       <tr>
       <td><%= role.name %></td>
       <td class="text-right">
-        <%= link("Edit", to: role_path(@conn, :edit, role.id), class: "btn btn-primary btn-sm") %>
-        <%= link("Delete", to: role_path(@conn, :delete, role.id),
-          method: :delete, data: [confirm: "Are you sure you want to delete?"], class: "btn btn-primary btn-sm") %>
+     
+        <%= link("", to: role_path(@conn, :edit, role.id), class: "btn btn-sm fa fa-edit") %>
+        <%= link("", to: role_path(@conn, :delete, role.id),
+          method: :delete, data: [confirm: "Are you sure you want to delete?"], class: "btn fa fa-trash btn-sm") %>
       </td>
+      <i class=""></i>
       </tr>
       <% end %>
     </tbody>
