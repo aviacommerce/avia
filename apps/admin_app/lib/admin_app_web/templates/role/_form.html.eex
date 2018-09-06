@@ -4,8 +4,8 @@
   
   <%= label f, :permissions, "Permissions" %>
   <%= multiple_select(f, :permissions, formatted_list(:permissions),
-        prompt: "Add Permission", class: "full-width w-100", "data-init-plugin": "select2")%>
-  <br><br>
+        prompt: "Add Permission", class: "full-width w-100 mb-3", "data-init-plugin": "select2")%>
+  
   <%= submit "Submit", class: "btn btn-primary submit-btn" %>
   <%= link("Cancel", to: role_path(@conn, :index), class: "btn btn-primary") %>
 <% end %>

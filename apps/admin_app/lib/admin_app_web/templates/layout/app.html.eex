@@ -6,12 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-
+    <%= csrf_meta_tag %>
     <title>Snitch | Admin</title>
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
   </head>
-
   <body>
     <%= render "header.html", conn: @conn%>
     <%= render "flash.html", conn: @conn%>

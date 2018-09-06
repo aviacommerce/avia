@@ -1,8 +1,12 @@
 @import './custom/variables';
 
 .list-container {
+  .col1{width:5vw;}
+  .col2{width:75vw;}
+  .col3{width:10vw;}
+  .col4{width:10vw;}
   background-color: $gray-101;
-  height: 100vh;
+  height: 100%;
   .list-header {
     background-color: $white;
     padding: .4em 1em;

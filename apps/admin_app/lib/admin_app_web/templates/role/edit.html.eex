@@ -1,15 +1,17 @@
-<div class="card container text-uppercase">
-  <h4><a href="/roles">Roles</a> / Edit Role</h4>
-  <hr/>
-  <%= form_for @changeset, role_path(@conn, :update, @role), [as: :role], fn f -> %>
-    <%= input f, :name %>
-    <%= input f, :description %>
-    <%= label f, :permissions, "Permissions" %>
-    <%= multiple_select(f, :permissions, formatted_list(:permissions),
-          value: selected_permissions(@role.permissions), class: "full-width w-100",
-          "data-init-plugin": "select2") %>
-    <br><br>
-    <%= submit "Submit", class: "btn btn-primary submit-btn" %>
-    <%= link("Cancel", to: role_path(@conn, :index), class: "btn btn-primary") %>
-  <% end %>
+<div class="list-container">
+  <h4 class="p-3"><a href="/roles">Roles</a> / Edit Role</h4>  
+  <div class="col-12">
+  <div class="card col-12">
+    <%= form_for @changeset, role_path(@conn, :update, @role), [as: :role], fn f -> %>
+      <%= input f, :name %>
+      <%= input f, :description %>
+      <%= label f, :permissions, "Permissions" %>
+      <%= multiple_select(f, :permissions, formatted_list(:permissions),
+            value: selected_permissions(@role.permissions), class: "full-width w-100 mb-3",
+            "data-init-plugin": "select2") %>      
+      <%= submit "Submit", class: "btn btn-primary submit-btn" %>
+      <%= link("Cancel", to: role_path(@conn, :index), class: "btn btn-primary") %>
+    <% end %>
+    </div>
+  <div>
 </div>

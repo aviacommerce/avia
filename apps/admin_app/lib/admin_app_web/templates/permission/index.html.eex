@@ -1,30 +1,32 @@
-<div class="row m-0 list-header">
-  <div class="col-10 p-0">
-    <h2>Permissions</h2>
-   </div>
-   <div class="col-2 p-0 float-right text-right">
-     <%= link("New Permission+", to: permission_path(@conn, :new), class: "btn btn-primary float-right") %>
-   </div> 
- </div>
-<div class="row m-0 list">
- <table class="table">
-    <thead class="thead-light">
-      <tr>
-        <th>Permission</th>
-        <th align="centre">Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <%= for permission <- @permissions do %>
-      <tr>
-      <td><%= permission.code %></td>
-      <td class="text-right">
-        <%= link("Edit", to: permission_path(@conn, :edit, permission.id), class: "btn btn-primary btn-sm") %>
-        <%= link("Delete", to: permission_path(@conn, :delete, permission.id),
-          method: :delete, data: [confirm: "Are you sure you want to delete?"], class: "btn btn-primary btn-sm") %>
-      </td>
-      </tr>
-      <% end %>
-    </tbody>
-  </table>
+<div class="list-container">
+  <div class="row m-0 list-header">
+    <div class="col-10 p-0">
+      <h2>Permissions</h2>
+    </div>
+    <div class="col-2 p-0 float-right text-right">
+      <%= link("New Permission+", to: permission_path(@conn, :new), class: "btn btn-primary float-right") %>
+    </div> 
+  </div>
+  <div class="row m-0 list">
+  <table class="table">
+      <thead class="thead-light">
+        <tr>
+          <th>Permission</th>
+          <th align="centre">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= for permission <- @permissions do %>
+        <tr>
+        <td><%= permission.code %></td>
+        <td class="text-right">
+          <%= link("Edit", to: permission_path(@conn, :edit, permission.id), class: "btn btn-primary btn-sm") %>
+          <%= link("Delete", to: permission_path(@conn, :delete, permission.id),
+            method: :delete, data: [confirm: "Are you sure you want to delete?"], class: "btn btn-primary btn-sm") %>
+        </td>
+        </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 </div>
