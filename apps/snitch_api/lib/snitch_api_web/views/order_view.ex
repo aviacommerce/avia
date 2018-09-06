@@ -20,7 +20,7 @@ defmodule SnitchApiWeb.OrderView do
   has_many(
     :line_items,
     serializer: SnitchApiWeb.LineItemView,
-    include: true
+    include: false
   )
 
   has_many(
@@ -43,6 +43,7 @@ defmodule SnitchApiWeb.OrderView do
       {:ok, acc} = Money.add(acc, total)
       acc
     end)
+    |> Money.round(currency_digits: :cash)
   end
 
   def line_items(struct, _conn) do

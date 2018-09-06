@@ -30,6 +30,6 @@ defmodule SnitchApiWeb.TaxonomyControllerTest do
 
   test "lists all taxonomies entries on index", %{conn: conn} do
     conn = get(conn, taxonomy_path(conn, :index))
-    assert json_response(conn, 200)["data"]
+    assert json_response(conn, 200)["taxonomies"]
   end
 end

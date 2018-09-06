@@ -39,7 +39,8 @@ defmodule SnitchApiWeb.UserControllerTest do
           user_path(conn, :login, user)
         )
 
-      assert json_response(conn, 200)["token"]
+      response = json_response(conn, 200)
+      assert response["data"]["attributes"]["token"]
     end
 
     test "render errors when data is invalid", %{conn: conn} do
