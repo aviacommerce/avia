@@ -13,8 +13,16 @@ defmodule SnitchApiWeb.UserView do
     |> List.to_string()
   end
 
-  def render("token.json-api", %{data: token}) do
-    %{token: token}
+  def render("token.json-api", %{data: token, user: user}) do
+    %{
+      data: %{
+        type: "user",
+        id: user.id,
+        attributes:
+          Map.take(user, [:email, :first_name, :last_name, :id])
+          |> Map.merge(%{token: token})
+      }
+    }
   end
 
   def render("logout.json-api", %{data: status}) do

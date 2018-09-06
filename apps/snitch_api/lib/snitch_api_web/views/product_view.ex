@@ -22,6 +22,14 @@ defmodule SnitchApiWeb.ProductView do
     :rating_summary
   ])
 
+  def selling_price(product) do
+    Money.round(product.selling_price, currency_digits: :cash)
+  end
+
+  def max_retail_price(product) do
+    Money.round(product.max_retail_price, currency_digits: :cash)
+  end
+
   def images(product, _conn) do
     product = product |> Snitch.Repo.preload(:images)
 
@@ -32,6 +40,12 @@ defmodule SnitchApiWeb.ProductView do
   def rating_summary(product, _conn) do
     ProductReview.review_aggregate(product)
   end
+
+  has_one(
+    :theme,
+    serializer: SnitchApiWeb.VariationThemeView,
+    include: false
+  )
 
   has_many(
     :variants,

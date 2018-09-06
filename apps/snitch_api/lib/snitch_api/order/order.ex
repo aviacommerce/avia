@@ -7,9 +7,9 @@ defmodule SnitchApi.Order do
 
   alias Snitch.Repo
   alias Snitch.Data.Model.LineItem, as: LineItemModel
+  alias Snitch.Data.Model.Order, as: OrderModel
   alias BeepBop.Context
-  alias Snitch.Data.Model.Order
-  alias Snitch.Data.Model.PaymentMethod
+  alias Snitch.Data.Model.{Order, PaymentMethod}
   alias Snitch.Data.Schema.LineItem
   alias Snitch.Domain.Order.DefaultMachine
 
@@ -33,6 +33,20 @@ defmodule SnitchApi.Order do
 
     transition = transition_to_address(order.state, context)
     transition_response(transition, order_id)
+  end
+
+  def load_order(order_id) do
+    line_item_query = from(LineItem, order_by: [desc: :inserted_at], preload: [product: :theme])
+    order = Repo.preload(OrderModel.get(order_id), line_items: line_item_query)
+  end
+
+  def delete_line_item(line_item_id) do
+    with %LineItem{} = line_item <- LineItemModel.get(line_item_id),
+         {:ok, _} <- LineItemModel.delete(line_item) do
+      {:ok, line_item}
+    else
+      nil -> {:error, :not_found}
+    end
   end
 
   def add_to_cart(line_item) do

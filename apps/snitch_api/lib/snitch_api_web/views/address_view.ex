@@ -3,6 +3,7 @@ defmodule SnitchApiWeb.AddressView do
   use JaSerializer.PhoenixView
 
   alias SnitchApiWeb.AddressView
+  alias Snitch.Data.Model.{Country, State}
 
   location("/addresses/:id")
 
@@ -16,8 +17,20 @@ defmodule SnitchApiWeb.AddressView do
     :alternate_phone,
     :zip_code,
     :state_id,
-    :country_id
+    :country_id,
+    :country,
+    :state
   ])
+
+  def country(address, _conn) do
+    Country.get(address.country_id)
+    |> Map.take([:name, :iso_name])
+  end
+
+  def state(address, _conn) do
+    State.get(address.state_id)
+    |> Map.take([:name, :code])
+  end
 
   def render("address.json-api", %{data: address}) do
     %{

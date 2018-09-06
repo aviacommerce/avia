@@ -2,15 +2,15 @@ defmodule SnitchApiWeb.LineItemController do
   use SnitchApiWeb, :controller
 
   alias Snitch.Data.Model.LineItem, as: LineItemModel
-  alias Snitch.Data.Schema.LineItem
-  alias Snitch.Data.Schema.Variant
-  alias Snitch.Data.Schema.Product
+  alias Snitch.Data.Model.Order, as: OrderModel
+  alias Snitch.Data.Schema.{LineItem, Variant, Product}
   alias Snitch.Repo
   import Ecto.Query
   alias SnitchApi.Order, as: OrderContext
 
   plug(SnitchApiWeb.Plug.DataToAttributes)
   plug(SnitchApiWeb.Plug.LoadUser)
+  action_fallback(SnitchApiWeb.FallbackController)
 
   def create(conn, %{"product_id" => product_id} = params) do
     %{selling_price: selling_price} = Repo.get(Product, product_id)
@@ -19,10 +19,28 @@ defmodule SnitchApiWeb.LineItemController do
     with {:ok, line_item} <- OrderContext.add_to_cart(line_item) do
       line_item = line_item |> Repo.preload(:product)
 
+      order = OrderContext.load_order(params["order_id"])
+
       conn
       |> put_status(200)
       |> put_resp_header("location", line_item_path(conn, :show, line_item.id))
-      |> render("show.json-api", data: line_item)
+      |> render(
+        SnitchApiWeb.OrderView,
+        "show.json-api",
+        data: order,
+        opts: [
+          include: "line_items,line_items.product"
+        ]
+      )
+    end
+  end
+
+  def delete(conn, %{"id" => line_item_id}) do
+    case OrderContext.delete_line_item(line_item_id) do
+      {:ok, _} ->
+        conn
+        |> put_status(204)
+        |> send_resp(:no_content, "")
     end
   end
 
@@ -35,7 +53,7 @@ defmodule SnitchApiWeb.LineItemController do
       conn
       |> put_status(200)
       |> put_resp_header("location", line_item_path(conn, :show, line_item))
-      |> render("show.json-api", data: line_item, opts: [include: "product"])
+      |> render("show.json-api", data: line_item)
     end
   end
 
