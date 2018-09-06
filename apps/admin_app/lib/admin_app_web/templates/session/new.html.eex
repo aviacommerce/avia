@@ -1,4 +1,4 @@
-<div class="card-wrapper col-5 m-auto pb-3">
+<div class="card-wrapper col-12 col-sm-10 col-lg-5 m-auto pb-3">
   <div class="brand text-center pb-3">
     <img src="/images/logo.png">
   </div>
