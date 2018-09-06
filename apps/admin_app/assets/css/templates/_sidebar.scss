@@ -1,0 +1,21 @@
+@import '../custom/variables';
+@import "font-awesome";
+
+.sidebar {
+  border-right: 1px solid $gray-400;
+  height: 100vh;
+
+  .nav {
+    li {
+      width: 100%;
+
+      .nav-link {
+        color:$gray-900;
+        border-radius: 0;
+        &:hover {
+          background-color: $gray-300;
+        }
+      }
+    }
+  }
+}
