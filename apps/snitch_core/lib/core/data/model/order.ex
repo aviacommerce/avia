@@ -51,7 +51,8 @@ defmodule Snitch.Data.Model.Order do
     query =
       from(
         order in Order,
-        where: order.user_id == ^user_id and order.state in ["cart", "address"]
+        where:
+          order.user_id == ^user_id and order.state in ["cart", "address", "delivery", "payment"]
       )
 
     query
