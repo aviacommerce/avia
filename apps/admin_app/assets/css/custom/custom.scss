@@ -1,30 +1,90 @@
 @import 'variables';
 @import "switch";
 @import "bootstrap";
+@import "login";
+@import "font-face";
+
 body {
+  font-family: "avia1" !important;
+
+  .prealative {
+    position: relative;
+  }
+
+  .required {
+    &:after {
+      color: $red;
+      content: "*";
+      font-family: arial;
+      font-size: 20px;
+      position: absolute;
+      margin-left: 4px;
+      top: -5px;
+    }
+  }
+
+  .btn-primary {
+    background-color: $main-sub-color !important;
+    font-size: .875em !important;
+    color: $white;
+    border-color: $main-sub-color;
+    height: 38px;
+    line-height: 1.4;
+    padding: 8px 12px;
+
+    &:hover {
+      background-color: $btn-hover-color !important;
+      font-size: .875em !important;
+      border-color: $btn-hover-color;
+    }
+
+    &:focus {
+      box-shadow: none!important;
+    }
+  }
+
+  // .plus{
+  //   background-image: url("../images/plus.svg");
+  //   background-repeat: no-repeat;
+  //   color:red;
+  // }
+  .border-custom {
+    border-radius: 3px;
+    background-color: $white;
+    border: 1px solid $bordercolor1;
+    border-bottom-color: $bordercolor2
+  }
+
   .select2-container .select2-selection--single {
     height: 2.8rem;
   }
+
   .form-control,
   .select2-container .select2-selection--single {
-    padding: 0.5rem;
-    border-radius: 0;
-    transition: all 300ms;
-    &:hover,
+    border-radius: 3px;
+    box-shadow: 0 1px 2px 0 rgba($black, 0.05) inset;
+    transition: opacity 0.3s ease-out;
+    border-color: rgba($black, 0.15);
+    border-top-color: rgba($black, 0.2);
+    border-style: solid;
+    border-width: 1px;
+    color: $main-sub-color;
+
+    &:hover {
+      border-color: $gray-500;
+    }
+
     &:focus {
-      transform: translateY(-3px);
-      @extend .shadow-sm;
+      border-color: rgba($black, 0.8);
+      box-shadow: none;
     }
   }
+
   .card {
-    @extend .p-5,
-    .shadow-sm,
-    .border,
-    .border-light;
+    @extend .py-3,
+    .border-custom
   }
-  .btn, .badge {
-    @extend .shadow;
-  }
+
   .form-group.required {
     label::after {
       color: #f55753;
@@ -36,6 +96,7 @@ body {
       top: -5px;
     }
   }
+
   .loader {
     background-image: url("/images/loader.svg");
     height: 30px;
@@ -48,7 +109,7 @@ body {
     max-width: 125px;
     max-height: 125px;
     float: left;
-    margin-bottom:10px;
+    margin-bottom: 10px;
   }
 
   .img-wrap {
@@ -62,9 +123,9 @@ body {
     top: 2px;
     right: 2px;
     z-index: 100;
-    background-color: #FFF;
+    background-color: $white;
     padding: 5px 2px 2px;
-    color: #000;
+    color: $black;
     font-weight: bold;
     cursor: pointer;
     opacity: .2;
@@ -82,5 +143,73 @@ body {
   .img-wrap:hover .product-delete {
     opacity: 1;
   }
+}
 
+.sidebar {
+  width: 256px;
+  position: fixed;
+  top: 0;
+}
+
+.main {
+  margin-left: 256px;
+  width: calc(100vw - 256px);
+}
+
+.nav {
+  background-color: $white;
+
+  a {
+    padding: 9px 18px;
+
+    .flag {
+      display: table;
+      width: 100%;
+
+      .flag-img {
+        padding-right: 12px;
+
+        .icon {
+          display: inline-block;
+          fill: currentColor;
+          height: 24px;
+          vertical-align: middle;
+          width: 24px;
+        }
+      }
+    }
+
+    .flag-body,
+    .flag-img {
+      display: table-cell;
+      vertical-align: middle;
+    }
+  }
+
+  .navshophead {
+    padding: 16px 13px;
+    cursor: pointer;
+
+    .shopdpdown {
+      left: 10px !important;
+      top: 20px !important;
+      border: 1px solid $gray-300;
+      border-radius: 0;
+    }
+
+    .dropdown-toggle {
+      padding: 3px;
+      margin-bottom: 10px;
+
+      span {
+        display: inline-block;
+        padding: 4px 6px;
+        font-weight: 600;
+        font-size: 18px;
+        line-height: 1.2;
+        -webkit-font-smoothing: antialiased;
+        font-family: "Graphik Webfont", -apple-system, BlinkMacSystemFont, "Roboto", "Droid Sans", "Segoe UI", "Helvetica", Arial, sans-serif;
+      }
+    }
+  }
 }

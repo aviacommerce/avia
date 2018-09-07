@@ -6,14 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-
+    <%= csrf_meta_tag %>
     <title>Snitch | Admin</title>
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
 
     <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.7/lib/draggable.bundle.js"></script>
+   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
   </head>
   <body>
-    <%= render "header.html", conn: @conn%>
+    <%# <%= render "header.html", conn: @conn%>
     <%= render "flash.html", conn: @conn%>
     <%= render "main.html", assigns%>
     <%=# render "footer.html" %>

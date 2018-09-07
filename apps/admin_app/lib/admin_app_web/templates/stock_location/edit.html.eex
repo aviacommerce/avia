@@ -1,4 +1,4 @@
-<div class="card container text-uppercase">
+<div class="card container  text-uppercase">
     <h4>
         <a href="/stock_locations">Stock Locations</a> / Create Stock Location
         <%= link("delete", to: stock_location_path(@conn, :delete, @stock_location), method: :delete, data: [confirm: "Are you sure, you want to delete (#{@stock_location.name}) stock location"], class: "btn btn-danger float-right") %>

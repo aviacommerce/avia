@@ -1,22 +1,76 @@
-<html>
-  <head>
-    <%= csrf_meta_tag %>
-  </head>
-</html>
-
-<div class="card container text-uppercase">
-  <h4><a href="/payment_methods">Payment Method</a> / New Payment Method</h4>
-
-  <%= form_for @changeset, payment_method_path(@conn, :create), fn f -> %>
-    <%= select_input(f, :provider, providers(), "provider", id: "payment-provider",
-          prompt: "Choose provider") %>
-    <%= input(f, :name)%>
-    <%= input(f, :description) %>
-    <div id="preferences">
+<div class="list-container">
+  <div class="pt-3 pb-0 pr-3 pl-3 back"> <img src="/images/left-arrow.svg" width="20" height="20" class="d-inline-block align-top" alt="">  <a href="/payment_methods">Payment Method</a> </div>
+  <h4 class="p-3 m-0">Add Payment Method</h4>
+  <div class="col-12">
+    <div class="card col-12">
+      <%= form_for @changeset, payment_method_path(@conn, :create), fn f -> %>
+        <div class="form-group row ">
+          <label for="inputEmail3" class="col-sm-3 col-form-label">
+              <div class="label required">
+                Provider
+              </div>
+           <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+          </label>
+          <div class="col-sm-9">           
+            <%= select_input(f, :provider, providers(), "provider", id: "payment-provider",
+              prompt: "Choose provider", label: false) %>
+          </div>
+        </div>
+        <div class="form-group row ">
+          <label for="inputEmail3" class="col-sm-3 col-form-label">
+              <div class="label required">
+                Name
+              </div>
+           <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+          </label>
+          <div class="col-sm-9">           
+            <%= input(f, :name)%>
+          </div>
+        </div>
+        <div class="form-group row ">
+          <label for="inputEmail3" class="col-sm-3 col-form-label">
+              <div class="label ">
+                Description
+              </div>
+           <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+          </label>
+          <div class="col-sm-9">           
+                <%= input(f, :description) %>
+                <div id="preferences">
+                </div>
+          </div>
+        </div>
+        <div class="form-group row ">
+          <label for="inputEmail3" class="col-sm-3 col-form-label">
+              <div class="label ">
+                Active
+              </div>
+           <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+          </label>
+          <div class="col-sm-9">           
+            <%= checkbox_input(f, :active?, "Active ") %> 
+          </div>
+        </div>
+        <div class="form-group row ">
+          <label for="inputEmail3" class="col-sm-3 col-form-label">
+              <div class="label ">
+                Live Mode
+              </div>
+           <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+          </label>
+          <div class="col-sm-9">           
+             <%= checkbox_input(f, :live_mode?, "Live Mode ") %>       
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-10">
+            <%= submit "Submit", class: "btn btn-primary submit-btn col-2" %>
+            <%= link("Cancel", to: payment_method_path(@conn, :index), class: "btn btn-primary col-2") %>
+          </div>
+        </div>
+      </form>
+      <% end %>
     </div>
-    <%= checkbox_input(f, :active?, "Active") %>
-    <%= checkbox_input(f, :live_mode?, "Live Mode") %>
-    <%= submit "Submit", class: "btn btn-primary submit-btn" %>
-    <%= link("Cancel", to: payment_method_path(@conn, :index), class: "btn btn-primary") %>
-  <% end %>
+  </div>
 </div>
+
