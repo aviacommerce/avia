@@ -20,7 +20,7 @@ defmodule SnitchApi.Order do
   """
 
   def attach_address(order_id, shipping_address, billing_address) do
-    order = Order.get(order_id)
+    order = Order.get(order_id) |> Repo.preload([:payments, :packages])
 
     context =
       order
@@ -31,7 +31,7 @@ defmodule SnitchApi.Order do
         }
       )
 
-    transition = DefaultMachine.add_addresses(context)
+    transition = transition_to_address(order.state, context)
     transition_response(transition, order_id)
   end
 
@@ -88,5 +88,21 @@ defmodule SnitchApi.Order do
 
   defp transition_response(%Context{errors: errors}, _) do
     errors
+  end
+
+  defp transition_to_address("cart", context) do
+    DefaultMachine.add_addresses(context)
+  end
+
+  defp transition_to_address("address", context) do
+    DefaultMachine.delivery_to_address(context)
+  end
+
+  defp transition_to_address("delivery", context) do
+    DefaultMachine.delivery_to_address(context)
+  end
+
+  defp transition_to_address("payment", context) do
+    DefaultMachine.payment_to_address(context)
   end
 end
