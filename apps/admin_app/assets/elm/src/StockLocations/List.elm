@@ -1,6 +1,6 @@
 module StockLocations.List exposing (..)
 
-import Html exposing (Html, a, button, div, h2, h3, table, tbody, td, text, th, thead, tr, img)
+import Html exposing (Html, a, button, div, h2, h3, img, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, colspan, href, scope, src)
 import Http
 import Json.Decode exposing (Decoder, at, bool, field, int, list, map4, string)
@@ -55,7 +55,7 @@ viewStockLocationsOrError model =
         RemoteData.Loading ->
             tr []
                 [ td [ colspan 4, class "text-center" ]
-                    [ div [class "loader"] [  ]
+                    [ div [ class "loader" ] []
                     ]
                 ]
 
@@ -125,20 +125,28 @@ renderStockLocations stockLocations =
 
 view : Model -> Html Msg
 view model =
-    div [ class "StockLocations--container card container" ]
-        [ h2 []
-            [ text "Stock Location List"
-            , a [ href "/stock_locations/new", class "btn btn-primary float-right" ] [ text "Create Stock Location" ]
-            ]
-        , table [ class "StockLocations__List table" ]
-            [ thead [ class "thead-light" ]
-                [ tr []
-                    [ th [ scope "col" ] [ text "#" ]
-                    , th [ scope "col" ] [ text "Name" ]
-                    , th [ scope "col" ] [ text "Status" ]
-                    , th [ scope "col" ] [ text "Action" ]
+    div [ class "StockLocations--container list-container" ]
+        [ div [ class "row m-0 list-header" ]
+            [ div [class "col-10 p-0"]
+                [ h2 []
+                    [ text "Stock Location List"
                     ]
                 ]
-            , viewStockLocationsOrError model
+            , div [class "col-2 p-0 float-right text-right"]
+                [ a [ href "/stock_locations/new", class "btn btn-primary float-right" ] [ text "Create Stock Location" ]
+                ]
+            ]
+        , div [ class "row m-0 list" ]
+            [ table [ class "StockLocations__List table" ]
+                [ thead [ class "thead-light" ]
+                    [ tr []
+                        [ th [ class "col1" ] [ text "#" ]
+                        , th [ class "col2" ] [ text "Name" ]
+                        , th [ class "col3" ] [ text "Status" ]
+                        , th [ class "col4" ] [ text "Action" ]
+                        ]
+                    ]
+                , viewStockLocationsOrError model
+                ]
             ]
         ]

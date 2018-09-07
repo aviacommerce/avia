@@ -1,6 +1,11 @@
-<h4>Edit Product Brand</h4>
-<hr>
-<%= if @brand.image do %>
+
+
+<div class="list-container">
+  <div class="pt-3 pb-0 pr-3 pl-3 back"> <img src="/images/left-arrow.svg"
+   width="20" height="20" class="d-inline-block align-top" alt=""> 
+   <a href="/product_brands">Product Brand</a> </div>
+  <h4 class="p-3 m-0">Edit a Brand</h4> 
+  <%= if @brand.image do %>
   <div class="card" style="width: 15rem;">
   <%= img_tag(get_image_url(@brand.image, @brand), class: "card-img-top") %>
   <div class="card-body">
@@ -8,8 +13,13 @@
   </div>
 </div>
 <% end %>
-<%= render "form.html",
+  <div class="col-12">
+    <div class="card col-12">
+         <%= render "form.html",
     changeset: @changeset,
     conn: @conn,
     action: product_brand_path(@conn, :update, @changeset.data.id)
 %>
+    </div>
+  <div>
+</div>

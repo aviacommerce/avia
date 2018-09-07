@@ -1,0 +1,424 @@
+@import './custom/variables';
+@import './custom/custom';
+
+.list-container {
+  .back {
+    color: $main-sub-color;
+    font-size: .875em;
+
+    a {
+      text-decoration: underline;
+      color: $main-sub-color;
+    }
+  }
+
+  .col1 {
+    width: 5vw;
+  }
+
+  .col2 {
+    width: 75vw;
+  }
+
+  .col3 {
+    width: 10vw;
+  }
+
+  .col4 {
+    width: 10vw;
+  }
+
+  background-color: $gray-101;
+  height: 100%;
+  height:100vh;
+
+  .list-header {
+    background-color: $white;
+    padding: .4em 1em;
+    border-bottom: 1px solid $gray-400;
+
+    h2 {
+      font-size: 1.625em;
+      color: $main-sub-color;
+      font-weight: bold;
+      margin-top: .5rem;
+    }
+
+    .col-2 {
+      padding-top: .3rem !important;
+    }
+  }
+
+  h4 {
+    font-size: 1.625em;
+    color: $main-sub-color;
+    font-weight: bold;
+  }
+
+  .card {
+    h2 {
+      font-size: 1.225em;
+      color: $main-sub-color;
+      font-weight: bold;
+    }
+
+    .label {
+      font-size: .875em;
+      color: $main-sub-color;
+      font-weight: 600;
+    }
+
+    .label-txt {
+      font-size: .75em;
+      color: $txt-light;
+    }
+  }
+
+  .list {
+    background-color: $gray-101;
+    padding: 1em 0.938em;
+
+    .table-contaner {
+      @extend .border-custom;
+
+      .head {
+        color: $main-sub-color;
+        padding: .6em 0.72em;
+        font-weight: 600;
+        font-size: 1.23em
+      }
+
+      .table {
+        border-top: 0 solid;
+
+        thead {
+          background-color: $bg-color;
+        }
+
+        .table-btn {
+          background-color: $main-sub-color !important;
+          color: $white;
+        }
+
+        td {
+          border-bottom-color: $bordercolor1 !important;
+          font-size: 0.875em;
+          padding: 10px 18px;
+        }
+
+        th {
+          font-size: 0.875em;
+          padding: 1.12em;
+          color: $gray-900;
+          border-top: 0px solid $white !important;
+          border-bottom: 1px solid $bordercolor1 !important;
+        }
+      }
+    }
+
+    .dropdown-selectall {
+      height: 38.6px;
+      width: 4.4em;
+      margin-right: 16.7px;
+      margin-left: 10.3px;
+      padding-top: 8px;
+    }
+
+    .btn-group {
+      display: inline !important;
+
+      .btn {
+        margin: 0 -4.5px;
+        cursor: pointer;
+        padding: 6px 15px;
+
+        &:focus {
+          box-shadow: none !important;
+        }
+      }
+    }
+
+    .card {
+      padding: 0px !important;
+
+      .card-footer {
+        padding: 10px;
+      }
+
+      .card-body {
+        padding: 0em;
+
+        .card-title {
+          padding: 1rem;
+          font-size: .8em;
+          height: 3.6em;
+          overflow: hidden;
+        }
+      }
+    }
+  }
+
+  .options {
+    color: $gray-500;
+    position: relative;
+    top: 2px;
+
+    &:hover {
+      text-decoration: none;
+      color: $main-color;
+      border: 1px solid $gray-300;
+      border-radius: 4px;
+    }
+  }
+
+  .checkbox label {
+    cursor: pointer;
+    margin-bottom: 0;
+  }
+
+  .checkbox label:after,
+    {
+    content: '';
+    display: table;
+    clear: both;
+  }
+
+  .checkbox .cr,
+  .radio .cr {
+    position: relative;
+    display: inline-block;
+    border: 1px solid #a9a9a9;
+    border-radius: .25em;
+    width: 1.3em;
+    height: 1.3em;
+    margin-right: .5em;
+  }
+
+  .radio .cr {
+    border-radius: 50%;
+    position: relative;
+    top: 4px;
+  }
+
+  .checkbox .cr .cr-icon,
+  .radio .cr .cr-icon {
+    position: absolute;
+    font-size: .8em;
+    line-height: 0;
+    top: 50%;
+    left: 20%;
+  }
+
+  .radio .cr .cr-icon {
+    margin-left: 0.04em;
+  }
+
+  .checkbox label input[type="checkbox"],
+  .radio label input[type="radio"] {
+    display: none;
+  }
+
+  .checkbox label input[type="checkbox"]+.cr>.cr-icon,
+  .radio label input[type="radio"]+.cr>.cr-icon {
+    transform: scale(3) rotateZ(-20deg);
+    opacity: 0;
+    transition: all .3s ease-in;
+  }
+
+  .checkbox label input[type="checkbox"]:checked+.cr>.cr-icon,
+  .radio label input[type="radio"]:checked+.cr>.cr-icon {
+    transform: scale(1) rotateZ(0deg);
+    opacity: 1;
+  }
+
+  .radio label {
+    cursor: pointer;
+
+    input[type="radio"]:checked+.cr>.cr-icon {
+      top: 10px;
+    }
+  }
+
+  .checkbox label input[type="checkbox"]:disabled+.cr,
+  .radio label input[type="radio"]:disabled+.cr {
+    opacity: .5;
+  }
+}
+
+//
+// Switches for Bootstrap 4.
+//
+// - Fully customizable with Sass variables
+// - No JavaScript required
+// - Fully accessible
+//
+//
+// IMPORTANT: These Sass variables are defined in Bootstrap's variables.scss. You should import that file first, then remove these.
+//
+$font-size-base: 1rem;
+$font-size-lg: ($font-size-base * 1.25);
+$font-size-sm: ($font-size-base * .875);
+$input-height: 2.375rem;
+$input-height-sm: 1.9375rem;
+$input-height-lg: 3rem;
+$input-btn-focus-width: .2rem;
+$custom-control-indicator-bg: #dee2e6;
+$custom-control-indicator-disabled-bg: #e9ecef;
+$custom-control-description-disabled-color: #868e96;
+$white: white;
+$theme-colors: ('primary': #08d);
+//
+// These variables can be used to customize the switch component.
+//
+$switch-height: calc(#{$input-height} * .8) !default;
+$switch-height-sm: calc(#{$input-height-sm} * .8) !default;
+$switch-height-lg: calc(#{$input-height-lg} * .8) !default;
+$switch-border-radius: $switch-height !default;
+$switch-bg: $custom-control-indicator-bg !default;
+$switch-checked-bg: map-get($theme-colors, 'primary') !default;
+$switch-disabled-bg: $custom-control-indicator-disabled-bg !default;
+$switch-disabled-color: $custom-control-description-disabled-color !default;
+$switch-thumb-bg: $white !default;
+$switch-thumb-border-radius: 50% !default;
+$switch-thumb-padding: 2px !default;
+$switch-focus-box-shadow: 0 0 0 $input-btn-focus-width rgba(map-get($theme-colors, 'primary'), .25);
+$switch-transition: .2s all !default;
+
+.switch {
+  font-size: $font-size-base;
+  position: relative;
+
+  input {
+    position: absolute;
+    height: 1px;
+    width: 1px;
+    background: none;
+    border: 0;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    overflow: hidden;
+    padding: 0;
+
+    +label {
+      position: relative;
+      min-width: calc(#{$switch-height} * 2);
+      border-radius: $switch-border-radius;
+      height: $switch-height;
+      line-height: $switch-height;
+      display: inline-block;
+      cursor: pointer;
+      outline: none;
+      user-select: none;
+      vertical-align: middle;
+      text-indent: calc(calc(#{$switch-height} * 2) + .5rem);
+    }
+
+    +label::before,
+    +label::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: calc(#{$switch-height} * 2);
+      bottom: 0;
+      display: block;
+    }
+
+    +label::before {
+      right: 0;
+      background-color: $switch-bg;
+      border-radius: $switch-border-radius;
+      transition: $switch-transition;
+    }
+
+    +label::after {
+      top: $switch-thumb-padding;
+      left: $switch-thumb-padding;
+      width: calc(#{$switch-height} - calc(#{$switch-thumb-padding} * 2));
+      height: calc(#{$switch-height} - calc(#{$switch-thumb-padding} * 2));
+      border-radius: $switch-thumb-border-radius;
+      background-color: $switch-thumb-bg;
+      transition: $switch-transition;
+    }
+
+    &:checked+label::before {
+      background-color: $switch-checked-bg;
+    }
+
+    &:checked+label::after {
+      margin-left: $switch-height;
+    }
+
+    &:focus+label::before {
+      outline: none;
+      box-shadow: $switch-focus-box-shadow;
+    }
+
+    &:disabled+label {
+      color: $switch-disabled-color;
+      cursor: not-allowed;
+    }
+
+    &:disabled+label::before {
+      background-color: $switch-disabled-bg;
+    }
+  }
+
+  // Small variation
+  &.switch-sm {
+    font-size: $font-size-sm;
+
+    input {
+      +label {
+        min-width: calc(#{$switch-height-sm} * 2);
+        height: $switch-height-sm;
+        line-height: $switch-height-sm;
+        text-indent: calc(calc(#{$switch-height-sm} * 2) + .5rem);
+      }
+
+      +label::before {
+        width: calc(#{$switch-height-sm} * 2);
+      }
+
+      +label::after {
+        width: calc(#{$switch-height-sm} - calc(#{$switch-thumb-padding} * 2));
+        height: calc(#{$switch-height-sm} - calc(#{$switch-thumb-padding} * 2));
+      }
+
+      &:checked+label::after {
+        margin-left: $switch-height-sm;
+      }
+    }
+  }
+
+  // Large variation
+  &.switch-lg {
+    font-size: $font-size-lg;
+
+    input {
+      +label {
+        min-width: calc(#{$switch-height-lg} * 2);
+        height: $switch-height-lg;
+        line-height: $switch-height-lg;
+        text-indent: calc(calc(#{$switch-height-lg} * 2) + .5rem);
+      }
+
+      +label::before {
+        width: calc(#{$switch-height-lg} * 2);
+      }
+
+      +label::after {
+        width: calc(#{$switch-height-lg} - calc(#{$switch-thumb-padding} * 2));
+        height: calc(#{$switch-height-lg} - calc(#{$switch-thumb-padding} * 2));
+      }
+
+      &:checked+label::after {
+        margin-left: $switch-height-lg;
+      }
+    }
+  }
+
+  +.switch {
+    margin-left: 1rem;
+  }
+}
