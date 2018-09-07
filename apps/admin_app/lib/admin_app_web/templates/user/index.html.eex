@@ -1,28 +1,41 @@
-<div class="card container">
-  <h2>
-    Users
-    <%= link("New User+", to: user_path(@conn, :new), class: "btn btn-primary float-right") %>
-  </h2>
-  <table class="table">
-    <thead class="thead-light">
-      <tr>
-        <th>User</th>
-        <th>Email</th>
-        <th align="centre">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <%= for user <- @users do %>
-      <tr>
-      <td><%= user.first_name<>" "<>user.last_name %></td>
-      <td><%= user.email%></td>
-      <td class="text-right">
-        <%= link("Edit", to: user_path(@conn, :edit, user.id), class: "btn btn-primary btn-sm") %>
-        <%= link("Delete", to: user_path(@conn, :delete, user.id),
-          method: :delete, data: [confirm: "Are you sure to delte"], class: "btn btn-primary btn-sm") %>
-      </td>
-      </tr>
-      <% end %>
-    </tbody>
-  </table>
+<div class="list-container">
+  <div class="row m-0 list-header">
+    <div class="col-10 p-0">
+      <h2>Users</h2>
+    </div>
+    <div class="col-2 p-0 float-right text-right">
+      <%= link(" Add User", to: user_path(@conn, :new),
+       class: "btn btn-primary float-right fa fa-plus") %>
+
+    </div> 
+  </div>
+  <div class="row m-0 list">
+  <div class="table-contaner col-12 p-0">  
+  <div class="head"> List Details</div>
+   <table class="table">
+      <thead>
+        <tr>     
+        <th  scope="col">User</th>
+        <th  scope="col">Email</th>     
+          <th scope="col-1">Actions</th>
+        </tr>
+      </thead>
+      <tbody >
+        <%= for user <- @users do %>
+          <tr>
+          <td><%= user.first_name<>" "<>user.last_name %></td>
+          <td><%= user.email%></td>
+          <td class="text-right">
+            <%= link("", to: user_path(@conn, :edit, user.id), class: "btn btn-primary fa fa-edit") %>
+            <%= link("", to: user_path(@conn, :delete, user.id),
+              method: :delete, data: [confirm: "Are you sure to delte"], class: "btn btn-primary fa fa-trash") %>
+          </td>
+          </tr>
+          <% end %>
+       
+      </tbody>
+    </table>
+  </div>   
+  </div>
 </div>
+

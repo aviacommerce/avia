@@ -1,10 +1,33 @@
 <%= form_for @changeset, @action,[multipart: true], fn f ->  %>
-  <%= input f, :name%>
-  <div class="form-group">
-    <%= label f, :image, class: "control-label" %>
-    <%= file_input f, :image, class: "form-control" %>
-    <%= error_tag f, :body %>
+  <div class="form-group row ">
+    <label for="inputEmail3" class="col-sm-3 col-form-label">
+        <div class="label required">
+          Name
+        </div>
+    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+    </label>
+    <div class="col-sm-9">           
+      <%= input f, :name%>
+    </div>
   </div>
-  <%= submit "Submit", class: "btn btn-primary submit-btn" %>
+  <div class="form-group row ">
+    <label for="inputEmail3" class="col-sm-3 col-form-label">
+        <div class="label required">
+          Image
+        </div>
+    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+    </label>
+    <div class="col-sm-9">           
+      <%= file_input f, :image, class: "form-control" %>
+     <%= error_tag f, :body %>
+    </div>
+  </div>
+
+<div class="form-group row">
+  <div class="col-sm-10">
+    <%= submit "Submit", class: "btn btn-primary submit-btn" %>
   <%= link("Cancel", to: product_brand_path(@conn, :index), class: "btn btn-primary") %>
+   </div>
+</div>
+ 
 <% end %>

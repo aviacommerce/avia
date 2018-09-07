@@ -1,7 +1,16 @@
-<h4>Edit Variation Theme</h4>
-<%= render "form.html",
+<div class="list-container">
+  <div class="pt-3 pb-0 pr-3 pl-3 back"> <img src="/images/left-arrow.svg"
+   width="20" height="20" class="d-inline-block align-top" alt=""> 
+   <a href="/variation_themes">Variation Theme</a> </div>
+  <h4 class="p-3 m-0">Edit a theme</h4> 
+  <div class="col-12">
+    <div class="card col-12">
+      <%= render "form.html",
     changeset: @changeset,
     conn: @conn,
     action: variation_theme_path(@conn, :update, @changeset.data.id),
     option_types: @option_types
 %>
+    </div>
+  <div>
+</div>

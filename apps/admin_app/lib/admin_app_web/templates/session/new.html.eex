@@ -1,13 +1,13 @@
-<div class="card container text-uppercase">
-  <h4>Sign In</h4>
+<div class="card container text-uppercase login col-5 m-auto pb-3">
+  <h4 class="text-center pt-3">Sign In</h4>
   <hr/>
   <%= form_for @changeset, session_path(@conn, :create), [as: :session],
 fn f -> %>
     <%= input f, :email %>
     <%= input f, :password %>
-    <%= submit "Submit", class: "btn btn-primary submit-btn" %>
-    <p class="text-lowercase">
+    <p class="text-lowercase text-capitalize mb-0">
       <%= link "Forgot your password?", to: session_path(@conn, :password_reset) %>
     </p>
+    <%= submit "Submit", class: "btn btn-primary submit-btn col-12" %>    
   <% end %>
 </div>

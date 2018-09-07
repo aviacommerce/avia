@@ -29,6 +29,7 @@ import { editTaxon } from './edit_taxon' ;
 
 $(document).ready(() => {
   select2Selector();
+  getPaymentMethod();
   get_categories(1)
   handle_category_click()
   createTaxon();
@@ -36,7 +37,6 @@ $(document).ready(() => {
   handleImageSelect();
   deleteImage();
   setup_product();
-  getPaymentMethod();
 
   const sortable = new Draggable.Sortable(document.querySelectorAll(".mycontainer"), {
     draggable: ".draggable",

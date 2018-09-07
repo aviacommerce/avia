@@ -88,7 +88,7 @@ defmodule AdminAppWeb.InputHelpers do
         }"
     ]
 
-    label_opts = [class: "inline"]
+    label_opts = [class: "inline pr-3"]
     field_name = name || field
     class = opts[:class] || ""
     input_opts = [class: class] ++ opts
