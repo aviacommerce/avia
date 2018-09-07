@@ -1,10 +1,27 @@
 
 <ul id="drilldown" class="nav nav-pills nav-stacked">
-    <li><a class="nav-link" href="/orders"><i class="fa fa-first-order" aria-hidden="true"></i> Orders</a></li>
-    <li><a class="nav-link" href="#"> <i class="fa fa-repeat" aria-hidden="true"></i> Returns</a></li>
+    <li>
+      <div class="dropdown navshophead">
+        <a class="dropdown-toggle"  id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+         <img src="/images/shop_manager.001.svg" width="30" height="30" class="d-inline-block align-top" alt=""> 
+          <span>Shop Manager</span>
+        </a>
+        <div class="dropdown-menu shopdpdown" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" href="#">Action</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#">Another action</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#">Something else here</a>
+        </div>
+      </div>
+    </li>
+    <li><a class="nav-link" href="/orders">
+       <i class="fa fa-clipboard-list" aria-hidden="true"></i> Orders</a>
+    </li>
+    <li><a class="nav-link" href="#"> <i class="fa fa-exchange-alt" aria-hidden="true"></i> Returns</a></li>
     <li>
       <a class="nav-link" href="#" data-toggle="collapse" data-target="#drilldown-2">
-        <i class="fa fa-product-hunt" aria-hidden="true"></i> Products
+        <i class="fa fa-shapes" aria-hidden="true"></i> Products
       </a>
       <ul id="drilldown-2" class="nav nav-pills nav-stacked collapse pl-3">
         <li><a class="nav-link" href="/products">Product Catalogue</a></li>
@@ -15,11 +32,11 @@
         <li><a class="nav-link" href="/product_brands">Product Brands</a></li>
       </ul>
     </li>
-    <li><a class="nav-link" href="#"><i class="fa fa-file" aria-hidden="true"></i> Reports</a></li>
+    <li><a class="nav-link" href="#"><i class="fa fa-chart-bar" aria-hidden="true"></i> Reports</a></li>
     <li><a class="nav-link" href="/users"> <i class="fa fa-users" aria-hidden="true"></i> Users</a></li>
     <li>
       <a class="nav-link" href="#" data-toggle="collapse" data-target="#drilldown-1">
-       <i class="fa fa-cogs" aria-hidden="true"></i> Configurations
+       <i class="fa fa-sliders-h" aria-hidden="true"></i> Configurations
       </a>
       <ul id="drilldown-1" class="nav nav-pills nav-stacked collapse pl-3">
         <li><a class="nav-link" href="#">Stock Items</a></li>
@@ -32,4 +49,3 @@
       </div>
     </li>
   </ul>
-

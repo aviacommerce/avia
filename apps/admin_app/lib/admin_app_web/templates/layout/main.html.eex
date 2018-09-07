@@ -1,10 +1,10 @@
 <main role="main" class="row mx-0">
   <%= if Guardian.Plug.authenticated?(@conn) do %>
-    <div class="col-2 p-0 sidebar">
+    <div class="sidebar">
       <%= render "sidebar.html" %>
     </div>
   <% end %>
-  <div class="col-10 prealative p-0" >
+  <div class="main" >
     <%= render @view_module, @view_template, assigns %>
   </div>
 </main>

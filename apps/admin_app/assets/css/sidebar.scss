@@ -8,16 +8,17 @@
   .nav {
     li {
       width: 100%;
-
       .nav-link {
-        color: $gray-900;
+        color: $gray-600;
         border-radius: 0;
-        font-size: 1em;
+        font-size: 14px;;
+        color:#222;
 
         i {
-          font-size: 1.3em;
+          font-size: 1.4em;
           margin-right: .5em;
-          color: $gray-700;
+          color: $gray-600;
+          color:#757575;
         }
 
         &:hover {
