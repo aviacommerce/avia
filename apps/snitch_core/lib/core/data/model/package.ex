@@ -35,4 +35,12 @@ defmodule Snitch.Data.Model.Package do
   def get(query_fields) do
     QH.get(Package, query_fields, Repo)
   end
+
+  @doc """
+  Deletes the `package`.
+  """
+  @spec delete(Package.t()) :: {:ok, Package.t()} | {:error, Ecto.Changeset.t()}
+  def delete(%Package{} = package) do
+    QH.delete(Package, package, Repo)
+  end
 end
