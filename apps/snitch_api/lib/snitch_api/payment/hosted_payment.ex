@@ -3,14 +3,26 @@ defmodule SnitchApi.Payment.HostedPayment do
   Utilites for hosted payments.
   """
 
+  alias BeepBop.Context
   alias Snitch.Data.Model.HostedPayment
   alias Snitch.Data.Model.Order
   alias Snitch.Data.Model.Payment
   alias Snitch.Data.Model.PaymentMethod
+  alias Snitch.Domain.Order.DefaultMachine
+  alias Snitch.Repo
 
   def payment_order_context(%{status: "success"} = params) do
     payment_params = %{status: "paid"}
-    update_hosted_payment(params, payment_params)
+
+    case update_hosted_payment(params, payment_params) do
+      {:ok, order, _} ->
+        context = Context.new(order, state: %{})
+        transition = DefaultMachine.confirm_purchase_payment(context)
+        transition_response(transition, order)
+
+      {:error, _} = error ->
+        error
+    end
   end
 
   def payment_order_context(%{status: "failure"} = params) do
@@ -25,6 +37,8 @@ defmodule SnitchApi.Payment.HostedPayment do
     %{credentials: credentials, live_mode: live_mode}
   end
 
+  # TODO Check extra query fired for getting payment record
+  #     after update should use the returned payment.
   defp update_hosted_payment(params, payment_params) do
     order_id = params.order_id
     payment_id = params.payment_id
@@ -39,13 +53,22 @@ defmodule SnitchApi.Payment.HostedPayment do
       raw_response: raw_response
     }
 
-    with {:ok, hosted_payment} <-
+    with {:ok, %{hosted_payment: hosted_payment}} <-
            HostedPayment.update(hosted_payment, hosted_params, payment_params),
-         {:ok, order} <- Order.get(order_id) do
+         order <- Order.get(order_id) do
       payment = Payment.get(hosted_payment.payment_id)
       {:ok, order, payment}
     else
+      nil -> {:error, "Order not found"}
       {:error, _} -> {:error, "some error occured"}
     end
+  end
+
+  defp transition_response(%Context{errors: nil}, order) do
+    {:ok, order}
+  end
+
+  defp transition_response(%Context{errors: errors}, _) do
+    errors
   end
 end
