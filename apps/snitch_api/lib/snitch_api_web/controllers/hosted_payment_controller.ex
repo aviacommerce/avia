@@ -9,7 +9,6 @@ defmodule SnitchApiWeb.HostedPaymentController do
   action_fallback(SnitchApiWeb.FallbackController)
 
   @base_url "http://localhost:3000/api/v1/hosted-payment/"
-  @frontend_url ""
 
   def payubiz_request_url(conn, params) do
     {params, url} = payubiz_params_setup(params)
@@ -33,23 +32,33 @@ defmodule SnitchApiWeb.HostedPaymentController do
 
   def payment_success(conn, params) do
     response = SnitchPayments.data_parser(params)
+    url = Application.fetch_env!(:snitch_api, :frontend_checkout_url)
 
-    with {:ok, _, _} <- HostedPayment.payment_order_context(response) do
-      redirect(conn, external: @frontend_url <> "?info=payment_success")
+    with {:ok, order} <- HostedPayment.payment_order_context(response) do
+      address = url <> "order-success?orderReferance=#{order.id}"
+
+      redirect(
+        conn,
+        external: address
+      )
     else
-      {:error, _} ->
-        redirect(conn, external: @frontend_url <> "?error=payment_failed")
+      {:error, message} ->
+        redirect(
+          conn,
+          external: url <> "?order-failed?reason=#{message}"
+        )
     end
   end
 
   def payment_error(conn, params) do
     response = SnitchPayments.data_parser(params)
+    url = Application.fetch_env!(:snitch_api, :frontend_checkout_url)
 
     with {:ok, _, _} <- HostedPayment.payment_order_context(response) do
-      redirect(conn, external: @frontend_url <> "?info=payment_failed")
+      redirect(conn, external: url <> "?info=payment_failed")
     else
       {:error, _} ->
-        redirect(conn, external: @frontend_url <> "?error=error")
+        redirect(conn, external: url <> "?error=error")
     end
   end
 
@@ -87,7 +96,7 @@ defmodule SnitchApiWeb.HostedPaymentController do
   defp create_payubiz_params(params) do
     [
       key: params["key"],
-      txnid: params["order_id"],
+      txnid: params["order_number"],
       amount: params["amount"],
       productinfo: params["product_info"],
       firstname: params["first_name"],
