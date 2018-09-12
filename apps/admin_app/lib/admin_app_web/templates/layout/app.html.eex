@@ -13,8 +13,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.7/lib/draggable.bundle.js"></script>
    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
   </head>
-  <body>
-    <%# <%= render "header.html", conn: @conn%>
+  <body data-js-view-name="<%= js_view_name(@conn, @view_template) %>">
+    <%= render "header.html", conn: @conn%>
     <%= render "flash.html", conn: @conn%>
     <%= render "main.html", assigns%>
     <%=# render "footer.html" %>
