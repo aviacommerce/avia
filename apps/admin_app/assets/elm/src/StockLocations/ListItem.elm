@@ -30,10 +30,10 @@ renderStatus model =
 view : Model -> Html a
 view model =
     tr [ class "StockLocations__List__Item" ]
-        [ th [ scope "col" ] [ text (toString model.sno) ]
+        [ td [] [ text (toString model.sno) ]
         , td [] [ a [ class "text-dark", href ("stock_locations/" ++ toString model.id) ] [ text model.name ] ]
         , td [] [ renderStatus model ]
         , td []
-            [ a [ class "btn btn-info btn-sm", href ("stock_locations/" ++ toString model.id ++ "/edit"), attribute "data-icon" "edit" ] [ text "Edit" ]
+            [ a [ class "btn btn-sm fa fa-edit ", href ("stock_locations/" ++ toString model.id ++ "/edit"), attribute "data-icon" "edit" ] [ text "" ]
             ]
         ]

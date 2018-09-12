@@ -59,11 +59,19 @@ defmodule AdminAppWeb.Router do
     resources("/product_brands", ProductBrandController)
     resources("/payment_methods", PaymentMethodController)
     post("/payment-provider-inputs", PaymentMethodController, :payment_preferences)
+    get("/product/category", ProductController, :select_category)
+    post("/product-images/:product_id", ProductController, :add_images)
+    delete("/product-images/", ProductController, :delete_image)
+
+    resources("/taxonomy", TaxonomyController, except: [:update])
+    post("/taxonomy/create", TaxonomyController, :create_taxonomy)
+    put("/taxonomy/update", TaxonomyController, :update_taxon)
   end
 
   scope "/", AdminAppWeb do
     pipe_through(:avoid_csrf)
     post("/products/variants/new", ProductController, :new_variant)
+    post("/product/stock", ProductController, :add_stock)
   end
 
   scope "/", AdminAppWeb do
@@ -85,5 +93,6 @@ defmodule AdminAppWeb.Router do
     pipe_through(:api)
 
     resources("/option_types", OptionTypeController)
+    get("/categories/:taxon_id", TaxonomyController, :index)
   end
 end

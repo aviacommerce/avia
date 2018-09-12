@@ -11,17 +11,40 @@ defmodule SnitchApiWeb.OrderView do
     :shipping_address,
     :number,
     :state,
-    :total,
+    :order_total_amount,
     :promot_total,
     :adjustment_total,
-    :item_total
+    :item_count
   ])
 
   has_many(
     :line_items,
     serializer: SnitchApiWeb.LineItemView,
-    include: true
+    include: false
   )
+
+  has_many(
+    :payments,
+    serializer: SnitchApiWeb.PaymentView,
+    include: false
+  )
+
+  def item_count(order, _) do
+    order.line_items
+    |> Enum.reduce(0, fn line_item, acc ->
+      acc = acc + line_item.quantity
+    end)
+  end
+
+  def order_total_amount(order, _) do
+    order.line_items
+    |> Enum.reduce(Money.new(:USD, 0), fn line_item, acc ->
+      {:ok, total} = Money.mult(line_item.unit_price, line_item.quantity)
+      {:ok, acc} = Money.add(acc, total)
+      acc
+    end)
+    |> Money.round(currency_digits: :cash)
+  end
 
   def line_items(struct, _conn) do
     struct
@@ -29,7 +52,7 @@ defmodule SnitchApiWeb.OrderView do
     |> Map.get(:line_items)
   end
 
-  def shipping_address(struct, conn) do
+  def shipping_address(struct, _conn) do
     struct
     |> Map.get(:shipping_address)
     |> case do
@@ -43,7 +66,7 @@ defmodule SnitchApiWeb.OrderView do
     end
   end
 
-  def billing_address(struct, conn) do
+  def billing_address(struct, _conn) do
     struct
     |> Map.get(:billing_address)
     |> case do

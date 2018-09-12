@@ -9216,12 +9216,8 @@ var _user$project$StockLocations_ListItem$view = function (model) {
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$th,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$scope('col'),
-					_1: {ctor: '[]'}
-				},
+				_elm_lang$html$Html$td,
+				{ctor: '[]'},
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html$text(
@@ -9278,7 +9274,7 @@ var _user$project$StockLocations_ListItem$view = function (model) {
 									_elm_lang$html$Html$a,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('btn btn-info btn-sm'),
+										_0: _elm_lang$html$Html_Attributes$class('btn btn-sm fa fa-edit '),
 										_1: {
 											ctor: '::',
 											_0: _elm_lang$html$Html_Attributes$href(
@@ -9298,7 +9294,7 @@ var _user$project$StockLocations_ListItem$view = function (model) {
 									},
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text('Edit'),
+										_0: _elm_lang$html$Html$text(''),
 										_1: {ctor: '[]'}
 									}),
 								_1: {ctor: '[]'}
@@ -9441,33 +9437,66 @@ var _user$project$StockLocations_List$view = function (model) {
 		_elm_lang$html$Html$div,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('StockLocations--container card container'),
+			_0: _elm_lang$html$Html_Attributes$class('StockLocations--container list-container'),
 			_1: {ctor: '[]'}
 		},
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$h2,
-				{ctor: '[]'},
+				_elm_lang$html$Html$div,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('Stock Location List'),
+					_0: _elm_lang$html$Html_Attributes$class('row m-0 list-header'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('col-10 p-0'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$h2,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Stock Location List'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}),
 					_1: {
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$a,
+							_elm_lang$html$Html$div,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$href('/stock_locations/new'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('btn btn-primary float-right'),
-									_1: {ctor: '[]'}
-								}
+								_0: _elm_lang$html$Html_Attributes$class('col-2 p-0 float-right text-right'),
+								_1: {ctor: '[]'}
 							},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('Create Stock Location'),
+								_0: A2(
+									_elm_lang$html$Html$a,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$href('/stock_locations/new'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('btn btn-primary float-right'),
+											_1: {ctor: '[]'}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Create Stock Location'),
+										_1: {ctor: '[]'}
+									}),
 								_1: {ctor: '[]'}
 							}),
 						_1: {ctor: '[]'}
@@ -9476,66 +9505,47 @@ var _user$project$StockLocations_List$view = function (model) {
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$table,
+					_elm_lang$html$Html$div,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('StockLocations__List table'),
+						_0: _elm_lang$html$Html_Attributes$class('row m-0 list'),
 						_1: {ctor: '[]'}
 					},
 					{
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$thead,
+							_elm_lang$html$Html$table,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('thead-light'),
+								_0: _elm_lang$html$Html_Attributes$class('StockLocations__List table'),
 								_1: {ctor: '[]'}
 							},
 							{
 								ctor: '::',
 								_0: A2(
-									_elm_lang$html$Html$tr,
-									{ctor: '[]'},
+									_elm_lang$html$Html$thead,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('thead-light'),
+										_1: {ctor: '[]'}
+									},
 									{
 										ctor: '::',
 										_0: A2(
-											_elm_lang$html$Html$th,
+											_elm_lang$html$Html$tr,
+											{ctor: '[]'},
 											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$scope('col'),
-												_1: {ctor: '[]'}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('#'),
-												_1: {ctor: '[]'}
-											}),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$th,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$scope('col'),
-													_1: {ctor: '[]'}
-												},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('Name'),
-													_1: {ctor: '[]'}
-												}),
-											_1: {
 												ctor: '::',
 												_0: A2(
 													_elm_lang$html$Html$th,
 													{
 														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$scope('col'),
+														_0: _elm_lang$html$Html_Attributes$class('col1'),
 														_1: {ctor: '[]'}
 													},
 													{
 														ctor: '::',
-														_0: _elm_lang$html$Html$text('Status'),
+														_0: _elm_lang$html$Html$text('#'),
 														_1: {ctor: '[]'}
 													}),
 												_1: {
@@ -9544,26 +9554,56 @@ var _user$project$StockLocations_List$view = function (model) {
 														_elm_lang$html$Html$th,
 														{
 															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$scope('col'),
+															_0: _elm_lang$html$Html_Attributes$class('col2'),
 															_1: {ctor: '[]'}
 														},
 														{
 															ctor: '::',
-															_0: _elm_lang$html$Html$text('Action'),
+															_0: _elm_lang$html$Html$text('Name'),
 															_1: {ctor: '[]'}
 														}),
-													_1: {ctor: '[]'}
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$th,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$class('col3'),
+																_1: {ctor: '[]'}
+															},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Status'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$th,
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$class('col4'),
+																	_1: {ctor: '[]'}
+																},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text('Action'),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														}
+													}
 												}
-											}
-										}
+											}),
+										_1: {ctor: '[]'}
 									}),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: _user$project$StockLocations_List$viewStockLocationsOrError(model),
+									_1: {ctor: '[]'}
+								}
 							}),
-						_1: {
-							ctor: '::',
-							_0: _user$project$StockLocations_List$viewStockLocationsOrError(model),
-							_1: {ctor: '[]'}
-						}
+						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
 			}

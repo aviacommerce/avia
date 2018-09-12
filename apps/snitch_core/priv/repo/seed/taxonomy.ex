@@ -12,8 +12,29 @@ defmodule Snitch.Seed.Taxonomy do
     [
       {"Dog",
        [
-         {"Food", []},
-         {"Treat", []},
+         {"Food",
+          [
+            {"Dry Food", []},
+            {"Wet Food", []},
+            {"Prescription Food", []},
+            {"Freeze-Dried Food", []},
+            {"Human-Grade", []},
+            {"Dehydrated Food", []},
+            {"Frozen Food", []},
+            {"Food Toppings", []}
+          ]},
+         {"Treat",
+          [
+            {"Dental & Hard Chews", []},
+            {"Soft & Chewy Treats", []},
+            {"Biscuits & Crunchy Treats", []},
+            {"Bully Sticks & Natural Chews ", []},
+            {"Jerky Treats", []},
+            {"Prescription Treats", []},
+            {"Freeze-Dried Treats", []},
+            {"Training Treats", []},
+            {"Dehydrated Treats", []}
+          ]},
          {"Toys", []},
          {"Healthcare", []},
          {"Dental Care", []},

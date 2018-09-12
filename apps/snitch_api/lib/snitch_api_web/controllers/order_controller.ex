@@ -3,9 +3,10 @@ defmodule SnitchApiWeb.OrderController do
 
   alias Snitch.Data.Model.Order, as: OrderModel
   alias Snitch.Data.Schema.Order
-  alias Snitch.Data.Schema.OrderAddress
+  alias Snitch.Data.Schema.LineItem
   alias SnitchApi.Order, as: OrderContext
   alias Snitch.Repo
+  import Ecto.Query
 
   action_fallback(SnitchApiWeb.FallbackController)
   plug(SnitchApiWeb.Plug.DataToAttributes)
@@ -13,15 +14,15 @@ defmodule SnitchApiWeb.OrderController do
 
   def index(conn, params) do
     user = conn.assigns.current_user
-    orders = Repo.preload(OrderModel.user_orders(user.id), :line_items)
+    line_item_query = from(LineItem, order_by: [desc: :inserted_at], preload: [product: :theme])
+    orders = Repo.preload(OrderModel.user_orders(user.id), line_items: line_item_query)
 
     render(
       conn,
       "index.json-api",
       data: orders,
       opts: [
-        include: params["include"],
-        fields: conn.query_params["fields"]
+        include: "line_items,line_items.product"
       ]
     )
   end
@@ -38,6 +39,8 @@ defmodule SnitchApiWeb.OrderController do
 
   def guest_order(conn, _params) do
     with {:ok, %Order{} = order} <- OrderModel.create_guest_order() do
+      order = OrderContext.load_order(order.id)
+
       conn
       |> put_status(200)
       |> put_resp_header("location", order_path(conn, :show, Map.get(order, :id)))
@@ -46,38 +49,22 @@ defmodule SnitchApiWeb.OrderController do
   end
 
   def select_address(conn, %{"id" => order_id} = params) do
-    order = OrderModel.get(order_id)
-
     shipping_address =
       for {key, val} <- params["shipping_address"], into: %{}, do: {String.to_atom(key), val}
 
     billing_address =
-      for {key, val} <- params["shipping_address"], into: %{}, do: {String.to_atom(key), val}
+      for {key, val} <- params["billing_address"],
+          into: %{},
+          do: {String.to_atom(key), val} || shipping_address
 
-    shipping_address =
-      shipping_address
-      |> Map.update!(:country_id, &String.to_integer/1)
-      |> Map.update!(:state_id, &String.to_integer/1)
-
-    billing_address =
-      billing_address
-      |> Map.update!(:country_id, &String.to_integer/1)
-      |> Map.update!(:state_id, &String.to_integer/1)
-
-    order_address = %{
-      shipping_address: shipping_address,
-      billing_address: billing_address
-    }
-
-    with {:ok, %Order{} = order} <- OrderModel.partial_update(order, order_address) do
+    with {:ok, order} <- OrderContext.attach_address(order_id, shipping_address, billing_address) do
       conn
       |> put_status(200)
       |> render(
         "show.json-api",
         data: order,
         opts: [
-          include: params["include"],
-          fields: conn.query_params["fields"]
+          include: "line_items"
         ]
       )
     end
@@ -85,10 +72,26 @@ defmodule SnitchApiWeb.OrderController do
 
   def fetch_guest_order(conn, %{"order_number" => order_number}) do
     with %Order{} = order <- OrderModel.get(%{number: order_number}) do
+      line_item_query =
+        from(
+          LineItem,
+          order_by: [desc: :inserted_at],
+          preload: [product: [:theme, [options: :option_type]]]
+        )
+
+      order = order |> Repo.preload(line_items: line_item_query)
+
       conn
       |> put_status(200)
       |> put_resp_header("location", order_path(conn, :show, order))
-      |> render("show.json-api", data: order)
+      |> render(
+        "show.json-api",
+        data: order,
+        opts: [
+          include:
+            "line_items,line_items.product,line_items.product.options,line_items.product.options.option_type"
+        ]
+      )
     else
       nil ->
         conn
@@ -101,10 +104,37 @@ defmodule SnitchApiWeb.OrderController do
     user_id = Map.get(conn.assigns[:current_user], :id)
 
     {:ok, order} = OrderModel.user_order(user_id)
+    order = order |> Repo.preload(line_items: [product: [:theme, [options: :option_type]]])
 
     conn
     |> put_status(200)
     |> put_resp_header("location", order_path(conn, :show, order))
-    |> render("show.json-api", data: order)
+    |> render(
+      "show.json-api",
+      data: order,
+      opts: [
+        include:
+          "line_items,line_items.product,line_items.product.options,line_items.product.options.option_type"
+      ]
+    )
+  end
+
+  def add_payment(conn, %{
+        "payment_method_id" => payment_method_id,
+        "id" => order_id,
+        "amount" => amount
+      }) do
+    amount = Money.new(:USD, amount)
+
+    with {:ok, order} <- OrderContext.add_payment(order_id, payment_method_id, amount) do
+      order = Repo.preload(order, :payments)
+
+      render(
+        conn,
+        "show.json-api",
+        data: order,
+        opts: [include: "payments,line_items"]
+      )
+    end
   end
 end

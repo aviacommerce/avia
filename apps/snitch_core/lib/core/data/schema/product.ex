@@ -12,7 +12,9 @@ defmodule Snitch.Data.Schema.Product do
     ProductOptionValue,
     VariationTheme,
     Review,
-    ProductBrand
+    ProductBrand,
+    StockItem,
+    ShippingCategory
   }
 
   alias Money.Ecto.Composite.Type, as: MoneyType
@@ -32,29 +34,39 @@ defmodule Snitch.Data.Schema.Product do
     field(:promotionable, :boolean)
     field(:selling_price, MoneyType)
     field(:max_retail_price, MoneyType)
+    field(:height, :decimal, default: Decimal.new(0))
+    field(:width, :decimal, default: Decimal.new(0))
+    field(:depth, :decimal, default: Decimal.new(0))
+    field(:sku, :string)
+    field(:position, :integer)
+    field(:weight, :decimal, default: Decimal.new(0))
     timestamps()
 
     has_many(:variations, Variation, foreign_key: :parent_product_id, on_replace: :delete)
     has_many(:variants, through: [:variations, :child_product])
 
     has_many(:options, ProductOptionValue)
+    has_many(:stock_items, StockItem)
 
     many_to_many(:reviews, Review, join_through: "snitch_product_reviews")
     many_to_many(:images, Image, join_through: "snitch_product_images", on_replace: :delete)
 
     belongs_to(:theme, VariationTheme)
     belongs_to(:brand, ProductBrand)
+    belongs_to(:shipping_category, ShippingCategory)
   end
 
   @required_fields ~w(name selling_price max_retail_price)a
-  @optional_fields ~w(description meta_description meta_keywords meta_title brand_id)a
+  @optional_fields ~w(description meta_description meta_keywords meta_title brand_id height width depth weight)a
 
   def create_changeset(model, params \\ %{}) do
     common_changeset(model, params)
   end
 
   def update_changeset(model, params \\ %{}) do
-    common_changeset(model, params)
+    model
+    |> common_changeset(params)
+    |> cast_assoc(:images, with: &Image.changeset/2)
   end
 
   def variant_create_changeset(parent_product, params) do
@@ -92,7 +104,7 @@ defmodule Snitch.Data.Schema.Product do
     variant_changes =
       get_change(changeset, :variations)
       |> Enum.map(fn c ->
-        if(c.action == :replace) do
+        if c.action == :replace do
           Map.update(c, :action, nil, fn x -> nil end)
         else
           c

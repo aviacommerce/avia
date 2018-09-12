@@ -39,7 +39,7 @@ defmodule AdminAppWeb.OrderView do
 
   defp render_line_item(line_item, order) do
     content = [
-      render_variant(line_item.variant),
+      render_variant(line_item.product),
       content_tag(:td, line_item.unit_price),
       render_quantity_with_stock(line_item),
       render_update_buttons(line_item.id, order),
@@ -49,15 +49,15 @@ defmodule AdminAppWeb.OrderView do
     content_tag(:tr, List.flatten(content))
   end
 
-  defp render_variant(variant) do
-    [content_tag(:th, content_tag(:i, "", class: "far fa-image")), content_tag(:td, variant.sku)]
+  defp render_variant(product) do
+    [content_tag(:th, content_tag(:i, "", class: "far fa-image")), content_tag(:td, product.sku)]
   end
 
   defp render_update_buttons(item, order) do
     if is_editable?(order.state) do
       content_tag(
         :td,
-        form_tag("/orders/#{order.number}/cart/edit?update=#{item}", method: "post") do
+        form_tag "/orders/#{order.number}/cart/edit?update=#{item}", method: "post" do
           content_tag(:button, ["update"], class: "btn btn-primary", type: "submit")
         end
       )
@@ -68,7 +68,7 @@ defmodule AdminAppWeb.OrderView do
     if is_editable?(order.state) do
       content_tag(
         :td,
-        form_tag("/orders/#{order.number}/cart?edit=#{item}", method: "post") do
+        form_tag "/orders/#{order.number}/cart?edit=#{item}", method: "post" do
           content_tag(:button, ["remove"], class: "btn btn-primary", type: "submit")
         end
       )
@@ -139,7 +139,7 @@ defmodule AdminAppWeb.OrderView do
     ]
 
     list =
-      form_tag("/orders/#{order.number}/cart?add=#{item.id}", method: "put") do
+      form_tag "/orders/#{order.number}/cart?add=#{item.id}", method: "put" do
         List.flatten(content)
       end
 
@@ -148,15 +148,15 @@ defmodule AdminAppWeb.OrderView do
 
   def render_update_item(item, order) do
     content = [
-      content_tag(:td, item.variant.sku),
-      content_tag(:td, item.variant.selling_price),
+      content_tag(:td, item.product.sku),
+      content_tag(:td, item.product.selling_price),
       content_tag(:td, tag(:input, name: "quantity", value: item.quantity)),
-      content_tag(:td, tag(:hidden, name: "variant_id", value: item.variant_id)),
+      content_tag(:td, tag(:hidden, name: "product_id", value: item.product_id)),
       content_tag(:td, content_tag(:button, ["Add"], type: "submit"))
     ]
 
     list =
-      form_tag("/orders/#{order.number}/cart/update?update=#{item.id}", method: "put") do
+      form_tag "/orders/#{order.number}/cart/update?update=#{item.id}", method: "put" do
         List.flatten(content)
       end
 
@@ -177,13 +177,18 @@ defmodule AdminAppWeb.OrderView do
     ]
 
     list =
-      form_tag(
-        "/orders/#{order.number}/address/search?address_id=#{address.id}",
-        method: "put"
-      ) do
+      form_tag "/orders/#{order.number}/address/search?address_id=#{address.id}", method: "put" do
         List.flatten(content)
       end
 
     content_tag(:tr, list)
+  end
+
+  def display_email(order) do
+    if order.user do
+      order.user.email
+    else
+      "Guest Order"
+    end
   end
 end

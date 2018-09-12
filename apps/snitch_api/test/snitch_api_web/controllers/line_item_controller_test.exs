@@ -38,8 +38,7 @@ defmodule SnitchApiWeb.LineItemControllerTest do
       user = conn.assigns[:current_user]
       order = insert(:order, user_id: user.id)
 
-      variant =
-        insert(:variant, product: insert(:product), shipping_category: insert(:shipping_category))
+      variant = insert(:product, shipping_category: insert(:shipping_category))
 
       line_item =
         :line_item
@@ -57,7 +56,7 @@ defmodule SnitchApiWeb.LineItemControllerTest do
                 type: "order"
               }
             },
-            variant: %{
+            product: %{
               data: %{
                 id: variant.id,
                 type: "variant"
@@ -73,7 +72,7 @@ defmodule SnitchApiWeb.LineItemControllerTest do
     end
 
     test "Updating a line item", %{conn: conn} do
-      line_item = insert(:line_item, order: insert(:order), variant: insert(:variant))
+      line_item = insert(:line_item, order: insert(:order), product: insert(:product))
 
       data = %{
         data: %{

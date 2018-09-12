@@ -35,6 +35,14 @@ defmodule Snitch.Data.Model.Payment do
   def get_all, do: Repo.all(Payment)
 
   @doc """
+  Deletes the record for supplied `payment` struct.
+  """
+  @spec delete(Payment.t()) :: {:ok, Payment.t()} | {:error, Ecto.Changeset.t()}
+  def delete(%Payment{} = payment) do
+    QH.delete(Payment, payment, Repo)
+  end
+
+  @doc """
   Fetch the (associated) concrete Payment subtype.
 
   > Note that the `:payment` association is not loaded.

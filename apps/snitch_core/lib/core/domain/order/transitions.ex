@@ -13,9 +13,10 @@ defmodule Snitch.Domain.Order.Transitions do
   alias BeepBop.Context
   alias Snitch.Data.Model.Package
   alias Snitch.Data.Schema.Order
+  alias Snitch.Data.Model.Payment, as: PaymentModel
 
   alias Snitch.Domain.Package, as: PackageDomain
-  alias Snitch.Domain.{Shipment, ShipmentEngine, Splitters.Weight}
+  alias Snitch.Domain.{Payment, Shipment, ShipmentEngine, Splitters.Weight}
 
   @doc """
   Embeds the addresses and computes some totals of the `order`.
@@ -121,6 +122,43 @@ defmodule Snitch.Domain.Order.Transitions do
   def persist_shipment(%Context{valid?: false} = context), do: context
 
   @doc """
+  Removes the shipment belonging to Order from DB.
+
+  Shipments which are basically `Package`s and their `PackageItem`s are
+  removed together in a transaction.
+
+  ```
+  context.state.packages :: {:ok, [Pacakge.t()]} | {:error, Ecto.Changeset.t()}
+  ```
+  """
+  def remove_shipment(%Context{valid?: true, struct: %Order{} = order} = context) do
+    packages =
+      Repo.transaction(fn ->
+        order.packages
+        |> Stream.map(&Package.delete/1)
+        |> fail_fast_reduce()
+        |> case do
+          {:error, error} ->
+            Repo.rollback(error)
+
+          {:ok, packages} ->
+            packages
+        end
+      end)
+
+    case packages do
+      {:ok, packages} ->
+        state = Map.put(context.state, :packages, packages)
+        struct(context, state: state)
+
+      {:error, changeset} ->
+        struct(context, valid?: false, errors: changeset)
+    end
+  end
+
+  def remove_shipment(%Context{valid?: false} = context), do: context
+
+  @doc """
   Persists the shipping preferences of the user in each `package` of the `order`.
 
   Along with the chosen `ShippingMethod`, we update pacakge price fields. User's
@@ -167,6 +205,65 @@ defmodule Snitch.Domain.Order.Transitions do
       struct(context, valid?: false, errors: [shipping_preferences: "is invalid"])
     end
   end
+
+  @doc """
+  Tranistion function to handle payment creation.
+
+  For more information see.
+  ## See
+  `Snitch.Domain.Payment`
+  """
+  @spec make_payment_record(Context.t()) :: Contex.t()
+  def make_payment_record(
+        %Context{
+          valid?: true,
+          struct: %Order{} = order,
+          state: %{
+            payment_method: payment_method,
+            payment_params: payment_params
+          }
+        } = context
+      ) do
+    case Payment.create_payment(payment_params, payment_method, order) do
+      {:ok, map} ->
+        state = Map.put(context.state, :payment, map)
+        struct(context, state: state)
+
+      {:error, changeset} ->
+        struct(context, valid?: false, errors: changeset.errors)
+    end
+  end
+
+  @doc """
+  Removes `payment` as well as corresponding `subpayment` type records created
+  for an order in a transaction.
+  """
+  def remove_payment_record(%Context{valid?: true, struct: %Order{} = order} = context) do
+    payments =
+      Repo.transaction(fn ->
+        order.payments
+        |> Stream.map(&PaymentModel.delete/1)
+        |> fail_fast_reduce()
+        |> case do
+          {:error, error} ->
+            Repo.rollback(error)
+
+          {:ok, payments} ->
+            payments
+        end
+      end)
+
+    case payments do
+      {:ok, payments} ->
+        state = Map.put(context.state, :payments, payments)
+        struct(context, state: state)
+
+      {:error, changeset} ->
+        struct(context, valid?: false, errors: changeset)
+    end
+  end
+
+  def remove_payment_record(%Context{valid?: false} = context), do: context
 
   defp validate_shipping_preferences([], _), do: true
 

@@ -1,9 +1,19 @@
-<h4>New Product Protoype</h4>
-<%= render "form.html",
-    changeset: @changeset,
-    conn: @conn,
-    action: prototype_path(@conn, :create),
-    themes: @themes,
-    properties: @properties,
-    taxons: @taxons
-%>
+
+<div class="list-container">
+  <div class="pt-3 pb-0 pr-3 pl-3 back"> <img src="/images/left-arrow.svg"
+   width="20" height="20" class="d-inline-block align-top" alt=""> 
+   <a href="/prototypes">Protoype</a> </div>
+  <h4 class="p-3 m-0">Add a Protoype</h4> 
+  <div class="col-12">
+    <div class="card col-12">
+         <%= render "form.html",
+					changeset: @changeset,
+					conn: @conn,
+					action: prototype_path(@conn, :create),
+					themes: @themes,
+					properties: @properties,
+					taxons: @taxons
+			%>
+    </div>
+  <div>
+</div>

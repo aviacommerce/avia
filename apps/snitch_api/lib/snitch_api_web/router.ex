@@ -28,6 +28,8 @@ defmodule SnitchApiWeb.Router do
     resources("/taxons", TaxonController, only: [:index, :show])
     get("/countries", AddressController, :countries)
     get("/countries/:id/states/", AddressController, :country_states)
+    get("/brands", ProductBrandController, :index)
+    post("/product_option_values/:id", ProductOptionValueController, :update)
   end
 
   scope "/api/v1", SnitchApiWeb do
@@ -41,7 +43,9 @@ defmodule SnitchApiWeb.Router do
     resources("/wishlist_items", WishListItemController, only: [:index, :create, :delete])
     resources("/orders", OrderController, only: [:index, :show])
     resources("/line_items", LineItemController, only: [:create, :update, :show])
+    delete("/line_items", LineItemController, :delete)
     post("/orders/:id/select_address", OrderController, :select_address)
+    post("/orders/:id/add-payment", OrderController, :add_payment)
     post("/orders/current", OrderController, :current)
     resources("/ratings", RatingController, only: [:index, :show])
     resources("/reviews", ReviewController, only: [:create, :update, :delete])

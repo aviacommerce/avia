@@ -1,6 +1,12 @@
 defmodule SnitchApiWeb.PaymentView do
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
+
+  attributes([
+    :amount,
+    :slug,
+    :payment_method_id
+  ])
 end
 
 defmodule SnitchApiWeb.PaymentMethodView do

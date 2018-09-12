@@ -1,0 +1,91 @@
+@import './custom/variables';
+@import "font-awesome";
+
+.sidebar {
+  border-right: 1px solid $bordercolor1;
+  height: 100vh;
+  overflow-y: auto;
+
+  .nav {
+    li {
+      width: 100%;
+
+      .nav-link {
+        color: $gray-600;
+        border-radius: 0;
+        font-size: 14px;
+        ;
+        color: #222;
+
+        i {
+          font-size: 1.4em;
+          margin-right: .5em;
+          color: $gray-600;
+          color: #757575;
+        }
+
+        &:hover {
+          background-color: $gray-300;
+        }
+      }
+    }
+  }
+
+  .abnav {
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    z-index: 999;
+    height: 100vh;
+    background-color: $white;
+  }
+}
+
+.profile {
+  bottom: 0;
+  list-style: none;
+  position: fixed !important;
+  width: 256px !important;
+
+  .dropdown-menu {
+    top: -10px!important;
+    left: 10px!important;
+    will-change: transform;
+    border-radius: 0;
+    border-top: 0px;
+  }
+
+  a {
+    width: 100%;
+    font-size: .875em;
+    background-color: $white;
+    border-top: 1px solid $bordercolor1;
+    border-right: 1px solid $bordercolor1;
+    display: block;
+    cursor: pointer;
+
+    &:after {
+      right: 15%;
+      top: 50%;
+      position: absolute;
+      border-bottom: 0.3em solid;
+      border-top: 0px;
+    }
+
+    .usrimg {
+      width: 30px;
+      height: 30px;
+      padding: 1px;
+      border-radius: 50%;
+      border: 1px solid $bordercolor1;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .username {
+      display: inline-block;
+      padding: 5px 10px;
+    }
+  }
+}

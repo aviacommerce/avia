@@ -1,10 +1,32 @@
-<tr>
-  <th scope="row" class="ui-state-default"></th>
-  <td><%= @theme.name %></td>
-  <td>
-    <div class="float-right">
-    <%= link("Edit", to: variation_theme_path(@conn, :edit, @theme.id), class: "btn btn-primary")%>
-    <%= link("Delete", to: variation_theme_path(@conn, :delete, @theme.id), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger")%>
-  </div>
-  </td>
-</tr>
+<div class="table-contaner col-12 p-3 mb-2">        
+    <div class="row">
+      <div class="col-1">
+          <div class="checkbox">
+            <label>
+            <input type="checkbox" value="">
+            <span class="cr"><i class="cr-icon fa fa-check"></i></span>              
+            </label>
+          </div>
+      </div>
+      <div class="col-3"><%= @theme.name %></div>
+      <div class="col-4">
+      
+      </div>
+      <div class="col-3">
+        
+      </div>
+      <div class="col-1">
+          <div class="dropdown col-12 p-0 float-right">
+            <a class="p-2 dropdown-toggle options" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-cog"></i>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
+              <%= link("Edit", to: variation_theme_path(@conn, :edit, @theme.id), class: "dropdown-item")%>
+                <%= link("Delete", to: variation_theme_path(@conn, :delete, @theme.id), method: :delete, 
+                data: [confirm: "Are you sure?"], class: "dropdown-item")%>
+            </div>
+          </div>
+      </div>
+    </div>       
+</div>
+   

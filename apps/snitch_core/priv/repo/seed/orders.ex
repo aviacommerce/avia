@@ -4,7 +4,7 @@ defmodule Snitch.Seed.Orders do
   import Snitch.Tools.Helper.Order, only: [line_items_with_price: 2]
 
   alias Ecto.DateTime
-  alias Snitch.Data.Schema.{LineItem, Order, ShippingCategory, User, Variant}
+  alias Snitch.Data.Schema.{LineItem, Order, ShippingCategory, User, Product}
   alias Snitch.Repo
 
   require Logger
@@ -30,7 +30,7 @@ defmodule Snitch.Seed.Orders do
   # }
 
   defp build_orders do
-    variants = Repo.all(Variant)
+    variants = Repo.all(Product)
     [user | _] = Repo.all(User)
 
     digest = [
@@ -100,7 +100,7 @@ defmodule Snitch.Seed.Orders do
       |> List.flatten()
 
     Repo.insert_all(
-      Variant,
+      Product,
       Enum.into(variants(categories), []),
       returning: [:id],
       on_conflict: :nothing
@@ -113,7 +113,7 @@ defmodule Snitch.Seed.Orders do
     |> Stream.map(&"shoes-nike-#{&1}")
     |> Stream.zip(categories)
     |> Stream.map(fn {sku, sc_id} ->
-      %{random_variant() | sku: sku, shipping_category_id: sc_id}
+      %{random_variant() | sku: sku, shipping_category_id: sc_id, slug: sku}
     end)
   end
 
@@ -122,13 +122,14 @@ defmodule Snitch.Seed.Orders do
 
     %{
       sku: nil,
+      slug: nil,
       weight: Decimal.new("0.45"),
       height: Decimal.new("0.15"),
       depth: Decimal.new("0.1"),
       width: Decimal.new("0.4"),
       selling_price: price,
+      max_retail_price: price,
       shipping_category_id: nil,
-      cost_price: Money.sub!(price, Money.new("1.499", :USD)),
       inserted_at: DateTime.utc(),
       updated_at: DateTime.utc()
     }

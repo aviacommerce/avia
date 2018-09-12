@@ -4,7 +4,7 @@ defmodule Snitch.Data.Model.WishListItem do
   """
 
   use Snitch.Data.Model
-  alias Snitch.Data.Schema.Variant
+  alias Snitch.Data.Schema.Product
   alias Snitch.Data.Schema.WishListItem
 
   @doc """
@@ -51,15 +51,15 @@ defmodule Snitch.Data.Model.WishListItem do
     query =
       from(
         item in WishListItem,
-        group_by: item.variant_id,
-        select: item.variant_id,
+        group_by: item.product_id,
+        select: item.product_id,
         order_by: [desc: count(item.id)]
       )
 
     from(
-      variant in Variant,
+      variant in Product,
       join: item in subquery(query),
-      where: item.variant_id == variant.id,
+      where: item.product_id == variant.id,
       select: variant
     )
   end

@@ -29,7 +29,7 @@ defmodule Snitch.Factory.Shipping do
           state: "pending",
           quantity: 1,
           delta: 0,
-          variant: build(:variant),
+          product: build(:product),
           line_item: build(:line_item)
         }
       end

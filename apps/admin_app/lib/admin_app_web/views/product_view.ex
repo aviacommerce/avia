@@ -1,5 +1,6 @@
 defmodule AdminAppWeb.ProductView do
   use AdminAppWeb, :view
+  alias Snitch.Data.Model.Product
 
   @currencies ["USD", "INR"]
 
@@ -37,8 +38,28 @@ defmodule AdminAppWeb.ProductView do
     |> Decimal.round(2)
   end
 
+  def get_currency_value(nil) do
+    @currencies |> List.first()
+  end
+
+  def get_currency_value(money) do
+    money.currency
+  end
+
   # TODO This needs to fetched from config
   def get_currency() do
     @currencies
+  end
+
+  def get_image_url(image, product) do
+    Product.image_url(image.name, product)
+  end
+
+  def get_variant_option(variants) do
+    Enum.map(variants, fn variant -> {variant.name, variant.id} end)
+  end
+
+  def get_stock_locations_option(locations) do
+    Enum.map(locations, fn location -> {location.name, location.id} end)
   end
 end

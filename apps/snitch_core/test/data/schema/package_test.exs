@@ -23,7 +23,7 @@ defmodule Snitch.Data.Schema.PackageTest do
     quantity: 3,
     delta: 2,
     backordered?: false,
-    variant_id: 0,
+    product_id: 0,
     line_item_id: 0,
     tax: Money.zero(:USD),
     package_id: 0

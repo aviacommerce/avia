@@ -48,6 +48,13 @@ defmodule Snitch.Data.Model.HostedPayment do
       QH.create(HostedPayment, hosted_method_params, Repo)
     end)
     |> Repo.transaction()
+    |> case do
+      {:ok, data} ->
+        {:ok, data}
+
+      {:error, _, error_data, _} ->
+        {:error, error_data}
+    end
   end
 
   @doc """
@@ -74,6 +81,13 @@ defmodule Snitch.Data.Model.HostedPayment do
       PaymentModel.update(nil, Map.put(payment_params, :id, hosted_payment.payment_id))
     end)
     |> Repo.transaction()
+    |> case do
+      {:ok, data} ->
+        {:ok, data}
+
+      {:error, _, error_data, _} ->
+        {:error, error_data}
+    end
   end
 
   @doc """

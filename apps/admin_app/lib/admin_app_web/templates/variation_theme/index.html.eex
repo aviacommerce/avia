@@ -1,25 +1,14 @@
-<div class="row">
-  <div class="col-5">
-    <h2>Variation Themes</h2>
+<div class="list-container">
+  <div class="row m-0 list-header">
+    <div class="col-10 p-0">
+      <h2>Variation Themes</h2>
+    </div>
+    <div class="col-2 p-0 float-right text-right">
+     <%= link(" Create New", to: variation_theme_path(@conn, :new), class: "btn btn-primary fa fa-plus")%>  
+    </div> 
   </div>
-  <div class="col-6" align="right">
-    <%= link("Create New", to: variation_theme_path(@conn, :new), class: "btn btn-primary")%>
-  </div>
-  <div class="col-1"></div>
-</div>
-<div class="row">
-  <div class="col-12">
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col"></th>
-      <th scope="col">Name</th>
-      <th actions="col"></th>
-    </tr>
-  </thead>
-  <tbody class="ui-sortable">
+  <div class="row m-0 list">
     <%= render_many @themes, AdminAppWeb.VariationThemeView, "_theme.html", conn: @conn, as: :theme %>
-  </tbody>
-</table>
-</div>
+
+  </div>
 </div>

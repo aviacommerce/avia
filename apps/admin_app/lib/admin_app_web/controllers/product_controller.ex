@@ -5,8 +5,10 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Data.Model.Product, as: ProductModel
   alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Data.Model.ProductPrototype, as: PrototypeModel
-  alias Snitch.Data.Schema.ProductBrand
+  alias Snitch.Data.Schema.{ProductBrand, StockLocation}
   alias Snitch.Tools.Money
+  alias Snitch.Data.Model.StockItem, as: StockModel
+  alias Snitch.Data.Schema.StockItem, as: StockSchema
 
   plug(:scrub_referer_query_params when action in [:create])
   plug(:load_resources when action in [:new, :edit])
@@ -34,7 +36,7 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def edit(conn, %{"id" => id} = params) do
-    preloads = [variants: [options: :option_type]]
+    preloads = [variants: [options: :option_type], images: []]
 
     with %ProductSchema{} = product <- ProductModel.get(id) |> Repo.preload(preloads) do
       changeset = ProductSchema.create_changeset(product, params)
@@ -47,6 +49,54 @@ defmodule AdminAppWeb.ProductController do
          {:ok, product} <- ProductModel.update(product, params) do
       redirect(conn, to: product_path(conn, :index))
     end
+  end
+
+  def add_images(conn, %{"product_images" => product_images, "product_id" => id}) do
+    product =
+      id
+      |> String.to_integer()
+      |> ProductModel.get()
+      |> Repo.preload(:images)
+
+    images = (product_images["images"] ++ product.images) |> parse_images()
+
+    params = %{"images" => images}
+
+    case ProductModel.add_images(product, params) do
+      {:ok, _} ->
+        redirect(conn, to: product_path(conn, :index))
+
+      {:error, _} ->
+        redirect(conn, to: product_path(conn, :index))
+    end
+  end
+
+  def delete_image(conn, %{"image_id" => image_id, "product_id" => product_id}) do
+    image_id = String.to_integer(image_id)
+    product_id = String.to_integer(product_id)
+
+    case ProductModel.delete_image(product_id, image_id) do
+      {:ok, _} ->
+        conn
+        |> put_status(200)
+        |> json(%{data: "success"})
+
+      {:error, reason} ->
+        conn
+        |> put_status(500)
+        |> json(%{data: reason})
+    end
+  end
+
+  defp parse_images(image_list) do
+    Enum.reduce(image_list, [], fn
+      %Plug.Upload{} = image, acc ->
+        [%{"image" => image} | acc]
+
+      image, acc ->
+        %{id: id, name: name} = Map.from_struct(image)
+        [%{"id" => id, "name" => name} | acc]
+    end)
   end
 
   def delete(conn, params) do
@@ -63,6 +113,26 @@ defmodule AdminAppWeb.ProductController do
 
       {:ok, product} = Repo.update(changeset)
       redirect(conn, to: product_path(conn, :index))
+    end
+  end
+
+  def select_category(conn, params) do
+    render(conn, "product_category.html")
+  end
+
+  def add_stock(conn, %{"stock" => params}) do
+    with {:ok, stock} <- check_stock(params["product_id"], params["location_id"]),
+         {:ok, updated_stock} <- StockModel.update(params, stock) do
+      redirect(conn, to: product_path(conn, :index))
+    end
+  end
+
+  defp check_stock(product_id, location_id) do
+    query_fields = %{product_id: product_id, stock_location_id: location_id}
+
+    case StockModel.get(query_fields) do
+      %StockSchema{} = stock_item -> {:ok, stock_item}
+      nil -> StockModel.create(product_id, location_id, 0, false)
     end
   end
 
@@ -149,8 +219,11 @@ defmodule AdminAppWeb.ProductController do
 
     brands = Repo.all(ProductBrand)
 
+    stock_locations = Repo.all(StockLocation)
+
     conn
     |> assign(:prototype, prototype)
+    |> assign(:stock_locations, stock_locations)
     |> assign(:brands, brands)
   end
 end

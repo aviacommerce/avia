@@ -106,7 +106,7 @@ defmodule Snitch.Seed.Stocks do
         |> Enum.zip()
         |> Enum.map(fn {%{id: id}, count, backorder} ->
           %{
-            variant_id: id,
+            product_id: id,
             stock_location_id: Map.fetch!(locations, location),
             count_on_hand: count,
             backorderable: if(backorder == :t, do: true, else: false),
