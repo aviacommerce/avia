@@ -81,7 +81,7 @@ defmodule SnitchApiWeb.OrderController do
           preload: [product: [:theme, [options: :option_type]]]
         )
 
-      order = order |> Repo.preload(line_items: line_item_query)
+      order = order |> Repo.preload([[line_items: line_item_query], :packages, :payments])
 
       conn
       |> put_status(200)
@@ -91,7 +91,7 @@ defmodule SnitchApiWeb.OrderController do
         data: order,
         opts: [
           include:
-            "line_items,line_items.product,line_items.product.options,line_items.product.options.option_type"
+            "line_items,line_items.product,line_items.product.options,line_items.product.options.option_type,payments,packages"
         ]
       )
     else
@@ -106,7 +106,10 @@ defmodule SnitchApiWeb.OrderController do
     user_id = Map.get(conn.assigns[:current_user], :id)
 
     {:ok, order} = OrderModel.user_order(user_id)
-    order = order |> Repo.preload(line_items: [product: [:theme, [options: :option_type]]])
+
+    order =
+      order
+      |> Repo.preload(line_items: [product: [:theme, [options: :option_type]]], packages: :items)
 
     conn
     |> put_status(200)
@@ -116,7 +119,7 @@ defmodule SnitchApiWeb.OrderController do
       data: order,
       opts: [
         include:
-          "line_items,line_items.product,line_items.product.options,line_items.product.options.option_type"
+          "line_items,line_items.product,line_items.product.options,line_items.product.options.option_type,packages,packages.items"
       ]
     )
   end
