@@ -12,6 +12,7 @@ defmodule SnitchApi.Order do
   alias Snitch.Data.Model.{Order, PaymentMethod}
   alias Snitch.Data.Schema.LineItem
   alias Snitch.Domain.Order.DefaultMachine
+  alias Snitch.Domain.Order, as: OrderDomain
 
   @doc """
   Attaching address to order.
@@ -37,7 +38,7 @@ defmodule SnitchApi.Order do
 
   def load_order(order_id) do
     line_item_query = from(LineItem, order_by: [desc: :inserted_at], preload: [product: :theme])
-    order = Repo.preload(OrderModel.get(order_id), line_items: line_item_query)
+    Repo.preload(OrderModel.get(order_id), line_items: line_item_query)
   end
 
   def delete_line_item(line_item_id) do
@@ -56,9 +57,11 @@ defmodule SnitchApi.Order do
     end
   end
 
-  def add_payment(order_id, payment_method_id, amount) do
+  def add_payment(order_id, payment_method_id) do
     with order when not is_nil(order) <- Order.get(order_id),
          payment_method when not is_nil(payment_method) <- PaymentMethod.get(payment_method_id) do
+      amount = OrderDomain.total_amount(order)
+
       context =
         order
         |> Context.new(
@@ -78,6 +81,54 @@ defmodule SnitchApi.Order do
     else
       nil ->
         {:error, :not_found}
+    end
+  end
+
+  def add_shipments(order_id, []) do
+    with order when not is_nil(order) <- Order.get(order_id) do
+      order = Repo.preload(order, packages: :items)
+      shipping_preferences = package_manifest(order.packages)
+
+      context =
+        Context.new(
+          order,
+          state: %{
+            shipping_preferences: shipping_preferences
+          }
+        )
+
+      transition = DefaultMachine.add_shipments(context)
+      transition_response(transition, order.id)
+    else
+      nil ->
+        {:error, :not_found}
+    end
+  end
+
+  def add_shipments(order_id, packages) do
+    with order when not is_nil(order) <-
+           order_id
+           |> Order.get()
+           |> Repo.preload(packages: :items),
+         true <- length(packages) == length(order.packages) do
+      shipping_preferences = parse_package_params(packages)
+
+      context =
+        Context.new(
+          order,
+          state: %{
+            shipping_preferences: shipping_preferences
+          }
+        )
+
+      transition = DefaultMachine.add_shipments(context)
+      transition_response(transition, order.id)
+    else
+      nil ->
+        {:error, :not_found}
+
+      _ ->
+        {:error, "package list does not equal all order packages"}
     end
   end
 
@@ -118,5 +169,21 @@ defmodule SnitchApi.Order do
 
   defp transition_to_address("payment", context) do
     DefaultMachine.payment_to_address(context)
+  end
+
+  defp package_manifest(packages) do
+    Enum.map(packages, fn %{id: id, shipping_methods: methods} ->
+      shipping_mehod = List.first(methods)
+      %{package_id: id, shipping_method_id: shipping_mehod.id}
+    end)
+  end
+
+  defp parse_package_params(packages) do
+    Enum.map(packages, fn package ->
+      %{
+        package_id: String.to_integer(package["package_id"]),
+        shipping_method_id: String.to_integer(package["shipping_method_id"])
+      }
+    end)
   end
 end

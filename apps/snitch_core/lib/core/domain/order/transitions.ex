@@ -161,7 +161,7 @@ defmodule Snitch.Domain.Order.Transitions do
   @doc """
   Persists the shipping preferences of the user in each `package` of the `order`.
 
-  Along with the chosen `ShippingMethod`, we update pacakge price fields. User's
+  Along with the chosen `ShippingMethod`, we update package price fields. User's
   selection is assumed to be under the `context.state.shipping_preferences` key-path.
 
   ## Schema of the `:state`

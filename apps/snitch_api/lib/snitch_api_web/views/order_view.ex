@@ -1,6 +1,7 @@
 defmodule SnitchApiWeb.OrderView do
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
+  alias Snitch.Domain.Order
 
   location("/orders/:id")
 
@@ -29,6 +30,12 @@ defmodule SnitchApiWeb.OrderView do
     include: false
   )
 
+  has_many(
+    :packages,
+    serializer: SnitchApiWeb.PackageView,
+    include: false
+  )
+
   def item_count(order, _) do
     order.line_items
     |> Enum.reduce(0, fn line_item, acc ->
@@ -37,13 +44,7 @@ defmodule SnitchApiWeb.OrderView do
   end
 
   def order_total_amount(order, _) do
-    order.line_items
-    |> Enum.reduce(Money.new(:USD, 0), fn line_item, acc ->
-      {:ok, total} = Money.mult(line_item.unit_price, line_item.quantity)
-      {:ok, acc} = Money.add(acc, total)
-      acc
-    end)
-    |> Money.round(currency_digits: :cash)
+    Order.total_amount(order)
   end
 
   def line_items(struct, _conn) do

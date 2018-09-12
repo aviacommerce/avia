@@ -10,6 +10,7 @@ defmodule Snitch.Domain.Order do
   import Ecto.Changeset
 
   alias Snitch.Data.Schema.Order
+  alias Snitch.Tools.Defaults
 
   @spec validate_change(Ecto.Changeset.t()) :: Ecto.Changeset.t()
   def validate_change(%{valid?: false} = changeset), do: changeset
@@ -27,6 +28,73 @@ defmodule Snitch.Domain.Order do
         _ ->
           changeset
       end
+    end)
+  end
+
+  @doc """
+  Returns the total cost for an `order`.
+
+  The total for an `order` depends on the `state` in which the order is in.
+
+  If the order is in `cart` or the `address` state then total cost is summation
+  of individual costs of the lineitems.
+
+  In case the order is in advanced stages like `delivery` or `payment` then the
+  summation includes shipment cost, shipping taxes and other taxes on individual
+  lineitems as well.
+  """
+  @spec total_amount(Order.t()) :: Money.t()
+  def total_amount(%Order{state: state} = order) when state in ["cart", "address"] do
+    {:ok, currency} = Defaults.fetch(:currency)
+    order = Repo.preload(order, :line_items)
+    line_item_total(order.line_items, currency)
+  end
+
+  def total_amount(%Order{} = order) do
+    order = Repo.preload(order, [:line_items, packages: :items])
+    {:ok, currency} = Defaults.fetch(:currency)
+
+    Money.add!(
+      line_item_total(order.line_items, currency),
+      packages_total_cost(order.packages, currency)
+    )
+  end
+
+  defp line_item_total(line_items, currency) do
+    line_items
+    |> Enum.reduce(Money.new(currency, 0), fn line_item, acc ->
+      {:ok, total} = Money.mult(line_item.unit_price, line_item.quantity)
+      {:ok, acc} = Money.add(acc, total)
+      acc
+    end)
+    |> Money.round(currency_digits: :cash)
+  end
+
+  defp packages_total_cost(packages, currency) do
+    packages
+    |> Enum.reduce(
+      Money.new(currency, 0),
+      fn %{items: items, shipping_tax: shipping_tax, cost: cost}, acc ->
+        acc
+        |> Money.add!(shipping_tax)
+        |> Money.add!(cost)
+        |> Money.add!(package_items_total_cost(items, currency))
+      end
+    )
+    |> Money.round(currency_digits: :cash)
+  end
+
+  # TODO: handle shipping tax for items
+  # At present updating taxes for package items on persisting shipping
+  # preferences(transition funtction) is not handled.
+  defp package_items_total_cost(package_items, currency) do
+    Enum.reduce(package_items, Money.new(currency, 0), fn %{shipping_tax: shipping_tax, tax: tax},
+                                                          acc ->
+      shipping_tax = shipping_tax || Money.new!(currency, 0)
+
+      acc
+      |> Money.add!(shipping_tax)
+      |> Money.add!(tax)
     end)
   end
 end
