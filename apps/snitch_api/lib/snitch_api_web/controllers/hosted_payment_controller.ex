@@ -35,7 +35,7 @@ defmodule SnitchApiWeb.HostedPaymentController do
     url = Application.fetch_env!(:snitch_api, :frontend_checkout_url)
 
     with {:ok, order} <- HostedPayment.payment_order_context(response) do
-      address = url <> "order-success?orderReferance=#{order.id}"
+      address = url <> "order-success?orderReferance=#{order.number}"
 
       redirect(
         conn,

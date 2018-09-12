@@ -17,8 +17,6 @@ defmodule SnitchApiWeb.LineItemController do
     line_item = Map.put(params, "unit_price", selling_price)
 
     with {:ok, line_item} <- OrderContext.add_to_cart(line_item) do
-      line_item = line_item |> Repo.preload(:product)
-
       order = OrderContext.load_order(params["order_id"])
 
       conn
@@ -33,6 +31,51 @@ defmodule SnitchApiWeb.LineItemController do
         ]
       )
     end
+  end
+
+  def guest_line_item(conn, %{"order_id" => order_id} = params) do
+    with {:ok, line_item} <- add_line_item(params) do
+      order = OrderContext.load_order(line_item.order_id)
+
+      conn
+      |> put_status(200)
+      |> put_resp_header("location", line_item_path(conn, :show, line_item.id))
+      |> render(
+        SnitchApiWeb.OrderView,
+        "show.json-api",
+        data: order,
+        opts: [
+          include: "line_items,line_items.product"
+        ]
+      )
+    end
+  end
+
+  def guest_line_item(conn, params) do
+    with {:ok, blank_order} <- OrderModel.create_guest_order(),
+         params <- Map.put(params, "order_id", blank_order.id),
+         {:ok, line_item} <- add_line_item(params) do
+      order = OrderContext.load_order(line_item.order_id)
+
+      conn
+      |> put_status(200)
+      |> put_resp_header("location", line_item_path(conn, :show, line_item.id))
+      |> render(
+        SnitchApiWeb.OrderView,
+        "show.json-api",
+        data: order,
+        opts: [
+          include: "line_items,line_items.product"
+        ]
+      )
+    end
+  end
+
+  def add_line_item(params) do
+    %{selling_price: selling_price} = Repo.get(Product, params["product_id"])
+    line_item = Map.put(params, "unit_price", selling_price)
+
+    OrderContext.add_to_cart(line_item)
   end
 
   def delete(conn, %{"id" => line_item_id}) do
