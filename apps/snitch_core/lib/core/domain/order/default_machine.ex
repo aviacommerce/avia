@@ -80,9 +80,12 @@ defmodule Snitch.Domain.Order.DefaultMachine do
       |> Transitions.persist_shipment()
     end)
 
-    event(:add_payment, %{from: [:address], to: :payment}, fn context ->
-      context
-      |> Transitions.make_payment_record()
+    event(:add_shipments, %{from: [:address], to: :delivery}, fn context ->
+      Transitions.persist_shipping_preferences(context)
+    end)
+
+    event(:add_payment, %{from: [:delivery], to: :payment}, fn context ->
+      Transitions.make_payment_record(context)
     end)
 
     event(:save_shipping_preferences, %{from: [:address], to: :delivery}, fn context ->

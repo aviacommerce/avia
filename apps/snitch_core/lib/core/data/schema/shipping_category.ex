@@ -5,14 +5,14 @@ defmodule Snitch.Data.Schema.ShippingCategory do
 
   use Snitch.Data.Schema
 
-  alias Snitch.Data.Schema.{Variant}
+  alias Snitch.Data.Schema.{Product}
 
   @type t :: %__MODULE__{}
 
   schema "snitch_shipping_categories" do
     field(:name, :string)
 
-    has_many(:variants, Variant)
+    has_many(:products, Product)
 
     timestamps()
   end
