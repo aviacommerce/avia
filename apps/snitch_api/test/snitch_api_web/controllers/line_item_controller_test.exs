@@ -6,6 +6,10 @@ defmodule SnitchApiWeb.LineItemControllerTest do
   import Snitch.Factory
   # alias Snitch.Data.Model.Order, as: OrderModel
 
+  setup_all do
+    Application.put_env(:snitch_core, :defaults, currency: :USD)
+  end
+
   setup %{conn: conn} do
     conn =
       conn

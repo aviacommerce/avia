@@ -2,8 +2,8 @@ defmodule SnitchApiWeb.OrderController do
   use SnitchApiWeb, :controller
 
   alias Snitch.Data.Model.Order, as: OrderModel
-  alias Snitch.Data.Schema.Order
   alias Snitch.Data.Schema.LineItem
+  alias Snitch.Data.Schema.Order
   alias SnitchApi.Order, as: OrderContext
   alias Snitch.Repo
   import Ecto.Query
@@ -58,13 +58,15 @@ defmodule SnitchApiWeb.OrderController do
           do: {String.to_atom(key), val} || shipping_address
 
     with {:ok, order} <- OrderContext.attach_address(order_id, shipping_address, billing_address) do
+      order = Repo.preload(order, packages: [items: :product])
+
       conn
       |> put_status(200)
       |> render(
         "show.json-api",
         data: order,
         opts: [
-          include: "line_items"
+          include: "line_items,packages,packages.items,packages.shipping_methods"
         ]
       )
     end
@@ -121,12 +123,9 @@ defmodule SnitchApiWeb.OrderController do
 
   def add_payment(conn, %{
         "payment_method_id" => payment_method_id,
-        "id" => order_id,
-        "amount" => amount
+        "id" => order_id
       }) do
-    amount = Money.new(:USD, amount)
-
-    with {:ok, order} <- OrderContext.add_payment(order_id, payment_method_id, amount) do
+    with {:ok, order} <- OrderContext.add_payment(order_id, payment_method_id) do
       order = Repo.preload(order, :payments)
 
       render(
@@ -134,6 +133,19 @@ defmodule SnitchApiWeb.OrderController do
         "show.json-api",
         data: order,
         opts: [include: "payments,line_items"]
+      )
+    end
+  end
+
+  def add_shipments(conn, %{"id" => id, "packages" => packages}) do
+    with {:ok, order} <- OrderContext.add_shipments(id, packages) do
+      order = Repo.preload(order, packages: :items)
+
+      render(
+        conn,
+        "show.json-api",
+        data: order,
+        opts: [include: "packages,line_items"]
       )
     end
   end

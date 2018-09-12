@@ -1,11 +1,14 @@
 defmodule SnitchApiWeb.OrderControllerTest do
   use SnitchApiWeb.ConnCase, async: true
   import Snitch.Factory
-
   alias Snitch.Data.Model.Order, as: OrderModel
   alias Snitch.Repo
   alias SnitchApi.Accounts
   alias SnitchApi.{Accounts, Guardian}
+
+  setup_all do
+    Application.put_env(:snitch_core, :defaults, currency: :USD)
+  end
 
   setup %{conn: conn} do
     insert(:role, name: "user")

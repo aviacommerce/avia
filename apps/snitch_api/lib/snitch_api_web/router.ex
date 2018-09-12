@@ -46,6 +46,7 @@ defmodule SnitchApiWeb.Router do
     delete("/line_items", LineItemController, :delete)
     post("/orders/:id/select_address", OrderController, :select_address)
     post("/orders/:id/add-payment", OrderController, :add_payment)
+    patch("/orders/:id/add-shipment", OrderController, :add_shipments)
     post("/orders/current", OrderController, :current)
     resources("/ratings", RatingController, only: [:index, :show])
     resources("/reviews", ReviewController, only: [:create, :update, :delete])
