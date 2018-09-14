@@ -24,8 +24,14 @@ matrix:
 
 addons:
   postgresql: "9.5"
-  
+
+env:
+  global:
+    - FRONTEND_CHECKOUT_URL=http://localhost:4200/checkout/
+    - HOSTED_PAYMENT_URL=http://localhost:3000/api/v1/hosted-payment/
+
 notifications:
   email:
     recipients:
       - ananya95+travis@gmail.com
+

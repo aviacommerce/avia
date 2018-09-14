@@ -39,6 +39,7 @@ config :snitch_api, SnitchApi.Guardian,
   secret_key: "V4h+IQskKPefHzO58nDlKRz/ZAWZ1KpM2PBt0Tp3ozexHDE8JQ4dkwblH7PZvZOm"
 
 config :snitch_api, frontend_checkout_url: System.get_env("FRONTEND_CHECKOUT_URL")
+config :snitch_api, hosted_payment_url: System.get_env("HOSTED_PAYMENT_URL")
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

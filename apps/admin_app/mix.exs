@@ -51,7 +51,7 @@ defmodule AdminApp.Mixfile do
       {:swoosh, "~> 0.15"},
       {:phoenix_swoosh, "~> 0.2"},
       {:gen_smtp, "~> 0.12"},
-      {:snitch_payments, github: "aviabird/snitch_payments", branch: "develop"}
+      {:snitch_payments, github: "aviacommerce/avia_payments", branch: "develop"}
     ]
   end
 end
