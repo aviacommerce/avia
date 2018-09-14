@@ -39,7 +39,7 @@ body {
     }
 
     &:focus {
-      box-shadow: none!important;
+      box-shadow: none !important;
     }
   }
 
@@ -193,8 +193,16 @@ body {
     .shopdpdown {
       left: 10px !important;
       top: 20px !important;
-      border: 1px solid $gray-300;
+      border: 1px solid $bordercolor1;
+      border-top: 0 solid $bordercolor1;
       border-radius: 0;
+      padding: 0px;
+
+      a {
+
+        border-top: 1px solid $bordercolor1;
+        border-right: 0 solid $bordercolor1;
+      }
     }
 
     .dropdown-toggle {
