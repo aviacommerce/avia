@@ -9,6 +9,7 @@ defmodule Snitch.Domain.Taxonomy do
   import AsNestedSet.Queriable, only: [dump_one: 2]
   import Ecto.Query
 
+  alias Ecto.Multi
   alias Snitch.Data.Schema.{Taxon, Taxonomy}
   alias Snitch.Tools.Helper.Taxonomy, as: Helper
 
@@ -97,6 +98,19 @@ defmodule Snitch.Domain.Taxonomy do
     Repo.get_by(Taxonomy, name: name)
   end
 
+  @doc """
+  Get taxonomy by id
+  """
+  def get_taxonomy_by_id(id) do
+    Repo.get_by(Taxonomy, id: id)
+  end
+
+  def delete_taxonomy(id) do
+    id
+    |> get_taxonomy_by_id
+    |> Repo.delete()
+  end
+
   @spec get_all_taxonomy :: [map()]
   def get_all_taxonomy do
     Taxonomy
@@ -129,13 +143,22 @@ defmodule Snitch.Domain.Taxonomy do
   Create a taxonomy with given name.
   """
   def create_taxonomy(name) do
-    %Taxonomy{name: name} |> Repo.insert()
+    multi =
+      Multi.new()
+      |> Multi.run(:taxonomy, fn _ ->
+        %Taxonomy{name: name} |> Repo.insert()
+      end)
+      |> Multi.run(:root_taxon, fn %{taxonomy: taxonomy} ->
+        taxon = %Taxon{name: name, taxonomy_id: taxonomy.id} |> add_root
+        {:ok, taxon}
+      end)
+      |> Repo.transaction()
   end
 
   @doc """
   Delete a taxon
   """
   def delete_taxon(taxon) do
-    taxon |> Repo.delete()
+    taxon |> AsNestedSet.delete() |> AsNestedSet.execute(Repo)
   end
 end

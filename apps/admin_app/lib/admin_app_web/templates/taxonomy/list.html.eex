@@ -12,9 +12,11 @@
           <div class="edit-taxon btn-primary col">Edit</div>
         </td>
         <td>
-          <%= link "Delete", to: taxonomy_path(@conn, :delete, get_taxon_id(@taxonomy)), class: "btn-sm btn-danger col", method: :delete %>
+          <%= if not check_root(@taxonomy) do %>
+            <%= link "Delete", to: taxonomy_path(@conn, :delete, get_taxon_id(@taxonomy)), class: "btn-sm btn-danger col", method: :delete %>
+          <% end %>
         </td>
-      </tr> 
+      </tr>
     </table>
   </div>
   <%= if has_children(@taxonomy) do %>
