@@ -53,7 +53,7 @@ defmodule SnitchApi.Mixfile do
 
       # http client
       {:httpoison, "~> 0.13"},
-      {:snitch_payments, github: "aviabird/snitch_payments", branch: "develop"},
+      {:snitch_payments, github: "aviacommerce/avia_payments", branch: "develop"},
 
       # html parser
       {:floki, "~> 0.20.0"}

@@ -8,7 +8,7 @@ defmodule SnitchApiWeb.HostedPaymentController do
   plug(SnitchApiWeb.Plug.DataToAttributes)
   action_fallback(SnitchApiWeb.FallbackController)
 
-  @base_url "http://localhost:3000/api/v1/hosted-payment/"
+  @base_url Application.fetch_env!(:snitch_api, :hosted_payment_url)
 
   def payubiz_request_url(conn, params) do
     {params, url} = payubiz_params_setup(params)
