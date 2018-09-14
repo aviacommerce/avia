@@ -23,4 +23,4 @@ erl_crash.dump
 .iex.exs
 .elixir_ls
 
-/.env
+/env/local.env
