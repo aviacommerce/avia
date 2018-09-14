@@ -14,7 +14,6 @@
         color: $gray-600;
         border-radius: 0;
         font-size: 14px;
-        ;
         color: #222;
 
         i {
@@ -48,11 +47,15 @@
   width: 256px !important;
 
   .dropdown-menu {
-    top: -10px!important;
-    left: 10px!important;
+    top: -10px !important;
+    left: 10px !important;
     will-change: transform;
     border-radius: 0;
     border-top: 0px;
+
+    a {
+      border-right: 0px solid $bordercolor1;
+    }
   }
 
   a {
