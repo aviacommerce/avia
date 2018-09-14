@@ -79,6 +79,10 @@ defmodule Snitch.Core.Mixfile do
       # image uploading
       {:arc, "~> 0.10.0"},
       {:arc_ecto, "~> 0.10.0"},
+      {:ex_aws, "~> 2.0"},
+      {:ex_aws_s3, "~> 2.0"},
+      {:hackney, "~> 1.9"},
+      {:sweet_xml, "~> 0.6"},
       {:cowboy, "~> 1.0"},
       {:plug, "~> 1.0"},
 

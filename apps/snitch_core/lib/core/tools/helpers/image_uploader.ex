@@ -9,7 +9,7 @@ defmodule Snitch.Tools.Helper.ImageUploader do
   @versions [:original, :thumb]
 
   # function override to store images locally.
-  def __storage, do: Arc.Storage.Local
+  def __storage, do: Arc.Storage.S3
 
   @doc """
   Validates image file type.
