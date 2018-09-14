@@ -4,9 +4,11 @@ defmodule Snitch.Domain.Payment do
   """
   alias Snitch.Data.Model.HostedPayment
   alias SnitchPayments.PaymentMethodCode
-  alias Snitch.Data.Schema.{Order, PaymentMethod}
+  alias Snitch.Data.Schema.{Order, PaymentMethod, Payment}
+  alias Snitch.Repo
 
   @hosted_payment PaymentMethodCode.hosted_payment()
+  @cod_payment PaymentMethodCode.cash_on_delivery()
 
   @doc """
    Creates payment record in the `pending` state.
@@ -64,6 +66,27 @@ defmodule Snitch.Domain.Payment do
       hosted_params,
       payment_method_id
     )
+  end
+
+  defp create_payment_with_subtype(
+         @cod_payment,
+         _,
+         payment_params,
+         slug,
+         order_id,
+         payment_method_id
+       ) do
+    payment = struct(Payment, payment_params)
+
+    more_payment_params = %{
+      order_id: order_id,
+      payment_type: PaymentMethodCode.cash_on_delivery(),
+      payment_method_id: payment_method_id,
+      slug: slug
+    }
+
+    changeset = Payment.create_changeset(payment, more_payment_params)
+    Repo.insert(changeset)
   end
 
   # generates a unique slug using nano id
