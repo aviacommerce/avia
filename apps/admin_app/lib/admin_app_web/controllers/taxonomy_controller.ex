@@ -60,7 +60,6 @@ defmodule AdminAppWeb.TaxonomyController do
     parent_taxon = Taxonomy.get_taxon(id)
     taxon_params = %Taxon{name: taxon["name"]}
     new_taxon = Taxonomy.add_taxon(parent_taxon, taxon_params, :child)
-
     changeset = Taxon.update_changeset(new_taxon, %{"variation_theme_ids" => taxon["themes"]})
     Repo.update(changeset)
 
@@ -68,12 +67,26 @@ defmodule AdminAppWeb.TaxonomyController do
       render_to_string(
         TaxonomyView,
         "taxon.html",
-        name: taxon
+        name: taxon["name"]
       )
 
     conn
     |> put_status(200)
     |> json(%{html: html})
+  end
+
+  def delete_taxonomy(conn, %{"id" => id}) do
+    case Taxonomy.delete_taxonomy(id) do
+      {:ok, taxonomy} ->
+        conn
+        |> put_flash(:info, "Taxonomy deleted successfully")
+        |> redirect(to: taxonomy_path(conn, :index))
+
+      {:error, changeset} ->
+        conn
+        |> put_flash(:error, "Taxonomy not deleted. Please try again")
+        |> redirect(to: taxonomy_path(conn, :index))
+    end
   end
 
   def delete(conn, %{"id" => id}) do
@@ -88,30 +101,19 @@ defmodule AdminAppWeb.TaxonomyController do
         |> render("taxonomy.html", taxonomy: taxonomy, token: token)
 
       taxon ->
-        root_taxon =
-          taxon
-          |> check_if_root(conn)
-
-        case root_taxon do
-          true ->
-            conn
-            |> put_flash(:error, "Root taxon can't be deleted.")
-            |> render("taxonomy.html", taxonomy: taxonomy, token: token)
-
-          false ->
-            Taxonomy.delete_taxon(taxon)
+        case Taxonomy.delete_taxon(taxon) do
+          {_, nil} ->
             taxonomy = Taxonomy.dump_taxonomy(taxon.taxonomy_id)
 
             conn
             |> put_flash(:info, "Taxon deleted successfully")
             |> render("taxonomy.html", taxonomy: taxonomy, token: token)
+
+          _ ->
+            conn
+            |> put_flash(:error, "Please try again.")
+            |> render("taxonomy.html", taxonomy: taxonomy, token: token)
         end
     end
-  end
-
-  defp check_if_root(taxon, conn) do
-    query = from(t in TaxonomySchema, select: t.root_id)
-    root_ids = Snitch.Repo.all(query)
-    Enum.member?(root_ids, taxon.id)
   end
 end

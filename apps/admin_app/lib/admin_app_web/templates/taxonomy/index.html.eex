@@ -16,6 +16,7 @@
           <%= taxonomy.name %>
           <span class="pull-right">
             <%= link "Edit", to: taxonomy_path(@conn, :edit, taxonomy.id), class: "btn btn-info" %>
+            <%= link "Delete", to: taxonomy_path(@conn, :delete_taxonomy, %{id: taxonomy.id}), class: "btn btn-danger", method: :delete %>
           </span>
         </div>
         <% end %>
