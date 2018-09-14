@@ -76,7 +76,7 @@
   "ranch": {:hex, :ranch, "1.3.2", "e4965a144dc9fbe70e5c077c65e73c57165416a901bd02ea899cfd95aa890986", [:rebar3], [], "hexpm"},
   "recase": {:hex, :recase, "0.3.0", "a3a6b2bfc9a1c3047b6f37d49ea52027ea59fd256505254b8e9d63c68d09ab89", [:mix], [], "hexpm"},
   "slugger": {:hex, :slugger, "0.3.0", "efc667ab99eee19a48913ccf3d038b1fb9f165fa4fbf093be898b8099e61b6ed", [:mix], [], "hexpm"},
-  "snitch_payments": {:git, "https://github.com/aviabird/snitch_payments.git", "f7f48c9594fdfa6cdc6f0b0a024191aba7d7ab09", [branch: "develop"]},
+  "snitch_payments": {:git, "https://github.com/aviabird/snitch_payments.git", "c91ceccbf01ebb38c796168d624c079dd7d16861", [branch: "develop"]},
   "ssl_verify_fun": {:hex, :ssl_verify_fun, "1.1.1", "28a4d65b7f59893bc2c7de786dec1e1555bd742d336043fe644ae956c3497fbe", [:make, :rebar], [], "hexpm"},
   "swoosh": {:hex, :swoosh, "0.15.0", "b5baf4cc8118e226ae7481c8ef31a71c46337dfbc5cc8b6050a2ee9bf2f44667", [:mix], [{:cowboy, "~> 1.0", [hex: :cowboy, repo: "hexpm", optional: true]}, {:gen_smtp, "~> 0.12", [hex: :gen_smtp, repo: "hexpm", optional: true]}, {:hackney, "~> 1.9", [hex: :hackney, repo: "hexpm", optional: false]}, {:jason, "~> 1.0", [hex: :jason, repo: "hexpm", optional: false]}, {:mime, "~> 1.1", [hex: :mime, repo: "hexpm", optional: false]}, {:plug, "~> 1.4", [hex: :plug, repo: "hexpm", optional: true]}], "hexpm"},
   "unicode_util_compat": {:hex, :unicode_util_compat, "0.3.1", "a1f612a7b512638634a603c8f401892afbf99b8ce93a45041f8aaca99cadb85e", [:rebar3], [], "hexpm"},

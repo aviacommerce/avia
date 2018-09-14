@@ -152,7 +152,8 @@ defmodule SnitchApi.Order do
   end
 
   defp transition_response(%Context{errors: errors}, _) do
-    errors
+    {:error, message} = errors
+    {:error, %{message: message}}
   end
 
   defp transition_to_address("cart", context) do
