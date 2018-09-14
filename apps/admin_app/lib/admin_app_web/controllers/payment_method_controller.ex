@@ -87,7 +87,7 @@ defmodule AdminAppWeb.PaymentMethodController do
     provider = String.to_atom(provider)
 
     credentials =
-      provider.credentials()
+      provider.preferences()
       |> Enum.into(%{}, fn credential -> {credential, ""} end)
 
     html =

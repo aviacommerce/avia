@@ -9,16 +9,15 @@ defmodule SnitchApi.Payment.HostedPayment do
   alias Snitch.Data.Model.Payment
   alias Snitch.Data.Model.PaymentMethod
   alias Snitch.Domain.Order.DefaultMachine
-  alias Snitch.Repo
 
   def payment_order_context(%{status: "success"} = params) do
-    payment_params = %{status: "paid"}
+    payment_params = %{state: "paid"}
 
     case update_hosted_payment(params, payment_params) do
       {:ok, order, _} ->
         context = Context.new(order, state: %{})
         transition = DefaultMachine.confirm_purchase_payment(context)
-        transition_response(transition, order)
+        transition_response(transition)
 
       {:error, _} = error ->
         error
@@ -26,7 +25,7 @@ defmodule SnitchApi.Payment.HostedPayment do
   end
 
   def payment_order_context(%{status: "failure"} = params) do
-    payment_params = %{status: "failed"}
+    payment_params = %{state: "failed"}
     update_hosted_payment(params, payment_params)
   end
 
@@ -64,11 +63,12 @@ defmodule SnitchApi.Payment.HostedPayment do
     end
   end
 
-  defp transition_response(%Context{errors: nil}, order) do
+  defp transition_response(%Context{errors: nil, struct: order}) do
     {:ok, order}
   end
 
   defp transition_response(%Context{errors: errors}, _) do
-    errors
+    {:error, message} = errors
+    {:error, %{message: message}}
   end
 end
