@@ -35,7 +35,7 @@ defmodule Snitch.Data.Model.Product do
   @spec get_product_list() :: [Product.t()]
   def get_product_list() do
     child_product_ids = from(c in Variation, select: c.child_product_id) |> Repo.all()
-    query = from(p in Product, where: p.id not in ^child_product_ids)
+    query = from(p in Product, where: p.is_active == true and p.id not in ^child_product_ids)
     Repo.all(query)
   end
 
@@ -63,6 +63,19 @@ defmodule Snitch.Data.Model.Product do
   @spec get(integer) :: Product.t() | nil
   def get(id) do
     QH.get(Product, id, Repo)
+  end
+
+  @doc """
+  Discontinues a product
+
+  Takes Product id as input
+  """
+  @spec get(integer) :: {:ok, Product.t()} | {:error, Ecto.Changeset.t()} | nil
+  def delete(id) do
+    with %Product{} = product <- get(id),
+         changeset <- Product.delete_changeset(product) do
+      Repo.update(changeset)
+    end
   end
 
   @doc """

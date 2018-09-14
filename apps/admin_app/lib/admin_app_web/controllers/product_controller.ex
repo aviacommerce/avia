@@ -98,7 +98,12 @@ defmodule AdminAppWeb.ProductController do
     end)
   end
 
-  def delete(conn, params) do
+  def delete(conn, %{"id" => id}) do
+    with {:ok, product} <- ProductModel.delete(id) do
+      conn
+      |> put_flash(:info, "Product deleted successfully")
+      |> redirect(to: product_path(conn, :index))
+    end
   end
 
   def new_variant(conn, params) do

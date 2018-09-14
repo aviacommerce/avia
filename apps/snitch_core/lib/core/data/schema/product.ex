@@ -5,6 +5,7 @@ defmodule Snitch.Data.Schema.Product do
 
   use Snitch.Data.Schema
   alias Snitch.Data.Schema.Product.NameSlug
+  alias Snitch.Repo
 
   alias Snitch.Data.Schema.{
     Variation,
@@ -41,10 +42,18 @@ defmodule Snitch.Data.Schema.Product do
     field(:sku, :string)
     field(:position, :integer)
     field(:weight, :decimal, default: Decimal.new(0))
+    field(:is_active, :boolean, default: true)
     timestamps()
 
     has_many(:variations, Variation, foreign_key: :parent_product_id, on_replace: :delete)
     has_many(:variants, through: [:variations, :child_product])
+
+    many_to_many(
+      :products,
+      Snitch.Data.Schema.Product,
+      join_through: "snitch_product_variants",
+      join_keys: [parent_product_id: :id, child_product_id: :id]
+    )
 
     has_many(:options, ProductOptionValue)
     has_many(:stock_items, StockItem)
@@ -73,11 +82,25 @@ defmodule Snitch.Data.Schema.Product do
 
   def variant_create_changeset(parent_product, params) do
     parent_product
-    |> Snitch.Repo.preload([:variants, :options])
+    |> Repo.preload([:variants, :options])
     |> cast(params, [:theme_id])
     |> validate_required([:theme_id])
     |> cast_assoc(:variations, required: true)
     |> theme_change_check()
+  end
+
+  def delete_changeset(product, _params \\ %{}) do
+    product = Repo.preload(product, [:products])
+
+    variant_params =
+      product.products
+      |> Enum.map(&%{"is_active" => false, "id" => &1.id})
+
+    params = %{"id" => product.id, "is_active" => false, "products" => variant_params}
+
+    product
+    |> cast(params, [:is_active])
+    |> cast_assoc(:products, with: &cast(&1, &2, [:is_active]))
   end
 
   def child_product(model, params \\ %{}) do
