@@ -79,6 +79,15 @@
     padding: 1em 0.938em;
 
     .table-contaner {
+      .col-1{
+        padding: 0 0;
+        &:first-child{
+          padding-left: 15px;
+          padding-right: 0;
+         
+        }
+        .col{padding: 0;}
+      }
       @extend .border-custom;
 
       .head {
