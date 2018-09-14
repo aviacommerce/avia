@@ -34,7 +34,7 @@ defmodule SnitchApiWeb.ProductView do
     product = product |> Snitch.Repo.preload(:images)
 
     product.images
-    |> Enum.map(fn image -> Product.image_url(image.name, product) end)
+    |> Enum.map(fn image -> %{"product_url" => Product.image_url(image.name, product)} end)
   end
 
   def rating_summary(product, _conn) do

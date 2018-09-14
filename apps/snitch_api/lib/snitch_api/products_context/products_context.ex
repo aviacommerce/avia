@@ -12,6 +12,7 @@ defmodule SnitchApi.ProductsContext do
   """
   def list_products(conn, params) do
     query = define_query(params)
+    query = from(p in query, where: p.is_active == true)
     page = create_page(query, %{}, conn)
     products = paginate_collection(query, params)
     {products, page}
@@ -34,9 +35,18 @@ defmodule SnitchApi.ProductsContext do
   end
 
   def product_by_brand(brand_id) do
-    query = from(p in Product, where: p.brand_id == ^brand_id)
+    query = from(p in Product, where: p.brand_id == ^brand_id and p.is_active == true)
 
-    product = Repo.all(query)
+    review_query = from(c in Review, limit: 5, preload: [rating_option_vote: :rating_option])
+
+    product =
+      Repo.all(query)
+      |> Repo.preload(
+        reviews: review_query,
+        variants: [:images, options: :option_type, theme: [:option_types]],
+        theme: [:option_types],
+        options: :option_type
+      )
   end
 
   @doc """
