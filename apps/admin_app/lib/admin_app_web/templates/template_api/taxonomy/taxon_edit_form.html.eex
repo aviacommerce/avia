@@ -9,8 +9,8 @@
       <label class="control-label">Variation Theme</label>
       <%= multiple_select :taxons, :taxons, get_themes(), selected: get_selected_values(@taxon), "data-init-plugin": "select2", name: "taxon[themes][]" %>
     </div>
-    <div class="col-sm-9 form-group"> 
-      <label class="control-label">Image</label>          
+    <div class="col-sm-9 form-group">
+      <label class="control-label">Image</label>
       <%= file_input f, :image, class: "form-control" %>
     </div>
     <%= if @taxon.image do %>

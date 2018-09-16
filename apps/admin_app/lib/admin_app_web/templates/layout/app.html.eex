@@ -10,16 +10,16 @@
     <title>Snitch | Admin</title>
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
 
-    <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.7/lib/draggable.bundle.js"></script>
    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
   </head>
   <body data-js-view-name="<%= js_view_name(@conn, @view_template) %>">
-    <%# <%= render "header.html", conn: @conn%> 
+    <%# <%= render "header.html", conn: @conn%>
     <%= render "flash.html", conn: @conn%>
     <%= render "main.html", assigns%>
     <%=# render "footer.html" %>
       <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
       <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
       <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-color/2.1.2/jquery.color.js"></script>
   </body>
 </html>

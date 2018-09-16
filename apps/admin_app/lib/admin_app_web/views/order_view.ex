@@ -95,26 +95,23 @@ defmodule AdminAppWeb.OrderView do
   end
 
   def render_address(address) do
-    content_tag(
-      :div,
-      [
-        content_tag(:div, ["#{address.first_name} #{address.last_name}"], class: "name"),
-        content_tag(
-          :div,
-          [
-            address.address_line_1,
-            address.address_line_2,
-            address.city,
-            address.phone,
-            address.zip_code
-          ]
-          |> Enum.reject(&(&1 == nil))
-          |> Enum.intersperse([",", tag(:br)])
-          |> List.flatten(),
-          class: "addres-detail"
-        )
-      ]
-    )
+    content_tag(:div, [
+      content_tag(:div, ["#{address.first_name} #{address.last_name}"], class: "name"),
+      content_tag(
+        :div,
+        [
+          address.address_line_1,
+          address.address_line_2,
+          address.city,
+          address.phone,
+          address.zip_code
+        ]
+        |> Enum.reject(&(&1 == nil))
+        |> Enum.intersperse([",", tag(:br)])
+        |> List.flatten(),
+        class: "addres-detail"
+      )
+    ])
   end
 
   defp is_editable?(_), do: true

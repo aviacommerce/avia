@@ -33,4 +33,24 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
     |> put_status(200)
     |> json(%{html: html})
   end
+
+  def update_taxon(conn, %{"taxon" => %{"taxon" => taxon_name, "taxon_id" => taxon_id} = params}) do
+    taxon = taxon_id |> Taxonomy.get_taxon()
+
+    params = %{
+      name: taxon_name,
+      variation_theme_ids: params["themes"],
+      image: params["image"]
+    }
+
+    case Taxonomy.update_taxon(taxon, params) do
+      {:ok, taxon} ->
+        render(conn, "taxon.json", %{taxon: taxon})
+
+      {:error, changeset} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(%{})
+    end
+  end
 end
