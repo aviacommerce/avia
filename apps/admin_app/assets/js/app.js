@@ -45,25 +45,6 @@ window.addEventListener('unload', handleDocumentUnload, false);
 
 $(document).ready(() => {
   select2Selector();
-
-  const sortable = new Draggable.Sortable(document.querySelectorAll(".mycontainer"), {
-    draggable: ".draggable",
-    mirror: {
-      constrainDimensions: true
-    }
-  })
-
-  let dropcontainer;
-
-  sortable.on(`drag:over:container`, (evt) => {
-    dropcontainer = evt.overContainer
-  })
-
-  sortable.on(`drag:stop`, (evt) => {
-    $(dropcontainer)
-    .css("background", "yellow")
-  })
-
 })
 
 const elmDiv = document.getElementById("elm-main");

@@ -217,8 +217,8 @@ defmodule Snitch.Domain.Taxonomy do
 
   defp persist(multi) do
     case Repo.transaction(multi) do
-      {:ok, _} ->
-        {:ok, "success"}
+      {:ok, multi_result} ->
+        {:ok, multi_result.taxon}
 
       {:error, _, failed_value, _} ->
         {:error, failed_value}
@@ -233,7 +233,7 @@ defmodule Snitch.Domain.Taxonomy do
     Multi.run(multi, :image_upload, fn %{taxon: taxon} ->
       case ImageUploader.store({image, taxon}) do
         {:ok, _} ->
-          {:ok, "upload success"}
+          {:ok, taxon}
 
         _ ->
           {:error, "upload error"}

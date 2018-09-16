@@ -17,4 +17,8 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyView do
   def get_image_url(image, taxon) do
     Taxonomy.image_url(image.name, taxon)
   end
+
+  def render("taxon.json", %{taxon: taxon}) do
+    Map.take(taxon, [:id, :name, :parent_id])
+  end
 end

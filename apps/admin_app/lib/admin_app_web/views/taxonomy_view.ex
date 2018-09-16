@@ -12,10 +12,8 @@ defmodule AdminAppWeb.TaxonomyView do
     taxon.id
   end
 
-  def check_root({taxon, list}) do
-    query = from(t in Taxonomy, select: t.root_id)
-    root_ids = Snitch.Repo.all(query)
-    Enum.member?(root_ids, taxon.id)
+  def is_root({taxon, list}) do
+    taxon.parent_id == nil
   end
 
   def has_children({taxon, list}) do

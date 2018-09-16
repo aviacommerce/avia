@@ -78,7 +78,6 @@ defmodule AdminAppWeb.Router do
     pipe_through(:avoid_csrf)
     post("/products/variants/new", ProductController, :new_variant)
     post("/product/stock", ProductController, :add_stock)
-    put("/taxonomy/update", TaxonomyController, :update_taxon)
   end
 
   scope "/", AdminAppWeb do
@@ -106,6 +105,7 @@ defmodule AdminAppWeb.Router do
     resources("/option_types", OptionTypeController)
     get("/categories/:taxon_id", TaxonomyController, :index)
     get("/taxon/:taxon_id", TaxonomyController, :taxon_edit)
+    put("/taxonomy/update", TaxonomyController, :update_taxon)
     post("/product_option_values/:id", OptionTypeController, :update)
   end
 end
