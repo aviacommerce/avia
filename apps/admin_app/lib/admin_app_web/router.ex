@@ -96,5 +96,6 @@ defmodule AdminAppWeb.Router do
     resources("/option_types", OptionTypeController)
     get("/categories/:taxon_id", TaxonomyController, :index)
     get("/taxon/:taxon_id", TaxonomyController, :taxon_edit)
+    post("/product_option_values/:id", OptionTypeController, :update)
   end
 end
