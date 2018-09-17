@@ -21,4 +21,7 @@
       </tbody>
     </table>
   </div>
+  <div class="card-body">
+    <%= render_invoice_links(@order) %>
+  </div>
 </div>
