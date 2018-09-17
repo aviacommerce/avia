@@ -19,7 +19,7 @@ defmodule SnitchApiWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: SnitchApiWeb
+      use Phoenix.Controller, log: false, namespace: SnitchApiWeb
       import Plug.Conn
       import SnitchApiWeb.Router.Helpers
       import SnitchApiWeb.Gettext
@@ -51,7 +51,7 @@ defmodule SnitchApiWeb do
 
   def channel do
     quote do
-      use Phoenix.Channel
+      use Phoenix.Channel, log_join: false, log_handle_in: false
       import SnitchApiWeb.Gettext
     end
   end

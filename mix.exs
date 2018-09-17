@@ -23,7 +23,8 @@ defmodule Snitch.Mixfile do
       {:jason, "~> 1.0"},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
-      {:inch_ex, "~> 0.5.6", only: [:docs, :dev]}
+      {:inch_ex, "~> 0.5.6", only: [:docs, :dev]},
+      {:distillery, "~> 2.0", runtime: false}
     ]
   end
 
