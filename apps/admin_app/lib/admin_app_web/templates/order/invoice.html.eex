@@ -1,0 +1,128 @@
+<div class="container">
+  <table style="width: 100%;">
+    <tr>
+      <td style="width: 50%;">
+        <h1>INVOICE</h1>
+      </td>
+      <td style="width: 50%;">
+        <span style="font-weight: bolder;">CONTACT US :</span>
+        <a href="mailto:snitch@aviacommerce.com">snitch@aviacommerce.com</a>
+      </td>
+    </tr>
+  </table>
+  <hr>
+  <br>
+  <table style="width: 100%;">
+    <tr>
+      <td style="width: 50%;">
+        <div><span style="font-weight: bolder;">CLIENT :</span> 
+          <%= if (Map.get(@order, :user) != nil) do %>
+            <%= @order.user.first_name %> <%= @order.user.last_name %>
+          <% else %>
+            <div>Not Found</div>
+          <% end %>
+        </div>
+        <div><span style="font-weight: bolder;">ORDER NO. :</span> <%= @order.number %></div>
+        <div><span style="font-weight: bolder;">EMAIL :</span> <a href="mailto:#{@order.user.email}"><%= @order.user.email%></a></div>
+        <div><span style="font-weight: bolder;">DATE :</span> <%= "#{@order.inserted_at.year}-#{@order.inserted_at.month}-#{@order.inserted_at.day}" %></div>
+      </td>
+      <td style="width: 50%;">
+        <span style="font-weight: bolder;">BILLING ADDRESS :</span>
+          <%= if (Map.get(@order, :billing_address) != nil) do %>
+            <div><%= @order.billing_address.first_name %> <%= @order.billing_address.last_name %> </div>
+            <div><%= @order.billing_address.address_line_1 %> </div>
+            <div><%= @order.billing_address.address_line_2 %> </div>
+            <div><%= @order.billing_address.state_id |> get_state_name() %> </div>
+            <div><%= @order.billing_address.city %> </div>
+            <div><%= @order.billing_address.zip_code %> </div>
+            <div><%= @order.billing_address.country_id |> get_iso() %> </div>
+          <% else %>
+            <div>Not Found</div>
+          <% end %>
+      </td>
+    </tr>
+    <tr>
+      <td style="width: 50%;">
+      </td>
+      <td style="width: 50%;">
+        <span style="font-weight: bolder;">SHIPPING ADDRESS :</span>
+          <%= if (Map.get(@order, :shipping_address) != nil) do %>
+            <div><%= @order.shipping_address.first_name %> <%= @order.shipping_address.last_name %> </div>
+            <div><%= @order.shipping_address.address_line_1 %> </div>
+            <div><%= @order.shipping_address.address_line_2 %> </div>
+            <div><%= @order.shipping_address.state_id |> get_state_name() %> </div>
+            <div><%= @order.shipping_address.city %> </div>
+            <div><%= @order.shipping_address.zip_code %> </div>
+            <div><%= @order.shipping_address.country_id |> get_iso() %> </div>
+          <% else %>
+            <div>Not Found</div>
+          <% end %>
+      </td>
+    </tr>
+  </table>
+  <hr>
+  <br>
+  <table class="table" style="width: 100%;">
+        <thead class="thead-light" style="width: 100%;">
+          <tr>
+            <th scope="col" colspan="2"> Item Description </th>
+            <th scope="col"> Quantity</th>
+            <th scope="col"> Price </th>
+          </tr>
+        </thead>
+        <tbody style="width: 100%;">
+          <%= for line_item <- @order.line_items do %>
+            <%= render_invoice_line_item(line_item, @order) %>
+          <% end %>
+        </tbody>
+  </table>
+  <hr>
+  <br>
+  <table style="width: 100%;">
+    <tr>
+      <td style="width: 100%;">
+        <h3 style="font-weight: bolder;">Order Summary</h3>
+      <td>
+    </tr>
+    <tr>
+      <td style="width: 100%;">
+        <table class="table" style="width: 100%;">
+            <tbody>
+              <%= summary(@order) %>
+            </tbody>
+        </table>
+      </td>
+    </tr>
+  </table>
+  <table style="width: 100%;">
+    <tr>
+      <td style="width: 100%;">
+        <div style="border: 2px solid black;">
+          <table style="width: 100%;">
+            <tr>
+              <td style="width: 60%;">
+              </td>
+              <td style="width: 40%; font-weight: bolder; font-size: 15px;">
+                For Seller ...........
+                <br>
+            <br>
+            <br>
+            <br>
+              </td>
+            </tr>
+            <tr>
+              <td style="width: 60%;">
+              </td>
+              <td style="width: 40%; font-weight: bolder; font-size: 15px;">
+                Authorized Signatory
+              </td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
+
+  
+  

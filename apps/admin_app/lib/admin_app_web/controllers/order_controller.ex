@@ -37,6 +37,46 @@ defmodule AdminAppWeb.OrderController do
     redirect(conn, to: order_path(conn, :show, order.id))
   end
 
+  def show_invoice(conn, params) do
+    order =
+      load_order(%{number: params["number"]})
+      |> Repo.preload([:line_items, :user])
+
+    render(conn, "invoice.html", %{order: order})
+  end
+
+  def show_packing_slip(conn, params) do
+    order =
+      load_order(%{number: params["number"]})
+      |> Repo.preload([:line_items, :user])
+
+    render(conn, "packing_slip.html", %{order: order})
+  end
+
+  def download_invoice_pdf(conn, params) do
+    {:ok, pdf_content} = File.read("invoices/#{params["number"]}.pdf")
+
+    conn
+    |> put_resp_content_type("application/pdf")
+    |> put_resp_header(
+      "content-disposition",
+      "attachment; filename=\"invoice_#{params["number"]}.pdf\""
+    )
+    |> send_resp(200, pdf_content)
+  end
+
+  def download_packing_slip_pdf(conn, params) do
+    {:ok, pdf_content} = File.read("invoices/packing_slip_#{params["number"]}.pdf")
+
+    conn
+    |> put_resp_content_type("application/pdf")
+    |> put_resp_header(
+      "content-disposition",
+      "attachment; filename=\"packing_slip_#{params["number"]}.pdf\""
+    )
+    |> send_resp(200, pdf_content)
+  end
+
   def edit(conn, params) do
     order = load_order(%{number: params["order_number"]})
 
