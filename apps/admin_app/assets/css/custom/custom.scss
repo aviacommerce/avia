@@ -11,6 +11,10 @@ body {
     position: relative;
   }
 
+  a {
+    color: $main-sub-color;
+  }
+
   .required {
     &:after {
       color: $red;
@@ -23,9 +27,15 @@ body {
     }
   }
 
+  .list-group-item.active {
+
+    background-color: $main-sub-color;
+    border-color: $main-sub-color;
+  }
+
   .btn-primary {
-    background-color: $main-sub-color !important;
-    font-size: .875em !important;
+    background-color: $main-sub-color;
+    font-size: .875em;
     color: $white;
     border-color: $main-sub-color;
     height: 38px;
@@ -33,26 +43,48 @@ body {
     padding: 8px 12px;
 
     &:hover {
-      background-color: $btn-hover-color !important;
-      font-size: .875em !important;
+      background-color: $btn-hover-color;
+      font-size: .875em;
       border-color: $btn-hover-color;
     }
 
     &:focus {
-      box-shadow: none !important;
+      box-shadow: none;
     }
   }
 
-  // .plus{
-  //   background-image: url("../images/plus.svg");
-  //   background-repeat: no-repeat;
-  //   color:red;
-  // }
   .border-custom {
     border-radius: 3px;
     background-color: $white;
     border: 1px solid $bordercolor1;
     border-bottom-color: $bordercolor2
+  }
+
+  .btn-outline-secondary {
+    border-color: $gray-102;
+    color: $gray-500 - 45;
+    font-weight: bold;
+
+    &:hover {
+      color: $gray-500 - 90;
+      background-color: $gray-101;
+      border-color: $gray-102;
+    }
+
+    &:focus {
+      box-shadow: none;
+    }
+  }
+
+  .btn-outline-secondary:not(:disabled):not(.disabled):active:focus,
+  .btn-outline-secondary:not(:disabled):not(.disabled).active:focus,
+  .show>.btn-outline-secondary.dropdown-toggle:focus {
+    box-shadow: none;
+  }
+
+  .btn {
+    border-radius: 3px;
+    font-size: 14px;
   }
 
   .select2-container .select2-selection--single {
@@ -62,7 +94,7 @@ body {
   .form-control,
   .select2-container .select2-selection--single {
     border-radius: 3px;
-    box-shadow: 0 1px 2px 0 rgba($black, 0.05) inset;
+    box-shadow: 0 1px 2px 0 rgba($black, 0.05);
     transition: opacity 0.3s ease-out;
     border-color: rgba($black, 0.15);
     border-top-color: rgba($black, 0.2);
@@ -105,17 +137,12 @@ body {
     background-position: center;
   }
 
-  #selectedProductImages img {
-    max-width: 125px;
-    max-height: 125px;
-    float: left;
-    margin-bottom: 10px;
-  }
 
   .img-wrap {
     position: relative;
     display: inline-block;
     font-size: 0;
+    height: 120px;
   }
 
   .img-wrap .product-delete {
@@ -136,8 +163,8 @@ body {
   }
 
   .img-wrap img {
-    max-width: 200px;
-    max-height: 300px;
+    width: 150px;
+    height: 100px;
   }
 
   .img-wrap:hover .product-delete {
@@ -149,6 +176,7 @@ body {
   width: 256px;
   position: fixed;
   top: 0;
+
 }
 
 .main {
@@ -187,7 +215,7 @@ body {
   }
 
   .navshophead {
-    padding: 16px 13px;
+    padding: 16px 11px;
     cursor: pointer;
 
     .shopdpdown {
@@ -199,7 +227,6 @@ body {
       padding: 0px;
 
       a {
-
         border-top: 1px solid $bordercolor1;
         border-right: 0 solid $bordercolor1;
       }
@@ -211,12 +238,12 @@ body {
 
       span {
         display: inline-block;
-        padding: 4px 6px;
+        padding: 8px 7px;
         font-weight: 600;
         font-size: 18px;
         line-height: 1.2;
         -webkit-font-smoothing: antialiased;
-        font-family: "Graphik Webfont", -apple-system, BlinkMacSystemFont, "Roboto", "Droid Sans", "Segoe UI", "Helvetica", Arial, sans-serif;
+        font-family: "avia1" !important;
       }
     }
   }

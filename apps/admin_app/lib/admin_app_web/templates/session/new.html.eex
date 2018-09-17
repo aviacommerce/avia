@@ -1,13 +1,44 @@
-<div class="card container text-uppercase login col-5 m-auto pb-3">
-  <h4 class="text-center pt-3">Sign In</h4>
-  <hr/>
-  <%= form_for @changeset, session_path(@conn, :create), [as: :session],
-fn f -> %>
+<div class="login-container">
+  <header>
+    <div class="col-4 m-auto p-0">
+      <div class="row m-0">
+        <div class="float-left col p-0">
+          <img src="/images/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
+        </div>
+        <div class="float-right col text-right p-0">
+          <button class="btn btn-outline-secondary">Regsister</button>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="login col-4 m-auto pb-3 px-0">
+    <h4 class="pt-3 signin mb-4">Sign In to Continue</h4>
+    <%= form_for @changeset, session_path(@conn, :create), [as: :session],
+      fn f -> %>
     <%= input f, :email %>
     <%= input f, :password %>
-    <p class="text-lowercase text-capitalize mb-0">
+    <p class="text-lowercase text-capitalize mb-0 forgot">
       <%= link "Forgot your password?", to: session_path(@conn, :password_reset) %>
     </p>
     <%= submit "Submit", class: "btn btn-primary submit-btn col-12" %>    
-  <% end %>
+    <% end %>
+    <a href="" class="trouble">Trouble signing in?</a>
+    <div class="or text-center">
+      <span class="bg-white p-xs-2 vertical-align-bottom text-gray-lighter" style="line-height:0;">
+      OR
+      </span>
+    </div>
+    <a class="btn btn-outline-secondary btn-option">
+    Continue with Google
+    </a>
+    <a class="btn btn-outline-secondary btn-option">
+    Continue with Facebook
+    </a>
+    <div class="info-text">
+      By clicking Continue with Google or Continue with Facebook, you agree to Avia 
+      Terms of Use and Privacy Policy. Avia may send you communications; you may 
+      change your preferences in your account settings.
+       We'll never post without your permission.
+    </div>
+  </div>
 </div>

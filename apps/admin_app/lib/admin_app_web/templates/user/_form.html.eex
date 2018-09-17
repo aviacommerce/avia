@@ -1,11 +1,75 @@
 <%= form_for @changeset, @action, [as: :user],
-fn f -> %>
-  <%= input f, :first_name %>
-  <%= input f, :last_name %>
-  <%= input f, :email %>
-  <%= input f, :password %>
-  <%= input f, :password_confirmation %>
-  <%= select_input f, :role_id, formatted_list(:role) %>
-  <%= submit "Submit", class: "btn btn-primary submit-btn" %>
-  <%= link("Cancel", to: user_path(@conn, :index), class: "btn btn-primary") %>
+  fn f -> %>
+<div class="form-group row ">
+  <label for="inputEmail3" class="col-sm-3 col-form-label">
+    <div class="label required">
+      First Name
+    </div>
+    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+  </label>
+  <div class="col-sm-9">
+    <%= input f, :first_name %>
+  </div>
+</div>
+<div class="form-group row ">
+  <label for="inputEmail3" class="col-sm-3 col-form-label">
+    <div class="label required">
+      Last Name
+    </div>
+    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+  </label>
+  <div class="col-sm-9">
+    <%= input f, :last_name %>
+  </div>
+</div>
+<div class="form-group row ">
+  <label for="inputEmail3" class="col-sm-3 col-form-label">
+    <div class="label required">
+      Email
+    </div>
+    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+  </label>
+  <div class="col-sm-9">
+    <%= input f, :email %>
+  </div>
+</div>
+<div class="form-group row ">
+  <label for="inputEmail3" class="col-sm-3 col-form-label">
+    <div class="label required">
+      Password
+    </div>
+    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+  </label>
+  <div class="col-sm-9">
+    <%= input f, :password %>
+  </div>
+</div>
+<div class="form-group row ">
+  <label for="inputEmail3" class="col-sm-3 col-form-label">
+    <div class="label required">
+      Confirm Password
+    </div>
+    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+  </label>
+  <div class="col-sm-9">
+    <%= input f, :password_confirmation %>
+  </div>
+</div>
+<div class="form-group row ">
+  <label for="inputEmail3" class="col-sm-3 col-form-label">
+    <div class="label required">
+      Role
+    </div>
+    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+  </label>
+  <div class="col-sm-9">
+    <%= select_input f, :role_id, formatted_list(:role) %>
+  </div>
+</div>
+<div class="form-group row">
+  <div class="col-sm-10">
+    <%= submit "Submit", class: "btn btn-primary submit-btn" %>
+    <%= link("Cancel", to: user_path(@conn, :index), class: "btn btn-primary") %>
+  </div>
+</div>
 <% end %>
