@@ -1,0 +1,148 @@
+<div class="container">
+    <table style="width: 100%;">
+    <tr>
+        <td style="width: 100%;">
+            <div><span>Ship to:</span></div>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 100%; font-weight: bolder;">
+            <%= if (Map.get(@order, :shipping_address) != nil) do %>
+                <div><%= @order.shipping_address.first_name %> <%= @order.shipping_address.last_name %> </div>
+                <div><%= @order.shipping_address.address_line_1 %> </div>
+                <div><%= @order.shipping_address.address_line_2 %> </div>
+                <div><%= @order.shipping_address.state_id |> get_state_name() %> </div>
+                <div><%= @order.shipping_address.city %> </div>
+                <div><%= @order.shipping_address.zip_code %> </div>
+                <div><%= @order.shipping_address.country_id |> get_iso() %> </div>
+            <% else %>
+                <div>Not Found</div>
+            <% end %>
+        </td>
+    </tr>
+    </table>
+    <br>
+    <div style="border-top-style: dashed;">
+    </div>
+    <br>
+    <table style="width: 100%;">
+    <tr>
+        <td style="width: 100%;">
+        <div><span style="font-weight: bolder;">ORDER NO. :</span> <%= @order.number %></div>
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 100%;">
+        <div><span>Thank you for buying from our store.</span></div>
+        </td>
+    </tr>
+    </table>
+    <br>
+    <div style="border: 1px solid black;">
+    <table class="table" style="width: 100%;">
+            <thead class="thead-light" style="width: 100%;">
+            <tr>
+                <th scope="col" colspan="2"> Item Description </th>
+                <th scope="col"> Quantity</th>
+                <th scope="col"> Price </th>
+            </tr>
+            </thead>
+            <tbody style="width: 100%;">
+                <%= for line_item <- @order.line_items do %>
+                    <%= render_invoice_line_item(line_item, @order) %>
+                <% end %>
+            </tbody>
+    </table>
+    <br>
+    <table style="width: 100%;">
+        <tr>
+        <td style="width: 100%;">
+            <h3 style="font-weight: bolder;">Order Summary</h3>
+        <td>
+        </tr>
+        <tr>
+        <td style="width: 100%;">
+            <table class="table" style="width: 100%;">
+                <tbody>
+                <%= summary(@order) %>
+                </tbody>
+            </table>
+        </td>
+        </tr>
+    </table>
+    </div>
+    <br>
+    <div style="border-top-style: dashed;">
+    </div>
+    <br>
+    
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 100%; font-weight: bolder; font-size: 20px; text-align: center;">
+            Declaration Letter
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 100%; font-weight: bolder; font-size: 20px; text-align: center;">
+            To Whomsoever It May Concern
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 100%;">
+                <%= if (Map.get(@order, :shipping_address) != nil) do %>
+                    I, <%= @order.shipping_address.first_name %> <%= @order.shipping_address.last_name %>, have place the order for
+                <% else %>
+                    I, ......................, have place the order for
+              <% end %>
+            </td>
+        </tr>
+    </table>
+    <br>
+    <div style="border: 1px solid black;">
+        <table style="width: 100%;">
+            <tr>
+                <td style="width: 100%;">
+                    <table class="table" style="width: 100%;">
+                        <thead class="thead-light" style="width: 100%;">
+                            <tr>
+                                <th scope="col" colspan="2"> Item Description </th>
+                                <th scope="col"> Quantity</th>
+                                <th scope="col"> Price </th>
+                            </tr>
+                        </thead>
+                        <tbody style="width: 100%;">
+                            <%= for line_item <- @order.line_items do %>
+                                <%= render_invoice_line_item(line_item, @order) %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <br>
+    <table style="width: 100%;">  
+        <tr>
+            <td style="width: 100%;">
+                <%= if (Map.get(@order, :shipping_address) != nil) do %>
+                    <div><%= @order.shipping_address.first_name %> <%= @order.shipping_address.last_name %> </div>
+                    <div><%= @order.shipping_address.address_line_1 %> </div>
+                    <div><%= @order.shipping_address.address_line_2 %> </div>
+                    <div><%= @order.shipping_address.state_id |> get_state_name() %> </div>
+                    <div><%= @order.shipping_address.city %> </div>
+                    <div><%= @order.shipping_address.zip_code %> </div>
+                    <div><%= @order.shipping_address.country_id |> get_iso() %> </div>
+                <% else %>
+                    <div>Not Found</div>
+                <% end %>
+                <br>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 100%;">
+                I hereby confirm that said above goods are being purchased for my internal or personal purpose and not for re-sale. I
+further understand and agree to Aviacommerce Terms and Conditions of Sale available at www.aviacommerce.com or upon request.
+            </td>
+        </tr>
+    </table>
+</div>

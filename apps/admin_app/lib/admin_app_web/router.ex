@@ -77,6 +77,10 @@ defmodule AdminAppWeb.Router do
 
   scope "/", AdminAppWeb do
     pipe_through(:browser)
+    get("/orders/:number/show-invoice", OrderController, :show_invoice)
+    get("/orders/:number/show-packing-slip", OrderController, :show_packing_slip)
+    get("/orders/:number/download-packing-slip", OrderController, :download_packing_slip_pdf)
+    get("/orders/:number/download-invoice", OrderController, :download_invoice_pdf)
     resources("/session", SessionController, only: [:new, :create, :edit, :update])
     get("/password_reset", SessionController, :password_reset)
     get("/password_recovery", SessionController, :verify)

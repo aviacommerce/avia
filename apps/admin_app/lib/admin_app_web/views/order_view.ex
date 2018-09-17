@@ -4,7 +4,9 @@ defmodule AdminAppWeb.OrderView do
 
   alias Snitch.Data.Model.Order, as: OrderModel
 
-  alias Snitch.Data.Model.LineItem
+  alias Snitch.Data.Model.{LineItem, Country, State}
+
+  alias Snitch.Repo
 
   @bootstrap_contextual_class %{
     "slug" => "light",
@@ -191,5 +193,83 @@ defmodule AdminAppWeb.OrderView do
     else
       "Guest Order"
     end
+  end
+
+  def render_invoice_links(order) do
+    order_new =
+      order
+      |> Repo.preload(:line_items)
+      |> Repo.preload(:user)
+
+    html = Phoenix.View.render_to_string(AdminAppWeb.OrderView, "invoice.html", order: order_new)
+
+    payslip_html =
+      Phoenix.View.render_to_string(AdminAppWeb.OrderView, "packing_slip.html", order: order_new)
+
+    {:ok, file} = PdfGenerator.generate_binary(html, page_size: "A4", delete_temporary: false)
+
+    {:ok, packing_slip_file} =
+      PdfGenerator.generate_binary(payslip_html, page_size: "A4", delete_temporary: false)
+
+    path = "invoices/#{order.number}.pdf"
+    packing_slip_path = "invoices/packing_slip_#{order.number}.pdf"
+    File.write(path, file)
+    File.write(packing_slip_path, packing_slip_file)
+
+    content = [
+      content_tag(
+        :a,
+        "Download Invoice",
+        href: "#{order.number}/download-invoice",
+        class: "btn btn-primary",
+        style: "margin-right: 3px;"
+      ),
+      content_tag(
+        :a,
+        "Show Packing Slip",
+        href: "#{order.number}/show-packing-slip",
+        class: "btn btn-primary",
+        style: "margin-right: 3px;"
+      ),
+      content_tag(
+        :a,
+        "Download Packing Slip",
+        href: "#{order.number}/download-packing-slip",
+        class: "btn btn-primary",
+        style: "margin-right: 3px;"
+      )
+    ]
+
+    content_tag(:div, content)
+  end
+
+  defp render_invoice_line_item(line_item, order) do
+    content = [
+      render_variant(line_item.product),
+      render_quantity(line_item),
+      content_tag(:td, " #{line_item.unit_price} ")
+    ]
+
+    content_tag(:tr, List.flatten(content))
+  end
+
+  defp render_quantity(line_item) do
+    content_tag(:td, " x #{line_item.quantity}")
+  end
+
+  defp get_country(country_id) do
+    Country.get(country_id)
+  end
+
+  defp get_state(state_id) do
+    State.get(state_id)
+  end
+
+  defp get_state_name(state_id) do
+    state_id |> get_state() |> Map.get(:name)
+  end
+
+  defp get_iso(country_id) do
+    country_id |> get_country() |> Map.get(:iso)
   end
 end
