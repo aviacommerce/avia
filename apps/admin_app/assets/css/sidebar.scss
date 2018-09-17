@@ -3,7 +3,7 @@
 
 .sidebar {
   border-right: 1px solid $bordercolor1;
-  height: 100vh;
+  height: calc(100vh - 3.5vw);
   overflow-y: auto;
 
   .nav {

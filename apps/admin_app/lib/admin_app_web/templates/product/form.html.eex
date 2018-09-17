@@ -1,184 +1,330 @@
 <ul class="nav nav-tabs">
-  <li class="nav-item">
-    <a class="nav-link active" href="#tab1default" data-toggle="tab">Product Detail</a>
-  </li>
-  <%= if  @conn.request_path != product_path(@conn, :new) do %>
-    <%= if has_themes(@parent_product) do %>
-      <li class="nav-item">
-        <a class="nav-link" href="#tab2default" data-toggle="tab">Variants</a>
-      </li>
-    <% end %>
-  <li class="nav-item">
-    <a class="nav-link" href="#tab3default" data-toggle="tab">Images</a>
-  </li>
-    <li class="nav-item">
+   <li class="nav-item">
+      <a class="nav-link active" href="#tab1default" data-toggle="tab">Product Detail</a>
+   </li>
+   <%= if  @conn.request_path != product_path(@conn, :new) do %>
+   <%= if has_themes(@parent_product) do %>
+   <li class="nav-item">
+      <a class="nav-link" href="#tab2default" data-toggle="tab">Variants</a>
+   </li>
+   <% end %>
+   <li class="nav-item">
+      <a class="nav-link" href="#tab3default" data-toggle="tab">Images</a>
+   </li>
+   <li class="nav-item">
       <a class="nav-link" href="#tab4default" data-toggle="tab">Stock</a>
-    </li>
-  <% end %>
+   </li>
+   <% end %>
 </ul>
 <div class="tab-content">
-    <div class="tab-pane fade in active show" id="tab1default">
-    <%= form_for @changeset, @action, [multipart: true], fn f ->  %>
+   <div class="tab-pane fade in active show" id="tab1default">
+      <%= form_for @changeset, @action, [multipart: true], fn f ->  %>
       <%= hidden_input f, :id %>
       <%= if  @conn.request_path == product_path(@conn, :new) do %>
-        <%= hidden_input :taxon_id, :taxon_id, value: get_taxon(@conn), name: "product[taxon_id]" %>
+      <%= hidden_input :taxon_id, :taxon_id, value: get_taxon(@conn), name: "product[taxon_id]" %>
       <% end %>
-      <%= input f, :name%>
-      <%= textarea_input f, :description%>
-      <div class="row">
-        <div class="col-6">
-          <div class="form-group required">
-            <label>Selling Price</label>
-            <div class="input-group mb-3">
-              <%= text_input :selling_price, :amount, value: get_amount(f.data.selling_price), class: "form-control", name: "product[selling_price][amount]" %>
-              <div class="input-group-append">
-                <%= select :selling_price, :currency, get_currency(),value: get_currency_value(f.data.selling_price), class: "form-control", name: "product[selling_price][currency]" %>
-              </div>
+      <div class="form-group row ">
+         <label  class="col-sm-3 col-form-label">
+            <div class="label required">
+               Name
             </div>
-          </div>
-        </div>
-        <div class="col-6">
-          <div class="form-group required">
-            <label>Maximum Retail Price</label>
-            <div class="input-group mb-3">
-              <%= text_input :max_retail_price, :amount, value: get_amount(f.data.max_retail_price), class: "form-control", name: "product[max_retail_price][amount]" %>
-              <div class="input-group-append">
-                <%= select :max_retail_price, :currency, get_currency(),value: get_currency_value(f.data.max_retail_price), class: "form-control", name: "product[max_retail_price][currency]" %>
-              </div>
-            </div>
-          </div>
-        </div>
+            <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+         </label>
+         <div class="col-sm-9">           
+            <%= input f, :name%>
+         </div>
       </div>
-      <%= textarea_input f, :meta_description%>
-      <%= select_input f, :brand_id, get_brand_options(@brands) %>
-      <%= input f, :meta_keywords%>
-      <%= input f, :meta_title%>
-      <%= input f, :height %>
-      <%= input f, :width %>
-      <%= input f, :depth %>
-      <%= input f, :weight %>
-
-      <%= submit "Submit", class: "btn btn-primary submit-btn" %>
-    <% end %>
-    </div>
-
-    <%= if  @conn.request_path != product_path(@conn, :new) and has_themes(@parent_product) do %>
-      <div class="tab-pane fade" id="tab2default" style="padding:10px">
-
+      <div class="form-group row ">
+         <label  class="col-sm-3 col-form-label">
+            <div class="label">
+               Description
+            </div>
+            <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+         </label>
+         <div class="col-sm-9">           
+            <%= textarea_input f, :description%>
+         </div>
+      </div>
+      <div class="form-group row ">
+         <label  class="col-sm-3 col-form-label">
+            <div class="label">
+               Selling Price
+            </div>
+            <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+         </label>
+         <div class="col-sm-9 input-group">
+            <%= text_input :selling_price, :amount, value: get_amount(f.data.selling_price), class: "form-control", name: "product[selling_price][amount]" %>
+            <div class="input-group-append">
+               <%= select :selling_price, :currency, get_currency(),value: get_currency_value(f.data.selling_price), class: "form-control", name: "product[selling_price][currency]" %>
+            </div>
+         </div>
+      </div>
+      <div class="form-group row ">
+         <label  class="col-sm-3 col-form-label">
+            <div class="label">
+               Maximum Retail Price
+            </div>
+            <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+         </label>
+         <div class="col-sm-9 input-group">
+            <%= text_input :max_retail_price, :amount, value: get_amount(f.data.max_retail_price), class: "form-control", name: "product[max_retail_price][amount]" %>
+            <div class="input-group-append">
+               <%= select :max_retail_price, :currency, get_currency(),value: get_currency_value(f.data.max_retail_price), class: "form-control", name: "product[max_retail_price][currency]" %>
+            </div>
+         </div>
+      </div>
+      <div class="form-group row ">
+         <label  class="col-sm-3 col-form-label">
+            <div class="label ">
+               Meta Description
+            </div>
+            <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+         </label>
+         <div class="col-sm-9">           
+            <%= textarea_input f, :meta_description%>
+         </div>
+      </div>
+      <div class="form-group row ">
+         <label  class="col-sm-3 col-form-label">
+            <div class="label">
+               Brand
+            </div>
+            <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+         </label>
+         <div class="col-sm-9">           
+            <%= select_input f, :brand_id, get_brand_options(@brands) %>
+         </div>
+      </div>
+      <div class="form-group row ">
+         <label  class="col-sm-3 col-form-label">
+            <div class="label">
+               Meta keywords
+            </div>
+            <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+         </label>
+         <div class="col-sm-9">           
+            <%= input f, :meta_keywords%>
+         </div>
+      </div>
+      <div class="form-group row ">
+         <label  class="col-sm-3 col-form-label">
+            <div class="label">
+               Meta Title
+            </div>
+            <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+         </label>
+         <div class="col-sm-9">           
+            <%= input f, :meta_title%>
+         </div>
+      </div>
+      <div class="form-group row ">
+         <label  class="col-sm-3 col-form-label">
+            <div class="label">
+               Height
+            </div>
+            <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+         </label>
+         <div class="col-sm-9">           
+            <%= input f, :height %>
+         </div>
+      </div>
+      <div class="form-group row ">
+         <label  class="col-sm-3 col-form-label">
+            <div class="label">
+               Width
+            </div>
+            <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+         </label>
+         <div class="col-sm-9">           
+            <%= input f, :width %>
+         </div>
+      </div>
+      <div class="form-group row ">
+         <label  class="col-sm-3 col-form-label">
+            <div class="label">
+               Depth
+            </div>
+            <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+         </label>
+         <div class="col-sm-9">           
+            <%= input f, :depth %>
+         </div>
+      </div>
+      <div class="form-group row ">
+         <label  class="col-sm-3 col-form-label">
+            <div class="label">
+               Depth
+            </div>
+            <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+         </label>
+         <div class="col-sm-9">           
+            <%= input f, :depth %>
+         </div>
+      </div>
+      <div class="form-group row ">
+         <label  class="col-sm-3 col-form-label">
+            <div class="label">
+               Weight
+            </div>
+            <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+         </label>
+         <div class="col-sm-9">           
+            <%= input f, :weight %>
+         </div>
+      </div>
+      <div class="form-group row">
+         <div class="col-sm-10">
+            <%= submit "Submit", class: "btn btn-primary submit-btn" %>
+         </div>
+      </div>
+      <% end %>
+   </div>
+   <%= if  @conn.request_path != product_path(@conn, :new) and has_themes(@parent_product) do %>
+   <div class="tab-pane fade p-2" id="tab2default" >
       <div style="padding: 10px; background: #f8f9fa; border-radius: 10px">
-        <div class="form-group required">
-          <label>Variation Theme</label>
-          <%= select :theme, :theme_id, themes_options(@parent_product), selected: @parent_product.theme_id ,prompt: "", class: "form-control", id: "product_theme_id" %>
-        </div>
-        <div id="variation_options" style="padding: 10px 0px 10px 0px;"></div>
-        <div class="modal fade" id="theme_change_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Warning</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <div class="alert alert-danger" role="alert">
-                  Changing theme will remove all the associated variants.
-                  Are you sure you want to do this?
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                <button id="theme_change_confirm" type="button" class="btn btn-primary">Yes</button>
-              </div>
+         <div class="form-group required">
+            <label>Variation Theme</label>
+            <%= select :theme, :theme_id, themes_options(@parent_product), selected: @parent_product.theme_id ,prompt: "", class: "form-control", id: "product_theme_id" %>
+         </div>
+         <div id="variation_options" style="padding: 10px 0px 10px 0px;"></div>
+         <div class="modal fade" id="theme_change_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title" id="exampleModalLongTitle">Warning</h5>
+                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                     </button>
+                  </div>
+                  <div class="modal-body">
+                     <div class="alert alert-danger" role="alert">
+                        Changing theme will remove all the associated variants.
+                        Are you sure you want to do this?
+                     </div>
+                  </div>
+                  <div class="modal-footer">
+                     <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                     <button id="theme_change_confirm" type="button" class="btn btn-primary">Yes</button>
+                  </div>
+               </div>
             </div>
-          </div>
-        </div>
+         </div>
       </div>
-
       <%= if has_variants(@parent_product) do %>
-        <div>
-        <h3>Product Variants</h3>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Product ID</th>
-              <%= for option_type <- get_option_types(@parent_product) do %>
-                <th><%= option_type.display_name %></th>
-              <% end %>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-              <%= for variant <- @parent_product.variants do %>
-                <tr>
+      <div>
+         <h3>Product Variants</h3>
+         <table class="table">
+            <thead>
+               <tr>
+                  <th>Product ID</th>
+                  <%= for option_type <- get_option_types(@parent_product) do %>
+                  <th><%= option_type.display_name %></th>
+                  <% end %>
+                  <th></th>
+               </tr>
+            </thead>
+            <tbody>
+               <%= for variant <- @parent_product.variants do %>
+               <tr>
                   <td><%= variant.id %></td>
                   <%= for option <- variant.options do %>
-                    <td class="option-value" contenteditable="true" data-option_value_id="<%= option.id %>"><%= option.value %></td>
+                  <td class="option-value" contenteditable="true" data-option_value_id="<%= option.id %>"><%= option.value %></td>
                   <% end %>
                   <td>
-                    <%= link("Edit", to: product_path(@conn, :edit, variant.id), class: "btn btn-primary") %>
+                     <%= link("Edit", to: product_path(@conn, :edit, variant.id), class: "btn btn-primary") %>
                   </td>
-                </tr>
-              <% end %>
+               </tr>
+               <% end %>
             </tbody>
-          </table>
-          </div>
-        <% end %>
+         </table>
       </div>
-    <% end %>
-    <%= if  @conn.request_path != product_path(@conn, :new) do %>
-  <div class="tab-pane fade" id="tab3default">
-    <div style="padding: 10px; background: #f8f9fa; border-radius: 10px">
-      <input id="product-id" name="product-id" type="hidden" value="<%= @parent_product.id %>" >
-      <%= if length(@parent_product.images) > 0 do %>
-        <%= for image <- @parent_product.images do %>
-        <div class="img-wrap">
-          <span class="product-delete">&times;
-            <input name="delete-image-id" type="hidden" value="<%= image.id %>" >
-          </span>
-          <%= img_tag(get_image_url(image, @parent_product), class: "img-thumbnail") %>
-        </div>
-     <% end %>
+      <% end %>
+   </div>
    <% end %>
-   <%= form_for @conn, product_path(@conn, :add_images, @parent_product.id),
-     [as: :product_images, multipart: true], fn f -> %>
-     <%= file_input f, :images, multiple: true, class: "form-control",
-       id: "product-images" %>
-     <div id="selectedProductImages">
-     </div>
-     <hr>
-     <%= submit "Save Images", class: "btn btn-primary" %>
-     <% end %>
-    </div>
-  </div>
-  <% end %>
-  <%= if  @conn.request_path != product_path(@conn, :new) do %>
-   <div class="tab-pane fade" id="tab4default">
-   <form accept-charset="UTF-8" action="/product/stock" method="post">
-     <%= if is_parent_product(@conn.params["id"]) do %>
-      <div class="form-group required">
-        <label>Variant</label>
-        <%= select :stock, :product_id, get_variant_option(@parent_product.variants), class: "form-control"%>
+   <%= if  @conn.request_path != product_path(@conn, :new) do %>
+   <div class="tab-pane fade" id="tab3default">
+      <div style="padding: 10px; border-radius: 10px">
+         <input id="product-id" name="product-id" type="hidden" value="<%= @parent_product.id %>" >
+         <%= if length(@parent_product.images) > 0 do %>
+         <%= for image <- @parent_product.images do %>
+         <div class="img-wrap">
+            <span class="product-delete">&times;
+            <input name="delete-image-id" type="hidden" value="<%= image.id %>" >
+            </span>
+            <%= img_tag(get_image_url(image, @parent_product), class: "img-thumbnail") %>
+         </div>
+         <% end %>
+         <% end %>
+         <%= form_for @conn, product_path(@conn, :add_images, @parent_product.id),
+            [as: :product_images, multipart: true], fn f -> %>
+         
+         <div class="form-group row ">
+            <label  class="col-sm-3 col-form-label">
+               <div class="label required">
+                  Images
+               </div>
+               <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+            </label>
+            <div class="col-sm-9">
+               <%= file_input f, :images, multiple: true, class: "form-control",
+                  id: "product-images" %>
+               <div id="selectedProductImages">
+               </div>
+            </div>
+         </div>
+         <div class="form-group row">
+          <div class="col-sm-10">
+            <%= submit "Save Images", class: "btn btn-primary" %>
+          </div>
+        </div>
+         <% end %>
       </div>
-     <% else %>
-        <%= hidden_input :stock, :product_id, value: @conn.params["id"] %>
-     <% end %>
-
-     <div class="form-group required">
-       <label>Stock Location</label>
-       <%= select :stock, :location_id, get_stock_locations_option(@stock_locations), class: "form-control"%>
-     </div>
-     <div class="form-group required">
-       <label>Count</label>
-         <%= text_input :stock, :count_on_hand , class: "form-control"%>
-     </div>
-     <button class="btn btn-primary submit-btn" type="submit">Add Stock</button>
-   </form>
- </div>
- <% end %>
+   </div>
+   <% end %>
+   <%= if  @conn.request_path != product_path(@conn, :new) do %>
+   <div class="tab-pane fade pt-2"  id="tab4default">
+      <form accept-charset="UTF-8" action="/product/stock" method="post">
+         <%= if is_parent_product(@conn.params["id"]) do %>
+         <div class="form-group required">
+            <label>Variant</label>
+            <%= select :stock, :product_id, get_variant_option(@parent_product.variants), class: "form-control"%>
+         </div>
+         <% else %>
+         <%= hidden_input :stock, :product_id, value: @conn.params["id"] %>
+         <% end %>
+         <div class="form-group row ">
+            <label  class="col-sm-3 col-form-label">
+               <div class="label required">
+                  Stock Location
+               </div>
+               <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+            </label>
+            <div class="col-sm-9">           
+               <%= select :stock, :location_id, get_stock_locations_option(@stock_locations), class: "form-control"%>
+            </div>
+         </div>
+         <div class="form-group row ">
+            <label  class="col-sm-3 col-form-label">
+               <div class="label required">
+                  Count
+               </div>
+               <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+            </label>
+            <div class="col-sm-9">           
+               <%= text_input :stock, :count_on_hand , class: "form-control"%>
+            </div>
+         </div>
+         <div class="form-group row">
+            <div class="col-sm-10">
+               <button class="btn btn-primary submit-btn" type="submit">Add Stock</button>
+            </div>
+         </div>
+      </form>
+   </div>
+   <% end %>
 </div>
 <html>
-  <head>
-    <%= csrf_meta_tag %>
-  </head>
+   <head>
+      <%= csrf_meta_tag %>
+   </head>
 </html>
