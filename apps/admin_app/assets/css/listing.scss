@@ -74,20 +74,49 @@
     }
   }
 
+  .selectedProductImages {
+    .col-6 .media {
+      border: 1px solid $bordercolor1;
+      background-color: $white;
+      padding: 10px;
+      height: 120px;
+
+      .media-body {
+        padding-top: 10px;
+      }
+    }
+
+    img {
+      width: 49%;
+      padding: 1%;
+    }
+  }
+
+  .input-group {
+    .form-control {
+      height: 37.5px;
+    }
+  }
+
   .list {
     background-color: $gray-101;
     padding: 1em 0.938em;
 
     .table-contaner {
-      .col-1{
+      .col-1 {
         padding: 0 0;
-        &:first-child{
+
+        &:first-child {
           padding-left: 15px;
           padding-right: 0;
-         
+
         }
-        .col{padding: 0;}
+
+        .col {
+          padding: 0;
+        }
       }
+
       @extend .border-custom;
 
       .head {
@@ -127,22 +156,53 @@
 
     .dropdown-selectall {
       height: 38.6px;
-      width: 4.4em;
-      margin-right: 16.7px;
-      margin-left: 10.3px;
-      padding-top: 8px;
+      width: 61px;
+      margin-right: 16px;
+      margin-left: 8.5px;
+      padding-top: 9px;
+      background-color: $white;
+
+      .dropdown-toggle::after {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        margin-left: 0.255em;
+        vertical-align: 0.255em;
+        content: "";
+        border-top: 0.3em solid $bordercolor2;
+        border-right: 0.3em solid transparent;
+        border-bottom: 0;
+        border-left: 0.3em solid transparent;
+      }
     }
 
     .btn-group {
       display: inline !important;
 
+      .dropdown-toggle::after {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        margin-left: 0.255em;
+        vertical-align: 0.255em;
+        content: "";
+        border-top: 0.3em solid $bordercolor2;
+        border-right: 0.3em solid transparent;
+        border-bottom: 0;
+        border-left: 0.3em solid transparent;
+      }
+
       .btn {
-        margin: 0 -4.5px;
+        height: 38.6px;
+        margin: 0 -2.6px;
         cursor: pointer;
-        padding: 6px 15px;
+        padding: 9px 12px 6.7px;
+        color: $gray-500;
 
         &:focus {
           box-shadow: none !important;
+          color: $bordercolor1;
+          background-color: $main-sub-color;
         }
       }
     }
@@ -152,19 +212,32 @@
 
       .card-footer {
         padding: 10px;
+        background-color: $white;
+        border-top: 1px solid $bordercolor1;
       }
 
       .card-body {
         padding: 0em;
+        background-color: $white;
 
         .card-title {
-          padding: 1rem;
+          padding: 10px;
           font-size: .8em;
-          height: 3.6em;
+          height: 4em;
           overflow: hidden;
+        }
+
+        .variants {
+          padding: 2px 10px;
+          font-size: 14px;
+          height: 25px;
         }
       }
     }
+  }
+
+  .list-extra {
+    padding: 1.5em 0.538em;
   }
 
   .options {
@@ -196,10 +269,11 @@
   .radio .cr {
     position: relative;
     display: inline-block;
-    border: 1px solid #a9a9a9;
-    border-radius: .25em;
-    width: 1.3em;
-    height: 1.3em;
+    border: 1px solid $bordercolor2;
+    border-radius: 3px;
+    width: 16px;
+    ;
+    height: 16px;
     margin-right: .5em;
   }
 
@@ -212,10 +286,10 @@
   .checkbox .cr .cr-icon,
   .radio .cr .cr-icon {
     position: absolute;
-    font-size: .8em;
+    font-size: .7em;
     line-height: 0;
-    top: 50%;
-    left: 20%;
+    top: 56%;
+    left: 13%;
   }
 
   .radio .cr .cr-icon {
@@ -244,7 +318,8 @@
     cursor: pointer;
 
     input[type="radio"]:checked+.cr>.cr-icon {
-      top: 10px;
+      top: 7.6px;
+      left: 0.8px;
     }
   }
 
@@ -252,6 +327,71 @@
   .radio label input[type="radio"]:disabled+.cr {
     opacity: .5;
   }
+}
+
+.card1 {
+  display: flex;
+  overflow-x: auto;
+
+  .list-group-item {
+    border-bottom: 1px solid $bordercolor1;
+    border-right: 1px solid $bordercolor1;
+    border-left: 0 soid $bordercolor1;
+    border-top: 0 soid $bordercolor1;
+    border-radius: 0;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  .card--content {
+    min-width: 300px;
+    box-shadow: 3px 5px rgba(255, 255, 255, 0.05);
+  }
+
+  .list-group {
+    overflow-y: auto;
+  }
+
+  .add-product {
+    position: relative;
+    top: 50%;
+    transform: perspective(1px) translateY(-50%);
+    text-align: center;
+  }
+
+}
+
+
+#category_loader {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background-color: $white;
+  opacity: 0.8;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: $main-sub-color;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: $main-sub-color;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: $main-sub-color
 }
 
 //
@@ -429,5 +569,29 @@ $switch-transition: .2s all !default;
 
   +.switch {
     margin-left: 1rem;
+  }
+}
+
+.upload-btn-wrapper {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+
+  .btn {
+    border: 2px solid $gray-500;
+    color: $gray-500;
+    background-color: $white;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .upload-btn-wrapper input[type=file] {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
   }
 }

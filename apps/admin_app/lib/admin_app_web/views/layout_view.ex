@@ -31,4 +31,9 @@ defmodule AdminAppWeb.LayoutView do
     |> String.split(".")
     |> Enum.at(0)
   end
+
+  def get_user_name(conn) do
+    user = conn.private.guardian_default_resource
+    "#{user.first_name} #{user.last_name}"
+  end
 end

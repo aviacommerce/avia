@@ -1,104 +1,93 @@
 @import "node_modules/bootstrap/scss/functions";
-
-//
-// Color system
-//
-
-// stylelint-disable
-$white:    #fff !default;
+$white: #fff !default;
 $gray-100: #f8f9fa !default;
 $gray-200: #e9ecef !default;
 $gray-300: #dee2e6 !default;
 $gray-400: #ced4da !default;
-$gray-500: #adb5bd !default;
+$gray-500: #757575 !default;
 $gray-600: #6c757d !default;
 $gray-700: #495057 !default;
 $gray-800: #343a40 !default;
 $gray-900: #333 !default;
-$black:    #000 !default;
+$black: #000 !default;
 $gray-101: #faf9f4 !default;
+$gray-102: #d2d2d2 !default;
 $grays: () !default;
-$grays: map-merge((
-  "100": $gray-100,
-  "200": $gray-200,
-  "300": $gray-300,
-  "400": $gray-400,
-  "500": $gray-500,
-  "600": $gray-600,
-  "700": $gray-700,
-  "800": $gray-800,
-  "900": $gray-900
-), $grays);
-$main-color: #f45800!default;
-$bordercolor1: #E1E3DF!default;
-$bordercolor2: #CBCCC9!default;
-$main-sub-color: #222!default;
-$btn-hover-color:#353535!default;
-$txt-light:#595959 !default;
-$bg-color:#f8f8f6 !default;
-$blue:    #2196F3 !default;
-$indigo:  #6610f2 !default;
-$purple:  #9C27B0 !default;
-$pink:    #E91E63 !default;
-$red:     #F44336 !default;
-$orange:  #ff7e15 !default;
-$yellow:  #FFEB3B !default;
-$green:   #28D094 !default;
-$teal:    #009688 !default;
-$cyan:    #00BCD4 !default;
-$amber:   #FFC107 !default;
-$b-gray:  #607D8B !default;
+$grays: map-merge(("100": $gray-100,
+"200": $gray-200,
+"300": $gray-300,
+"400": $gray-400,
+"500": $gray-500,
+"600": $gray-600,
+"700": $gray-700,
+"800": $gray-800,
+"900": $gray-900), $grays);
+$main-color: #f45800 !default;
+$bordercolor1: #E1E3DF !default;
+$bordercolor2: #CBCCC9 !default;
+$main-sub-color: #222 !default;
+$btn-hover-color: #353535 !default;
+$txt-light: #595959 !default;
+$bg-color: #f8f8f6 !default;
+$blue: #2196F3 !default;
+$indigo: #6610f2 !default;
+$purple: #9C27B0 !default;
+$pink: #E91E63 !default;
+$red: #F44336 !default;
+$orange: #ff7e15 !default;
+$yellow: #FFEB3B !default;
+$green: #28D094 !default;
+$teal: #009688 !default;
+$cyan: #00BCD4 !default;
+$amber: #FFC107 !default;
+$b-gray: #607D8B !default;
 
 $colors: () !default;
-$colors: map-merge((
-  "blue":       $blue,
-  "indigo":     $indigo,
-  "purple":     $purple,
-  "pink":       $pink,
-  "red":        $red,
-  "orange":     $orange,
-  "yellow":     $yellow,
-  "green":      $green,
-  "teal":       $teal,
-  "cyan":       $cyan,
-  "amber":      $amber,
-  "b-gray":     $b-gray,
-  "white":      $white,
-  "gray":       $gray-600,
-  "gray-dark":  $gray-800
-), $colors);
+$colors: map-merge(("blue": $blue,
+"indigo": $indigo,
+"purple": $purple,
+"pink": $pink,
+"red": $red,
+"orange": $orange,
+"yellow": $yellow,
+"green": $green,
+"teal": $teal,
+"cyan": $cyan,
+"amber": $amber,
+"b-gray": $b-gray,
+"white": $white,
+"gray": $gray-600,
+"gray-dark": $gray-800), $colors);
 
-$primary:       $main-sub-color !default;
-$secondary:     $gray-600 !default;
-$success:       $green !default;
-$info:          $cyan !default;
-$warning:       $yellow !default;
-$danger:        $red !default;
-$light:         $gray-300 !default;
-$dark:          $gray-800 !default;
+$primary: $main-sub-color !default;
+$secondary: $gray-600 !default;
+$success: $green !default;
+$info: $cyan !default;
+$warning: $yellow !default;
+$danger: $red !default;
+$light: $gray-300 !default;
+$dark: $gray-800 !default;
 
 $theme-colors: () !default;
-$theme-colors: map-merge((
-  "primary":    $primary,
-  "secondary":  $secondary,
-  "success":    $success,
-  "info":       $info,
-  "warning":    $warning,
-  "danger":     $danger,
-  "light":      $light,
-  "dark":       $dark
-), $theme-colors);
+$theme-colors: map-merge(("primary": $primary,
+"secondary": $secondary,
+"success": $success,
+"info": $info,
+"warning": $warning,
+"danger": $danger,
+"light": $light,
+"dark": $dark), $theme-colors);
 // stylelint-enable
 
 // Set a specific jump point for requesting color jumps
-$theme-color-interval:      8% !default;
+$theme-color-interval: 8% !default;
 
 // The yiq lightness value that determines when the lightness of color changes from "dark" to "light". Acceptable values are between 0 and 255.
-$yiq-contrasted-threshold:  150 !default;
+$yiq-contrasted-threshold: 150 !default;
 
 // Customize the light and dark text colors for use in our YIQ color contrast function.
-$yiq-text-dark:             $gray-900 !default;
-$yiq-text-light:            $white !default;
+$yiq-text-dark: $gray-900 !default;
+$yiq-text-light: $white !default;
 
 
 @import "node_modules/bootstrap/scss/variables";
