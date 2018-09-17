@@ -10,7 +10,7 @@ export default class View extends MainView {
         var id = $(this).closest('.item').data("taxon_id");
         $(`#taxon-edit-loader`).addClass(`loader`).show();
 
-        fetch('http://localhost:4000/api/taxon/' + id)
+        fetch('/api/taxon/' + id)
         .then(function(response) {
           return response.json()
         })
@@ -22,6 +22,7 @@ export default class View extends MainView {
           select2Selector()
         })
       })
+
       $(".mycontainer")
         .on("click", ".add-taxon", function(){
         $("#taxon-modal").modal({show: true})

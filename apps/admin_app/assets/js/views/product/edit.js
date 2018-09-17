@@ -131,21 +131,21 @@ function setup_product() {
     get_variation_options(theme_id, product_id)
 }
 
-function update_option_value(id, value) {
-  $.ajax({
-    type: "POST",
-    url: 'http://localhost:3000/api/v1/product_option_values/' + id,
-    crossDomain: true,
-    data: {
-      value: value
-    },
-    success: function (response) {}
-  })
-}
+function update_option_value(id, value){
+    $.ajax({
+      type: "POST",
+      url: '/api/product_option_values/' + id,
+      crossDomain: true,
+      data: {value: value},
+      success: function(response){
+      }
+    })
+  }
 
-function get_variation_options(theme_id, product_id) {
-  fetch('http://localhost:4000/api/option_types?theme_id=' + theme_id + "&product_id=" + product_id)
-    .then(function (response) {
+  function get_variation_options(theme_id, product_id)
+  {
+    fetch('/api/option_types?theme_id=' + theme_id + "&product_id=" + product_id)
+    .then(function(response) {
       return response.json();
     })
     .then(function (myJson) {

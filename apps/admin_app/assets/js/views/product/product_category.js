@@ -5,14 +5,14 @@ export default class View extends MainView {
       super.mount();
       get_categories(1)
       handle_category_click();
-  
+
       // Specific logic here
       console.log('ProductProduct_categoryView mounted');
     }
-  
+
     unmount() {
       super.unmount();
-  
+
       // Specific logic here
       console.log('ProductProduct_categoryView unmounted');
     }
@@ -25,7 +25,7 @@ export default class View extends MainView {
 function get_categories(id)
 {
   $(`#category_loader`).addClass(`loader`).show();
-  fetch('http://localhost:4000/api/categories/' + id)
+  fetch('/api/categories/' + id)
   .then(function(response) {
     return response.json();
   })
@@ -40,24 +40,23 @@ function handle_category_click(){
     $(`#category_selection`)
     .on("click", "li", function(e){
       let clicked_li = $(e.target);
-  
+
       //clear existing active li
       var ul =  clicked_li.closest("ul");
-  
+
       ul
       .children()
       .each(function(){
         $(this).removeClass(`active`);
       });
-  
+
       //remove all categories after
       var card = ul.closest('.card--content');
       card.nextAll().remove();
-  
+
       var next_taxon_id = clicked_li.data('taxon_id');
       clicked_li.addClass('active')
-  
+
       get_categories(next_taxon_id);
     })
   }
-  
