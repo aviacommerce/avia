@@ -24,7 +24,7 @@ var storedFile = []
 
 export function handleImageSelect() {
   document.querySelector('#product-images').addEventListener('change', selectedFile, false);
-  selDiv = $("#selectedProductImages");
+  selDiv = $("#img-selected-container");
 }
 
 function selectedFile(e) {
@@ -41,7 +41,7 @@ function selectedFile(e) {
     storedFile.push(f)
     var reader = new FileReader();
     reader.onload = function (e) {
-      var html = "<div class=\"col-6 px-1 mb-2\"><div class=\"media\"><img class=\"align-self-start mr-3\" src=\"" + e.target.result + "\" alt=\"Generic placeholder image\" /> <div class=\"media-body\"><h5 class=\"mt-0\">" + f.name + "</h5> </div> </div></div>";
+      var html = "<div class=\"col-3 p-1 mb-2\"><div class=\"media\"><img class=\"align-self-start mr-3\" src=\"" + e.target.result + "\" alt=\"Generic placeholder image\" /> </div></div>";
       selDiv.append(html);
     }
     reader.readAsDataURL(f);

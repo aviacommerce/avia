@@ -1,7 +1,7 @@
 <ul id="drilldown" class="nav nav-pills nav-stacked">
   <li>
     <div class="dropdown navshophead">
-      <a class="dropdown-toggle"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <a class="dropdown-toggle toggle"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <img src="/images/shop_manager.001.svg" width="32" height="32" class="d-inline-block align-top" alt="">
       <span>Shop Manager</span>
       </a>
@@ -13,18 +13,19 @@
     </div>
   </li>
   <li>
+ 
     <a class="nav-link" href="/orders">
-    <i class="fa fa-clipboard-list" aria-hidden="true"></i> Orders
+    <i class="fa fa-clipboard-list" aria-hidden="true"></i> <span> Orders</span>
     </a>
   </li>
   <li>
     <a class="nav-link" href="#">
-    <i class="fa fa-exchange-alt" aria-hidden="true"></i> Returns
+    <i class="fa fa-exchange-alt" aria-hidden="true"></i> <span> Returns</span>
     </a>
   </li>
   <li>
     <a class="nav-link" href="#" data-toggle="collapse" data-target="#drilldown-2">
-    <i class="fa fa-shapes" aria-hidden="true"></i> Products
+    <i class="fa fa-shapes" aria-hidden="true"></i>  <span> Products</span>
     </a>
     <ul id="drilldown-2" class="nav nav-pills nav-stacked collapse pl-3">
       <li>
@@ -52,17 +53,17 @@
   </li>
   <li>
     <a class="nav-link" href="#">
-    <i class="fa fa-chart-bar" aria-hidden="true"></i> Reports
+    <i class="fa fa-chart-bar" aria-hidden="true"></i>  <span> Reports</span>
     </a>
   </li>
   <li>
     <a class="nav-link" href="/users">
-    <i class="fa fa-users" aria-hidden="true"></i> Users
+    <i class="fa fa-users" aria-hidden="true"></i>  <span> Users</span>
     </a>
   </li>
   <li>
     <a class="nav-link" href="#" data-toggle="collapse" data-target="#drilldown-1">
-    <i class="fa fa-sliders-h" aria-hidden="true"></i> Configurations
+    <i class="fa fa-sliders-h" aria-hidden="true"></i>  <span> Configurations</span>
     </a>
     <ul id="drilldown-1" class="nav nav-pills nav-stacked collapse pl-3">
       <li>
@@ -85,18 +86,26 @@
       </li>
     </ul>
   </li>
-  <li class="dropdown profile ">
-    <a class="dropdown-toggle"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    <span class="usrimg">
-    <i class="fas fa-user"></i>
-    </span>
-    <span class="username">
-      <%= get_user_name(@conn) %>
-    </span>
-    </a>
-    <div class="dropdown-menu p-0 ">
-      <a class="dropdown-item" href="#">Back to store</a>
-      <a class="dropdown-item" href="#">Account</a><%= link("LogOut", to: session_path(@conn, :new), method: :delete, class: "dropdown-item")%>
-    </div>
+  <li class="profile">
+    <ul>
+       <li class="dropdown">
+        <a class="dropdown-toggle"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="usrimg">
+        <i class="fas fa-user"></i>
+        </span>
+        <span class="username">
+          <%= get_user_name(@conn) %>
+        </span>
+        </a>
+        <div class="dropdown-menu p-0 ">
+          <a class="dropdown-item" href="#">Back to store</a>
+          <a class="dropdown-item" href="#">Account</a><%= link("LogOut", to: session_path(@conn, :new), method: :delete, class: "dropdown-item")%>
+        </div>
+      </li>
+      <li>
+        <a id="drawertoggle"><i class="fas fa-angle-double-left"></i></a>
+      </li>
+    </ul>  
   </li>
+ 
 </ul>
