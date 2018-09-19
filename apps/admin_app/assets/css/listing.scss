@@ -74,7 +74,9 @@
     }
   }
 
-  .selectedProductImages {
+  .img-selected-container {
+    margin-top: 4px;
+
     .col-6 .media {
       border: 1px solid $bordercolor1;
       background-color: $white;
@@ -87,8 +89,14 @@
     }
 
     img {
-      width: 49%;
-      padding: 1%;
+      width: 100%;
+      height: 100px;
+      padding: 0.25rem;
+      background-color: $white;
+      border: 1px solid $bordercolor1;
+      border-radius: 0.25rem;
+      margin: 0;
+
     }
   }
 
@@ -271,8 +279,7 @@
     display: inline-block;
     border: 1px solid $bordercolor2;
     border-radius: 3px;
-    width: 16px;
-    ;
+    width: 16px;    
     height: 16px;
     margin-right: .5em;
   }
@@ -572,26 +579,40 @@ $switch-transition: .2s all !default;
   }
 }
 
-.upload-btn-wrapper {
+.file-upload {
+  cursor: pointer;
   position: relative;
-  overflow: hidden;
   display: inline-block;
 
-  .btn {
-    border: 2px solid $gray-500;
-    color: $gray-500;
-    background-color: $white;
-    padding: 8px 20px;
-    border-radius: 8px;
-    font-size: 20px;
-    font-weight: bold;
+  .file-upload__label {
+    display: block;
+    padding: 1.2em 1em;
+    color: $main-sub-color;
+    background: transparent;
+    border-radius: .25em;
+    border: 1px solid $main-color;
+    text-align: center;
+    cursor: pointer;
+    i {
+      font-size: 2em;
+      color: $main-sub-color;
+    }
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 
-  .upload-btn-wrapper input[type=file] {
-    font-size: 100px;
+  .file-upload__input {
     position: absolute;
     left: 0;
     top: 0;
+    right: 0;
+    bottom: 0;
+    font-size: 1;
+    width: 100%;
+    height: 100%;
     opacity: 0;
+    cursor: pointer;
   }
 }

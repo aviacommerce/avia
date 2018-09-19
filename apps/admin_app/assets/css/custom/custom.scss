@@ -140,15 +140,17 @@ body {
 
   .img-wrap {
     position: relative;
-    display: inline-block;
     font-size: 0;
-    height: 120px;
+  }
+
+  .imgcol .col-3 {
+    max-width: 150px;
   }
 
   .img-wrap .product-delete {
     position: absolute;
-    top: 2px;
-    right: 2px;
+    top: 4px;
+    right: 8px;
     z-index: 100;
     background-color: $white;
     padding: 5px 2px 2px;
