@@ -1,0 +1,4 @@
+<div>
+  <%= render_variant(@line_item.product) %>
+  <div>Quantity <%= render_quantity_with_stock(@line_item) %></div>
+</div>

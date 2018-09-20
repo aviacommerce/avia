@@ -1,0 +1,37 @@
+<div class="table-contaner col-12 p-3 mb-2">
+  <div class="row">
+    <div class="col-1">
+      <div class="checkbox">
+        <label>
+        <input type="checkbox" value="">
+        <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+        </label>
+      </div>
+    </div>
+    <div>
+      <%= @order.user.first_name <>" "<>@order.user.last_name %>
+    </div>
+    <div>
+      <%= order_total(@order) %>
+    </div>
+    <div class="col-3"><a href="/orders/<%= @order.number %>/detail" rel="nofollow"><%= @order.number %></a></div>
+    <div class="col-3">
+        <%= @order.inserted_at %>
+    </div>
+    <div class="col-1">
+      <%= @order.state %>
+    </div>
+    <div class="col-3">
+      <%= @order.user.email %>
+    </div>
+    <div>
+      Ship to
+       <%= render_address(@order.shipping_address) %>
+    </div>
+    <div>
+      <%= for line_item <- @order.line_items do %>
+        <%= render "line_item_card.html", line_item: line_item %>
+      <% end %>
+    </div>
+  </div>
+</div>

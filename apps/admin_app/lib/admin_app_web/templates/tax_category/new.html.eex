@@ -11,7 +11,7 @@
       <%= error_tag f, :name %>
     </label>
   </div>
-  <div class="form-group">  
+  <div class="form-group">
     <label for="Description">
       Description <%= text_input f, :description, class: "form-control"%>
     </label>

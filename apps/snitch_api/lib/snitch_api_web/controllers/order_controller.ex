@@ -109,7 +109,10 @@ defmodule SnitchApiWeb.OrderController do
 
     order =
       order
-      |> Repo.preload(line_items: [product: [:theme, [options: :option_type]]], packages: :items)
+      |> Repo.preload(
+        line_items: [product: [:theme, [options: :option_type]]],
+        packages: [items: :product]
+      )
 
     conn
     |> put_status(200)

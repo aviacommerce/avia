@@ -55,7 +55,7 @@ defmodule Snitch.Domain.Order.DefaultMachine do
   alias Snitch.Domain.Order.Transitions
 
   state_machine Order, :state, ~w(cart address payment delivery processing rts shipping
-                  complete cancelled)a do
+                  complete cancelled confirmed balance_due)a do
     event(:add_addresses, %{from: [:cart], to: :address}, fn context ->
       context
       |> Transitions.associate_address()
@@ -92,12 +92,14 @@ defmodule Snitch.Domain.Order.DefaultMachine do
       Transitions.persist_shipping_preferences(context)
     end)
 
-    event(:confirm_purchase_payment, %{from: [:payment], to: :rts}, fn context ->
+    event(:confirm_purchase_payment, %{from: [:payment], to: :confirmed}, fn context ->
       context
+      |> Transitions.confirm_order_payment_status()
+      |> Transitions.process_shipments()
     end)
 
-    event(:confirm, %{from: [:payment], to: :processing}, fn context ->
-      context
+    event(:confirm_cod_payment, %{from: [:payment], to: :balance_due}, fn context ->
+      Transitions.process_shipments(context)
     end)
 
     event(:captured, %{from: [:processing], to: :rts}, fn context ->

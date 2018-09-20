@@ -465,7 +465,7 @@ defmodule Snitch.Domain.ShipmentTest do
                  } = item
                ],
                shipping_methods: [method],
-               state: "ready"
+               state: "pending"
              } = package = Shipment.to_package(shipment, order)
 
       assert item.line_item_id == shipment_item.line_item.id

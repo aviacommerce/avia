@@ -15,4 +15,3 @@ export default class View extends MainView {
       console.log('TaxonomyIndexView unmounted');
     }
 }
-  

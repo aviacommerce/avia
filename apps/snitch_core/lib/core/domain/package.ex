@@ -5,6 +5,8 @@ defmodule Snitch.Domain.Package do
 
   use Snitch.Domain
 
+  import Ecto.Query
+  alias Ecto.Multi
   alias Snitch.Data.Schema.Package
   alias Snitch.Tools.Money, as: MoneyTools
 
@@ -37,5 +39,20 @@ defmodule Snitch.Domain.Package do
   @spec shipping_tax(Package.t()) :: Money.t()
   def shipping_tax(_package) do
     MoneyTools.zero!()
+  end
+
+  @doc """
+  Returns an `Ecto.Multi()` struct to perform an update on `packages` for the
+  supplied `order`.
+  """
+  @spec update_all_for_order(Multi.t(), Order.t(), map) :: Multi.t()
+  def update_all_for_order(multi, order, params) do
+    query =
+      from(
+        package in Package,
+        where: package.order_id == ^order.id
+      )
+
+    Multi.update_all(multi, :update_package_params, query, set: params)
   end
 end
