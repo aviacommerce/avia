@@ -8,8 +8,8 @@ defmodule Snitch.Domain.Order do
   use Snitch.Domain
 
   import Ecto.Changeset
-
-  alias Snitch.Data.Schema.Order
+  import Ecto.Query
+  alias Snitch.Data.Schema.{Order, Payment}
   alias Snitch.Tools.Defaults
 
   @spec validate_change(Ecto.Changeset.t()) :: Ecto.Changeset.t()
@@ -29,6 +29,29 @@ defmodule Snitch.Domain.Order do
           changeset
       end
     end)
+  end
+
+  @doc """
+  Returns summation of all the `payments` for the order in the supplied `payment`
+  state.
+  """
+  @spec payments_total(Order.t(), Strin.t()) :: Money.t()
+  def payments_total(order, payment_state) do
+    {:ok, currency} = Defaults.fetch(:currency)
+
+    query =
+      from(
+        payment in Payment,
+        where: payment.state == ^payment_state
+      )
+
+    order = Repo.preload(order, payments: query)
+
+    order.payments
+    |> Enum.reduce(Money.new(currency, 0), fn payment, acc ->
+      Money.add!(acc, payment.amount)
+    end)
+    |> Money.round(currency_digits: :cash)
   end
 
   @doc """
@@ -54,10 +77,13 @@ defmodule Snitch.Domain.Order do
     order = Repo.preload(order, [:line_items, packages: :items])
     {:ok, currency} = Defaults.fetch(:currency)
 
-    Money.add!(
-      line_item_total(order.line_items, currency),
-      packages_total_cost(order.packages, currency)
-    )
+    total =
+      Money.add!(
+        line_item_total(order.line_items, currency),
+        packages_total_cost(order.packages, currency)
+      )
+
+    Money.round(total, currency_digits: :cash)
   end
 
   defp line_item_total(line_items, currency) do

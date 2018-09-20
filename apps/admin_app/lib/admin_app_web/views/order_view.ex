@@ -1,12 +1,11 @@
 defmodule AdminAppWeb.OrderView do
   use AdminAppWeb, :view
   alias Phoenix.HTML.FormData
-
   alias Snitch.Data.Model.Order, as: OrderModel
-
   alias Snitch.Data.Model.{LineItem, Country, State}
-
   alias Snitch.Repo
+  alias Snitch.Domain.Order, as: OrderDomain
+  alias Snitch.Data.Model.LineItem
 
   @bootstrap_contextual_class %{
     "slug" => "light",
@@ -52,7 +51,7 @@ defmodule AdminAppWeb.OrderView do
     content_tag(:tr, List.flatten(content))
   end
 
-  defp render_variant(product) do
+  def render_variant(product) do
     [content_tag(:th, content_tag(:i, "", class: "far fa-image")), content_tag(:td, product.sku)]
   end
 
@@ -78,11 +77,11 @@ defmodule AdminAppWeb.OrderView do
     end
   end
 
-  defp render_quantity_with_stock(line_item) do
+  def render_quantity_with_stock(line_item) do
     content_tag(:td, "#{line_item.quantity} x on hand")
   end
 
-  defp render_address(address) do
+  def render_address(address) do
     content_tag(
       :p,
       [
@@ -271,5 +270,10 @@ defmodule AdminAppWeb.OrderView do
 
   defp get_iso(country_id) do
     country_id |> get_country() |> Map.get(:iso)
+  end
+
+  def order_total(order) do
+    {:ok, total} = Money.to_string(OrderDomain.total_amount(order))
+    total
   end
 end

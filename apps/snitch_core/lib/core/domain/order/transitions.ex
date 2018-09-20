@@ -17,6 +17,7 @@ defmodule Snitch.Domain.Order.Transitions do
 
   alias Snitch.Domain.Package, as: PackageDomain
   alias Snitch.Domain.{Payment, Shipment, ShipmentEngine, Splitters.Weight}
+  alias Snitch.Domain.Order, as: OrderDomain
 
   @doc """
   Embeds the addresses and computes some totals of the `order`.
@@ -205,6 +206,43 @@ defmodule Snitch.Domain.Order.Transitions do
       struct(context, valid?: false, errors: [shipping_preferences: "is invalid"])
     end
   end
+
+  @doc """
+  Marks all the `shipment` aka `packages` of an ordertransition from `pending`
+  to the `processing` state.
+
+  This function is a side effect of the transition in which payment for an
+  order is made. In case of full payment of the order, all the packages should
+  move to the processing stage.
+  """
+  @spec process_shipments(Context.t()) :: Context.t()
+  def process_shipments(%Context{valid?: true, struct: %Order{} = order} = context) do
+    params = [state: "processing"]
+    package_update_multi = PackageDomain.update_all_for_order(Multi.new(), order, params)
+    struct(context, multi: package_update_multi)
+  end
+
+  def process_shipments(%Context{valid?: false} = context), do: context
+
+  @doc """
+  Checks if `order` is fully paid for.
+
+  The order total cost should match sum of all the `payments` for that `order`
+  in `paid` state.
+  """
+  @spec confirm_order_payment_status(Context.t()) :: Context.t()
+  def confirm_order_payment_status(%Context{valid?: true, struct: %Order{} = order} = context) do
+    order_cost = OrderDomain.total_amount(order)
+    order_payments_total = OrderDomain.payments_total(order, "paid")
+
+    if order_cost == order_payments_total do
+      context
+    else
+      struct(context, valid?: false, errors: [error: "balance due for order"])
+    end
+  end
+
+  def confirm_order_payment_status(%Context{valid?: false} = context), do: context
 
   @doc """
   Tranistion function to handle payment creation.

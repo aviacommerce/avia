@@ -1,47 +1,24 @@
 <div class="list-container">
   <div class="row m-0 list-header">
     <div class="col-10 p-0">
-      <h2>Listing Orders</h2>
-    </div>
-    <div class="col-2 p-0 float-right text-right">
-     <form action="orders" method="post" class="float-right">
-      <button type="submit" formmethod="post" class="btn btn-primary float-right"><i class="fas fa-plus"></i>  Create Order</button>
-    </form>
+      <h2>Manage Orders</h2>
     </div>
   </div>
+
+  <nav class="navbar navbar-expand-sm">
+    <ul class="nav nav-tabs">
+      <li class="order-tab nav-item"><%= link "Pending", to: order_path(@conn, :index, "pending"),
+        class: "nav-link active" %></li>
+      <li class="order-tab nav-item"><%= link "Unshipped", to: order_path(@conn, :index,
+        "unshipped"), class: "nav-link" %></li>
+      <li class="order-tab nav-item"><%= link "Shipped", to: order_path(@conn, :index,
+        "shipped"), class: "nav-link" %></li>
+      <li class="order-tab nav-item"><%= link "Complete", to: order_path(@conn, :index,
+        "complete"), class: "nav-link" %></li>
+    </ul>
+  </nav>
+
   <div class="row m-0 list">
-     <%= for {order, index} <- Enum.with_index(@orders) do %>
-      <div class="table-contaner col-12 p-3 mb-2">
-         <div class="row">
-            <div class="col-1">
-               <div class="checkbox">
-                  <label>
-                  <input type="checkbox" value="">
-                  <span class="cr"><i class="cr-icon fa fa-check"></i></span>
-                  </label>
-               </div>
-            </div>
-            <div class="col-3"><a href="orders/<%= order.number %>" rel="nofollow"><%= order.number %></a></div>
-            <div class="col-3">
-               <%= order.inserted_at %>
-            </div>
-            <div class="col-1">
-              <%= order.state %>
-            </div>
-            <div class="col-3">
-              <%= order.user.email %>
-            </div>
-            <div class="col-1">
-               <div class="dropdown col-12 p-0 float-right">
-                  <a class="p-2 dropdown-toggle options" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i class="fa fa-cog"></i>
-                  </a>
-                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
-                  </div>
-               </div>
-            </div>
-         </div>
-      </div>
-    <% end %>
+     <%= render "order_listing.html", conn: @conn, orders: @orders, token: @token %>
   </div>
 </div>

@@ -184,7 +184,7 @@ defmodule Snitch.Domain.Shipment do
       shipping_category_id: package.category.id,
       shipping_methods: shipping_methods,
       items: items,
-      state: if(package.backorders?, do: "backordered", else: "ready")
+      state: if(package.backorders?, do: "backordered", else: "pending")
     }
   end
 
