@@ -23,12 +23,10 @@ export default class View extends MainView {
         });
       }
     }
-  
+
     unmount() {
       super.unmount();
-  
       // Specific logic here
       console.log('Payment_methodNewView unmounted');
     }
 }
-  

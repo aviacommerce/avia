@@ -1,0 +1,7 @@
+<%= if length(@orders) == 0 do %>
+  <p>No Orders to Show</p>
+<% else %>
+  <%= for {order, index} <- Enum.with_index(@orders) do %>
+    <%= render "order_list_card.html", order: order %>
+  <% end %>
+<% end %>

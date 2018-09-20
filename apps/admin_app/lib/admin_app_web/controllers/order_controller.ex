@@ -1,33 +1,44 @@
 defmodule AdminAppWeb.OrderController do
   use AdminAppWeb, :controller
+
+  import Ecto.Query
+  import Phoenix.View, only: [render_to_string: 3]
+
   alias Snitch.Data.Model.Order
   alias BeepBop.Context
   alias Snitch.Domain.Order.DefaultMachine
-  alias Snitch.Data.Schema.Variant
-  alias Snitch.Data.Schema.Address
+  alias Snitch.Data.Schema.{Address, Product}
   alias Snitch.Repo
-  import Ecto.Query
+  alias AdminAppWeb.OrderView
+  alias AdminApp.OrderContext
+
+  def index(conn, %{"category" => category}) do
+    orders = OrderContext.order_list(category)
+    token = get_csrf_token()
+
+    html =
+      render_to_string(
+        OrderView,
+        "order_listing.html",
+        orders: orders,
+        token: token
+      )
+
+    conn
+    |> put_status(200)
+    |> json(%{html: html})
+  end
 
   def index(conn, _params) do
     render(conn, "index.html", %{
-      orders: Repo.preload(Order.get_all(), :user),
+      orders: OrderContext.order_list("pending"),
       token: get_csrf_token()
     })
   end
 
-  def show(conn, params) do
-    order = load_order(%{number: params["number"]})
-
-    search =
-      case params["search"] do
-        nil ->
-          []
-
-        _ ->
-          search_item_variant(params["search"])
-      end
-
-    render(conn, "show.html", %{order: order, search: search})
+  def show(conn, %{"number" => _number} = params) do
+    order = OrderContext.get_order(params)
+    render(conn, "show.html", order: order)
   end
 
   def create(conn, _params) do

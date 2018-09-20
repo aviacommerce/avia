@@ -7,7 +7,7 @@ defmodule SnitchApi.CodPayment do
   def make_payment(order_id) do
     with order when not is_nil(order) <- Order.get(order_id) do
       context = Context.new(order)
-      transition = DefaultMachine.confirm_purchase_payment(context)
+      transition = DefaultMachine.confirm_cod_payment(context)
       transition_response(transition)
     else
       _ ->
