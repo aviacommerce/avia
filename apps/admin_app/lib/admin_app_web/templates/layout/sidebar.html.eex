@@ -84,6 +84,9 @@
       <li>
         <a class="nav-link" href="/payment_methods">Payment Methods</a>
       </li>
+      <li>
+        <a class="nav-link" href="/zones">Zones</a>
+      </li>
     </ul>
   </li>
   <li class="profile">

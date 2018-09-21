@@ -18,5 +18,10 @@ defmodule Snitch.Data.Model.Country do
   end
 
   @spec formatted_list() :: [{String.t(), non_neg_integer}]
-  def formatted_list, do: Repo.all(from(c in Country, select: {c.name, c.id}))
+  def formatted_list do
+    Country
+    |> order_by([s], asc: s.name)
+    |> select([s], {s.name, s.id})
+    |> Repo.all()
+  end
 end
