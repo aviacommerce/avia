@@ -1,0 +1,51 @@
+<%= form_for @changeset, @action, fn f -> %>
+        <div class="form-group row ">
+          <label for="inputEmail3" class="col-sm-3 col-form-label">
+            <div class="label required">
+              Name
+            </div>
+          </label>
+          <div class="col-sm-9">           
+            <%= input(f, :name)%>
+          </div>
+        </div>
+        <div class="form-group row ">
+          <label for="inputEmail3" class="col-sm-3 col-form-label">
+            <div class="label">
+              Description
+            </div>
+          </label>
+          <div class="col-sm-9">           
+            <%= input(f, :description) %>
+          </div>
+        </div>
+        <div class="form-group row ">
+          <label for="inputEmail3" class="col-sm-3 col-form-label">
+              <div class="label required">
+                Zone Type
+              </div>
+          </label>
+          <div class="col-sm-9"> 
+            <%= select(f, :zone_type, get_zones(), id: "active-zone", selected: "C") %>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-3 col-form-label" id="zone-list">
+            <div class="label required" id="list-label">
+            </div>
+          </label>
+          <div class="col-sm-9" id="state-zone-list">           
+            <%= multiple_select(f, :state_members, get_states(), "data-init-plugin": "select2") %>
+          </div>
+          <div class="col-sm-9" id="country-zone-list">           
+            <%= multiple_select(f, :country_members, get_countries(), "data-init-plugin": "select2") %>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-10">
+            <%= submit "Submit", class: "btn btn-primary submit-btn col-2" %>
+            <%= link("Cancel", to: zone_path(@conn, :index), class: "btn btn-primary col-2") %>
+          </div>
+        </div>
+      </form>
+      <% end %>

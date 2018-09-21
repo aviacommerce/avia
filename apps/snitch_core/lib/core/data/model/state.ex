@@ -12,6 +12,16 @@ defmodule Snitch.Data.Model.State do
     QH.get(State, query_fields_or_primary_key, Repo)
   end
 
+  @spec get_all() :: [State.t()]
+  def get_all() do
+    Repo.all(State)
+  end
+
   @spec formatted_list() :: [{String.t(), non_neg_integer}]
-  def formatted_list, do: Repo.all(from(s in State, select: {s.name, s.id}))
+  def formatted_list do
+    State
+    |> order_by([s], asc: s.name)
+    |> select([s], {s.name, s.id})
+    |> Repo.all()
+  end
 end
