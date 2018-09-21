@@ -51,6 +51,8 @@ defmodule Snitch.Data.Schema.Zone do
   """
   @spec update_changeset(t, map) :: Ecto.Changeset.t()
   def update_changeset(zone, params) do
-    cast(zone, params, @update_fields)
+    zone
+    |> cast(params, @update_fields)
+    |> validate_required(@create_fields)
   end
 end

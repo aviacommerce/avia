@@ -50,8 +50,7 @@ defmodule Snitch.Data.Model.CountryZone do
   """
   @spec member_ids(Zone.t()) :: [non_neg_integer]
   def member_ids(%Zone{} = zone) do
-    query = from(m in CountryZoneMember, where: m.zone_id == ^zone.id, select: m.country_id)
-    Repo.all(query)
+    zone |> members() |> Enum.into([], fn x -> x.id end)
   end
 
   @doc """

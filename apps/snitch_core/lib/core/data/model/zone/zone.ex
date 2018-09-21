@@ -4,9 +4,11 @@ defmodule Snitch.Data.Model.Zone do
   """
 
   alias Ecto.Multi
+  use Snitch.Data.Model
   alias Snitch.Data.Model.{CountryZone, StateZone}
   alias Snitch.Data.Schema.Zone
   alias Snitch.Repo
+  import Ecto.Query
 
   defmacro __using__(_) do
     quote do
@@ -34,12 +36,20 @@ defmodule Snitch.Data.Model.Zone do
   * `zone_changeset` is the state/country `Zone` changeset.
   * `member_ids` is the list of country/state primary keys which are to be inserted.
   """
+
+  def creation_multi(zone_changeset, []) do
+    Multi.new()
+    |> Multi.insert(:zone, zone_changeset)
+  end
+
   @spec creation_multi(Ecto.Changeset.t(), [non_neg_integer]) :: Multi.t()
   def creation_multi(zone_changeset, member_ids) do
     Multi.new()
     |> Multi.insert(:zone, zone_changeset)
     |> Multi.run(:members, fn %{zone: zone} ->
-      multi_run_insert_members(member_ids, zone)
+      if member_ids != [] do
+        multi_run_insert_members(member_ids, zone)
+      end
     end)
   end
 
@@ -59,6 +69,10 @@ defmodule Snitch.Data.Model.Zone do
       multi_run_insert_members(added, zone)
     end)
     |> Multi.append(remove_members_multi(removed, zone))
+  end
+
+  def delete(id_or_instance) do
+    QH.delete(Zone, id_or_instance, Repo)
   end
 
   defp multi_run_insert_members(member_ids, zone) do
@@ -89,10 +103,17 @@ defmodule Snitch.Data.Model.Zone do
       |> zone_module.member_ids()
       |> MapSet.new()
 
-    new_members = MapSet.new(new_member_ids)
+    new_members = new_member_ids |> get_new_members_mapset()
     added = set_difference(new_members, old_members)
     removed = set_difference(old_members, new_members)
     %{added: added, removed: removed}
+  end
+
+  defp get_new_members_mapset(new_member_ids) do
+    case new_member_ids do
+      nil -> MapSet.new()
+      _ -> new_member_ids |> MapSet.new()
+    end
   end
 
   defp get_zone_module(%Zone{zone_type: "S"}), do: StateZone
@@ -103,5 +124,35 @@ defmodule Snitch.Data.Model.Zone do
     a
     |> MapSet.difference(b)
     |> MapSet.to_list()
+  end
+
+  @spec members(Zone.t()) :: [Country.t()] | [State.t()]
+  def members(%Zone{} = zone) do
+    case zone.zone_type do
+      "S" -> StateZone.members(zone)
+      "C" -> CountryZone.members(zone)
+    end
+  end
+
+  @spec member_ids(Zone.t()) :: Country.t() | State.t()
+  def member_ids(%Zone{} = zone) do
+    case zone.zone_type do
+      "S" -> StateZone.member_ids(zone)
+      "C" -> CountryZone.member_ids(zone)
+    end
+  end
+
+  @spec get(map | non_neg_integer) :: Zone.t() | nil
+  def get(id) do
+    Zone
+    |> where([z], z.id == ^id)
+    |> Repo.all()
+    |> List.first()
+  end
+
+  def get_all() do
+    Zone
+    |> order_by([z], asc: z.name)
+    |> Repo.all()
   end
 end
