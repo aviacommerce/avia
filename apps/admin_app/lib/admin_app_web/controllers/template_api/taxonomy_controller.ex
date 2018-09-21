@@ -26,7 +26,7 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
   end
 
   def taxon_edit(conn, %{"taxon_id" => taxon_id}) do
-    taxon = Repo.get(Taxon, taxon_id) |> Repo.preload(:variation_themes)
+    taxon = Repo.get(Taxon, taxon_id) |> Repo.preload([:variation_themes, :image])
     html = render_to_string(TaxonomyView, "taxon_edit_form.html", %{conn: conn, taxon: taxon})
 
     conn
