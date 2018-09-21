@@ -1,4 +1,4 @@
-<%= form_for @conn, taxonomy_path(@conn, :update_taxon),[as: :taxon, class: "edittaxonform", id: "taxon-form", method: "put"], fn f -> %>
+<%= form_for @conn, taxonomy_path(@conn, :update_taxon),[as: :taxon, class: "edittaxonform", multipart: true, id: "taxon-form", method: "put"], fn f -> %>
   <%= hidden_input f, :taxon_id, class: "form-control", id: "editform-taxon-id", value: @taxon.id %>
   <div class="form-group">
     <div class="form-group">
@@ -9,6 +9,17 @@
       <label class="control-label">Variation Theme</label>
       <%= multiple_select :taxons, :taxons, get_themes(), selected: get_selected_values(@taxon), "data-init-plugin": "select2", name: "taxon[themes][]" %>
     </div>
+    <div class="col-sm-9 form-group"> 
+      <label class="control-label">Image</label>          
+      <%= file_input f, :image, class: "form-control" %>
+    </div>
+    <%= if @taxon.image do %>
+      <div class="card" style="width: 15rem;">
+        <%= img_tag(get_image_url(@taxon.image, @taxon), class: "card-img-top") %>
+      <div class="card-body">
+        <h5 class="card-title"><%= @taxon.name %></h5>
+      </div>
+    <% end %>
     <%= submit "Save", class: "btn btn-primary"%>
   </div>
 <% end %>

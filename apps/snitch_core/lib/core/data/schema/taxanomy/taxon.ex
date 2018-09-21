@@ -5,7 +5,7 @@ defmodule Snitch.Data.Schema.Taxon do
 
   import Ecto.Query
   alias Snitch.Repo
-  alias Snitch.Data.Schema.{Taxon, Taxonomy, VariationTheme}
+  alias Snitch.Data.Schema.{Image, Taxon, Taxonomy, VariationTheme, TaxonImage}
 
   @type t :: %__MODULE__{}
 
@@ -14,6 +14,9 @@ defmodule Snitch.Data.Schema.Taxon do
     field(:lft, :integer)
     field(:rgt, :integer)
     field(:variation_theme_ids, {:array, :binary}, virtual: true)
+
+    has_one(:taxon_image, TaxonImage, on_replace: :delete)
+    has_one(:image, through: [:taxon_image, :image])
 
     many_to_many(
       :variation_themes,
@@ -28,10 +31,12 @@ defmodule Snitch.Data.Schema.Taxon do
   end
 
   @cast_fields ~w(name parent_id taxonomy_id lft rgt)
-  @update_fields ~w(name variation_theme_ids)
+  @update_fields ~w(name)
 
   def changeset(taxon, params) do
     cast(taxon, params, @cast_fields)
+    |> validate_required([:name])
+    |> cast_assoc(:taxon_image, with: &TaxonImage.changeset/2)
   end
 
   defp put_assoc_variation_theme(changeset, theme) when theme in [nil, ""] do
@@ -49,9 +54,27 @@ defmodule Snitch.Data.Schema.Taxon do
   end
 
   def update_changeset(taxon, params) do
+    ids = get_variation_theme(params.variation_theme_ids)
+
     taxon
-    |> Repo.preload(:variation_themes)
+    |> Repo.preload([:variation_themes, :taxon_image])
     |> cast(params, @update_fields)
-    |> put_assoc_variation_theme(params["variation_theme_ids"])
+    |> validate_required([:name])
+    |> cast_assoc(:taxon_image, with: &TaxonImage.changeset/2)
+    |> put_assoc_variation_theme(ids)
+  end
+
+  defp get_variation_theme(nil) do
+    nil
+  end
+
+  defp get_variation_theme("") do
+    ""
+  end
+
+  defp get_variation_theme(variation_theme_ids) do
+    if is_binary(variation_theme_ids),
+      do: variation_theme_ids |> String.split(","),
+      else: variation_theme_ids
   end
 end
