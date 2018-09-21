@@ -19,8 +19,8 @@ defmodule Snitch.Data.Schema.ProductBrandImage do
   Returns a changeset.
   """
   @spec changeset(t, map) :: Ecto.Changeset.t()
-  def changeset(%__MODULE__{} = brandimage, params) do
-    brandimage
+  def changeset(%__MODULE__{} = brand_image, params) do
+    brand_image
     |> cast(params, [:product_brand_id, :image_id])
     |> validate_required([:image_id])
   end

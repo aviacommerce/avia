@@ -41,7 +41,12 @@ defmodule AdminAppWeb.TaxonomyController do
 
   def update_taxon(conn, %{"taxon" => %{"taxon" => taxon_name, "taxon_id" => taxon_id} = params}) do
     taxon = taxon_id |> Taxonomy.get_taxon()
-    params = %{"name" => taxon_name, "variation_theme_ids" => params["themes"]}
+
+    params = %{
+      name: taxon_name,
+      variation_theme_ids: params["themes"],
+      image: params["image"]
+    }
 
     case Taxonomy.update_taxon(taxon, params) do
       {:ok, taxon} ->
@@ -51,23 +56,21 @@ defmodule AdminAppWeb.TaxonomyController do
 
       {:error, changeset} ->
         conn
-        |> put_flash(:error, "Taxon update unsuccessful")
+        |> put_flash(:error, changeset)
         |> redirect(to: taxonomy_path(conn, :index))
     end
   end
 
-  def create(conn, %{"id" => id, "taxon" => taxon}) do
+  def create(conn, %{"id" => id, "image" => image, "name" => name, "themes" => themes}) do
+    taxon_params = %{name: name, themes: themes, image: image}
     parent_taxon = Taxonomy.get_taxon(id)
-    taxon_params = %Taxon{name: taxon["name"]}
-    new_taxon = Taxonomy.add_taxon(parent_taxon, taxon_params, :child)
-    changeset = Taxon.update_changeset(new_taxon, %{"variation_theme_ids" => taxon["themes"]})
-    Repo.update(changeset)
+    taxon = Taxonomy.create_taxon(parent_taxon, taxon_params)
 
     html =
       render_to_string(
         TaxonomyView,
         "taxon.html",
-        name: taxon["name"]
+        name: name
       )
 
     conn

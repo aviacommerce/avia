@@ -33,11 +33,22 @@ export default class View extends MainView {
         event.preventDefault();
         var tid = $("#form-taxon-id").val();
         let target_div = $(`.item[data-taxon_id=${tid}]`);
-
+        var form_data = new FormData();
+        var image_file =  $(this).find('input[name="taxon[image]"]')[0].files[0];
+        var name = $(this).find('input[name="taxon[name]"]').val();
+        var themes = $("#taxons_taxons").val();
+        var csrf = $( this ).find( 'input:hidden' ).val();
+        form_data.append('image', image_file);
+        form_data.append('name', name);
+        form_data.append('themes', themes); 
+        form_data.append('_csrf_token', csrf);
+        form_data.append('id', tid);
         $.ajax({
           url: '/taxonomy',
           type: "POST",
-          data: $(this).serialize(),
+          data: form_data,
+          processData: false,
+          contentType: false,
           success: function(result) {
             $("#taxon-modal").modal('hide');
             target_div.append(result.html);
