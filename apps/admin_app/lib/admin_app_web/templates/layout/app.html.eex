@@ -19,6 +19,32 @@
     <%= render "main.html", assigns%>
     <%=# render "footer.html" %>
       <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.debug.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js"></script>
+      <script type="text/javascript">
+        function genInvoicePDF() {
+          html2canvas(document.getElementById("invoiceData"), {
+            onrendered: function (canvas) {
+              var img = canvas.toDataURL("image/png");
+              var doc = new jsPDF();
+              doc.addImage(img, 'JPEG', 20, 20);
+              doc.save('invoice.pdf');
+            }
+          });
+        }
+      </script>
+      <script type="text/javascript">
+        function genPackingSlipPDF() {
+          html2canvas(document.getElementById("packingslipData"), {
+            onrendered: function (canvas) {
+              var img = canvas.toDataURL("image/png");
+              var doc = new jsPDF();
+              doc.addImage(img, 'JPEG', 20, 20);
+              doc.save('packingslip.pdf');
+            }
+          });
+        }
+      </script>
       <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
       <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
   </body>
