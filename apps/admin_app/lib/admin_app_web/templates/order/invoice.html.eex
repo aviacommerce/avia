@@ -85,13 +85,7 @@
       <td>
     </tr>
     <tr>
-      <td style="width: 100%;">
-        <table class="table" style="width: 100%;">
-            <tbody>
-              <%= summary(@order) %>
-            </tbody>
-        </table>
-      </td>
+      <%= render "order_total_summary.html", order: @order %>
     </tr>
   </table>
   <table style="width: 100%;">
@@ -123,6 +117,3 @@
     </tr>
   </table>
 </div>
-
-  
-  

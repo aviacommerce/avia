@@ -68,4 +68,3 @@ $(document).ready(() => {
 
 const elmDiv = document.getElementById("elm-main");
 Elm.Main.embed(elmDiv);
-

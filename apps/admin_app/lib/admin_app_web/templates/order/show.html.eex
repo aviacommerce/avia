@@ -100,22 +100,50 @@
     </ol>
   </nav>
   <h2>
-    Order #<%= @order.id %>
+    Order
+    from <%= @order.user.first_name <> " " <> @order.user.last_name %>
     <%= state_badge(@order.state) %>
   </h2>
+  <div class="btn-group mx-2">
+    <button class="btn btn-outline-secondary btn-md dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Order Actions
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+      <%= link "Pending", to: order_package_path(@conn, :update_package,
+        @order.id, [state: :processing]), method: :put, class: "dropdown-item" %>
+      <%= link "Ready", to: order_package_path(@conn, :update_package,
+        @order.id, [state: :ready]), method: :put, class: "dropdown-item" %>
+      <%= link "Ship", to: order_package_path(@conn, :update_package,
+        @order.id, [state: :shipped]), method: :put, class: "dropdown-item" %>
+    <div class="dropdown-divider"></div>
+      <%= link "Mark as Complete", to: order_path(@conn, :update_state,
+        @order.id), method: :put, class: "dropdown-item" %>
+    </div>
+    </div>
+  </div>
   <div class="row">
     <div class="col-8">
       <%= render "line_item.html", %{order: @order} %>
+      <div class="card-body">
+        <%= render_invoice_links(@order) %>
+      </div>
       <%= render "addresses.html", %{order: @order} %>
     </div>
     <div class="col-4">
       <h3>Order Summary</h3>
+      <%= render "order_total_summary.html", order: @order %>
+      <div>
+      <h3>Payment Summary</h3>
       <table class="table table-sm">
-        <caption class="sr-only">order summary</caption>
-        <tbody>
-          <%= summary(@order) %>
-        </tbody>
+        <caption class="sr-only">Payment Summary</caption>
+          <tbody>
+          <%= for payment <- @order.payments do %>
+            <tr><th>Method Selected</th><td><%= payment.payment_type %></td></tr>
+            <tr><th>Status</th><td><%= payment.state %></td></tr>
+          <% end %>
+          </tbody>
       </table>
+      </div>
     </div>
   </div>
 </div>

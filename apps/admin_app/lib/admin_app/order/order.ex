@@ -7,7 +7,24 @@ defmodule AdminApp.OrderContext do
   def get_order(%{"number" => number}) do
     %{number: number}
     |> OrderModel.get()
-    |> Repo.preload([[line_items: :product], :packages, :payments, :user])
+    |> Repo.preload([
+      [line_items: :product],
+      [packages: [:items, :shipping_method]],
+      :payments,
+      :user
+    ])
+  end
+
+  def get_order(%{"id" => id}) do
+    id
+    |> String.to_integer()
+    |> OrderModel.get()
+    |> Repo.preload([
+      [line_items: :product],
+      [packages: [:items, :shipping_method]],
+      :payments,
+      :user
+    ])
   end
 
   def order_list("pending") do
@@ -32,7 +49,7 @@ defmodule AdminApp.OrderContext do
     end)
   end
 
-  def order_list("unshipped") do
+  def order_list("shipped") do
     query = query_confirmed_orders()
     orders = load_orders(query)
 
@@ -50,7 +67,7 @@ defmodule AdminApp.OrderContext do
         where: order.state == "complete"
       )
 
-    orders = Repo.all(Order, query)
+    Repo.all(query)
   end
 
   defp query_confirmed_orders() do
