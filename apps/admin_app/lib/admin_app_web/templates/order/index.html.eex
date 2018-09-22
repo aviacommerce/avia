@@ -1,24 +1,59 @@
 <div class="list-container">
-  <div class="row m-0 list-header">
-    <div class="col-10 p-0">
-      <h2>Manage Orders</h2>
-    </div>
-  </div>
-
-  <nav class="navbar navbar-expand-sm">
-    <ul class="nav nav-tabs">
-      <li class="order-tab nav-item"><%= link "Pending", to: order_path(@conn, :index, "pending"),
-        class: "nav-link active" %></li>
-      <li class="order-tab nav-item"><%= link "Unshipped", to: order_path(@conn, :index,
-        "unshipped"), class: "nav-link" %></li>
-      <li class="order-tab nav-item"><%= link "Shipped", to: order_path(@conn, :index,
-        "shipped"), class: "nav-link" %></li>
-      <li class="order-tab nav-item"><%= link "Complete", to: order_path(@conn, :index,
-        "complete"), class: "nav-link" %></li>
-    </ul>
-  </nav>
-
-  <div class="row m-0 list">
-     <%= render "order_listing.html", conn: @conn, orders: @orders, token: @token %>
-  </div>
+   <div class="row m-0 list-header">
+      <div class="col-10 p-0">
+         <h2>Orders & Shipping</h2>
+      </div>
+   </div>
+   <div class="row m-0">
+      <div class="col-9 p-0">
+         <nav class="navbar navbar-expand-sm">
+            <ul class="nav nav-tabs">
+               <li class="order-tab nav-item"><%= link "Pending", to: order_path(@conn, :index, "pending"),
+                  class: "nav-link active" %></li>
+               <li class="order-tab nav-item"><%= link "Unshipped", to: order_path(@conn, :index,
+                  "unshipped"), class: "nav-link" %></li>
+               <li class="order-tab nav-item"><%= link "Shipped", to: order_path(@conn, :index,
+                  "shipped"), class: "nav-link" %></li>
+               <li class="order-tab nav-item"><%= link "Complete", to: order_path(@conn, :index,
+                  "complete"), class: "nav-link" %></li>
+            </ul>
+         </nav>
+         <div class="row m-0 list">
+            <div class="col-12 p-0">
+               <%= render "order_listing.html", conn: @conn, orders: @orders, token: @token %>
+            </div>
+         </div>
+      </div>
+      <div class="col-3 rightbar">
+         <form>
+            <div class="form-group">
+               <label class="label-heading">Sort By</label>
+               <select class="form-control">
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+               </select>
+            </div>
+            <div class="col-sm-12 p-0">
+               <label class="label-heading">Sort By Date</label>
+               <div class="radio">
+                  <label>
+                  <input type="radio" name="o3" value="">
+                  <span class="cr"><i class="cr-icon fa fa-circle"></i></span>
+                  Option1
+                  </label>
+               </div>
+               <div class="radio">
+                  <label>
+                  <input type="radio" name="o3" value="" checked>
+                  <span class="cr"><i class="cr-icon fa fa-circle"></i></span>
+                  Option2
+                  </label>
+               </div>
+            </div>
+         </form>
+      </div>
+   </div>
 </div>

@@ -1,4 +1,12 @@
-<div>
-  <%= render_variant(@line_item.product) %>
-  <div>Quantity <%= render_quantity_with_stock(@line_item) %></div>
+<div class="media mt-3 lineitem-detail">
+   <a class="pr-3" href="#">
+   <img src="/images/empty-img.png" alt="Default">
+   </a>
+   <div class="media-body">
+      <div class="mt-0 text-capitalize name"><%= render_variant(@line_item.product) %></div>
+      <div class="variant">
+         <span>Quantity</span>
+         <span><%= render_quantity_with_stock(@line_item) %></span>
+      </div>
+   </div>
 </div>
