@@ -35,7 +35,7 @@
   .list-header {
     background-color: $white;
     padding: .4em 1em;
-    border-bottom: 1px solid $gray-400;
+    border-bottom: 1px solid $bordercolor1;
 
     h2 {
       font-size: 1.625em;
@@ -96,7 +96,6 @@
       border: 1px solid $bordercolor1;
       border-radius: 0.25rem;
       margin: 0;
-
     }
   }
 
@@ -106,18 +105,160 @@
     }
   }
 
+  .navbar {
+    .nav {
+      background-color: transparent;
+      width: 100%;
+
+      .nav-item {
+        font-size: 16px !important;
+      }
+    }
+
+    /* Tabs*/
+    section {
+      padding: 60px 0;
+    }
+
+    .nav-tabs .nav-item.show .nav-link,
+    .nav-tabs .nav-link.active {
+      color: $gray-800;
+      border-bottom: 4px solid $main-color !important;
+      font-size: 16px;
+      background-color: transparent;
+    }
+
+    .nav-tabs .nav-link {
+      border: 0px solid;
+      border-top-left-radius: .25rem;
+      border-top-right-radius: .25rem;
+      color: $gray-600;
+      font-size: 16px;
+      padding: 8px;
+      margin-right: 5px;
+      font-weight: normal;
+    }
+
+    .nav-tabs .nav-link {
+      &:hover {
+        color: $gray-800;
+        border-bottom: 4px solid $main-sub-color !important;
+        font-size: 16px;
+        background-color: transparent;
+      }
+    }
+  }
+
+  .rightbar {
+    padding-top: 10px;
+
+    form {
+      .label-heading {
+        font-weight: bold;
+        font-size: .875em;
+      }
+    }
+  }
+
   .list {
     background-color: $gray-101;
     padding: 1em 0.938em;
 
     .table-contaner {
+      .std-shipping {
+        font-size: 12px;
+      }
+
+      .order-action {
+        .order {
+          font-size: 12px;
+        }
+
+        .address {
+          .ship {
+            color: $gray-400;
+            font-size: 12px;
+          }
+
+          .name {
+            font-size: 12px;
+            font-weight: 600;
+          }
+
+          .addres-detail {
+            font-size: 12px;
+          }
+        }
+
+        .dropdown {
+          width: 36px;
+
+          a {
+            padding: 5px;
+            position: relative;
+
+            img {
+              width: 20px;
+            }
+          }
+        }
+      }
+
+      .lineitem {
+        .name {
+          font-weight: 500;
+        }
+
+        .order-datail {
+          font-size: 12px;
+
+          span {
+            &:first-child {
+              text-decoration: underline;
+            }
+
+            margin-right: 10px;
+          }
+        }
+
+        .lineitem-detail {
+          a {
+            img {
+              width: 75px;
+              height: 75px;
+              border-radius: 3px;
+            }
+          }
+
+          .name {
+            font-size: 12px;
+          }
+
+          .variant {
+            span {
+              font-size: 12px;
+
+              &:first-child {
+                font-weight: 300;
+                line-height: 1.6;
+                color: $gray-400;
+              }
+
+              &:last-child {
+                font-weight: bold;
+                color: $main-sub-color;
+              }
+            }
+          }
+        }
+      }
+
       .col-1 {
         padding: 0 0;
 
         &:first-child {
           padding-left: 15px;
           padding-right: 0;
-
         }
 
         .col {
@@ -170,35 +311,13 @@
       padding-top: 9px;
       background-color: $white;
 
-      .dropdown-toggle::after {
-        display: inline-block;
-        width: 0;
-        height: 0;
-        margin-left: 0.255em;
-        vertical-align: 0.255em;
-        content: "";
-        border-top: 0.3em solid $bordercolor2;
-        border-right: 0.3em solid transparent;
-        border-bottom: 0;
-        border-left: 0.3em solid transparent;
+      .checkbox {
+        margin-right: 10px;
       }
     }
 
     .btn-group {
       display: inline !important;
-
-      .dropdown-toggle::after {
-        display: inline-block;
-        width: 0;
-        height: 0;
-        margin-left: 0.255em;
-        vertical-align: 0.255em;
-        content: "";
-        border-top: 0.3em solid $bordercolor2;
-        border-right: 0.3em solid transparent;
-        border-bottom: 0;
-        border-left: 0.3em solid transparent;
-      }
 
       .btn {
         height: 38.6px;
@@ -273,13 +392,17 @@
     clear: both;
   }
 
+  .checkbox .cr {
+    margin-right: 0 !important;
+  }
+
   .checkbox .cr,
   .radio .cr {
     position: relative;
     display: inline-block;
     border: 1px solid $bordercolor2;
     border-radius: 3px;
-    width: 16px;    
+    width: 16px;
     height: 16px;
     margin-right: .5em;
   }
@@ -293,7 +416,7 @@
   .checkbox .cr .cr-icon,
   .radio .cr .cr-icon {
     position: absolute;
-    font-size: .7em;
+    font-size: .6em;
     line-height: 0;
     top: 56%;
     left: 13%;
@@ -325,14 +448,79 @@
     cursor: pointer;
 
     input[type="radio"]:checked+.cr>.cr-icon {
-      top: 7.6px;
-      left: 0.8px;
+      top: 7.85px;
+      left: 2.1px;
     }
   }
 
   .checkbox label input[type="checkbox"]:disabled+.cr,
   .radio label input[type="radio"]:disabled+.cr {
     opacity: .5;
+  }
+
+  .order-detail {
+    h2 {
+      font-size: 20px;
+      font-weight: 500;
+    }
+
+    .shipby {
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .lineitem-detail {
+      a {
+        img {
+          width: 75px;
+          height: 75px;
+          border-radius: 3px;
+        }
+      }
+
+      .variant {
+        span {
+          font-size: 12px;
+
+          &:first-child {
+            font-weight: 300;
+            line-height: 1.6;
+            color: $gray-400;
+          }
+
+          &:last-child {
+            font-weight: bold;
+            color: $main-sub-color;
+          }
+        }
+      }
+    }
+
+    .address {
+      .ship {
+        color: $gray-400;
+        font-size: 12px;
+        font-weight: normal;
+      }
+
+      .std-shipping {
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .name {
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .addres-detail {
+        font-size: 12px;
+      }
+    }
+
+    .orderon {
+      font-size: 12px;
+    }
   }
 }
 
@@ -367,9 +555,7 @@
     transform: perspective(1px) translateY(-50%);
     text-align: center;
   }
-
 }
-
 
 #category_loader {
   position: absolute;
@@ -593,6 +779,7 @@ $switch-transition: .2s all !default;
     border: 1px solid $main-color;
     text-align: center;
     cursor: pointer;
+
     i {
       font-size: 2em;
       color: $main-sub-color;

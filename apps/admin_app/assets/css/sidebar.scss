@@ -14,13 +14,13 @@
         color: $gray-600;
         border-radius: 0;
         font-size: 14px;
-        color: #222;
+        color: $main-sub-color;
 
         i {
           font-size: 1.4em;
           margin-right: .5em;
           color: $gray-600;
-          color: #757575;
+          color: $gray-500;
         }
 
         &:hover {
@@ -61,7 +61,8 @@
       &:last-child {
         width: 20% !important;
 
-        a ,.dropdown-toggle {
+        a,
+        .dropdown-toggle {
           display: block !important;
 
           &:after {

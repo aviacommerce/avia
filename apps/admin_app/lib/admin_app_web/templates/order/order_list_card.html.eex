@@ -1,37 +1,48 @@
-<div class="table-contaner col-12 p-3 mb-2">
-  <div class="row">
-    <div class="col-1">
-      <div class="checkbox">
-        <label>
-        <input type="checkbox" value="">
-        <span class="cr"><i class="cr-icon fa fa-check"></i></span>
-        </label>
+<div class="table-contaner cpointer col-12 p-3 mb-2" onclick="location.href='/orders/<%= @order.number %>/detail';">
+   <div class="row">
+      <div class="col-7 p-0">
+         <div class="media lineitem">
+            <div class="checkbox mx-3">
+               <label>
+               <input type="checkbox" value="">
+               <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+               </label>
+            </div>
+            <div class="media-body">
+               <div class="name">
+                  <%= @order.user.first_name <>" "<>@order.user.last_name %>
+               </div>
+               <div class="order-datail">
+                  <span><a href="/orders/<%= @order.number %>/detail" rel="nofollow"><%= @order.number %></a></span> <span><%= order_total(@order) %></span>  
+               </div>
+               <div>
+                  <%= for line_item <- @order.line_items do %>
+                  <%= render "line_item_card.html", line_item: line_item %>
+                  <% end %>
+               </div>
+            </div>
+         </div>
       </div>
-    </div>
-    <div>
-      <%= @order.user.first_name <>" "<>@order.user.last_name %>
-    </div>
-    <div>
-      <%= order_total(@order) %>
-    </div>
-    <div class="col-3"><a href="/orders/<%= @order.number %>/detail" rel="nofollow"><%= @order.number %></a></div>
-    <div class="col-3">
-        <%= @order.inserted_at %>
-    </div>
-    <div class="col-1">
-      <%= @order.state %>
-    </div>
-    <div class="col-3">
-      <%= @order.user.email %>
-    </div>
-    <div>
-      Ship to
-       <%= render_address(@order.shipping_address) %>
-    </div>
-    <div>
-      <%= for line_item <- @order.line_items do %>
-        <%= render "line_item_card.html", line_item: line_item %>
-      <% end %>
-    </div>
-  </div>
+      <div class="col-5">
+         <div class="media order-action">
+            <div class="media-body">
+               <div class="order">              
+                  Ordered <span><%= @order.inserted_at %></span>
+               </div>
+               <div class="std-shipping my-3"><span class="mr-1">Standard Shipping</span>  (US$ 0.00) </div>
+               <div class="address">
+                  <div class="ship"> Ship to </div>
+                  <%= render_address(@order.shipping_address) %>
+               </div>
+            </div>
+            <div class="dropdown float-right">
+               <a class="options" href="#" role="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+               <img src="/images/dots.svg" alt="Default">
+               </a>
+               <div class="dropdown-menu dropdown-menu-right" >
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
 </div>
