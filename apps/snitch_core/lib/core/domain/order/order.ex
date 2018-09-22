@@ -68,9 +68,8 @@ defmodule Snitch.Domain.Order do
   """
   @spec total_amount(Order.t()) :: Money.t()
   def total_amount(%Order{state: state} = order) when state in ["cart", "address"] do
-    {:ok, currency} = Defaults.fetch(:currency)
     order = Repo.preload(order, :line_items)
-    line_item_total(order.line_items, currency)
+    line_item_total(order)
   end
 
   def total_amount(%Order{} = order) do
@@ -79,15 +78,17 @@ defmodule Snitch.Domain.Order do
 
     total =
       Money.add!(
-        line_item_total(order.line_items, currency),
+        line_item_total(order),
         packages_total_cost(order.packages, currency)
       )
 
     Money.round(total, currency_digits: :cash)
   end
 
-  defp line_item_total(line_items, currency) do
-    line_items
+  def line_item_total(order) do
+    {:ok, currency} = Defaults.fetch(:currency)
+
+    order.line_items
     |> Enum.reduce(Money.new(currency, 0), fn line_item, acc ->
       {:ok, total} = Money.mult(line_item.unit_price, line_item.quantity)
       {:ok, acc} = Money.add(acc, total)
@@ -124,5 +125,31 @@ defmodule Snitch.Domain.Order do
       |> Money.add!(shipping_tax)
       |> Money.add!(tax)
     end)
+  end
+
+  def total_tax(packages) do
+    {:ok, currency} = Defaults.fetch(:currency)
+
+    packages
+    |> Enum.reduce(Money.new(currency, 0), fn %{
+                                                items: items,
+                                                shipping_tax: shipping_tax
+                                              },
+                                              acc ->
+      acc
+      |> Money.add!(shipping_tax)
+      |> Money.add!(package_items_total_cost(items, currency))
+    end)
+    |> Money.round(currency_digits: :cash)
+  end
+
+  def shipping_total(packages) do
+    {:ok, currency} = Defaults.fetch(:currency)
+
+    packages
+    |> Enum.reduce(Money.new(currency, 0), fn %{cost: cost}, acc ->
+      Money.add!(acc, cost)
+    end)
+    |> Money.round(currency_digits: :cash)
   end
 end

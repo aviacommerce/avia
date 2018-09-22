@@ -11,6 +11,7 @@ defmodule AdminAppWeb.OrderController do
   alias Snitch.Repo
   alias AdminAppWeb.OrderView
   alias AdminApp.OrderContext
+  alias AdminApp.PackageContext
 
   def index(conn, %{"category" => category}) do
     orders = OrderContext.order_list(category)
@@ -39,6 +40,26 @@ defmodule AdminAppWeb.OrderController do
   def show(conn, %{"number" => _number} = params) do
     order = OrderContext.get_order(params)
     render(conn, "show.html", order: order)
+  end
+
+  def update_package(conn, %{"id" => id, "state" => state}) do
+    case PackageContext.update_packages(state, String.to_integer(id)) do
+      {:ok, _} ->
+        order = OrderContext.get_order(%{"id" => id})
+
+        conn
+        |> put_flash(:info, "Order Updated!")
+        |> render("show.html", order: order)
+
+      {:error, _} ->
+        put_flash(conn, :error, "update failed!")
+        redirect(conn, to: order_path(conn, :show))
+    end
+  end
+
+  def update_state(conn, %{"id" => id}) do
+    # TODO: complete the function after checking for packages state and
+    # order total
   end
 
   def create(conn, _params) do

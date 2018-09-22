@@ -35,6 +35,8 @@ defmodule AdminAppWeb.Router do
     get("/orders/:category", OrderController, :index)
     get("/orders", OrderController, :index)
     get("/orders/:number/detail", OrderController, :show)
+    put("/orders/:id/packages/", OrderController, :update_package, as: :order_package)
+    put("/orders/:id/state", OrderController, :update_state)
 
     resources "/orders", OrderController, only: ~w[show create]a, param: "number" do
       get("/cart", OrderController, :get, as: :cart)

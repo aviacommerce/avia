@@ -1,9 +1,6 @@
 defmodule AdminAppWeb.OrderView do
   use AdminAppWeb, :view
-  alias Phoenix.HTML.FormData
-  alias Snitch.Data.Model.Order, as: OrderModel
-  alias Snitch.Data.Model.{LineItem, Country, State}
-  alias Snitch.Repo
+  alias Snitch.Data.Model.{Country, LineItem, State}
   alias Snitch.Domain.Order, as: OrderDomain
   alias Snitch.Data.Model.LineItem
 
@@ -19,17 +16,6 @@ defmodule AdminAppWeb.OrderView do
     "completed" => "success"
   }
 
-  @summary_fields ~w(item_total tax_total adjustment_total promo_total total)a
-  @summary_fields_capitalized Enum.map(@summary_fields, fn field ->
-                                field
-                                |> Atom.to_string()
-                                |> String.replace("_", " ")
-                                |> String.capitalize()
-                              end)
-  @summary_field_classes %{
-    total: "table-secondary"
-  }
-
   def colorize(%{state: state}) do
     "table-" <> Map.fetch!(@bootstrap_contextual_class, state)
   end
@@ -43,9 +29,7 @@ defmodule AdminAppWeb.OrderView do
     content = [
       render_variant(line_item.product),
       content_tag(:td, line_item.unit_price),
-      render_quantity_with_stock(line_item),
-      render_update_buttons(line_item.id, order),
-      render_buttons(line_item.id, order)
+      render_quantity_with_stock(line_item)
     ]
 
     content_tag(:tr, List.flatten(content))
@@ -53,6 +37,35 @@ defmodule AdminAppWeb.OrderView do
 
   def render_variant(product) do
     content_tag(:td, product.sku)
+  end
+
+  def line_item_total(order) do
+    order
+    |> OrderDomain.line_item_total()
+    |> Money.to_string!()
+  end
+
+  def tax_total(order) do
+    order.packages
+    |> OrderDomain.total_tax()
+    |> Money.to_string!()
+  end
+
+  def shipping_total(order) do
+    order.packages
+    |> OrderDomain.shipping_total()
+    |> Money.to_string!()
+  end
+
+  def order_total(order) do
+    order
+    |> OrderDomain.total_amount()
+    |> Money.to_string!()
+  end
+
+  def shipping_method(order) do
+    package = List.first(order.packages)
+    String.capitalize(package.shipping_method.name)
   end
 
   defp render_update_buttons(item, order) do
@@ -78,7 +91,7 @@ defmodule AdminAppWeb.OrderView do
   end
 
   def render_quantity_with_stock(line_item) do
-    content_tag(:td, "#{line_item.quantity} x on hand")
+    content_tag(:td, "#{line_item.quantity}")
   end
 
   def render_address(address) do
@@ -101,37 +114,6 @@ defmodule AdminAppWeb.OrderView do
           class: "addres-detail"
         )
       ]
-    )
-  end
-
-  defp summary(order) do
-    content_tag(
-      :tbody,
-      @summary_fields
-      |> Stream.zip(@summary_fields_capitalized)
-      |> Enum.map(&make_summary_row(&1, order))
-    )
-  end
-
-  defp make_summary_row({field, field_capitalized}, order) when field in ~w(item_total total)a do
-    content_tag(
-      :tr,
-      [
-        content_tag(:th, field_capitalized, scope: "row"),
-        content_tag(:td, LineItem.compute_total(order.line_items))
-      ],
-      class: Map.get(@summary_field_classes, field)
-    )
-  end
-
-  defp make_summary_row({field, field_capitalized}, order) do
-    content_tag(
-      :tr,
-      [
-        content_tag(:th, field_capitalized, scope: "row"),
-        content_tag(:td, Snitch.Tools.Money.zero!())
-      ],
-      class: Map.get(@summary_field_classes, field)
     )
   end
 
@@ -200,15 +182,10 @@ defmodule AdminAppWeb.OrderView do
   end
 
   def render_invoice_links(order) do
-    order_new =
-      order
-      |> Repo.preload(:line_items)
-      |> Repo.preload(:user)
-
-    html = Phoenix.View.render_to_string(AdminAppWeb.OrderView, "invoice.html", order: order_new)
+    html = Phoenix.View.render_to_string(AdminAppWeb.OrderView, "invoice.html", order: order)
 
     payslip_html =
-      Phoenix.View.render_to_string(AdminAppWeb.OrderView, "packing_slip.html", order: order_new)
+      Phoenix.View.render_to_string(AdminAppWeb.OrderView, "packing_slip.html", order: order)
 
     {:ok, file} = PdfGenerator.generate_binary(html, page_size: "A4", delete_temporary: false)
 
@@ -224,21 +201,21 @@ defmodule AdminAppWeb.OrderView do
       content_tag(
         :a,
         "Download Invoice",
-        href: "#{order.number}/download-invoice",
+        href: "/orders/#{order.number}/download-invoice",
         class: "btn btn-primary",
         style: "margin-right: 3px;"
       ),
       content_tag(
         :a,
         "Show Packing Slip",
-        href: "#{order.number}/show-packing-slip",
+        href: "/orders/#{order.number}/show-packing-slip",
         class: "btn btn-primary",
         style: "margin-right: 3px;"
       ),
       content_tag(
         :a,
         "Download Packing Slip",
-        href: "#{order.number}/download-packing-slip",
+        href: "/orders/#{order.number}/download-packing-slip",
         class: "btn btn-primary",
         style: "margin-right: 3px;"
       )

@@ -10,6 +10,10 @@
       <h5>Shipping</h5><hr>
       <%= render_address(@order.shipping_address) %>
     </div>
+    <div class="col col-sm text-center">
+      <h5>Shipping Method Selected</h5>
+      <%= shipping_method(@order) %>
+    </div>
   </div>
 </div>
 <% else %>

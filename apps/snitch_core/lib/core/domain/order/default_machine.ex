@@ -98,7 +98,7 @@ defmodule Snitch.Domain.Order.DefaultMachine do
       |> Transitions.process_shipments()
     end)
 
-    event(:confirm_cod_payment, %{from: [:payment], to: :balance_due}, fn context ->
+    event(:confirm_cod_payment, %{from: [:payment], to: :confirmed}, fn context ->
       Transitions.process_shipments(context)
     end)
 

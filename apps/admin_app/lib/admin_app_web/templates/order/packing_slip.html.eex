@@ -62,11 +62,7 @@
         </tr>
         <tr>
         <td style="width: 100%;">
-            <table class="table" style="width: 100%;">
-                <tbody>
-                <%= summary(@order) %>
-                </tbody>
-            </table>
+            <%= render "order_total_summary.html", order: @order %>
         </td>
         </tr>
     </table>
@@ -75,7 +71,6 @@
     <div style="border-top-style: dashed;">
     </div>
     <br>
-    
     <table style="width: 100%;">
         <tr>
             <td style="width: 100%; font-weight: bolder; font-size: 20px; text-align: center;">
