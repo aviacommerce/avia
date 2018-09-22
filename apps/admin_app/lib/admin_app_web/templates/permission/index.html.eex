@@ -4,46 +4,41 @@
       <h2>Permissions</h2>
     </div>
     <div class="col-2 p-0 float-right text-right">
- 
-    <%= link("  Add a Permission ", to: permission_path(@conn, :new),
-      class: "btn btn-primary float-right fas fa-plus") %>
-    </div> 
+      <%= link("  Add a Permission ", to: permission_path(@conn, :new),
+        class: "btn btn-primary float-right fas fa-plus") %>
+    </div>
   </div>
   <div class="row m-0 list">
-  
     <%= for permission <- @permissions do  %>
-      <div class="table-contaner col-12 p-3 mb-2">        
-         <div class="row">
-            <div class="col-1">
-               <div class="checkbox">
-                  <label>
-                  <input type="checkbox" value="">
-                  <span class="cr"><i class="cr-icon fa fa-check"></i></span>              
-                  </label>
-               </div>
+    <div class="table-contaner col-12 p-3 mb-2">
+      <div class="row">
+        <div class="col-1">
+          <div class="checkbox">
+            <label>
+            <input type="checkbox" value="">
+            <span class="cr"><i class="cr-icon fa fa-check"></i></span>              
+            </label>
+          </div>
+        </div>
+        <div class="col-3"><%= permission.code %></div>
+        <div class="col-4">        
+        </div>
+        <div class="col-3">
+        </div>
+        <div class="col-1">
+          <div class="dropdown col-12 p-0 float-right">
+            <a class="p-2 dropdown-toggle options" href="#" role="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-cog"></i>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" >
+              <%= link("edit", to: permission_path(@conn, :edit, permission.id), class: "dropdown-item") %>
+              <%= link("delete", to: permission_path(@conn, :delete, permission.id),
+                method: :delete, data: [confirm: "Are you sure you want to delete?"], class: "dropdown-item") %>
             </div>
-            <div class="col-3"><%= permission.code %></div>
-            <div class="col-4">
-              
-              
-            </div>
-            <div class="col-3">
-              
-            </div>
-            <div class="col-1">
-               <div class="dropdown col-12 p-0 float-right">
-                  <a class="p-2 dropdown-toggle options" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i class="fa fa-cog"></i>
-                  </a>
-                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
-                    <%= link("edit", to: permission_path(@conn, :edit, permission.id), class: "dropdown-item") %>
-             <%= link("delete", to: permission_path(@conn, :delete, permission.id),
-            method: :delete, data: [confirm: "Are you sure you want to delete?"], class: "dropdown-item") %>
-                  </div>
-               </div>
-            </div>
-         </div>       
+          </div>
+        </div>
       </div>
+    </div>
     <% end %>
-</div>
+  </div>
 </div>

@@ -52,7 +52,7 @@ defmodule AdminAppWeb.OrderView do
   end
 
   def render_variant(product) do
-    [content_tag(:th, content_tag(:i, "", class: "far fa-image")), content_tag(:td, product.sku)]
+    content_tag(:td, product.sku)
   end
 
   defp render_update_buttons(item, order) do
@@ -83,19 +83,24 @@ defmodule AdminAppWeb.OrderView do
 
   def render_address(address) do
     content_tag(
-      :p,
+      :div,
       [
-        "#{address.first_name} #{address.last_name}",
-        address.address_line_1,
-        address.address_line_2,
-        address.city,
-        address.phone,
-        address.zip_code
+        content_tag(:div, ["#{address.first_name} #{address.last_name}"], class: "name"),
+        content_tag(
+          :div,
+          [
+            address.address_line_1,
+            address.address_line_2,
+            address.city,
+            address.phone,
+            address.zip_code
+          ]
+          |> Enum.reject(&(&1 == nil))
+          |> Enum.intersperse([",", tag(:br)])
+          |> List.flatten(),
+          class: "addres-detail"
+        )
       ]
-      |> Enum.reject(&(&1 == nil))
-      |> Enum.intersperse([",", tag(:br)])
-      |> List.flatten(),
-      class: "text-center"
     )
   end
 
