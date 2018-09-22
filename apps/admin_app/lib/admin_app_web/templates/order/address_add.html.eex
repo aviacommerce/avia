@@ -72,12 +72,7 @@
 
     <div class="col-4">
       <h3>Order Summary</h3>
-      <table class="table table-sm">
-        <caption class="sr-only">order summary</caption>
-        <tbody>
-          <%= summary(@order) %>
-        </tbody>
-      </table>
+       <%= render "order_total_summary.html", order: @order %>
     </div>
   </div>
   </div>
