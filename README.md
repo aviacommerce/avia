@@ -8,8 +8,8 @@
   <a href="https://codecov.io/gh/aviacommerce/avia">
     <img src="https://codecov.io/gh/aviacommerce/avia/branch/develop/graph/badge.svg" alt="codecov" title="coverage-status"/>
   </a>
-  <a href="http://inch-ci.org/github/aviabird/snitch">
-    <img src="http://inch-ci.org/github/aviabird/snitch.svg" alt="inch-ci" title="doc-status"/>
+  <a href="http://inch-ci.org/github/aviacommerce/avia">
+    <img src="http://inch-ci.org/github/aviacommerce/avia.svg?branch=develop" alt="inch-ci" title="doc-status"/>
   </a>
   <a href="https://www.pivotaltracker.com/n/projects/2149807">
     <img src="http://res.cloudinary.com/zeus999/image/upload/c_limit,h_1041,w_1487/v1486457388/Yatrum%20Logo/pt-badge_ss3dyt.svg" alt="pivotal" title="project-tracker"/>
