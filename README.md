@@ -2,11 +2,11 @@
     <img alt="Snitch logo" title="Snitch Logo" src="http://getdrawings.com/image/golden-snitch-drawing-59.jpg">
 </p>
 <p align="center">
-  <a href="https://travis-ci.org/aviabird/snitch">
-    <img src="https://travis-ci.org/aviabird/snitch.svg?branch=develop" alt="travis" title="build-status"/>
+  <a href="https://travis-ci.com/aviacommerce/avia">
+    <img src="https://travis-ci.com/aviacommerce/avia.svg?branch=develop" alt="travis" title="build-status"/>
   </a>
-  <a href="https://codecov.io/gh/aviabird/snitch">
-    <img src="https://codecov.io/gh/aviabird/snitch/branch/develop/graph/badge.svg" alt="codecov" title="coverage-status"/>
+  <a href="https://codecov.io/gh/aviacommerce/avia">
+    <img src="https://codecov.io/gh/aviacommerce/avia/branch/develop/graph/badge.svg" alt="codecov" title="coverage-status"/>
   </a>
   <a href="http://inch-ci.org/github/aviabird/snitch">
     <img src="http://inch-ci.org/github/aviabird/snitch.svg" alt="inch-ci" title="doc-status"/>
@@ -54,7 +54,3 @@ on our [pivotal project][pivotal]!
 ----
 
 [Logo attribution](http://getdrawings.com/golden-snitch-drawing)
-
-
-
-
