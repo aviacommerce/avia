@@ -242,7 +242,11 @@
       <div class="col-8">
          <%= render "line_item.html", %{order: @order} %>
          <div class="card-body">
-            <%= render_invoice_links(@order) %>
+          <div>
+            <a class="btn btn-primary" href="/orders/<%= @order.number %>/download-invoice" style="margin-right: 3px;">Download Invoice</a>
+            <a class="btn btn-primary" href="/orders/<%= @order.number %>/show-packing-slip" style="margin-right: 3px;">Show Packing Slip</a>
+            <a class="btn btn-primary" href="/orders/<%= @order.number %>/download-packing-slip" style="margin-right: 3px;">Download Packing Slip</a>
+          </div>
          </div>
          <%= render "addresses.html", %{order: @order} %>
       </div>

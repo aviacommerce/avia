@@ -6,6 +6,9 @@ before_install:
   - mix local.hex --force
   - mix local.rebar --force
   - mix deps.get
+  - wget https://downloads.wkhtmltopdf.org/0.12/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz
+  - tar xf wkhtmltox-0.12.4_linux-generic-amd64.tar.xz
+  - sudo mv wkhtmltox/bin/wkhtmltopdf /usr/bin
 script:
   - set -e
   - MIX_ENV=test mix format --check-formatted

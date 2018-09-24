@@ -13,6 +13,8 @@ defmodule AdminAppWeb.OrderController do
   alias AdminApp.OrderContext
   alias AdminApp.PackageContext
 
+  @root_path [File.cwd!(), "invoices"] |> Path.join()
+
   def index(conn, %{"category" => category}) do
     orders = OrderContext.order_list(category)
     token = get_csrf_token()
@@ -78,35 +80,19 @@ defmodule AdminAppWeb.OrderController do
   end
 
   def show_packing_slip(conn, params) do
-    order =
-      load_order(%{number: params["number"]})
-      |> Repo.preload([:line_items, :user])
+    order = load_order(%{number: params["number"]})
 
     render(conn, "packing_slip.html", %{order: order})
   end
 
   def download_invoice_pdf(conn, params) do
-    {:ok, pdf_content} = File.read("invoices/#{params["number"]}.pdf")
-
-    conn
-    |> put_resp_content_type("application/pdf")
-    |> put_resp_header(
-      "content-disposition",
-      "attachment; filename=\"invoice_#{params["number"]}.pdf\""
-    )
-    |> send_resp(200, pdf_content)
+    order = load_order(%{number: params["number"]})
+    download_pdf_response(conn, order, "invoice", params)
   end
 
   def download_packing_slip_pdf(conn, params) do
-    {:ok, pdf_content} = File.read("invoices/packing_slip_#{params["number"]}.pdf")
-
-    conn
-    |> put_resp_content_type("application/pdf")
-    |> put_resp_header(
-      "content-disposition",
-      "attachment; filename=\"packing_slip_#{params["number"]}.pdf\""
-    )
-    |> send_resp(200, pdf_content)
+    order = load_order(%{number: params["number"]})
+    download_pdf_response(conn, order, "packing_slip", params)
   end
 
   def edit(conn, params) do
@@ -281,6 +267,100 @@ defmodule AdminAppWeb.OrderController do
   defp load_order(order) do
     order
     |> Order.get()
-    |> Repo.preload(line_items: [:product])
+    |> Repo.preload([
+      [line_items: :product],
+      [packages: [:items, :shipping_method]],
+      :payments,
+      :user
+    ])
   end
+
+  defp download_pdf_response(conn, order, type, params) do
+    case generate_pdf(order, type) do
+      {:ok, :ok} ->
+        send_file_response(
+          conn,
+          params,
+          @root_path |> Path.join("#{type}_#{params["number"]}.pdf")
+        )
+
+      {:ok, {:error, reason}} ->
+        send_pdf_response(conn, params, {:error, reason |> format_error()})
+
+      {:error, message} ->
+        send_pdf_response(conn, params, {:error, message})
+    end
+  end
+
+  defp send_file_response(conn, params, path) do
+    case read_file(path) do
+      {:ok, file} -> send_pdf_response(conn, params, {:ok, file})
+      {:error, reason} -> send_pdf_response(conn, params, {:error, reason |> format_error()})
+    end
+  end
+
+  defp send_pdf_response(conn, params, {:error, msg}) do
+    conn
+    |> put_flash(:error, msg)
+    |> redirect(to: "/orders/#{params["number"]}")
+  end
+
+  defp send_pdf_response(conn, params, {:ok, data}) do
+    conn
+    |> put_resp_content_type("application/pdf")
+    |> put_resp_header(
+      "content-disposition",
+      "attachment; filename=\"invoice_#{params["number"]}.pdf\""
+    )
+    |> send_resp(200, data)
+  end
+
+  defp read_file(path) do
+    File.read(path)
+  end
+
+  def write_file(order, file, type) do
+    [@root_path, "#{type}_#{order.number}.pdf"]
+    |> Path.join()
+    |> Path.expand()
+    |> File.write(file)
+  end
+
+  defp generate_pdf(order, type) do
+    case generate_binary(order, type) do
+      {true, file} -> {:ok, order |> write_file(file, type)}
+      {false, _file} -> {:error, "Path resolution error!"}
+      {:error, message} -> {:error, message}
+    end
+  end
+
+  defp generate_binary(order, type) do
+    case get_pdf_binary(order, type) do
+      {:ok, file} ->
+        {resolve_dir_path(), file}
+
+      _ ->
+        {:error, "Error while generating binary!"}
+    end
+  end
+
+  def get_pdf_binary(order, type) do
+    case type do
+      "invoice" ->
+        OrderView
+        |> render_to_string("invoice.html", order: order)
+        |> PdfGenerator.generate_binary(page_size: "A4")
+
+      "packing_slip" ->
+        OrderView
+        |> render_to_string("packing_slip.html", order: order)
+        |> PdfGenerator.generate_binary(page_size: "A4")
+    end
+  end
+
+  defp resolve_dir_path() do
+    @root_path |> File.dir?() || (@root_path |> File.mkdir()) in [:ok, true]
+  end
+
+  defp format_error(error), do: :file.format_error(error)
 end
