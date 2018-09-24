@@ -12,7 +12,7 @@ defmodule Snitch.Data.Model.ProductReview do
   @review_detail %{
     average_rating: Decimal.new(0),
     review_count: 0,
-    rating_summary: %{}
+    rating_list: %{}
   }
 
   @doc """
@@ -59,7 +59,7 @@ defmodule Snitch.Data.Model.ProductReview do
   %{
     average_rating: 3.5 #average rating for the product
     review_count: 10 # number of reviews for a product
-    rating_detail: %{
+    rating_list: %{
       value_1: # values are rating_option codes corresponding to
                 "product" rating
       value_2:
@@ -74,7 +74,7 @@ defmodule Snitch.Data.Model.ProductReview do
   def review_aggregate(product) do
     reviews =
       product
-      |> Repo.preload(reviews: [rating_option_vote: :rating_option])
+      |> Repo.preload([reviews: [rating_option_vote: :rating_option]], force: true)
       |> Map.get(:reviews)
 
     calculate_aggregate(reviews, length(reviews), @review_detail)
@@ -88,8 +88,8 @@ defmodule Snitch.Data.Model.ProductReview do
 
   defp calculate_aggregate(reviews, count, review_detail) do
     {rating_detail, sum} =
-      Enum.reduce(reviews, {review_detail.rating_summary, 0}, fn review,
-                                                                 {rating_detail, rating_sum} ->
+      Enum.reduce(reviews, {review_detail.rating_list, 0}, fn review,
+                                                              {rating_detail, rating_sum} ->
         code = String.to_atom(review.rating_option_vote.rating_option.code)
         position = review.rating_option_vote.rating_option.position
         rating_value = get_rating_value(Map.get(rating_detail, code)) || 0
@@ -120,7 +120,7 @@ defmodule Snitch.Data.Model.ProductReview do
       review_detail
       | average_rating: sum |> Decimal.div(count) |> Decimal.round(1),
         review_count: count,
-        rating_summary: rating_summary
+        rating_list: rating_summary
     }
   end
 

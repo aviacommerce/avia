@@ -13,13 +13,13 @@ defmodule SnitchApiWeb.ProductController do
       reviews =
         product
         |> Repo.preload(reviews: [rating_option_vote: :rating_option])
-        |> Map.take(:reviews)
+        |> Map.take([:reviews])
 
       render(
         conn,
         SnitchApiWeb.ReviewView,
         "index.json-api",
-        data: reviews
+        data: reviews.reviews
       )
     end
   end
@@ -43,10 +43,9 @@ defmodule SnitchApiWeb.ProductController do
     )
   end
 
-  @include ~s(reviews,reviews.rating_option_vote,
-  reviews.rating_option_vote.rating_option,variants,variants.images,
+  @include ~s(reviews,reviews.rating_option_vote, variants,variants.images,
   variants.options,variants.options.option_type,options,options.option_type,
-  theme,theme.option_types)
+  theme,theme.option_types,reviews.rating_option_vote.rating_option)
   def index(conn, params) do
     {products, page} = Context.list_products(conn, params)
 

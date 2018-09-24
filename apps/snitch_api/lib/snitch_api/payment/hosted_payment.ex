@@ -9,6 +9,7 @@ defmodule SnitchApi.Payment.HostedPayment do
   alias Snitch.Data.Model.Payment
   alias Snitch.Data.Model.PaymentMethod
   alias Snitch.Domain.Order.DefaultMachine
+  alias Snitch.Repo
 
   def payment_order_context(%{status: "success"} = params) do
     payment_params = %{state: "paid"}
@@ -54,7 +55,7 @@ defmodule SnitchApi.Payment.HostedPayment do
 
     with {:ok, %{hosted_payment: hosted_payment}} <-
            HostedPayment.update(hosted_payment, hosted_params, payment_params),
-         order <- Order.get(order_id) do
+         order <- Order.get(order_id) |> Repo.preload(:user) do
       payment = Payment.get(hosted_payment.payment_id)
       {:ok, order, payment}
     else

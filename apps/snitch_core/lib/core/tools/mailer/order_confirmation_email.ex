@@ -2,9 +2,8 @@ defmodule Snitch.Tools.OrderEmail do
   @moduledoc """
   Composing email to send order confirmation mail.
   """
-  use Bamboo.EEx, path: "lib/core/tools/mailer/email_templates"
+  use Bamboo.EEx, path: Path.join([File.cwd!(), "lib/core/tools/mailer/email_templates"])
   alias Snitch.Tools.Mailer
-  alias Snitch.Data.Schema.Order
   alias Snitch.Repo
 
   def order_confirmation_mail(order) do

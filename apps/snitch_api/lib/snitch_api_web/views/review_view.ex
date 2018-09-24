@@ -5,10 +5,11 @@ defmodule SnitchApiWeb.ReviewView do
   location("/reviews/:id")
 
   attributes([
-    :text,
+    :title,
     :description,
     :locale,
-    :name
+    :name,
+    :updated_at
   ])
 
   has_one(

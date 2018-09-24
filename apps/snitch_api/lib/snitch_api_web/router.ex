@@ -31,6 +31,7 @@ defmodule SnitchApiWeb.Router do
     get("/brands", ProductBrandController, :index)
     post("/product_option_values/:id", ProductOptionValueController, :update)
     post("/guest/line_items", LineItemController, :guest_line_item)
+    resources("/ratings", RatingController, only: [:index, :show])
   end
 
   scope "/api/v1", SnitchApiWeb do
@@ -49,7 +50,6 @@ defmodule SnitchApiWeb.Router do
     post("/orders/:id/add-payment", OrderController, :add_payment)
     patch("/orders/:id/add-shipment", OrderController, :add_shipments)
     post("/orders/current", OrderController, :current)
-    resources("/ratings", RatingController, only: [:index, :show])
     resources("/reviews", ReviewController, only: [:create, :update, :delete])
     get("/product/:id/rating-summary", ProductController, :rating_summary)
     get("/product/:id/reviews", ProductController, :reviews)
