@@ -27,7 +27,7 @@
       <div class="col-3 rightbar">
          <form>
             <div class="form-group">
-               <label class="label-heading">Sort By</label>
+               <label class="label-heading">Sort by</label>
                <select class="form-control">
                   <option>1</option>
                   <option>2</option>

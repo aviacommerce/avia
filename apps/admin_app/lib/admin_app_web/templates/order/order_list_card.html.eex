@@ -1,8 +1,8 @@
-<div class="table-contaner cpointer col-12 p-3 mb-2" onclick="location.href='/orders/<%= @order.number %>/detail';">
+<div class="table-contaner cpointer orderlist col-12 p-3 mb-2" onclick="location.href='/orders/<%= @order.number %>/detail';">
    <div class="row">
       <div class="col-7 p-0">
          <div class="media lineitem">
-            <div class="checkbox mx-3">
+            <div class="checkbox mx-4">
                <label>
                <input type="checkbox" value="">
                <span class="cr"><i class="cr-icon fa fa-check"></i></span>

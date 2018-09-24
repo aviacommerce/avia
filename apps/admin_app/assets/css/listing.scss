@@ -1,6 +1,7 @@
 @import './custom/variables';
 @import './custom/custom';
 
+
 .list-container {
   .back {
     color: $main-sub-color;
@@ -34,8 +35,9 @@
 
   .list-header {
     background-color: $white;
-    padding: .4em 1em;
+    padding: 7px 1.1em;
     border-bottom: 1px solid $bordercolor1;
+    letter-spacing: .4px;
 
     h2 {
       font-size: 1.625em;
@@ -106,6 +108,8 @@
   }
 
   .navbar {
+    padding: 16px 6px .5rem 24px;
+
     .nav {
       background-color: transparent;
       width: 100%;
@@ -115,7 +119,6 @@
       }
     }
 
-    /* Tabs*/
     section {
       padding: 60px 0;
     }
@@ -151,11 +154,14 @@
 
   .rightbar {
     padding-top: 10px;
+    margin-top: 5px;
+    padding-left: 14px;
 
     form {
       .label-heading {
         font-weight: bold;
         font-size: .875em;
+        margin-bottom: 4px;
       }
     }
   }
@@ -163,6 +169,16 @@
   .list {
     background-color: $gray-101;
     padding: 1em 0.938em;
+
+    .orderlist {
+      margin-left: 9px;
+      padding: 26px 19px 24px 15px !important;
+      border-radius: 1px !important;
+
+      &:hover {
+        background-color: transparent;
+      }
+    }
 
     .table-contaner {
       .std-shipping {
@@ -176,7 +192,7 @@
 
         .address {
           .ship {
-            color: $gray-400;
+            color: $txt-light;
             font-size: 12px;
           }
 
@@ -241,7 +257,7 @@
               &:first-child {
                 font-weight: 300;
                 line-height: 1.6;
-                color: $gray-400;
+                color: $txt-light;
               }
 
               &:last-child {
@@ -303,16 +319,30 @@
       }
     }
 
+    .edit-option {
+      .dropdown-toggle::after {
+        border-top: 0.3em solid $bordercolor2;
+      }
+    }
+
     .dropdown-selectall {
-      height: 38.6px;
-      width: 61px;
-      margin-right: 16px;
-      margin-left: 8.5px;
+      height: 38.4px;
+      width: 62px;
+      margin-right: 15px;
+      margin-left: 8px;
       padding-top: 9px;
       background-color: $white;
 
       .checkbox {
-        margin-right: 10px;
+        margin-right: 11px;
+
+        .cr {
+          background-color: $white;
+        }
+      }
+
+      .dropdown-toggle::after {
+        border-top: 0.3em solid $bordercolor2;
       }
     }
 
@@ -320,11 +350,13 @@
       display: inline !important;
 
       .btn {
-        height: 38.6px;
+        height: 38.4px;
         margin: 0 -2.6px;
         cursor: pointer;
         padding: 9px 12px 6.7px;
-        color: $gray-500;
+        color: $txt-lightdark;
+        letter-spacing: .3px;
+        font-size: 13.85px;
 
         &:focus {
           box-shadow: none !important;
@@ -341,6 +373,7 @@
         padding: 10px;
         background-color: $white;
         border-top: 1px solid $bordercolor1;
+
       }
 
       .card-body {
@@ -364,11 +397,11 @@
   }
 
   .list-extra {
-    padding: 1.5em 0.538em;
+    padding: 1.5em 0.638em;
   }
 
   .options {
-    color: $gray-500;
+    color: $txt-lightdark;
     position: relative;
     top: 2px;
 
@@ -394,6 +427,7 @@
 
   .checkbox .cr {
     margin-right: 0 !important;
+    background-color: $white
   }
 
   .checkbox .cr,
@@ -464,6 +498,100 @@
       font-weight: 500;
     }
 
+    .order-btns {
+      .btn-outline-secondary {
+        background-color: $white;
+        color: $main-sub-color;
+
+        &:hover {
+          background-color: transparent;
+        }
+      }
+    }
+
+    .print {
+      .print-sub-head {
+        font-weight: 800;
+        font-size: 14px;
+        margin: 10px 0
+      }
+
+      .name {
+        font-weight: bold;
+        font-size: 13px;
+      }
+
+      .variant {
+        font-size: 12px;
+        color: $txt-light;
+      }
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .table {
+      font-size: 14px;
+      color: $main-sub-color;
+
+      thead th {
+        border-bottom: 1px solid $bordercolor1;
+      }
+
+      th,
+      td {
+        border-top: 0px solid $bordercolor1
+      }
+
+      td {
+        text-align: center;
+      }
+    }
+
+    .summery-datail {
+      margin-bottom: 15px;
+      padding: 15px 0;
+      border-bottom: 1px solid $bordercolor1;
+      font-size: 14px;
+
+      .left {
+        text-align: left;
+      }
+
+      .right {
+        text-align: right;
+      }
+    }
+
+    .total {
+      margin-bottom: 15px;
+      padding: 15px 0;
+      font-size: 14px;
+
+      .left {
+        text-align: left;
+      }
+
+      .right {
+        text-align: right;
+      }
+
+      .total-text {
+        font-weight: bold;
+        margin-top: 6px;
+      }
+
+      .paid-via {
+        font-size: 12px;
+
+        .n-paid {
+          color: $main-color;
+        }
+      }
+    }
+
     .shipby {
       font-size: 13px;
       font-weight: bold;
@@ -485,7 +613,7 @@
           &:first-child {
             font-weight: 300;
             line-height: 1.6;
-            color: $gray-400;
+            color: $txt-light;
           }
 
           &:last-child {
@@ -498,7 +626,7 @@
 
     .address {
       .ship {
-        color: $gray-400;
+        color: $txt-light;
         font-size: 12px;
         font-weight: normal;
       }
@@ -567,22 +695,26 @@
 }
 
 /* width */
+
 ::-webkit-scrollbar {
   width: 7px;
   height: 7px;
 }
 
 /* Track */
+
 ::-webkit-scrollbar-track {
   background: $main-sub-color;
 }
 
 /* Handle */
+
 ::-webkit-scrollbar-thumb {
   background: $main-sub-color;
 }
 
 /* Handle on hover */
+
 ::-webkit-scrollbar-thumb:hover {
   background: $main-sub-color
 }
