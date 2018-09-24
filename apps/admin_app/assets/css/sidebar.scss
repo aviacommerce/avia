@@ -1,6 +1,28 @@
 @import './custom/variables';
 @import "font-awesome";
 
+.mini-sidebar {
+  .nav {
+    .navshophead {
+      .dropdown-toggle {
+        span {
+          display: none;
+        }
+
+        &::after {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .nav-link {
+    span {
+      display: none;
+    }
+  }
+}
+
 .sidebar {
   border-right: 1px solid $bordercolor1;
   height: calc(100vh - 3.5vw);

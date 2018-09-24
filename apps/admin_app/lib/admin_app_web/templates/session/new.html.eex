@@ -5,9 +5,6 @@
         <div class="float-left col p-0">
           <img src="/images/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
         </div>
-        <div class="float-right col text-right p-0">
-          <button class="btn btn-outline-secondary">Regsister</button>
-        </div>
       </div>
     </div>
   </header>
@@ -22,23 +19,6 @@
     </p>
     <%= submit "Submit", class: "btn btn-primary submit-btn col-12" %>    
     <% end %>
-    <a href="" class="trouble">Trouble signing in?</a>
-    <div class="or text-center">
-      <span class="bg-white p-xs-2 vertical-align-bottom text-gray-lighter" style="line-height:0;">
-      OR
-      </span>
-    </div>
-    <a class="btn btn-outline-secondary btn-option">
-    Continue with Google
-    </a>
-    <a class="btn btn-outline-secondary btn-option">
-    Continue with Facebook
-    </a>
-    <div class="info-text">
-      By clicking Continue with Google or Continue with Facebook, you agree to Avia 
-      Terms of Use and Privacy Policy. Avia may send you communications; you may 
-      change your preferences in your account settings.
-       We'll never post without your permission.
-    </div>
+    <a href="" class="trouble">Trouble signing in?</a>   
   </div>
 </div>

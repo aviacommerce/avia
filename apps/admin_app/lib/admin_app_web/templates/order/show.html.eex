@@ -1,150 +1,274 @@
 <div class="list-container">
-  <div class="pt-3 pb-0 pr-3 pl-3 back"> <img src="/images/left-arrow.svg"
-    width="20" height="20" class="d-inline-block align-top" alt=""> 
-    <a href="/orders">Orders </a>  / <%= @order.number %>
-  </div>
-  <h4 class="p-3 m-0">Order Detail</h4>
-  <div class="row m-0 order-detail">
-    <div class="col-9">
-      <div class="row">
-        <div class="col-6">
-          <h2>Order from Arjun Singh</h2>
-          <div class="orderon"><span class="mr-2"><%= @order.number %></span> via Avia</div>
-          <div class="orderon"><span class="mr-2">1 item,</span> <span>US$ 2.00</span></div>
-        </div>
-        <div class="col-6 text-right">
-          <div class="shipby">Ship by 11 Oct, 2018 </div>
-          <div class="orderon"> Ordered 11:13, Thu, 20 Sep, 2018 </div>
-          <div class="orderon">  Ship to pune, India </div>
-        </div>
-      </div>
-      <h2 class="mt-3">Ship by 11 Oct 2018</h2>
-      <div class="card col-12">
-        <div class="row">
-          <div class="col-4">
-            <div class="address">
-              <div class="ship mb-3"> Ship to </div>
-              <%= render_address(@order.shipping_address) %>
+   <div class="pt-3 pb-0 pr-3 pl-3 back"> <img src="/images/left-arrow.svg"
+      width="20" height="20" class="d-inline-block align-top" alt=""> 
+      <a href="/orders">Orders </a>  
+   </div>
+   <h4 class="p-3 m-0">Order Detail</h4>
+   <div class="row m-0 order-detail">
+      <div class="col-9">
+         <div class="row">
+            <div class="col-6">
+               <h2>Order from Arjun Singh</h2>
+               <div class="orderon"><span class="mr-2"><%= @order.number %></span> via Avia</div>
+               <div class="orderon"><span class="mr-2">1 item,</span> <span>US$ 2.00</span></div>
             </div>
-          </div>
-          <div class="col-8">
-            <div class="address">
-              <div class="ship mb-3"> Selected by buyer </div>
-              <div class="std-shipping">
-                <div class="float-left">
-                  Standard Shipping
-                </div>
-                <div class="float-right ship ">
-                  US$ 0.00
-                </div>
-                <div class="clearfix"></div>
-              </div>
-              <div class="media mt-3 lineitem-detail">
-                <a class="pr-3" href="#">
-                <img src="/images/empty-img.png" alt="Default">
-                </a>
-                <div class="media-body">
-                  <div class="mt-0 text-capitalize">shoes-nike-0</div>
+            <div class="col-6 text-right">
+               <div class="shipby">Ship by 11 Oct, 2018 </div>
+               <div class="orderon"> Ordered 11:13, Thu, 20 Sep, 2018 </div>
+               <div class="orderon">  Ship to pune, India </div>
+            </div>
+         </div>
+         <div class="my-3 order-btns">
+            <div class="btn-group">
+               <button class="btn btn-outline-secondary btn-md dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+               Order Actions
+               </button>
+               <div class="dropdown-menu">
+                  <%= link "Pending", to: order_package_path(@conn, :update_package,
+                     @order.id, [state: :processing]), method: :put, class: "dropdown-item" %>
+                  <%= link "Ready", to: order_package_path(@conn, :update_package,
+                     @order.id, [state: :ready]), method: :put, class: "dropdown-item" %>
+                  <%= link "Ship", to: order_package_path(@conn, :update_package,
+                     @order.id, [state: :shipped]), method: :put, class: "dropdown-item" %>
+                  <div class="dropdown-divider"></div>
+                  <%= link "Mark as Complete", to: order_path(@conn, :update_state,
+                     @order.id), method: :put, class: "dropdown-item" %>
+               </div>
+            </div>
+         </div>
+         <h3 class="mt-3">Print</h3>
+         <div class="card col-12 print">
+            <div class="print-sub-head">What would you like to print?</div>
+            <div class="media lineitem-detail">
+               <div class="checkbox mx-2 mt-1">
+                  <label>
+                  <input type="checkbox" value="">
+                  <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+                  </label>
+               </div>
+               <div class="media-body">
+                  <a class="mt-0 text-capitalize name">Packing slips</a>
                   <div class="variant">
-                    <span>Quantity</span>
-                    <span>1 x on hand</span>
+                     Designed for buyers, add a coupon code and more.
                   </div>
-                </div>
-                <div class="ship" >
-                  Qty <span>1</span>
-                </div>
-              </div>
+               </div>
+               <a class="btn btn-primary float-right" href="#"> Print </a>
             </div>
-          </div>
-        </div>
+            <div class="media lineitem-detail mt-3">
+               <div class="checkbox mx-2 mt-1">
+                  <label>
+                  <input type="checkbox" value="">
+                  <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+                  </label>
+               </div>
+               <div class="media-body">
+                  <a class="mt-0 text-capitalize name">Order receipts</a>
+                  <div class="variant">
+                     Designed for buyers, add a coupon code and more.
+                  </div>
+               </div>
+               <a class="btn btn-primary float-right " href="#"> Print</a>
+            </div>
+         </div>
+         <h3 class="mt-3">Ship by 11 Oct 2018</h3>
+         <div class="card col-12">
+            <div class="row">
+               <div class="col-4">
+                  <div class="address">
+                     <div class="ship mb-3"> Ship to </div>
+                     <%= render_address(@order.shipping_address) %>
+                  </div>
+               </div>
+               <div class="col-8">
+                  <div class="address">
+                     <div class="ship mb-3"> Selected by buyer </div>
+                     <div class="std-shipping">
+                        <div class="float-left">
+                           Standard Shipping
+                        </div>
+                        <div class="float-right ship ">
+                           US$ 0.00
+                        </div>
+                        <div class="clearfix"></div>
+                     </div>
+                     <div class="media mt-3 lineitem-detail">
+                        <a class="pr-3" href="#">
+                        <img src="/images/empty-img.png" alt="Default">
+                        </a>
+                        <div class="media-body">
+                           <div class="mt-0 text-capitalize">shoes-nike-0</div>
+                           <div class="variant">
+                              <span>Quantity</span>
+                              <span>1 x on hand</span>
+                           </div>
+                        </div>
+                        <div class="ship" >
+                           Qty <span>1</span>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <h3 class="mt-3">Receipt # <%= @order.number %></h3>
+         <div class="card col-12">
+            <div class="table-responsive mt-2">
+               <table class="table">
+                  <thead>
+                     <tr class="d-flex">
+                        <th class="col-8">Items</th>
+                        <th class="col-2 text-center">Quantity</th>
+                        <th class="col-2 text-center">Item Price</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr class="d-flex">
+                        <td class="col-8 text-left">
+                           <div class="media lineitem-detail">
+                              <a class="pr-2 mr-1" href="#" >
+                              <img href="#" src="/images/empty-img.png" alt="Default">
+                              </a>
+                              <div class="media-body">
+                                 <a class="mt-0 text-capitalize name">Nike</a>
+                                 <div class="variant">                           
+                                 </div>
+                              </div>
+                           </div>
+                        </td>
+                        <td class="col-2">2</td>
+                        <td class="col-2">40 </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <div class="row m-0 summery-datail">
+                  <div class="col-6 left">
+                     Item total
+                  </div>
+                  <div class="col-6 right">
+                     US$ 2.00
+                  </div>
+               </div>
+               <div class="row m-0 summery-datail">
+                  <div class="col-6 left">
+                     Shipping cost
+                  </div>
+                  <div class="col-6 right">
+                     US$ 2.00
+                  </div>
+               </div>
+               <div class="row m-0 total">
+                  <div class="col-6 left">
+                     <div>Tax</div>
+                     <div class="total-text">Order total</div>
+                  </div>
+                  <div class="col-6 right">
+                     <div> US$ 2.00 </div>
+                     <div class="total-text"> US$ 2.00 </div>
+                     <div class="paid-via mt-4">
+                        <div class="">
+                           Paid via other method
+                        </div>
+                        <div class="n-paid">
+                           Not paid
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
       </div>
-    </div>
-    <div class="col-3 rightbar pt-0">
-      <form>
-        <div class="form-group">
-          <label class="label-heading">Sort By</label>
-          <select class="form-control">
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5</option>
-          </select>
-        </div>
-        <div class="col-sm-12 p-0">
-          <label class="label-heading">Sort By Date</label>
-          <div class="radio">
-            <label>
-            <input type="radio" name="o3" value="">
-            <span class="cr"><i class="cr-icon fa fa-circle"></i></span>
-            Option1
-            </label>
-          </div>
-          <div class="radio">
-            <label>
-            <input type="radio" name="o3" value="" checked>
-            <span class="cr"><i class="cr-icon fa fa-circle"></i></span>
-            Option2
-            </label>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
+      <div class="col-3 rightbar pt-0">
+         <form>
+            <div class="form-group">
+               <label class="label-heading">Sort by</label>
+               <select class="form-control">
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+               </select>
+            </div>
+            <div class="col-sm-12 p-0">
+               <label class="label-heading">Sort by date</label>
+               <div class="radio">
+                  <label>
+                  <input type="radio" name="o3" value="">
+                  <span class="cr"><i class="cr-icon fa fa-circle"></i></span>
+                  Option1
+                  </label>
+               </div>
+               <div class="radio">
+                  <label>
+                  <input type="radio" name="o3" value="" checked>
+                  <span class="cr"><i class="cr-icon fa fa-circle"></i></span>
+                  Option2
+                  </label>
+               </div>
+            </div>
+         </form>
+      </div>
+   </div>
+   <div class="">
+      <nav aria-label="breadcrumb">
+         <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/orders">Orders</a></li>
+            <li class="breadcrumb-item active" aria-current="page"></li>
+         </ol>
+      </nav>
+      <h2>
+         Order
+         from <%= @order.user.first_name <> " " <> @order.user.last_name %>
+         <%= state_badge(@order.state) %>
+      </h2>
+      <div class="btn-group mx-2">
+         <button class="btn btn-outline-secondary btn-md dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+         Order Actions
+         </button>
+         <div class="dropdown-menu dropdown-menu-right">
+            <%= link "Pending", to: order_package_path(@conn, :update_package,
+               @order.id, [state: :processing]), method: :put, class: "dropdown-item" %>
+            <%= link "Ready", to: order_package_path(@conn, :update_package,
+               @order.id, [state: :ready]), method: :put, class: "dropdown-item" %>
+            <%= link "Ship", to: order_package_path(@conn, :update_package,
+               @order.id, [state: :shipped]), method: :put, class: "dropdown-item" %>
+            <div class="dropdown-divider"></div>
+            <%= link "Mark as Complete", to: order_path(@conn, :update_state,
+               @order.id), method: :put, class: "dropdown-item" %>
+         </div>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col-8">
+         <%= render "line_item.html", %{order: @order} %>
+         <div class="card-body">
+            <%= render_invoice_links(@order) %>
+         </div>
+         <%= render "addresses.html", %{order: @order} %>
+      </div>
+      <div class="col-4">
+         <h3>Order Summary</h3>
+         <%= render "order_total_summary.html", order: @order %>
+         <div>
+            <h3>Payment Summary</h3>
+            <table class="table table-sm">
+               <caption class="sr-only">Payment Summary</caption>
+               <tbody>
+                  <%= for payment <- @order.payments do %>
+                  <tr>
+                     <th>Method Selected</th>
+                     <td><%= payment.payment_type %></td>
+                  </tr>
+                  <tr>
+                     <th>Status</th>
+                     <td><%= payment.state %></td>
+                  </tr>
+                  <% end %>
+               </tbody>
+            </table>
+         </div>
+      </div>
+   </div>
 </div>
-<div class="container">
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="/orders">Orders</a></li>
-      <li class="breadcrumb-item active" aria-current="page"></li>
-    </ol>
-  </nav>
-  <h2>
-    Order
-    from <%= @order.user.first_name <> " " <> @order.user.last_name %>
-    <%= state_badge(@order.state) %>
-  </h2>
-  <div class="btn-group mx-2">
-    <button class="btn btn-outline-secondary btn-md dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Order Actions
-    </button>
-    <div class="dropdown-menu dropdown-menu-right">
-      <%= link "Pending", to: order_package_path(@conn, :update_package,
-        @order.id, [state: :processing]), method: :put, class: "dropdown-item" %>
-      <%= link "Ready", to: order_package_path(@conn, :update_package,
-        @order.id, [state: :ready]), method: :put, class: "dropdown-item" %>
-      <%= link "Ship", to: order_package_path(@conn, :update_package,
-        @order.id, [state: :shipped]), method: :put, class: "dropdown-item" %>
-    <div class="dropdown-divider"></div>
-      <%= link "Mark as Complete", to: order_path(@conn, :update_state,
-        @order.id), method: :put, class: "dropdown-item" %>
-    </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-8">
-      <%= render "line_item.html", %{order: @order} %>
-      <div class="card-body">
-        <%= render_invoice_links(@order) %>
-      </div>
-      <%= render "addresses.html", %{order: @order} %>
-    </div>
-    <div class="col-4">
-      <h3>Order Summary</h3>
-      <%= render "order_total_summary.html", order: @order %>
-      <div>
-      <h3>Payment Summary</h3>
-      <table class="table table-sm">
-        <caption class="sr-only">Payment Summary</caption>
-          <tbody>
-          <%= for payment <- @order.payments do %>
-            <tr><th>Method Selected</th><td><%= payment.payment_type %></td></tr>
-            <tr><th>Status</th><td><%= payment.state %></td></tr>
-          <% end %>
-          </tbody>
-      </table>
-      </div>
-    </div>
-  </div>
 </div>
 </div>

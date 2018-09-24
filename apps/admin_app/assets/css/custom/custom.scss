@@ -23,7 +23,7 @@ body {
     margin-left: 0.255em;
     vertical-align: 0.255em;
     content: "";
-    border-top: 0.3em solid $gray-500;
+    border-top: 0.3em solid $txt-lightdark;
     border-right: 0.3em solid transparent;
     border-bottom: 0;
     border-left: 0.3em solid transparent;
@@ -61,13 +61,21 @@ body {
     padding: 8px 12px;
 
     &:hover {
-      background-color: $btn-hover-color;
+      background-color: $btn-hover-color + 10;
       font-size: .875em;
       border-color: $btn-hover-color;
     }
 
     &:focus {
       box-shadow: none;
+      background-color: $btn-hover-color;
+    }
+
+    &:not(:disabled):not(.disabled):active:focus,
+    &:not(:disabled):not(.disabled).active:focus,
+    .show>.btn-primary.dropdown-toggle:focus {
+      box-shadow: none;
+      background-color: $btn-hover-color;
     }
   }
 
@@ -80,11 +88,11 @@ body {
 
   .btn-outline-secondary {
     border-color: $gray-102;
-    color: $gray-500 - 45;
+    color: $txt-lightdark - 45;
     font-weight: bold;
 
     &:hover {
-      color: $gray-500 - 90;
+      color: $txt-lightdark - 90;
       background-color: $gray-101;
       border-color: $gray-102;
     }
@@ -122,7 +130,7 @@ body {
     color: $main-sub-color;
 
     &:hover {
-      border-color: $gray-500;
+      border-color: $txt-lightdark;
     }
 
     &:focus {
@@ -197,12 +205,23 @@ body {
   width: 256px;
   position: fixed;
   top: 0;
-
 }
 
 .main {
   margin-left: 256px;
   width: calc(100vw - 256px);
+}
+.max-main {
+  margin-left: 60px;
+  width: calc(100vw - 60px);
+}
+
+.mini-sidebar {
+  width: 60px;
+  position: fixed;
+  top: 0;
+
+  
 }
 
 .nav {
@@ -257,11 +276,21 @@ body {
       padding: 3px;
       margin-bottom: 10px;
 
+      &:after {
+        top: 1px;
+        left: -3px;
+        position: relative;
+        border-top: 4px solid $txt-lightdark;
+        border-right: 3px solid transparent;
+        border-bottom: 0;
+        border-left: 3px solid transparent;
+      }
+
       span {
         display: inline-block;
-        padding: 8px 3px;
+        padding: 8px 0px 8px 3px;
         line-height: 1.2;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.8px;
         font-size: 17px;
         font-weight: 600;
         -webkit-font-smoothing: antialiased;
