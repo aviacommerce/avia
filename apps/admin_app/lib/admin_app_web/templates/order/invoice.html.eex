@@ -1,6 +1,17 @@
 <div class="container">
-  <a href="javascript:genInvoicePDF()">Download PDF</a>
-  <div class="container" id="invoiceData" style="width: 60%;">
+  <button type="button" onclick="printJS({ 
+  printable: 'invoiceData', 
+  type: 'html', 
+  scanStyles: 'true', 
+  targetStyles: ['*'],
+  style: 'document.styleSheets',
+  style: '.table .thead-light th {color: #495057; background-color: #e9ecef; border-color: #dee2e6;}',
+  style: '.thead-light {color: red; font-size: 15px; margin: 10px auto;}',
+  style: '.table { width: 100%; max-width: 100%; margin-bottom: 1rem; background-color: transparent;}'
+  })">
+    Print
+ </button>
+  <div class="container" id="invoiceData" style="width: 100%;">
     <table style="width: 100%;">
       <tr>
         <td style="width: 50%;">
@@ -65,7 +76,7 @@
     <hr>
     <br>
     <table class="table" style="width: 100%;">
-          <thead class="thead-light" style="width: 100%;">
+          <thead class="thead-light">
             <tr>
               <th scope="col" colspan="2"> Item Description </th>
               <th scope="col"> Quantity</th>
