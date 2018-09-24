@@ -26,15 +26,15 @@
             </div>
           </div>
         </div>
-        <div class=" col p-0">
+        <div class="col p-0">
           <div class="btn-group" role="group">
             <button type="button" class="btn btn-outline-secondary">Renew</button>
             <button type="button" class="btn btn-outline-secondary">Deactivate</button>
             <button type="button" class="btn btn-outline-secondary">Delete</button>
           </div>
-          <div class="btn-group mx-2">
+          <div class="btn-group mx-2 edit-option">
             <button class="btn btn-outline-secondary btn-md dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Small button
+            Editing Options
             </button>
             <div class="dropdown-menu dropdown-menu-right">
               <a class="dropdown-item" href="#">Action</a>
@@ -67,7 +67,7 @@
                 </div>
                 <div class="card-footer">
                   <div class="row">
-                    <div class="checkbox col-4">
+                    <div class="checkbox col-4 pl-4 mt-1">
                       <label>
                       <input type="checkbox" value="">
                       <span class="cr"><i class="cr-icon fa fa-check"></i></span>
