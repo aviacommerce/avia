@@ -1,6 +1,8 @@
 defmodule AdminAppWeb.LayoutView do
   use AdminAppWeb, :view
   alias AdminAppWeb.Guardian
+  alias Snitch.Data.Schema.GeneralConfiguration
+  alias Snitch.Repo
 
   @doc """
   Generates name for the JavaScript view we want to use
@@ -30,6 +32,10 @@ defmodule AdminAppWeb.LayoutView do
     template
     |> String.split(".")
     |> Enum.at(0)
+  end
+
+  def check_general_settings() do
+    Repo.all(GeneralConfiguration) |> List.first()
   end
 
   def get_user_name(conn) do
