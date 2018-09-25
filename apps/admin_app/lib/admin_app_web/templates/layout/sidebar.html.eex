@@ -13,7 +13,6 @@
     </div>
   </li>
   <li>
- 
     <a class="nav-link" href="/orders">
     <i class="fa fa-clipboard-list" aria-hidden="true"></i> <span> Orders</span>
     </a>
@@ -66,6 +65,15 @@
     <i class="fa fa-sliders-h" aria-hidden="true"></i>  <span> Configurations</span>
     </a>
     <ul id="drilldown-1" class="nav nav-pills nav-stacked collapse pl-3">
+      <%= if check_general_settings() do %>
+        <li>
+          <a class="nav-link" href="/general_settings">General Settings</a>
+        </li>
+      <% else %>
+        <li>
+          <a class="nav-link" href="/general_settings/new">General Settings</a>
+        </li>
+      <% end %>
       <li>
         <a class="nav-link" href="#">Stock Items</a>
       </li>
@@ -76,7 +84,7 @@
         <a class="nav-link" href="#">Stock Movements</a>
       </li>
       <li>
-        <a class="nav-link" href="/roles"> Roles</a>
+        <a class="nav-link" href="/roles">Roles</a>
       </li>
       <li>
         <a class="nav-link" href="/permissions">Permission</a>
