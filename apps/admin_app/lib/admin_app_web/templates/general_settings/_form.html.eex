@@ -1,0 +1,12 @@
+<h2 class="col">GENERAL SETTINGS</h2>
+<%= form_for @changeset, @action, [as: :settings, id: "settings-form", method: @method], fn f -> %>
+    
+    <%= input f, :name %>
+    <%= input f, :meta_description %>
+    <%= input f, :meta_keywords %>
+    <%= input f, :seo_title %>
+    <%= input f, :sender_mail %>
+    <%= input f, :sendgrid_api_key %>
+    <%= input f, :currency %>
+    <%= submit "Submit", class: "btn btn-primary"%>
+<% end %>

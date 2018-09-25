@@ -266,7 +266,7 @@ defmodule AdminAppWeb.OrderView do
   end
 
   def get_support_email() do
-    Application.get_env(:admin_app, AdminAppWeb.Endpoint)[:support_email]
+    Application.get_env(:admin_app, AdminAppWeb.Endpoint)[:sendgrid_sender_mail]
   end
 
   def get_docs_url() do

@@ -1,0 +1,51 @@
+<div class="list-container">
+  <div class="row m-0 list-header">
+    <div class="col-10 p-0">
+        <h2> GENERAL SETTINGS </h2>
+    </div>
+  </div>
+  <table class="table">
+    <tbody>
+      <tr>
+        <td><b>NAME</b></td>
+        <td><%= @general_configuration.name %></td>
+      </tr>
+      <tr>
+        <td><b>META DESCRIPTION</b></td>
+        <td><%= @general_configuration.meta_description %></td>
+      </tr> 
+      <tr>
+        <td>
+          <b>META KEYWORDS</b>
+        </td>
+        <td>
+          <%= @general_configuration.meta_keywords %>
+        </td>
+      </tr>
+      <tr>
+        <td><b> SEO TITLE </b></td>
+        <td><%= @general_configuration.seo_title %></td>
+      </tr> 
+      <tr>
+        <td><b> SENDER MAIL </b></td> 
+        <td><%= @general_configuration.sender_mail %></td>
+      </tr> 
+      <tr>
+        <td><b>SENDGRID_API_KEY</b></td> 
+        <td><%= @general_configuration.sendgrid_api_key %></td>
+      </tr> 
+      <tr>
+        <td><b>CURRENCY</b></td> 
+        <td><%= @general_configuration.currency %></td>
+      </tr>
+    </tbody>
+  <table>
+  <div class = "col">
+    <%= link("Edit", to: general_settings_path(@conn, :edit, @general_configuration.id), class: "btn btn-info")
+    %>
+    <%= link("Delete", to: general_settings_path(@conn, :delete, @general_configuration.id),
+    method: :delete, data: [confirm: "Are you sure you want to delete?"], class: "btn btn-danger")
+    %>
+  </div>
+</div>
+
