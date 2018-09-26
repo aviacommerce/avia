@@ -15,8 +15,14 @@ use Mix.Config
 # which you typically run after static files are built.
 config :admin_app, AdminAppWeb.Endpoint,
   load_from_system_env: true,
-  url: [host: "example.com", port: 80],
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  url: [host: {:system, "HOST"}, port: {:system, "ADMIN_PORT"}],
+  server: true,
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  version: Application.spec(:admin_app, :vsn),
+  secret_key_base: System.get_env("PHOENIX_SECRET_KEY_BASE"),
+  session_cookie_name: System.get_env("SESSION_COOKIE_NAME"),
+  session_cookie_signing_salt: System.get_env("SESSION_COOKIE_SIGNING_SALT"),
+  session_cookie_encryption_salt: System.get_env("SESSION_COOKIE_ENCRYPTION_SALT")
 
 # Do not print debug messages in production
 config :logger, level: :info
