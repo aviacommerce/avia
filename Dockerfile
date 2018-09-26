@@ -6,7 +6,7 @@
 FROM madnight/docker-alpine-wkhtmltopdf as wkhtmltopdf_image
 
 # Builder stage
-FROM bitwalker/alpine-elixir-phoenix as builder
+FROM elixir:1.7.3 as builder
 
 ARG PHOENIX_SECRET_KEY_BASE
 ARG SESSION_COOKIE_NAME
@@ -38,8 +38,6 @@ WORKDIR /snitch
 # Umbrella
 COPY mix.exs mix.lock ./
 COPY config config
-COPY env env
-RUN source env/local.env
 
 # Apps
 COPY apps apps
@@ -52,23 +50,41 @@ COPY rel rel
 RUN mix release --env=prod --verbose
 
 ### Release
+FROM staticfloat/nginx-certbot
 
-FROM alpine:latest
-
-# We need bash and openssl for Phoenix
-RUN apk upgrade --no-cache && \
-    apk add --no-cache bash openssl && \
-    apk --update add imagemagick
+RUN apt-get update \
+  && apt-get -y install curl tar file xz-utils build-essential cron vim \
+  && apt-get -y install python-certbot-nginx \
+  && apt-get -y install imagemagick
 
 ENV MIX_ENV=prod \
-    SHELL=/bin/bash
+    SHELL=/bin/bash \
+    PHOENIX_SECRET_KEY_BASE=$PHOENIX_SECRET_KEY_BASE \
+    SESSION_COOKIE_NAME=$SESSION_COOKIE_NAME \
+    SESSION_COOKIE_SIGNING_SALT=$SESSION_COOKIE_SIGNING_SALT \
+    SESSION_COOKIE_ENCRYPTION_SALT=$SESSION_COOKIE_ENCRYPTION_SALT \
+    DATABASE_URL=$DATABASE_URL \
+    AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+    AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+    BUCKET_NAME=$BUCKET_NAME \
+    AWS_REGION=$AWS_DEFAULT_REGION \
+    FRONTEND_CHECKOUT_URL=$FRONTEND_CHECKOUT_URL \
+    HOSTED_PAYMENT_URL=$HOSTED_PAYMENT_URL
+
+# nginx conf
+COPY config/deploy/live/conf.d/* /etc/nginx/conf.d/
+RUN mkdir -p /etc/letsencrypt/live/admin.aviacommerce.org \
+  && mkdir -p /etc/letsencrypt/live/api.aviacommerce.org
+COPY config/deploy/live/admin.aviacommerce.org/* /etc/letsencrypt/live/admin.aviacommerce.org/
+COPY config/deploy/live/api.aviacommerce.org/* /etc/letsencrypt/live/api.aviacommerce.org/
 
 WORKDIR /snitch
-
 COPY --from=wkhtmltopdf_image /bin/wkhtmltopdf /usr/bin/
-
-COPY --from=builder /snitch/_build/prod/rel/snitch/releases/0.0.1/snitch.tar.gz .
-
+COPY --from=builder snitch/_build/prod/rel/snitch/releases/0.0.1/snitch.tar.gz .
 RUN tar zxf snitch.tar.gz && rm snitch.tar.gz
 
-CMD ["/snitch/bin/snitch", "foreground"]
+# RUN certbot -n --authenticator standalone --installer nginx -d api.aviacommerce.org -d admin.aviacommerce.org --pre-hook "service nginx stop" --post-hook "service nginx start" --agree-tos --email "hello@aviabird.com"
+
+RUN echo "nginx && /snitch/bin/snitch foreground" >> run.sh
+
+CMD ["sh", "/snitch/run.sh"]

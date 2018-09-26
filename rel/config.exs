@@ -55,8 +55,9 @@ release :snitch do
     snitch_core: :permanent
   ]
   set commands: [
-    migrate: "rel/commands/migrate.sh",
     seed: "rel/commands/seed.sh",
   ]
+  set pre_start_hooks: "rel/hooks/pre_start"
+  set post_start_hooks: "rel/hooks/post_start"
 end
 
