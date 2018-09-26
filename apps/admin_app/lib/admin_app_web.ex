@@ -19,7 +19,7 @@ defmodule AdminAppWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: AdminAppWeb
+      use Phoenix.Controller, log: false, namespace: AdminAppWeb
       import Plug.Conn
       import AdminAppWeb.Router.Helpers
       import AdminAppWeb.Gettext
@@ -56,7 +56,7 @@ defmodule AdminAppWeb do
 
   def channel do
     quote do
-      use Phoenix.Channel
+      use Phoenix.Channel, log_join: false, log_handle_in: false
       import AdminAppWeb.Gettext
     end
   end

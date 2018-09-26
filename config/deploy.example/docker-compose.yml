@@ -1,0 +1,13 @@
+version: '3'
+services:
+  snitch-demo:
+    image: '$AWS_ECS_URL/$AWS_ECS_DOCKER_IMAGE'
+    environment:
+      - HOST=$HOST
+      - PORT=$PORT
+      - API_PORT=$API_PORT
+      - ADMIN_PORT=$ADMIN_PORT
+    ports:
+      - '$PORT:$PORT'
+      - '$API_PORT:$API_PORT'
+      - '$ADMIN_PORT:$ADMIN_PORT'
