@@ -7,6 +7,34 @@
 body {
   font-family: "avia1" !important;
   color: $main-sub-color;
+  background-color: $gray-101;
+
+  .stickformbutton {
+    position: fixed;
+    bottom: -16px;
+    width: 97%;
+    background-color: $white;
+    margin-left: -31px;
+    padding: 8px 10px 4px;
+    border-top: 1px solid $bordercolor1;
+
+    .col-sm-10 {
+      padding: 0px 11px 0px 5px;
+    }
+  }
+
+  a:hover {
+    color: $main-sub-color;
+    text-decoration: none;
+  }
+
+  .btn-primary:not(:disabled):not(.disabled):active,
+  .btn-primary:not(:disabled):not(.disabled).active,
+  .show>.btn-primary.dropdown-toggle {
+    color: $white;
+    background-color: $main-sub-color;
+    border-color: $main-sub-color;
+  }
 
   .prealative {
     position: relative;
@@ -46,9 +74,15 @@ body {
   }
 
   .list-group-item.active {
-
     background-color: $main-sub-color;
     border-color: $main-sub-color;
+  }
+
+  .btn-secondary {
+    height: 38px;
+    line-height: 1.6;
+    padding: 8px 12px;
+    background-color: transparent;
   }
 
   .btn-primary {
@@ -164,7 +198,6 @@ body {
     background-position: center;
   }
 
-
   .img-wrap {
     position: relative;
     font-size: 0;
@@ -205,12 +238,16 @@ body {
   width: 256px;
   position: fixed;
   top: 0;
+  background-color: $white;
 }
 
 .main {
   margin-left: 256px;
   width: calc(100vw - 256px);
+  padding-bottom: 70px;
+  background-color: $gray-101;
 }
+
 .max-main {
   margin-left: 60px;
   width: calc(100vw - 60px);
@@ -220,8 +257,6 @@ body {
   width: 60px;
   position: fixed;
   top: 0;
-
-  
 }
 
 .nav {

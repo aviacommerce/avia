@@ -1,22 +1,22 @@
 <li data-taxon_id="<%= get_taxon_id(@taxonomy) %>">
   <span>
-    <i class="icon-folder-open"><%= get_taxon_name(@taxonomy) %></i>
-      <div class="taxon-actions float-right">
-        <i class="add-taxon fa fa-plus-square fa-4" aria-hidden="true"></i>
-        <i class="edit-taxon fa fa-pencil-square fa-4" aria-hidden="true"></i>
-        <%= if !is_root(@taxonomy) do %>
-          <i class="fa fa-trash fa-4" aria-hidden="true"></i>
-        <% end %>
-      </div>
+    <i class="icon-minus-sign fa"><%= get_taxon_name(@taxonomy) %></i>
+    <div class="taxon-actions float-right">
+      <i class="add-taxon fa fa-plus-square fa-4" aria-hidden="true"></i>
+      <i class="edit-taxon fa fa-pencil-square fa-4" aria-hidden="true"></i>
+      <%= if !is_root(@taxonomy) do %>
+      <i class="fa fa-trash fa-4" aria-hidden="true"></i>
+      <% end %>
+    </div>
   </span>
   <%= if has_children(@taxonomy) do %>
-    <ul data-parent_id="<%= get_taxon_id(@taxonomy) %>" >
-      <%= for tree <- get_children(@taxonomy) do %>
-        <%= render "list.html", conn: @conn, taxonomy: tree, token: @token %>
-      <% end %>
-    </ul>
+  <ul data-parent_id="<%= get_taxon_id(@taxonomy) %>" >
+    <%= for tree <- get_children(@taxonomy) do %>
+    <%= render "list.html", conn: @conn, taxonomy: tree, token: @token %>
+    <% end %>
+  </ul>
   <% else %>
-    <ul data-parent_id="<%= get_taxon_id(@taxonomy) %>" >
-    </ul>
+  <ul data-parent_id="<%= get_taxon_id(@taxonomy) %>" >
+  </ul>
   <% end %>
 </li>

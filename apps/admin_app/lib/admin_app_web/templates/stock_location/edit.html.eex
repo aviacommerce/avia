@@ -1,9 +1,10 @@
-<div class="card container  text-uppercase">
-    <h4>
-        <a href="/stock_locations">Stock Locations</a> / Create Stock Location
-        <%= link("delete", to: stock_location_path(@conn, :delete, @stock_location), method: :delete, data: [confirm: "Are you sure, you want to delete (#{@stock_location.name}) stock location"], class: "btn btn-danger float-right") %>
-    </h4>
-    <hr/>
-    <%= render "_form.html", changeset: @changeset,
+<div class="list-container">
+  <div class="pt-3 pb-0 pr-3 pl-3 back"> <img src="/images/left-arrow.svg" width="20" height="20" class="d-inline-block align-top" alt=""> <a href="/stock_locations">Stock Locations</a> </div>
+  <h4 class="p-3 m-0">Edit Locations</h4> 
+  <div class="col-12">
+    <div class="card col-12">  
+   <%= render "_form.html", changeset: @changeset,
                              action: stock_location_path(@conn, :update, @stock_location) %>
+    </div>
+  </div>
 </div>
