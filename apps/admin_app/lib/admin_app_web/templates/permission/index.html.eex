@@ -4,8 +4,8 @@
       <h2>Permissions</h2>
     </div>
     <div class="col-2 p-0 float-right text-right">
-      <%= link("  Add a Permission ", to: permission_path(@conn, :new),
-        class: "btn btn-primary float-right fas fa-plus") %>
+      <%= link(raw("<i class='fas fa-plus'></i> Add a Permission"), to: permission_path(@conn, :new),
+        class: "btn btn-primary float-right") %>
     </div>
   </div>
   <div class="row m-0 list">

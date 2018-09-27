@@ -1,57 +1,52 @@
 <%= form_for @changeset, @action, fn f ->  %>
-  <div class="form-group row ">
-    <label for="inputEmail3" class="col-sm-3 col-form-label">
-        <div class="label required">
-          Name
-        </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-    </label>
-    <div class="col-sm-9">           
-        <%= input f, :name%>
-    </div>
-  </div>
-
-  <div class="form-group row ">
-    <label for="inputEmail3" class="col-sm-3 col-form-label">
-        <div class="label required">
-         Product Category
-        </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-    </label>
-    <div class="col-sm-9">           
-         <%= select_input f, :taxon_id, get_options(@taxons), "" %>
-    </div>
-  </div>
-   <div class="form-group row ">
-    <label for="inputEmail3" class="col-sm-3 col-form-label">
-        <div class="label required">
-         Variation themes
-        </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-    </label>
-    <div class="col-sm-9">           
-          <%= multi_select f, :variation_theme_ids, get_options(@themes), "" %>
-    </div>
-  </div>
 <div class="form-group row ">
-    <label for="inputEmail3" class="col-sm-3 col-form-label">
-        <div class="label required">
-        Properties
-        </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-    </label>
-    <div class="col-sm-9">           
-          <%= multi_select f, :variation_theme_ids, get_options(@themes), "" %>
-    </div>
-  </div>
-
-
-<div class="form-group row">
-  <div class="col-sm-10">
-
-  <%= submit "Submit", class: "btn btn-primary submit-btn" %>
-  
-  </div>
+   <label for="inputEmail3" class="col-sm-3 col-form-label">
+      <div class="label required">
+         Name
+      </div>
+      <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+   </label>
+   <div class="col-sm-9">           
+      <%= input f, :name%>
+   </div>
 </div>
- 
+<div class="form-group row ">
+   <label for="inputEmail3" class="col-sm-3 col-form-label">
+      <div class="label required">
+         Product Category
+      </div>
+      <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+   </label>
+   <div class="col-sm-9">           
+      <%= select_input f, :taxon_id, get_options(@taxons), "" %>
+   </div>
+</div>
+<div class="form-group row ">
+   <label for="inputEmail3" class="col-sm-3 col-form-label">
+      <div class="label">
+         Variation themes
+      </div>
+      <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+   </label>
+   <div class="col-sm-9">           
+      <%= multi_select f, :variation_theme_ids, get_options(@themes), "" %>
+   </div>
+</div>
+<div class="form-group row ">
+   <label for="inputEmail3" class="col-sm-3 col-form-label">
+      <div class="label">
+         Properties
+      </div>
+      <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+   </label>
+   <div class="col-sm-9">           
+      <%= multi_select f, :variation_theme_ids, get_options(@themes), "" %>
+   </div>
+</div>
+<div class="form-group row stickformbutton">
+   <div class="col-sm-10">
+      <%= submit "Submit", class: "btn btn-primary submit-btn float-right" %>  
+      <%= submit "Cancel", class: "btn submit-btn btn-secondary btn-outline-secondary float-left" %>  
+   </div>
+</div>
 <% end %>

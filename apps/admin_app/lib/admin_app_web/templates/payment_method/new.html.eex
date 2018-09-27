@@ -35,10 +35,10 @@
            <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
           </label>
           <div class="col-sm-9">           
-                <%= input(f, :description) %>
-                <div id="preferences">
-                </div>
+            <%= input(f, :description) %>             
           </div>
+        </div>
+        <div id="preferences">
         </div>
         <div class="form-group row ">
           <label for="inputEmail3" class="col-sm-3 col-form-label">
@@ -62,10 +62,10 @@
              <%= checkbox_input(f, :live_mode?, "Live Mode ") %>       
           </div>
         </div>
-        <div class="form-group row">
+        <div class="form-group row stickformbutton">
           <div class="col-sm-10">
-            <%= submit "Submit", class: "btn btn-primary submit-btn col-2" %>
-            <%= link("Cancel", to: payment_method_path(@conn, :index), class: "btn btn-primary col-2") %>
+            <%= submit "Submit", class: "btn btn-primary submit-btn float-right" %>
+            <%= link("Cancel", to: payment_method_path(@conn, :index), class: "btn btn-secondary btn-outline-secondary  float-left") %>
           </div>
         </div>
       </form>
@@ -73,4 +73,3 @@
     </div>
   </div>
 </div>
-

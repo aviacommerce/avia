@@ -4,8 +4,8 @@
     <h2>Product Brands</h2>
   </div>
   <div class="col-2 p-0 float-right text-right">
-    <%= link(" Add a brand", to: product_brand_path(@conn, :new), 
-      class: "btn btn-primary fa fa-plus")%>  
+    <%= link(raw("<i class='fas fa-plus'></i> Add a brand"), to: product_brand_path(@conn, :new), 
+      class: "btn btn-primary")%>  
   </div>
 </div>
 <div class="row m-0 list">

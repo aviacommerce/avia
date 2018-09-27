@@ -4,7 +4,7 @@
       <h2>Variation Themes</h2>
     </div>
     <div class="col-2 p-0 float-right text-right">
-     <%= link(" Create New", to: variation_theme_path(@conn, :new), class: "btn btn-primary fa fa-plus")%>  
+     <%= link(raw("<i class='fas fa-plus'></i> Create New"), to: variation_theme_path(@conn, :new), class: "btn btn-primary")%>  
     </div> 
   </div>
   <div class="row m-0 list">

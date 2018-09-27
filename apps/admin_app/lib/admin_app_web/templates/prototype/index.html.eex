@@ -5,12 +5,11 @@
       <h2>Protoypes</h2>
     </div>
     <div class="col-2 p-0 float-right text-right">
-   <%= link("Add a Prototype", to: prototype_path(@conn, :new), class: "btn btn-primary")%>
+     <%= link(raw("<i class='fas fa-plus'></i> Add a Prototype"), to: prototype_path(@conn, :new), class: "btn btn-primary")%>
     </div> 
   </div>
   <div class="row m-0 list">
-  <%= render_many @prototypes, AdminAppWeb.PrototypeView, "_prototype.html", conn: @conn, as: :prototype %>
- 
-  </div>
+    <%= render_many @prototypes, AdminAppWeb.PrototypeView, "_prototype.html", conn: @conn, as: :prototype %>
+   </div>
 </div>
 
