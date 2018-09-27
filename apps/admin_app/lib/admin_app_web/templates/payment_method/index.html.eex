@@ -1,51 +1,51 @@
 <div class="list-container">
 <div class="row m-0 list-header">
-   <div class="col-10 p-0">
-      <h2>Payment</h2>
-   </div>
-   <div class="col-2 p-0 float-right text-right">
-      <%= link("  Add a method", to: payment_method_path(@conn, :new),
-         class: "btn btn-primary float-right fas fa-plus")%>
-   </div>
+  <div class="col-10 p-0">
+    <h2>Payment</h2>
+  </div>
+  <div class="col-2 p-0 float-right text-right">
+    <%= link( raw("<i class='fas fa-plus'></i> Add a method"), to: payment_method_path(@conn, :new),
+      class: "btn btn-primary float-right")%>
+  </div>
 </div>
 <div class="row m-0 list">
-   <%= for payment_method <- @payment_methods do %>
-   <div class="table-contaner col-12 p-3 mb-2">
-      <div class="row">
-         <div class="col-1">
-            <div class="checkbox">
-               <label>
-               <input type="checkbox" value="">
-               <span class="cr"><i class="cr-icon fa fa-check"></i></span>              
-               </label>
-            </div>
-         </div>
-         <div class="col-3"><%= payment_method.name %></div>
-         <div class="col-4">
-            <span> BY</span>
-            <%= payment_method.provider %>
-         </div>
-         <div class="col-3">
-            <%= payment_method.active? %>
-         </div>
-         <div class="col-1">
-            <div class="dropdown col-12 p-0 float-right">
-               <a class="p-2 dropdown-toggle options" href="#" role="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-               <i class="fa fa-cog"></i>
-               </a>
-               <div class="dropdown-menu dropdown-menu-right">
-                  <%= link("Edit", to: payment_method_path(@conn, :edit, payment_method.id),
-                     class: "dropdown-item")
-                     %>
-                  <div class="dropdown-divider"></div>
-                  <%= link("Delete", to: payment_method_path(@conn, :delete, payment_method.id),
-                     method: :delete, data: [confirm: "Are you sure you want to delete?"],
-                     class: "dropdown-item")
-                     %>
-               </div>
-            </div>
-         </div>
+  <%= for payment_method <- @payment_methods do %>
+  <div class="table-contaner col-12 p-3 mb-2">
+    <div class="row">
+      <div class="col-1">
+        <div class="checkbox">
+          <label>
+          <input type="checkbox" value="">
+          <span class="cr"><i class="cr-icon fa fa-check"></i></span>              
+          </label>
+        </div>
       </div>
-   </div>
-   <% end %>     
+      <div class="col-3"><%= payment_method.name %></div>
+      <div class="col-4">
+        <span> BY</span>
+        <%= payment_method.provider %>
+      </div>
+      <div class="col-3">
+        <%= payment_method.active? %>
+      </div>
+      <div class="col-1">
+        <div class="dropdown col-12 p-0 float-right">
+          <a class="p-2 dropdown-toggle options" href="#" role="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fa fa-cog"></i>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right">
+            <%= link("Edit", to: payment_method_path(@conn, :edit, payment_method.id),
+              class: "dropdown-item")
+              %>
+            <div class="dropdown-divider"></div>
+            <%= link("Delete", to: payment_method_path(@conn, :delete, payment_method.id),
+              method: :delete, data: [confirm: "Are you sure you want to delete?"],
+              class: "dropdown-item")
+              %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% end %>     
 </div>

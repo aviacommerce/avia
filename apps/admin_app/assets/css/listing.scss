@@ -31,13 +31,23 @@
 
   background-color: $gray-101;
   height: 100%;
-  height:100vh;
+
 
   .list-header {
     background-color: $white;
     padding: 7px 1.1em;
     border-bottom: 1px solid $bordercolor1;
     letter-spacing: .4px;
+
+    .pagelink {
+      color: $white;
+
+      path {
+        fill: $white
+      }
+
+      filter: invert(.5) sepia(1);
+    }
 
     h2 {
       font-size: 1.625em;
@@ -400,16 +410,20 @@
     padding: 1.5em 0.638em;
   }
 
-  .options {
-    color: $txt-lightdark;
-    position: relative;
-    top: 2px;
+  .options-container {
+    width: 60px;
 
-    &:hover {
-      text-decoration: none;
-      color: $main-color;
-      border: 1px solid $gray-300;
-      border-radius: 4px;
+    .options {
+      color: $txt-lightdark;
+      position: relative;
+      top: 2px;
+
+      &:hover {
+        text-decoration: none;
+        color: $main-color;
+        border: 1px solid $gray-300;
+        border-radius: 4px;
+      }
     }
   }
 
@@ -934,4 +948,112 @@ $switch-transition: .2s all !default;
     opacity: 0;
     cursor: pointer;
   }
+}
+
+// For the tree
+
+.select2 {
+  width: 100% !important
+}
+
+.tree {
+  Ul:first-child {
+    padding: 0;
+    margin: 0;
+  }
+
+  .icon-minus-sign {
+    padding-left: 2px;
+
+    &:before {
+      font-family: "Font Awesome 5 Free";
+      content: "\f068";
+      margin-right: 4px;
+    }
+  }
+
+  .icon-plus-sign {
+    padding-left: 2px;
+
+    &:before {
+      font-family: "Font Awesome 5 Free";
+      content: "\f067";
+      margin-right: 4px;
+    }
+  }
+}
+
+.tree li {
+  list-style-type: none;
+  margin: 0;
+  padding: 10px 0px 0 5px;
+  position: relative;
+}
+
+.tree li::before,
+.tree li::after {
+  content: '';
+  left: -20px;
+  position: absolute;
+  right: auto
+}
+
+.tree li::before {
+  border-left: 1px solid #999;
+  bottom: 50px;
+  height: 100%;
+  top: 0;
+  width: 1px
+}
+
+.tree li::after {
+  border-top: 1px solid #999;
+  height: 20px;
+  top: 25px;
+  width: 25px
+}
+
+.tree li span {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border: 1px solid #999;
+  border-radius: 5px;
+  display: inline-block;
+  padding: 3px 8px;
+  text-decoration: none;
+  width: 100%
+}
+
+.tree li.parent_li>span {
+  cursor: pointer
+}
+
+.tree>ul>li::before,
+.tree>ul>li::after {
+  border: 0
+}
+
+.tree li:last-child::before {
+  height: 30px
+}
+
+.tree li.parent_li>span:hover,
+.tree li.parent_li>span:hover+ul li span {
+  background: #eee;
+  border: 1px solid #94a0b4;
+  color: #000
+}
+
+.taxon-actions {
+  border: none !important;
+  display: inline;
+}
+
+.taxon-actions i {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.taxon-actions i:hover {
+  cursor: pointer;
 }

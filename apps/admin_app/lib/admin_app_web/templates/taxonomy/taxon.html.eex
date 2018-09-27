@@ -1,6 +1,6 @@
 <li class="parent_li" data-taxon_id="<%= @taxon.id %>">
   <span>
-    <i class="icon-folder-open"><%= @taxon.name %></i>
+    <i class="icon-minus-sign fa"><%= @taxon.name %></i>
     <div class="taxon-actions float-right">
       <i class="add-taxon fa fa-plus-square fa-4" aria-hidden="true"></i>
       <i class="edit-taxon fa fa-pencil-square fa-4" aria-hidden="true"></i>
