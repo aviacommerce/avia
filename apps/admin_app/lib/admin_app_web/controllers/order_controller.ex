@@ -41,7 +41,13 @@ defmodule AdminAppWeb.OrderController do
 
   def show(conn, %{"number" => _number} = params) do
     order = OrderContext.get_order(params)
-    render(conn, "show.html", order: order)
+
+    render(
+      conn,
+      "show.html",
+      order: order,
+      order_total: OrderContext.get_total(order)
+    )
   end
 
   def update_package(conn, %{"id" => id, "state" => state}) do
