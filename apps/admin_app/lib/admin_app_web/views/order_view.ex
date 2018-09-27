@@ -1,8 +1,8 @@
 defmodule AdminAppWeb.OrderView do
   use AdminAppWeb, :view
-  alias Snitch.Data.Model.{Country, LineItem, State}
+  alias Snitch.Data.Model.{Country, State}
   alias Snitch.Domain.Order, as: OrderDomain
-  alias Snitch.Data.Model.LineItem
+  alias AdminAppWeb.Helpers
 
   @bootstrap_contextual_class %{
     "slug" => "light",
@@ -15,6 +15,30 @@ defmodule AdminAppWeb.OrderView do
     "cancelled" => "secondary",
     "completed" => "success"
   }
+
+  def order_user_name(order) do
+    order.user.first_name <> order.user.last_name
+  end
+
+  def order_item_count(order) do
+    case length(order.line_items) do
+      1 ->
+        "1 item"
+
+      items ->
+        items <> " items"
+    end
+  end
+
+  def format_date(date) do
+    Helpers.format_date(date)
+  end
+
+  def get_country_state(order) do
+    country = get_country(order.shipping_address.country_id)
+    state = get_state(order.shipping_address.state_id)
+    state.name <> ", " <> country.name
+  end
 
   def colorize(%{state: state}) do
     "table-" <> Map.fetch!(@bootstrap_contextual_class, state)
@@ -39,9 +63,13 @@ defmodule AdminAppWeb.OrderView do
     content_tag(:td, product.sku)
   end
 
-  def line_item_total(order) do
+  def line_item_total(line_item) do
+    Money.mult!(line_item.unit_price, line_item.quantity)
+  end
+
+  def order_items_total(order) do
     order
-    |> OrderDomain.line_item_total()
+    |> OrderDomain.total_amount()
     |> Money.to_string!()
   end
 
@@ -54,12 +82,6 @@ defmodule AdminAppWeb.OrderView do
   def shipping_total(order) do
     order.packages
     |> OrderDomain.shipping_total()
-    |> Money.to_string!()
-  end
-
-  def order_total(order) do
-    order
-    |> OrderDomain.total_amount()
     |> Money.to_string!()
   end
 
@@ -192,11 +214,11 @@ defmodule AdminAppWeb.OrderView do
     content_tag(:td, " x #{line_item.quantity}")
   end
 
-  defp get_country(country_id) do
+  def get_country(country_id) do
     Country.get(country_id)
   end
 
-  defp get_state(state_id) do
+  def get_state(state_id) do
     State.get(state_id)
   end
 

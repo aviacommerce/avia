@@ -1,21 +1,23 @@
 <div class="list-container">
    <div class="pt-3 pb-0 pr-3 pl-3 back"> <img src="/images/left-arrow.svg"
-      width="20" height="20" class="d-inline-block align-top" alt=""> 
-      <a href="/orders">Orders </a>  
+      width="20" height="20" class="d-inline-block align-top" alt="">
+      <a href="/orders">Orders </a>
    </div>
    <h4 class="p-3 m-0">Order Detail</h4>
    <div class="row m-0 order-detail">
       <div class="col-9">
          <div class="row">
             <div class="col-6">
-               <h2>Order from Arjun Singh</h2>
+               <h2>Order from <%= order_user_name(@order) %></h2>
                <div class="orderon"><span class="mr-2"><%= @order.number %></span> via Avia</div>
-               <div class="orderon"><span class="mr-2">1 item,</span> <span>US$ 2.00</span></div>
+               <div class="orderon">
+                <span class="mr-1"><%= order_item_count(@order) %>,</span>
+                <span><%= @order_total %></span>
+               </div>
             </div>
             <div class="col-6 text-right">
-               <div class="shipby">Ship by 11 Oct, 2018 </div>
-               <div class="orderon"> Ordered 11:13, Thu, 20 Sep, 2018 </div>
-               <div class="orderon">  Ship to pune, India </div>
+               <div class="orderon"> Ordered <%= format_date(@order.updated_at) %></div>
+               <div class="orderon">  Ship to <%= get_country_state(@order) %></div>
             </div>
          </div>
          <div class="my-3 order-btns">
@@ -37,6 +39,11 @@
             </div>
          </div>
          <h3 class="mt-3">Print</h3>
+         <div>
+            <a class="btn btn-primary" href="/orders/<%= @order.number %>/download-invoice" style="margin-right: 3px;">Download Invoice</a>
+            <a class="btn btn-primary" href="/orders/<%= @order.number %>/show-packing-slip" style="margin-right: 3px;">Show Packing Slip</a>
+            <a class="btn btn-primary" href="/orders/<%= @order.number %>/download-packing-slip" style="margin-right: 3px;">Download Packing Slip</a>
+          </div>
          <div class="card col-12 print">
             <div class="print-sub-head">What would you like to print?</div>
             <div class="media lineitem-detail">
@@ -64,13 +71,13 @@
                <div class="media-body">
                   <a class="mt-0 text-capitalize name">Order receipts</a>
                   <div class="variant">
-                     Designed for buyers, add a coupon code and more.
+                    Designed for buyers, add a coupon code and more.
                   </div>
                </div>
                <a class="btn btn-primary float-right " href="#"> Print</a>
             </div>
          </div>
-         <h3 class="mt-3">Ship by 11 Oct 2018</h3>
+         <h3 class="mt-3">Shipping Details</h3>
          <div class="card col-12">
             <div class="row">
                <div class="col-4">
@@ -81,13 +88,13 @@
                </div>
                <div class="col-8">
                   <div class="address">
-                     <div class="ship mb-3"> Selected by buyer </div>
+                     <div class="ship mb-3"> Shipping Method Selected </div>
                      <div class="std-shipping">
                         <div class="float-left">
-                           Standard Shipping
+                          <%= shipping_method(@order) %>
                         </div>
                         <div class="float-right ship ">
-                           US$ 0.00
+                          <%= @order_total %>
                         </div>
                         <div class="clearfix"></div>
                      </div>
@@ -122,38 +129,36 @@
                      </tr>
                   </thead>
                   <tbody>
-                     <tr class="d-flex">
-                        <td class="col-8 text-left">
-                           <div class="media lineitem-detail">
-                              <a class="pr-2 mr-1" href="#" >
-                              <img href="#" src="/images/empty-img.png" alt="Default">
-                              </a>
-                              <div class="media-body">
-                                 <a class="mt-0 text-capitalize name">Nike</a>
-                                 <div class="variant">                           
-                                 </div>
-                              </div>
-                           </div>
-                        </td>
-                        <td class="col-2">2</td>
-                        <td class="col-2">40 </td>
-                     </tr>
+                    <%= for line_item <- @order.line_items do %>
+                      <tr class="d-flex">
+                          <td class="col-8 text-left">
+                            <div class="media lineitem-detail">
+                                <a class="pr-2 mr-1" href="#" >
+                                <img href="#" src="/images/empty-img.png" alt="Default">
+                                </a>
+                                <div class="media-body">
+                                  <a class="mt-0 text-capitalize name"> <%= line_item.product.sku %></a>
+                                  <div class="variant">
+                                  </div>
+                                </div>
+                            </div>
+                          </td>
+                          <td class="col-2"><%= line_item.quantity %></td>
+                          <td class="col-2"><%= line_item.unit_price %></td>
+                      </tr>
+                      <tr>
+                      <td>Item Total</td><td><%= line_item_total(line_item) %></td>
+                      </tr>
+                     <% end %>
                   </tbody>
                </table>
-               <div class="row m-0 summery-datail">
-                  <div class="col-6 left">
-                     Item total
-                  </div>
-                  <div class="col-6 right">
-                     US$ 2.00
-                  </div>
-               </div>
-               <div class="row m-0 summery-datail">
+            </div>
+            <div class="row m-0 summery-datail">
                   <div class="col-6 left">
                      Shipping cost
                   </div>
                   <div class="col-6 right">
-                     US$ 2.00
+                     <%= shipping_total(@order) %>
                   </div>
                </div>
                <div class="row m-0 total">
@@ -162,19 +167,20 @@
                      <div class="total-text">Order total</div>
                   </div>
                   <div class="col-6 right">
-                     <div> US$ 2.00 </div>
-                     <div class="total-text"> US$ 2.00 </div>
+                     <div> <%= tax_total(@order) %> </div>
+                     <div class="total-text"> <%= @order_total %></div>
                      <div class="paid-via mt-4">
+                      <%= for payment <- @order.payments do %>
                         <div class="">
-                           Paid via other method
+                            Paid via <%= payment.payment_type %>
                         </div>
                         <div class="n-paid">
-                           Not paid
+                           Status <%= payment.state %>
                         </div>
+                        <% end %>
                      </div>
                   </div>
                </div>
-            </div>
          </div>
       </div>
       <div class="col-3 rightbar pt-0">
@@ -208,71 +214,4 @@
             </div>
          </form>
       </div>
-   </div>
-   <div class="">
-      <nav aria-label="breadcrumb">
-         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/orders">Orders</a></li>
-            <li class="breadcrumb-item active" aria-current="page"></li>
-         </ol>
-      </nav>
-      <h2>
-         Order
-         from <%= @order.user.first_name <> " " <> @order.user.last_name %>
-         <%= state_badge(@order.state) %>
-      </h2>
-      <div class="btn-group mx-2">
-         <button class="btn btn-outline-secondary btn-md dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-         Order Actions
-         </button>
-         <div class="dropdown-menu dropdown-menu-right">
-            <%= link "Pending", to: order_package_path(@conn, :update_package,
-               @order.id, [state: :processing]), method: :put, class: "dropdown-item" %>
-            <%= link "Ready", to: order_package_path(@conn, :update_package,
-               @order.id, [state: :ready]), method: :put, class: "dropdown-item" %>
-            <%= link "Ship", to: order_package_path(@conn, :update_package,
-               @order.id, [state: :shipped]), method: :put, class: "dropdown-item" %>
-            <div class="dropdown-divider"></div>
-            <%= link "Mark as Complete", to: order_path(@conn, :update_state,
-               @order.id), method: :put, class: "dropdown-item" %>
-         </div>
-      </div>
-   </div>
-   <div class="row">
-      <div class="col-8">
-         <%= render "line_item.html", %{order: @order} %>
-         <div class="card-body">
-          <div>
-            <a class="btn btn-primary" href="/orders/<%= @order.number %>/download-invoice" style="margin-right: 3px;">Download Invoice</a>
-            <a class="btn btn-primary" href="/orders/<%= @order.number %>/show-packing-slip" style="margin-right: 3px;">Show Packing Slip</a>
-            <a class="btn btn-primary" href="/orders/<%= @order.number %>/download-packing-slip" style="margin-right: 3px;">Download Packing Slip</a>
-          </div>
-         </div>
-         <%= render "addresses.html", %{order: @order} %>
-      </div>
-      <div class="col-4">
-         <h3>Order Summary</h3>
-         <%= render "order_total_summary.html", order: @order %>
-         <div>
-            <h3>Payment Summary</h3>
-            <table class="table table-sm">
-               <caption class="sr-only">Payment Summary</caption>
-               <tbody>
-                  <%= for payment <- @order.payments do %>
-                  <tr>
-                     <th>Method Selected</th>
-                     <td><%= payment.payment_type %></td>
-                  </tr>
-                  <tr>
-                     <th>Status</th>
-                     <td><%= payment.state %></td>
-                  </tr>
-                  <% end %>
-               </tbody>
-            </table>
-         </div>
-      </div>
-   </div>
-</div>
-</div>
 </div>
