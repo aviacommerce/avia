@@ -3,6 +3,7 @@ defmodule AdminApp.OrderContext do
   alias Snitch.Data.Schema.Order
   alias Snitch.Data.Model.Order, as: OrderModel
   alias Snitch.Repo
+  alias Snitch.Domain.Order, as: OrderDomain
 
   def get_order(%{"number" => number}) do
     %{number: number}
@@ -25,6 +26,10 @@ defmodule AdminApp.OrderContext do
       :payments,
       :user
     ])
+  end
+
+  def get_total(order) do
+    OrderDomain.total_amount(order)
   end
 
   def order_list("pending") do

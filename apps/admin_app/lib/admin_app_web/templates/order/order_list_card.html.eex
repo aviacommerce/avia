@@ -26,7 +26,7 @@
       <div class="col-5">
          <div class="media order-action">
             <div class="media-body">
-               <div class="order">              
+               <div class="order">
                   Ordered <span><%= @order.inserted_at %></span>
                </div>
                <div class="std-shipping my-3"><span class="mr-1">Standard Shipping</span>  (US$ 0.00) </div>
