@@ -7,24 +7,54 @@ defmodule AdminAppWeb.InputHelpers do
   alias Phoenix.HTML.Form
 
   def input(form, field, name \\ nil, opts \\ []) do
-    type = Form.input_type(form, field)
-
     validate_required =
       form
       |> input_validations(field)
       |> check_required
 
+    type = Form.input_type(form, field)
     field_name = name || field
-    wrapper_opts = [class: "form-group #{validate_required}"]
-    label_opts = [class: "control-label"]
-
+    label_opts = [class: "label #{validate_required}"]
     input_opts = [class: "form-control #{state_class(form, field)}"] ++ opts
 
-    content_tag :div, wrapper_opts do
-      label = label(form, field, humanize(field_name), label_opts)
-      input = apply(Form, type, [form, field, input_opts])
-      error = EH.error_tag(form, field) || ""
-      [label, input, error]
+    case is_horizontal_layout?(opts) do
+      true -> make_horizontal_input(form, field, field_name, type, input_opts, label_opts, opts)
+      _ -> make_vertical_input(form, field, field_name, type, input_opts, label_opts, opts)
+    end
+  end
+
+  defp make_horizontal_input(form, field, field_name, type, input_opts, label_opts, opts) do
+    [
+      content_tag :label, class: "col-sm-3 col-form-label" do
+        [
+          content_tag :div, label_opts do
+            [humanize(field_name)]
+          end
+        ] ++ add_description(get_description(opts))
+      end,
+      content_tag :div, class: "col-sm-9" do
+        [
+          content_tag :div, class: "form-group" do
+            [apply(Form, type, [form, field, input_opts]), EH.error_tag(form, field) || ""]
+          end
+        ]
+      end
+    ]
+  end
+
+  defp make_vertical_input(form, field, field_name, type, input_opts, label_opts, opts) do
+    content_tag :div, class: "col-sm-12" do
+      [
+        content_tag :div, class: "form-group" do
+          [
+            content_tag :div, label_opts do
+              [humanize(field_name)]
+            end,
+            apply(Form, type, [form, field, input_opts]),
+            EH.error_tag(form, field) || ""
+          ] ++ add_description(get_description(opts))
+        end
+      ]
     end
   end
 
@@ -34,49 +64,256 @@ defmodule AdminAppWeb.InputHelpers do
       |> input_validations(field)
       |> check_required
 
+    type = Form.input_type(form, field)
     field_name = name || field
-    wrapper_opts = [class: "form-group #{validate_required}"]
-    label_opts = [class: ""]
+    label_opts = [class: "label #{validate_required}"]
+    input_opts = [class: "form-control #{state_class(form, field)}"] ++ opts
 
-    input_opts = [class: "form-control  #{state_class(form, field)}"] ++ opts
+    case is_horizontal_layout?(opts) do
+      true ->
+        make_horizontal_select_input(
+          form,
+          field,
+          field_name,
+          type,
+          list,
+          input_opts,
+          label_opts,
+          opts
+        )
 
-    content_tag :div, wrapper_opts do
-      label = label(form, field, humanize(field_name), label_opts)
-      select = select(form, field, list, input_opts)
-      error = EH.error_tag(form, field) || ""
-      [label, select, error || ""]
+      _ ->
+        make_vertical_select_input(
+          form,
+          field,
+          field_name,
+          type,
+          list,
+          input_opts,
+          label_opts,
+          opts
+        )
+    end
+  end
+
+  defp make_horizontal_select_input(
+         form,
+         field,
+         field_name,
+         type,
+         list,
+         input_opts,
+         label_opts,
+         opts
+       ) do
+    [
+      content_tag :label, class: "col-sm-3 col-form-label" do
+        [
+          content_tag :div, label_opts do
+            [humanize(field_name)]
+          end
+        ] ++ add_description(get_description(opts))
+      end,
+      content_tag :div, class: "col-sm-9" do
+        [
+          content_tag :div, class: "form-group" do
+            [select(form, field, list, input_opts), EH.error_tag(form, field) || ""]
+          end
+        ]
+      end
+    ]
+  end
+
+  defp make_vertical_select_input(
+         form,
+         field,
+         field_name,
+         type,
+         list,
+         input_opts,
+         label_opts,
+         opts
+       ) do
+    content_tag :div, class: "col-sm-12" do
+      [
+        content_tag :div, class: "form-group" do
+          [
+            content_tag :div, label_opts do
+              [humanize(field_name)]
+            end,
+            select(form, field, list, input_opts),
+            EH.error_tag(form, field) || ""
+          ] ++ add_description(get_description(opts))
+        end
+      ]
     end
   end
 
   def multi_select(form, field, list, name \\ nil, opts \\ []) do
+    validate_required =
+      form
+      |> input_validations(field)
+      |> check_required
+
+    type = Form.input_type(form, field)
+    field_name = name || field
+    label_opts = [class: "label #{validate_required}"]
+
     input_opts =
       [
         class: "full-width w-100 form-control #{state_class(form, field)}",
         "data-init-plugin": "select2"
       ] ++ opts
 
+    case is_horizontal_layout?(opts) do
+      true ->
+        make_horizontal_multi_select_input(
+          form,
+          field,
+          field_name,
+          type,
+          list,
+          input_opts,
+          label_opts,
+          opts
+        )
+
+      _ ->
+        make_vertical_multi_select_input(
+          form,
+          field,
+          field_name,
+          type,
+          list,
+          input_opts,
+          label_opts,
+          opts
+        )
+    end
+  end
+
+  defp make_horizontal_multi_select_input(
+         form,
+         field,
+         field_name,
+         type,
+         list,
+         input_opts,
+         label_opts,
+         opts
+       ) do
     input = Form.multiple_select(form, field, list, input_opts)
     hidden_input = hidden_input(form, field, value: "")
-    base_input(form, field, name, [hidden_input, input])
+    error = EH.error_tag(form, field) || ""
+
+    [
+      content_tag :label, class: "col-sm-3 col-form-label" do
+        [
+          content_tag :div, label_opts do
+            [humanize(field_name)]
+          end
+        ] ++ add_description(get_description(opts))
+      end,
+      content_tag :div, class: "col-sm-9" do
+        [
+          content_tag :div, class: "form-group" do
+            [hidden_input, input, error]
+          end
+        ]
+      end
+    ]
+  end
+
+  defp make_vertical_multi_select_input(
+         form,
+         field,
+         field_name,
+         type,
+         list,
+         input_opts,
+         label_opts,
+         opts
+       ) do
+    input = Form.multiple_select(form, field, list, input_opts)
+    hidden_input = hidden_input(form, field, value: "")
+    error = EH.error_tag(form, field) || ""
+
+    content_tag :div, class: "col-sm-12" do
+      [
+        content_tag :div, class: "form-group" do
+          [
+            content_tag :div, label_opts do
+              [humanize(field_name)]
+            end,
+            hidden_input,
+            input,
+            error
+          ] ++ add_description(get_description(opts))
+        end
+      ]
+    end
   end
 
   def textarea_input(form, field, name \\ nil, opts \\ []) do
-    field_name = name || field
-
     validate_required =
       form
       |> input_validations(field)
       |> check_required
 
-    wrapper_opts = [class: "form-group #{validate_required}"]
-    label_opts = [class: "control-label"]
-    textarea_opts = [class: "form-control  #{state_class(form, field)}"] ++ opts
+    type = Form.input_type(form, field)
+    field_name = name || field
+    label_opts = [class: "label #{validate_required}"]
+    input_opts = [class: "form-control #{state_class(form, field)}"] ++ opts
 
-    content_tag :div, wrapper_opts do
-      label = label(form, field, humanize(field_name), label_opts)
-      input = textarea(form, field, textarea_opts)
-      error = EH.error_tag(form, field) || ""
-      [label, input, error || ""]
+    case is_horizontal_layout?(opts) do
+      true ->
+        make_horizontal_textarea_input(
+          form,
+          field,
+          field_name,
+          type,
+          input_opts,
+          label_opts,
+          opts
+        )
+
+      _ ->
+        make_vertical_textarea_input(form, field, field_name, type, input_opts, label_opts, opts)
+    end
+  end
+
+  defp make_horizontal_textarea_input(form, field, field_name, type, input_opts, label_opts, opts) do
+    [
+      content_tag :label, class: "col-sm-3 col-form-label" do
+        [
+          content_tag :div, label_opts do
+            [humanize(field_name)]
+          end
+        ] ++ add_description(get_description(opts))
+      end,
+      content_tag :div, class: "col-sm-9" do
+        [
+          content_tag :div, class: "form-group" do
+            [textarea(form, field, input_opts), EH.error_tag(form, field) || ""]
+          end
+        ]
+      end
+    ]
+  end
+
+  defp make_vertical_textarea_input(form, field, field_name, type, input_opts, label_opts, opts) do
+    content_tag :div, class: "col-sm-12" do
+      [
+        content_tag :div, class: "form-group" do
+          [
+            content_tag :div, label_opts do
+              [humanize(field_name)]
+            end,
+            textarea(form, field, input_opts),
+            EH.error_tag(form, field) || ""
+          ] ++ add_description(get_description(opts))
+        end
+      ]
     end
   end
 
@@ -93,23 +330,76 @@ defmodule AdminAppWeb.InputHelpers do
         }"
     ]
 
-    label_opts = [class: "inline pr-3"]
+    type = Form.input_type(form, field)
     field_name = name || field
+    label_opts = [class: "label inline pr-3 #{validate_required}"]
     class = opts[:class] || ""
     input_opts = [class: class] ++ opts
 
-    content_tag :div, wrapper_opts do
-      label = label(form, field, humanize(field_name), label_opts)
+    case is_horizontal_layout?(opts) do
+      true ->
+        make_horizontal_checkbox_input(
+          form,
+          field,
+          field_name,
+          type,
+          input_opts,
+          label_opts,
+          opts
+        )
 
-      span_input =
-        content_tag :label, class: "switch" do
-          span = content_tag(:span, "", class: "slider round")
-          input = checkbox(form, field, input_opts)
-          error = EH.error_tag(form, field) || ""
-          [input, span, error || ""]
+      _ ->
+        make_vertical_checkbox_input(form, field, field_name, type, input_opts, label_opts, opts)
+    end
+  end
+
+  defp make_horizontal_checkbox_input(form, field, field_name, type, input_opts, label_opts, opts) do
+    span_input =
+      content_tag :label, class: "switch" do
+        span = content_tag(:span, "", class: "slider round")
+        input = checkbox(form, field, input_opts)
+        error = EH.error_tag(form, field) || ""
+        [input, span, error || ""]
+      end
+
+    [
+      content_tag :label, class: "col-sm-3 col-form-label" do
+        [
+          content_tag :div, label_opts do
+            [humanize(field_name)]
+          end
+        ] ++ add_description(get_description(opts))
+      end,
+      content_tag :div, class: "col-sm-9" do
+        [
+          content_tag :div, class: "form-group" do
+            span_input
+          end
+        ]
+      end
+    ]
+  end
+
+  defp make_vertical_checkbox_input(form, field, field_name, type, input_opts, label_opts, opts) do
+    span_input =
+      content_tag :label, class: "switch" do
+        span = content_tag(:span, "", class: "slider round")
+        input = checkbox(form, field, input_opts)
+        error = EH.error_tag(form, field) || ""
+        [input, span, error || ""]
+      end
+
+    content_tag :div, class: "col-sm-12" do
+      [
+        content_tag :div, class: "form-group" do
+          [
+            content_tag :div, label_opts do
+              [humanize(field_name)]
+            end,
+            span_input
+          ] ++ add_description(get_description(opts))
         end
-
-      [label, span_input]
+      ]
     end
   end
 
@@ -155,5 +445,23 @@ defmodule AdminAppWeb.InputHelpers do
     content_tag :div, wrapper_opts do
       form_label(form, field, name) ++ inputs ++ [error]
     end
+  end
+
+  defp is_horizontal_layout?(opts) do
+    Keyword.get(opts, :is_horizontal)
+  end
+
+  defp get_description(opts) do
+    Keyword.get(opts, :description)
+  end
+
+  defp add_description(nil), do: []
+
+  defp add_description(description) do
+    [
+      content_tag :div, class: "label-txt" do
+        description
+      end
+    ]
   end
 end
