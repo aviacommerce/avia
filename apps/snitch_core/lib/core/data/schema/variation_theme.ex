@@ -27,7 +27,7 @@ defmodule Snitch.Data.Schema.VariationTheme do
     timestamps()
   end
 
-  @create_params ~w(name)a
+  @create_params ~w(name option_type_ids)a
 
   @doc """
   Returns a changeset to create new Variation theme
@@ -52,12 +52,16 @@ defmodule Snitch.Data.Schema.VariationTheme do
     |> put_assoc_option_types(params["option_type_ids"])
   end
 
-  defp put_assoc_option_types(changeset, option_type) when option_type in [nil, ""] do
+  defp put_assoc_option_types(changeset, option_type) when option_type == nil do
     option_type_ids = Enum.map(changeset.data.option_types, & &1.id)
 
     changeset
     |> put_change(:option_type_ids, option_type_ids)
     |> put_assoc(:option_types, Enum.map([], &change/1))
+  end
+
+  defp put_assoc_option_types(changeset, option_type) when option_type == "" do
+    changeset
   end
 
   defp put_assoc_option_types(changeset, option_types) do
