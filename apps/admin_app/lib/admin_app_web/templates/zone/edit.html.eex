@@ -1,63 +1,63 @@
 <div class="list-container">
-  <div class="pt-3 pb-0 pr-3 pl-3 back"> <img src="/images/left-arrow.svg" width="20" height="20" class="d-inline-block align-top" alt="">  <a href="/zones">Zones</a> </div>
-  <h4 class="p-3 m-0">Edit Zone</h4>
-  <div class="col-12">
-    <div class="card col-12">
-      <%= form_for @changeset, zone_path(@conn, :update, @id), fn f -> %>
-        <div class="form-group row ">
-          <label for="inputEmail3" class="col-sm-3 col-form-label">
-            <div class="label required">
-              Name
+   <div class="pt-3 pb-0 pr-3 pl-3 back"> <img src="/images/left-arrow.svg" width="20" height="20" class="d-inline-block align-top" alt="">  <a href="/zones">Zones</a> </div>
+   <h4 class="p-3 m-0">Edit Zone</h4>
+   <div class="col-12">
+      <div class="card col-12">
+         <%= form_for @changeset, zone_path(@conn, :update, @id), fn f -> %>
+         <div class="form-group row ">
+            <label for="inputEmail3" class="col-sm-3 col-form-label">
+               <div class="label required">
+                  Name
+               </div>
+            </label>
+            <div class="col-sm-9">           
+               <%= input(f, :name)%>
             </div>
-          </label>
-          <div class="col-sm-9">           
-            <%= input(f, :name)%>
-          </div>
-        </div>
-        <div class="form-group row ">
-          <label for="inputEmail3" class="col-sm-3 col-form-label">
-            <div class="label">
-              Description
+         </div>
+         <div class="form-group row ">
+            <label for="inputEmail3" class="col-sm-3 col-form-label">
+               <div class="label">
+                  Description
+               </div>
+            </label>
+            <div class="col-sm-9">           
+               <%= input(f, :description) %>
             </div>
-          </label>
-          <div class="col-sm-9">           
-            <%= input(f, :description) %>
-          </div>
-        </div>
-        <div class="form-group row ">
-          <label for="inputEmail3" class="col-sm-3 col-form-label">
-              <div class="label required">
-                Zone Type
-              </div>
-          </label>
-          <div class="col-sm-9"> 
-            <%= select(f, :zone_type, get_zones(), id: "active-zone", selected: get_zone(@id).zone_type, disabled: true) %>
-          </div>
-        </div>
-        <div class="form-group row">
-          <label class="col-sm-3 col-form-label" id="zone-list">
-            <div class="label required" id="list-label">
-                <%= get_zone(@id).zone_type |> get_zone_type_name() %>
+         </div>
+         <div class="form-group row ">
+            <label for="inputEmail3" class="col-sm-3 col-form-label">
+               <div class="label">
+                  Zone Type
+               </div>
+            </label>
+            <div class="col-sm-9"> 
+               <%= select(f, :zone_type, get_zones(),class: "form-control", id: "active-zone", selected: get_zone(@id).zone_type, disabled: true) %>
             </div>
-          </label>
-          <%= if get_zone(@id).zone_type == "S" do %>
+         </div>
+         <div class="form-group row">
+            <label class="col-sm-3 col-form-label" id="zone-list">
+               <div class="label" id="list-label">
+                  <%= get_zone(@id).zone_type |> get_zone_type_name() %>
+               </div>
+            </label>
+            <%= if get_zone(@id).zone_type == "S" do %>
             <div class="col-sm-9" id="state-zone-list">           
-                <%= multiple_select(f, :state_members, get_states(), "data-init-plugin": "select2", selected: get_zone_members(get_zone(@id))) %>
+               <%= multiple_select(f, :state_members, get_states(), "data-init-plugin": "select2", selected: get_zone_members(get_zone(@id))) %>
             </div>
-          <% else %>
+            <% else %>
             <div class="col-sm-9" id="country-zone-list">           
-                <%= multiple_select(f, :country_members, get_countries(), "data-init-plugin": "select2", selected: get_zone_members(get_zone(@id))) %>
+               <%= multiple_select(f, :country_members, get_countries(), "data-init-plugin": "select2", selected: get_zone_members(get_zone(@id))) %>
             </div>
-          <% end %>
-        </div>
-        <div class="form-group row">
-          <div class="col-sm-10">
-            <%= submit "Submit", class: "btn btn-primary submit-btn col-2" %>
-            <%= link("Cancel", to: zone_path(@conn, :index), class: "btn btn-primary col-2") %>
-          </div>
-        </div>
-      </form>
-      <% end %>
-    </div>
-  </div>
+            <% end %>
+         </div>
+         <div class="form-group row stickformbutton">
+            <div class="col-sm-10">
+               <%= submit "Submit", class: "btn btn-primary submit-btn float-right" %>
+               <%= link("Cancel", to: zone_path(@conn, :index), class: "btn btn-secondary btn-outline-secondary float-left") %>
+            </div>
+         </div>
+         </form>
+         <% end %>
+      </div>
+   </div>
 </div>

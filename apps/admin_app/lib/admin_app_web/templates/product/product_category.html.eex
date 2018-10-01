@@ -2,11 +2,7 @@
   <div class="row m-0 list-header">
     <div class="col-10 p-0">
       <h2>Select product category</h2>
-    </div>
-    <div class="col-2 p-0 float-right text-right">
-      <%= link("  Add a method", to: payment_method_path(@conn, :new),
-        class: "btn btn-primary float-right fas fa-plus")%>
-    </div>
+    </div>   
   </div>
   <div class="row m-0 list">
     <div class="table-contaner col-12 p-0">

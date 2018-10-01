@@ -18,7 +18,7 @@
     <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
   </label>
   <div class="col-sm-9">           
-    <%= input f, :name%>
+    <%= input f, :display_name%>
   </div>
 </div>
 <div class="form-group row stickformbutton">
