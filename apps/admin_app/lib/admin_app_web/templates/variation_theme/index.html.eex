@@ -9,6 +9,5 @@
   </div>
   <div class="row m-0 list">
     <%= render_many @themes, AdminAppWeb.VariationThemeView, "_theme.html", conn: @conn, as: :theme %>
-
   </div>
 </div>

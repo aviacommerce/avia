@@ -4,7 +4,7 @@
       <h2>Products</h2>
     </div>
     <div class="col-2 p-0 float-right text-right">
-      <%= link("Create New", to: "/product/category", class: "btn btn-primary")%>
+      <%= link(raw("<i class='fas fa-plus'></i> Add a Product"), to: "/product/category", class: "btn btn-primary")%>
     </div>
   </div>
   <div class="row m-0 list list-extra">
