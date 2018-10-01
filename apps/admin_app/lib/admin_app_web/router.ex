@@ -77,6 +77,23 @@ defmodule AdminAppWeb.Router do
     delete("/taxonomy/delete", TaxonomyController, :delete_taxonomy)
     resources("/taxonomy", TaxonomyController, except: [:update])
     post("/taxonomy/create", TaxonomyController, :create_taxonomy)
+
+    get("/products/:product_id/property", ProductController, :index_property)
+    get("/products/:product_id/property/new", ProductController, :new_property)
+    get("/products/:product_id/property/:property_id/edit", ProductController, :edit_property)
+    post("/products/:product_id/property/create", ProductController, :create_property)
+
+    post(
+      "/products/:product_id/property/:property_id/update",
+      ProductController,
+      :update_property
+    )
+
+    delete(
+      "/products/:product_id/property/:property_id/delete",
+      ProductController,
+      :delete_property
+    )
   end
 
   scope "/", AdminAppWeb do

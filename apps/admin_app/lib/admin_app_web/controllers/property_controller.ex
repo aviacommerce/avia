@@ -3,6 +3,7 @@ defmodule AdminAppWeb.PropertyController do
 
   alias Snitch.Data.Model.Property, as: PropertyModel
   alias Snitch.Data.Schema.Property, as: PropertySchema
+  alias Snitch.Data.Model
 
   def index(conn, _params) do
     properties = PropertyModel.get_all()
@@ -56,6 +57,7 @@ defmodule AdminAppWeb.PropertyController do
 
   def delete(conn, %{"id" => id}) do
     with {id, _} <- Integer.parse(id),
+         true <- Model.ProductProperty.get_all_by_property(id) == [],
          {:ok, property} <- PropertyModel.delete(id) do
       conn
       |> put_flash(:info, "Property #{property.name} deleted successfully")
@@ -64,6 +66,11 @@ defmodule AdminAppWeb.PropertyController do
       {:error, _} ->
         conn
         |> put_flash(:error, "Failed to delete property")
+        |> redirect(to: property_path(conn, :index))
+
+      false ->
+        conn
+        |> put_flash(:error, "Property with associated products cannot be deleted")
         |> redirect(to: property_path(conn, :index))
 
       :error ->

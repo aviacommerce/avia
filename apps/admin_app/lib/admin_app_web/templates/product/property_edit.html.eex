@@ -1,0 +1,10 @@
+<div class="list-container">
+  <div class="pt-3 pb-0 pr-3 pl-3 back"> <img src="/images/left-arrow.svg"
+   width="20" height="20" class="d-inline-block align-top" alt=""> 
+   <a href= <%= "/products/#{@conn.params["product_id"]}/edit" %> >Product Edit</a> </div>
+  <h4 class="p-3 m-0">Edit a Property</h4> 
+  <div class="col-12">
+    <div class="card col-12">
+    <%= render "property_form.html", changeset: @changeset, conn: @conn, method: :post, action: product_path(@conn, :update_property, @conn.params["product_id"], @conn.params["property_id"]) %>
+  <div>
+</div>
