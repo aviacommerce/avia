@@ -52,4 +52,11 @@ defmodule Snitch.Data.Model.Property do
   def delete(instance) do
     QH.delete(Property, instance, Repo)
   end
+
+  def get_formatted_list() do
+    Property
+    |> order_by([p], asc: p.display_name)
+    |> select([p], {p.display_name, p.id})
+    |> Repo.all()
+  end
 end
