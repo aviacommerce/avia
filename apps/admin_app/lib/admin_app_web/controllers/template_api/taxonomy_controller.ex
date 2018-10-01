@@ -40,7 +40,7 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
     params = %{
       name: taxon_name,
       variation_theme_ids: params["themes"],
-      image: params["image"]
+      image: handle_image_value(params["image"])
     }
 
     case Taxonomy.update_taxon(taxon, params) do
@@ -53,4 +53,7 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
         |> json(%{})
     end
   end
+
+  defp handle_image_value(%Plug.Upload{} = file), do: file
+  defp handle_image_value(_), do: nil
 end
