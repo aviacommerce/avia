@@ -566,12 +566,13 @@
 
     .summery-datail {
       margin-bottom: 15px;
-      padding: 15px 0;
+      padding: 0px 0 15px;
       border-bottom: 1px solid $bordercolor1;
       font-size: 14px;
 
       .left {
         text-align: left;
+        padding-left: 10px;
       }
 
       .right {

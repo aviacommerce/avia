@@ -38,12 +38,7 @@
                </div>
             </div>
          </div>
-         <h3 class="mt-3">Print</h3>
-         <div>
-            <a class="btn btn-primary" href="/orders/<%= @order.number %>/download-invoice" style="margin-right: 3px;">Download Invoice</a>
-            <a class="btn btn-primary" href="/orders/<%= @order.number %>/show-packing-slip" style="margin-right: 3px;">Show Packing Slip</a>
-            <a class="btn btn-primary" href="/orders/<%= @order.number %>/download-packing-slip" style="margin-right: 3px;">Download Packing Slip</a>
-          </div>
+         <h3 class="mt-3">Print</h3>       
          <div class="card col-12 print">
             <div class="print-sub-head">What would you like to print?</div>
             <div class="media lineitem-detail">
@@ -59,7 +54,7 @@
                      Designed for buyers, add a coupon code and more.
                   </div>
                </div>
-               <a class="btn btn-primary float-right" href="#"> Print </a>
+               <a class="btn btn-primary float-right"  href="/orders/<%= @order.number %>/download-packing-slip" > Print </a>
             </div>
             <div class="media lineitem-detail mt-3">
                <div class="checkbox mx-2 mt-1">
@@ -69,12 +64,27 @@
                   </label>
                </div>
                <div class="media-body">
-                  <a class="mt-0 text-capitalize name">Order receipts</a>
+                  <a class="mt-0 text-capitalize name">Order Invoice</a>
                   <div class="variant">
                     Designed for buyers, add a coupon code and more.
                   </div>
                </div>
-               <a class="btn btn-primary float-right " href="#"> Print</a>
+               <a class="btn btn-primary float-right "href="/orders/<%= @order.number %>/download-invoice"> Print</a>
+            </div>
+            <div class="media lineitem-detail mt-3">
+               <div class="checkbox mx-2 mt-1">
+                  <label>
+                  <input type="checkbox" value="">
+                  <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+                  </label>
+               </div>
+               <div class="media-body">
+                  <a class="mt-0 text-capitalize name">Show Packing Slips</a>
+                  <div class="variant">
+                    Designed for buyers, add a coupon code and more.
+                  </div>
+               </div>
+               <a class="btn btn-primary float-right " href="/orders/<%= @order.number %>/show-packing-slip">Show</a>
             </div>
          </div>
          <h3 class="mt-3">Shipping Details</h3>
@@ -147,7 +157,7 @@
                           <td class="col-2"><%= line_item.unit_price %></td>
                       </tr>
                       <tr>
-                      <td>Item Total</td><td><%= line_item_total(line_item) %></td>
+                      <td class="col-8 text-left" colspan="2">Item Total</td><td><%= line_item_total(line_item) %></td>
                       </tr>
                      <% end %>
                   </tbody>
