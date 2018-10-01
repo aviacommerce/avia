@@ -49,7 +49,12 @@ defmodule AdminAppWeb.InputHelpers do
   end
 
   def multi_select(form, field, list, name \\ nil, opts \\ []) do
-    input_opts = [class: "full-width w-100", "data-init-plugin": "select2"] ++ opts
+    input_opts =
+      [
+        class: "full-width w-100 form-control #{state_class(form, field)}",
+        "data-init-plugin": "select2"
+      ] ++ opts
+
     input = Form.multiple_select(form, field, list, input_opts)
     hidden_input = hidden_input(form, field, value: "")
     base_input(form, field, name, [hidden_input, input])
