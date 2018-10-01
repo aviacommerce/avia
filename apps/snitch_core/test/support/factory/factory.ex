@@ -32,7 +32,9 @@ defmodule Snitch.Factory do
     User,
     Variant,
     Product,
-    ShippingCategory
+    ShippingCategory,
+    ProductProperty,
+    Property
   }
 
   alias Snitch.Core.Tools.MultiTenancy.Repo
@@ -213,6 +215,22 @@ defmodule Snitch.Factory do
       name: sequence(:product, &"shoes-nike-#{&1}"),
       description: "awesome products",
       slug: sequence(:slug, &"nike-#{&1}")
+    }
+  end
+
+  def product_property_factory do
+    %ProductProperty{
+      product: insert(:product),
+      property: insert(:property),
+      value: sequence("value")
+    }
+  end
+
+  # sequence(:first_name, &"Tony-#{&1}")
+  def property_factory do
+    %Property{
+      name: sequence("property"),
+      display_name: sequence("property")
     }
   end
 

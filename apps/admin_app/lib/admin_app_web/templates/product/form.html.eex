@@ -14,6 +14,9 @@
    <li class="nav-item">
       <a class="nav-link" href="#tab4default" data-toggle="tab">Stock</a>
    </li>
+   <li class="nav-item">
+      <a class="nav-link" href="#tab5default" data-toggle="tab">Properties</a>
+   </li>
    <% end %>
 </ul>
 <div class="tab-content ">
@@ -261,6 +264,13 @@
       </div>
     </form>
   </div>
+  <% end %>
+  <%= if  @conn.request_path != product_path(@conn, :new) do %>
+    <div class="tab-pane fade pt-2"  id="tab5default">
+      <%= render "property_index.html",
+              conn: @conn
+          %>
+    </div>
   <% end %>
 </div>
 <html>

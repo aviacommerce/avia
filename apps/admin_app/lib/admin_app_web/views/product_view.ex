@@ -1,9 +1,11 @@
 defmodule AdminAppWeb.ProductView do
   use AdminAppWeb, :view
-  alias Snitch.Data.Model.{Product, StockItem}
+
   alias Snitch.Data.Schema.{ShippingCategory, Variation}
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
+  alias Snitch.Data.Model.{Product, ProductProperty, Property, StockItem}
+  alias Snitch.Data.Schema
   import Ecto.Query
 
   @currencies ["USD", "INR"]
@@ -196,5 +198,17 @@ defmodule AdminAppWeb.ProductView do
 
   defp get_val(val, []) do
     val
+  end
+
+  def get_product_properties(product_id) when is_binary(product_id) do
+    product_id |> ProductProperty.get_all_by_product() |> Repo.preload(:property)
+  end
+
+  def get_property_changeset(conn) do
+    Schema.ProductProperty.create_changeset(%Schema.ProductProperty{}, %{})
+  end
+
+  def get_properties() do
+    Property.get_formatted_list()
   end
 end

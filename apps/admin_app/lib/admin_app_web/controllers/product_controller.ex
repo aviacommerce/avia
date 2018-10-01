@@ -3,8 +3,19 @@ defmodule AdminAppWeb.ProductController do
 
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Model.Product, as: ProductModel
+  alias Snitch.Data.Model
   alias Snitch.Data.Schema.Product, as: ProductSchema
-  alias Snitch.Data.Schema.{ProductBrand, StockLocation, VariationTheme}
+  alias Snitch.Data.Model.ProductPrototype, as: PrototypeModel
+
+  alias Snitch.Data.Schema.{
+    ProductBrand,
+    StockLocation,
+    VariationTheme,
+    ProductProperty,
+    Property
+  }
+
+  alias Snitch.Tools.Money
   alias Snitch.Data.Model.StockItem, as: StockModel
   alias Snitch.Data.Schema.StockItem, as: StockSchema
 
@@ -237,5 +248,64 @@ defmodule AdminAppWeb.ProductController do
       |> Map.put(:query_string, Plug.Conn.Query.encode(params))
 
     redirect(updated_conn, to: product_path(updated_conn, :index, params))
+  end
+
+  def index_property(conn, _params) do
+    render(conn, "property_index.html")
+  end
+
+  def new_property(conn, params) do
+    changeset =
+      ProductProperty.create_changeset(%ProductProperty{}, %{product_id: params["product_id"]})
+
+    render(conn, "property_new.html",
+      conn: conn,
+      changeset: changeset,
+      product_id: params["product_id"]
+    )
+  end
+
+  def create_property(conn, params) do
+    with %ProductSchema{} = _product <- ProductModel.get(params["product_id"]),
+         %Property{} = _property <- Model.Property.get(params["product_property"]["property_id"]),
+         {:ok, _product_property} <- Model.ProductProperty.create(params["product_property"]) do
+      redirect(conn, to: product_path(conn, :edit, params["product_id"]))
+    else
+      {:error, changeset} ->
+        render(conn, "property_new.html", changeset: changeset)
+    end
+  end
+
+  def edit_property(conn, params) do
+    changeset = ProductProperty.update_changeset(%ProductProperty{}, params)
+    render(conn, "property_edit.html", changeset: changeset, conn: conn)
+  end
+
+  def update_property(conn, params) do
+    with %ProductProperty{} = product_property <-
+           Model.ProductProperty.get_by(%{
+             product_id: params["product_property"]["product_id"],
+             property_id: params["product_property"]["property_id"]
+           }),
+         {:ok, _} = Model.ProductProperty.update(product_property, params["product_property"]) do
+      redirect(conn, to: product_path(conn, :edit, params["product_property"]["product_id"]))
+    else
+      {:error, changeset} ->
+        render(conn, "property_edit.html", changeset: changeset, conn: conn)
+    end
+  end
+
+  def delete_property(conn, params) do
+    with %ProductProperty{} = product_property <-
+           Model.ProductProperty.get_by(%{
+             product_id: params["product_id"],
+             property_id: params["property_id"]
+           }),
+         {:ok, _} <- Model.ProductProperty.delete(product_property) do
+      conn
+      |> put_flash(:info, "Product property deleted successfully")
+
+      redirect(conn, to: product_path(conn, :edit, params["product_id"]))
+    end
   end
 end
