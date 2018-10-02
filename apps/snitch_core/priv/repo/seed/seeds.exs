@@ -28,7 +28,7 @@ alias Snitch.Seed.{
 variant_count = 9
 
 # seeds the taxonomy
-Taxonomy.seed()
+# Taxonomy.seed()
 
 # seeds countries and states entity
 Repo.transaction(fn ->
@@ -39,23 +39,23 @@ end)
 # seed payment methods
 # PaymentMethods.seed!()
 
-Users.seed_address!()
+# Users.seed_address!()
 Users.seed_users!()
 
 Shipping.seed!()
 
-Repo.transaction(fn ->
-  Orders.seed_variants!()
-  Orders.seed_orders!()
-end)
+# Repo.transaction(fn ->
+#   Orders.seed_variants!()
+#   Orders.seed_orders!()
+# end)
 
-Stocks.seed!()
+# Stocks.seed!()
 
 # seed roles
 Role.seed()
 
 # seed products
-Product.seed()
+# Product.seed()
 
 # seeds a product rating and it's types
 ProductRating.seed()

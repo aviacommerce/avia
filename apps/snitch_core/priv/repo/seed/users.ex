@@ -14,9 +14,7 @@ defmodule Snitch.Seed.Users do
 
   def seed_users! do
     users = [
-      user("Harry", "Potter", "admin@snitch.com", @admin_passwd, true),
-      user("Tony", "Stark", "tony@snitch.com", @user_passwd),
-      user("Steven", "Rogers", "steven@snitch.com", @user_passwd)
+      user("Harry", "Potter", "admin@snitch.com", @admin_passwd, true)
     ]
 
     Repo.insert_all(User, users, on_conflict: :nothing, conflict_target: [:email])
