@@ -1,70 +1,22 @@
 <%= form_for @changeset, @action, [as: :user],
   fn f -> %>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label required">
-      First Name
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">
-    <%= input f, :first_name %>
-  </div>
+  <%= input f, :first_name, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
 </div>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label required">
-      Last Name
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">
-    <%= input f, :last_name %>
-  </div>
+  <%= input f, :last_name, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
 </div>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label required">
-      Email
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">
-    <%= input f, :email %>
-  </div>
+  <%= input f, :email, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
 </div>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label required">
-      Password
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">
-    <%= input f, :password %>
-  </div>
+  <%= input f, :password, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
 </div>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label required">
-      Confirm Password
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">
-    <%= input f, :password_confirmation %>
-  </div>
+  <%= input f, :password_confirmation, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
 </div>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label required">
-      Role
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">
-    <%= select_input f, :role_id, formatted_list(:role) %>
-  </div>
+  <%= select_input f, :role_id, formatted_list(:role), nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
 </div>
 <div class="form-group row stickformbutton">
   <div class="col-sm-10">
