@@ -10,6 +10,8 @@ docker build -t snitch:latest \
   --build-arg AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION \
   --build-arg FRONTEND_CHECKOUT_URL=$FRONTEND_CHECKOUT_URL \
   --build-arg HOSTED_PAYMENT_URL=$HOSTED_PAYMENT_URL \
+  --build-arg SENDGRID_SENDER_EMAIL=$SENDGRID_SENDER_EMAIL \
+  --build-arg SENDGRID_API_KEY=$SENDGRID_API_KEY \
   .
 
 docker run --rm -it -p 4001:4001 -p 3000:3000 -p 5432:5432 -e API_PORT=3000 -e ADMIN_PORT=4001 snitch:latest /bin/bash
