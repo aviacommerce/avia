@@ -20,10 +20,9 @@ after_script:
 
 matrix:
   include:
-  - elixir: "1.5.3"
+  - elixir: "1.7.2"
     script:
       - mix coveralls.json --umbrella
-  - elixir: "1.6.5"
 
 addons:
   postgresql: "9.5"

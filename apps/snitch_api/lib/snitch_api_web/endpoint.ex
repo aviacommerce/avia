@@ -1,5 +1,6 @@
 defmodule SnitchApiWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :snitch_api
+  use Sentry.Phoenix.Endpoint
 
   socket("/socket", SnitchApiWeb.UserSocket)
 

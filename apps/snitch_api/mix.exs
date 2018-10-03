@@ -9,7 +9,7 @@ defmodule SnitchApi.Mixfile do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.4",
+      elixir: "~> 1.7.2",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
@@ -23,7 +23,7 @@ defmodule SnitchApi.Mixfile do
   def application do
     [
       mod: {SnitchApi.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :sentry]
     ]
   end
 
@@ -56,7 +56,9 @@ defmodule SnitchApi.Mixfile do
       {:snitch_payments, github: "aviacommerce/avia_payments", branch: "develop"},
 
       # html parser
-      {:floki, "~> 0.20.0"}
+      {:floki, "~> 0.20.0"},
+      {:sentry, "~> 7.0"},
+      {:jason, "~> 1.1"}
     ]
   end
 end

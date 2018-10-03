@@ -9,7 +9,7 @@ defmodule AdminApp.Mixfile do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.4",
+      elixir: "~> 1.7.2",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
@@ -23,7 +23,7 @@ defmodule AdminApp.Mixfile do
   def application do
     [
       mod: {AdminApp.Application, []},
-      extra_applications: [:logger, :runtime_tools, :pdf_generator]
+      extra_applications: [:logger, :runtime_tools, :pdf_generator, :sentry]
     ]
   end
 
@@ -52,7 +52,9 @@ defmodule AdminApp.Mixfile do
       {:phoenix_swoosh, "~> 0.2"},
       {:gen_smtp, "~> 0.12"},
       {:snitch_payments, github: "aviacommerce/avia_payments", branch: "develop"},
-      {:pdf_generator, ">=0.3.7"}
+      {:pdf_generator, ">=0.3.7"},
+      {:sentry, "~> 7.0"},
+      {:jason, "~> 1.1"}
     ]
   end
 end
