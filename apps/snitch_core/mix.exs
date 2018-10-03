@@ -28,7 +28,7 @@ defmodule Snitch.Core.Mixfile do
   def application do
     [
       mod: {Snitch.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :sentry]
     ]
   end
 
@@ -90,7 +90,9 @@ defmodule Snitch.Core.Mixfile do
       {:plug, "~> 1.0"},
 
       # unique id generator
-      {:nanoid, "~> 1.0.1"}
+      {:nanoid, "~> 1.0.1"},
+      {:sentry, "~> 7.0"},
+      {:jason, "~> 1.1"}
     ]
   end
 
