@@ -1,5 +1,6 @@
 defmodule AdminAppWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :admin_app
+  use Sentry.Phoenix.Endpoint
 
   socket("/socket", AdminAppWeb.UserSocket)
 
@@ -11,7 +12,7 @@ defmodule AdminAppWeb.Endpoint do
     Plug.Static,
     at: "/",
     from: :admin_app,
-    gzip: false,
+    gzip: true,
     only: ~w(css fonts images js favicon.ico robots.txt)
   )
 

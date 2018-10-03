@@ -19,3 +19,13 @@ config :snitch_core, Snitch.Repo,
   ssl: false
 
 config :snitch_core, :defaults, currency: :USD
+
+config :sentry,
+  dsn: "https://dd946671f2c840b6b51740249efbbb34@sentry.io/1293293",
+  environment_name: :prod,
+  enable_source_code_context: true,
+  root_source_code_path: File.cwd!(),
+  tags: %{
+    env: "production"
+  },
+  included_environments: [:prod]

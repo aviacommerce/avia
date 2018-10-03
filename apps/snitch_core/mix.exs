@@ -11,7 +11,7 @@ defmodule Snitch.Core.Mixfile do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: ">= 1.5.3",
+      elixir: "~> 1.7.2",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -28,7 +28,7 @@ defmodule Snitch.Core.Mixfile do
   def application do
     [
       mod: {Snitch.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :sentry]
     ]
   end
 
@@ -90,7 +90,9 @@ defmodule Snitch.Core.Mixfile do
       {:plug, "~> 1.0"},
 
       # unique id generator
-      {:nanoid, "~> 1.0.1"}
+      {:nanoid, "~> 1.0.1"},
+      {:sentry, "~> 7.0"},
+      {:jason, "~> 1.1"}
     ]
   end
 
