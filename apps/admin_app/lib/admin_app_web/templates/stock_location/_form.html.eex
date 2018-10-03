@@ -1,135 +1,39 @@
 <%= form_for @changeset, @action, fn f -> %>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label">
-      Name
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">      
-    <%= input f, :name%>
-  </div>
+  <%= input f, :name, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label">
-      Admin name
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">      
-    <%= input f, :admin_name %>
-  </div>
+  <%= input f, :admin_name, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label">
-      Address line1
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">      
-    <%= textarea_input f, :address_line_1 %>
-  </div>
+  <%= textarea_input f, :address_line_1, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label">
-      Address line2
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">      
-    <%= textarea_input f, :address_line_2 %>
-  </div>
+  <%= textarea_input f, :address_line_2, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label">
-      City
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">      
-    <%= input f, :city %>
-  </div>
+  <%= input f, :city, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label">
-      Zip Code
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">      
-    <%= input f, :zip_code %>
-  </div>
+  <%= input f, :zip_code, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label">
-      Phone
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">      
-    <%= input f, :phone %>
-  </div>
+  <%= input f, :phone, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label">
-      Country
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">      
-    <%= select_input f, :country_id, formatted_list(:country) %>
-  </div>
+  <%= select_input f, :country_id, formatted_list(:country), nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label">
-      State
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">      
-    <%= select_input f, :state_id, formatted_list(:state) %>
-  </div>
+  <%= select_input f, :state_id, formatted_list(:state), nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label">
-      Active
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">      
-    <%= checkbox_input f, :active %>
-  </div>
+  <%= checkbox_input f, :active, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label">
-      Backorderable default
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">      
-    <%= checkbox_input f, :backorderable_default %>
-  </div>
+  <%= checkbox_input f, :backorderable_default, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <label for="inputEmail3" class="col-sm-3 col-form-label">
-    <div class="label">
-      Propagate all variants
-    </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-  </label>
-  <div class="col-sm-9">      
-    <%= checkbox_input f, :propagate_all_variants %>
-  </div>
+  <%= checkbox_input f, :propagate_all_variants, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
 </div>
 <div class="form-group row stickformbutton">
   <div class="col-sm-10">
