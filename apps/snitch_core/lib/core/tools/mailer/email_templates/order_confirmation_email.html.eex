@@ -3,7 +3,7 @@
 
     <p>Please review and retain the following order information for your records.</p>
    
-    <p>Order #<%= order.id %> Summary</p>
+    <p>Order #<%= @order.id %> Summary</p>
 
     <b> Order items list </b>:
     <table class="table">
@@ -15,7 +15,7 @@
         </tr>
     </thead>
    <tbody>
-    <%= for line_item <- order.line_items do %>
+    <%= for line_item <- @order.line_items do %>
         <tr>
             <td><%= line_item.product.sku %></td>
             <td><%= line_item.quantity %></td>
