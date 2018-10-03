@@ -5,62 +5,21 @@
     <div class="card col-12">
       <%= form_for @changeset, payment_method_path(@conn, :create), fn f -> %>
         <div class="form-group row ">
-          <label for="inputEmail3" class="col-sm-3 col-form-label">
-              <div class="label required">
-                Provider
-              </div>
-           <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-          </label>
-          <div class="col-sm-9">           
-            <%= select_input(f, :provider, providers(), "provider", id: "payment-provider",
-              prompt: "Choose provider", label: false) %>
-          </div>
+          <%= select_input f, :provider, providers(), "provider", id: "payment-provider", prompt: "Choose provider", description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
         </div>
         <div class="form-group row ">
-          <label for="inputEmail3" class="col-sm-3 col-form-label">
-              <div class="label required">
-                Name
-              </div>
-           <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-          </label>
-          <div class="col-sm-9">           
-            <%= input(f, :name)%>
-          </div>
+          <%= input f, :name, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
         </div>
         <div class="form-group row ">
-          <label for="inputEmail3" class="col-sm-3 col-form-label">
-              <div class="label ">
-                Description
-              </div>
-           <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-          </label>
-          <div class="col-sm-9">           
-            <%= input(f, :description) %>             
-          </div>
+          <%= input f, :description, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
         </div>
         <div id="preferences">
         </div>
         <div class="form-group row ">
-          <label for="inputEmail3" class="col-sm-3 col-form-label">
-              <div class="label ">
-                Active
-              </div>
-           <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-          </label>
-          <div class="col-sm-9">           
-            <%= checkbox_input(f, :active?, "Active ") %> 
-          </div>
+          <%= checkbox_input f, :active?, "Active", description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
         </div>
         <div class="form-group row ">
-          <label for="inputEmail3" class="col-sm-3 col-form-label">
-              <div class="label ">
-                Live Mode
-              </div>
-           <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-          </label>
-          <div class="col-sm-9">           
-             <%= checkbox_input(f, :live_mode?, "Live Mode ") %>       
-          </div>
+          <%= checkbox_input f, :live_mode?, "Live Mode", description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
         </div>
         <div class="form-group row stickformbutton">
           <div class="col-sm-10">
