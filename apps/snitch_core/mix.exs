@@ -43,7 +43,6 @@ defmodule Snitch.Core.Mixfile do
     [
       {:postgrex, "~> 0.13.5"},
       {:ecto, "~> 2.2"},
-      {:jason, "~> 1.0"},
       {:bamboo, "~> 1.1"},
       {:bamboo_smtp, "~> 1.6.0"},
       {:bamboo_eex, "~> 0.1.0"},
