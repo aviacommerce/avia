@@ -310,7 +310,7 @@ defmodule AdminAppWeb.OrderController do
   defp send_pdf_response(conn, params, {:error, msg}) do
     conn
     |> put_flash(:error, msg)
-    |> redirect(to: "/orders/#{params["number"]}")
+    |> redirect(to: "/orders/#{params["number"]}/detail")
   end
 
   defp send_pdf_response(conn, params, {:ok, data}) do
@@ -367,7 +367,10 @@ defmodule AdminAppWeb.OrderController do
   end
 
   defp resolve_dir_path() do
-    @root_path |> File.dir?() || (@root_path |> File.mkdir()) in [:ok, true]
+    (
+      (@root_path |> File.dir?()) ||
+      (@root_path |> File.mkdir_p())
+    ) in [:ok, true]
   end
 
   defp format_error(error), do: :file.format_error(error)

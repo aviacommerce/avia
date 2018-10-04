@@ -3,10 +3,9 @@
 # largest ec2 instance. So here we take the precompiled binary from the other
 # image available on Dockerfile - we will get to this in final stage.
 #
-FROM madnight/docker-alpine-wkhtmltopdf as wkhtmltopdf_image
 
 # Builder stage
-FROM elixir:1.7.3 as builder
+FROM elixir:1.7.3-slim as builder
 
 ARG PHOENIX_SECRET_KEY_BASE
 ARG SESSION_COOKIE_NAME
@@ -37,6 +36,15 @@ ENV MIX_ENV=prod \
     SENDGRID_API_KEY=$SENDGRID_API_KEY \
     SENDGRID_SENDER_EMAIL=$SENDGRID_SENDER_EMAIL
 
+# Install essential packages for application build
+RUN apt-get --fix-missing update && apt-get install -y --fix-missing apt-utils apt-transport-https curl git make inotify-tools gnupg g++
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+      && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+      && curl -sL https://deb.nodesource.com/setup_8.x | bash \
+      && apt-get install -y nodejs yarn \
+      && yarn global add elm@0.18.0 \
+      && elm-package install -y
+
 WORKDIR /snitch
 
 # Umbrella
@@ -48,6 +56,17 @@ COPY apps apps
 RUN mix do local.hex --force, local.rebar --force
 RUN mix do deps.get, deps.compile
 
+# Install npm/elm pacakges
+RUN cd apps/admin_app/assets \
+  && yarn install \
+  && cd elm && elm-package install --yes
+
+# Create assets build for admin app
+RUN cd apps/admin_app/assets \
+  && node node_modules/brunch/bin/brunch build --production \
+  && cd .. \
+  && mix phx.digest
+
 WORKDIR /snitch
 COPY rel rel
 
@@ -57,9 +76,17 @@ RUN mix release --env=prod --verbose
 FROM staticfloat/nginx-certbot
 
 RUN apt-get update \
-  && apt-get -y install curl tar file xz-utils build-essential cron vim \
+  && apt-get -y install curl tar file xz-utils build-essential cron \
   && apt-get -y install python-certbot-nginx \
-  && apt-get -y install imagemagick
+  && apt-get -y install imagemagick wkhtmltopdf xvfb \
+  # Resolves issue `QXcbConnection: Could not connect to display`
+  # https://github.com/JazzCore/python-pdfkit/wiki/Using-wkhtmltopdf-without-X-server#debianubuntu
+  && printf '#!/bin/bash\nxvfb-run -a --server-args="-screen 0, 1024x768x24" /usr/bin/wkhtmltopdf -q $*' > /usr/bin/wkhtmltopdf.sh \
+  && chmod a+x /usr/bin/wkhtmltopdf.sh \
+  && ln -s /usr/bin/wkhtmltopdf.sh /usr/local/bin/wkhtmltopdf \
+  && apt-get purge -y curl file xz-utils build-essential \
+  && apt-get -y autoremove \
+  && apt-get -y clean
 
 ENV MIX_ENV=prod \
     SHELL=/bin/bash \
@@ -85,7 +112,7 @@ COPY config/deploy/live/admin.aviacommerce.org/* /etc/letsencrypt/live/admin.avi
 COPY config/deploy/live/api.aviacommerce.org/* /etc/letsencrypt/live/api.aviacommerce.org/
 
 WORKDIR /snitch
-COPY --from=wkhtmltopdf_image /bin/wkhtmltopdf /usr/bin/
+
 COPY --from=builder snitch/_build/prod/rel/snitch/releases/0.0.1/snitch.tar.gz .
 RUN tar zxf snitch.tar.gz && rm snitch.tar.gz
 
