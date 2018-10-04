@@ -58,6 +58,9 @@
       </div>
     </div>
     <div class="form-group row ">
+      <%= select_input f, :shipping_category_id, get_shipping_category(), nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
+    </div>
+    <div class="form-group row ">
       <%= textarea_input f, :meta_description, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
     </div>
     <div class="form-group row ">
