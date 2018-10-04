@@ -12,7 +12,8 @@ defmodule Snitch.Factory do
     OptionType,
     Zone,
     Rating,
-    VariationTheme
+    VariationTheme,
+    ShippingCategory
   }
 
   alias Snitch.Data.Schema.{
@@ -30,21 +31,14 @@ defmodule Snitch.Factory do
     TaxRate,
     User,
     Variant,
-    Product
+    Product,
+    ShippingCategory
   }
 
   alias Snitch.Repo
 
   def currency do
     :USD
-  end
-
-  def product_factory do
-    %Product{
-      name: sequence(:name, &"Hill's-#{&1}"),
-      description: sequence(:description, &"description-#{&1}"),
-      slug: sequence(:slug, &"Hill's-#{&1}")
-    }
   end
 
   def user_factory do
