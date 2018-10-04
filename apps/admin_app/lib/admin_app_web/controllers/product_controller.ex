@@ -108,15 +108,19 @@ defmodule AdminAppWeb.ProductController do
 
   def new_variant(conn, params) do
     with %ProductSchema{} = parent_product <- ProductModel.get(params["product_id"]),
-         variant_params <- generate_variant_params(parent_product, params["options"]) do
-      changeset =
-        ProductSchema.variant_create_changeset(parent_product, %{
-          "variations" => variant_params,
-          "theme_id" => params["theme_id"]
-        })
-
+         variant_params <- generate_variant_params(parent_product, params["options"]),
+         %Ecto.Changeset{valid?: true} = changeset <-
+           ProductSchema.variant_create_changeset(parent_product, %{
+             "variations" => variant_params,
+             "theme_id" => params["theme_id"]
+           }) do
       {:ok, product} = Repo.update(changeset)
       redirect(conn, to: product_path(conn, :index))
+    else
+      _ ->
+        conn
+        |> put_flash(:error, "Failed to create variant")
+        |> redirect(to: product_path(conn, :index))
     end
   end
 
@@ -161,7 +165,8 @@ defmodule AdminAppWeb.ProductController do
           options: options,
           selling_price: parent_product.selling_price,
           max_retail_price: parent_product.max_retail_price,
-          taxon_id: parent_product.taxon_id
+          taxon_id: parent_product.taxon_id,
+          shipping_category_id: parent_product.shipping_category_id
         }
       }
     end)
