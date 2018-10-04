@@ -41,12 +41,13 @@ defmodule AdminAppWeb.OrderController do
 
   def show(conn, %{"number" => _number} = params) do
     order = OrderContext.get_order(params)
+    order_total = OrderContext.get_total(order)
 
     render(
       conn,
       "show.html",
       order: order,
-      order_total: OrderContext.get_total(order)
+      order_total: order_total
     )
   end
 
@@ -54,10 +55,11 @@ defmodule AdminAppWeb.OrderController do
     case PackageContext.update_packages(state, String.to_integer(id)) do
       {:ok, _} ->
         order = OrderContext.get_order(%{"id" => id})
+        order_total = OrderContext.get_total(order)
 
         conn
         |> put_flash(:info, "Order Updated!")
-        |> render("show.html", order: order)
+        |> render("show.html", order: order, order_total: order_total)
 
       {:error, _} ->
         put_flash(conn, :error, "update failed!")

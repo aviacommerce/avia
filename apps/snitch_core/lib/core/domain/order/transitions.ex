@@ -304,9 +304,11 @@ defmodule Snitch.Domain.Order.Transitions do
 
   def remove_payment_record(%Context{valid?: false} = context), do: context
 
-  def send_email_confirmation(%Context{valid?: true, struct: %Order{} = order} = context) do
+  def send_email_confirmation(
+        %Context{valid?: true, struct: %Order{} = order, multi: multi} = context
+      ) do
     multi =
-      Multi.run(Multi.new(), :add_email, fn _ ->
+      Multi.run(multi, :add_email, fn _ ->
         mail = OrderEmail.order_confirmation_mail(order)
         {:ok, mail}
       end)
