@@ -17,8 +17,7 @@ defmodule Snitch.Tools.OrderEmail do
 
   def order_confirmation_mail(order) do
     sender_email = Application.get_env(:snitch_core, Snitch.Tools.Mailer)[:sendgrid_sender_mail]
-    order = Repo.preload(order, [:user, line_items: :product])
-
+    order = Repo.preload(order, [:user, line_items: [product: :images]])
     user_email = order.user.email
     mail_template = order_email(%{order: order})
 

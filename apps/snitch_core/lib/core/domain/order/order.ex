@@ -10,7 +10,9 @@ defmodule Snitch.Domain.Order do
   import Ecto.Changeset
   import Ecto.Query
   alias Snitch.Data.Schema.{Order, Payment}
+  alias Snitch.Data.Model.Product
   alias Snitch.Tools.Defaults
+  alias Snitch.Tools.UrlValidator
 
   @spec validate_change(Ecto.Changeset.t()) :: Ecto.Changeset.t()
   def validate_change(%{valid?: false} = changeset), do: changeset
@@ -151,5 +153,24 @@ defmodule Snitch.Domain.Order do
       Money.add!(acc, cost)
     end)
     |> Money.round(currency_digits: :cash)
+  end
+
+  def fetch_image_url(line_item) do
+    image = line_item.product.images |> List.first()
+    Product.image_url(image.name, line_item.product)
+  end
+
+  def format_date(date) do
+    date
+    |> NaiveDateTime.to_erl()
+    |> form_date
+  end
+
+  defp form_date({{year, month, date}, _}) do
+    "#{date}/#{month}/#{year}"
+  end
+
+  def line_items_count(order) do
+    length(order.line_items)
   end
 end
