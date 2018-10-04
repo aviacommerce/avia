@@ -8,13 +8,15 @@ defmodule Snitch.Data.Schema.ProductTest do
 
   test "test valid data create_changeset/2" do
     taxon = insert(:taxon)
+    shipping_category = insert(:shipping_category)
 
     params = %{
       name: "HTC Desire 620",
       description: "HTC desire 620",
       selling_price: Money.new("12.99", currency()),
       max_retail_price: Money.new("14.99", currency()),
-      taxon_id: taxon.id
+      taxon_id: taxon.id,
+      shipping_category_id: shipping_category.id
     }
 
     changeset = Product.create_changeset(%Product{}, params)
@@ -53,7 +55,8 @@ defmodule Snitch.Data.Schema.ProductTest do
             ],
             "selling_price" => Money.new("12.99", currency()),
             "max_retail_price" => Money.new("14.99", currency()),
-            "taxon_id" => taxon.id
+            "taxon_id" => taxon.id,
+            "shipping_category_id" => parent_product.shipping_category_id
           }
         },
         %{
@@ -65,7 +68,8 @@ defmodule Snitch.Data.Schema.ProductTest do
             ],
             "selling_price" => Money.new("12.99", currency()),
             "max_retail_price" => Money.new("14.99", currency()),
-            "taxon_id" => taxon.id
+            "taxon_id" => taxon.id,
+            "shipping_category_id" => parent_product.shipping_category_id
           }
         }
       ]
@@ -96,7 +100,8 @@ defmodule Snitch.Data.Schema.ProductTest do
             ],
             "selling_price" => Money.new("12.99", currency()),
             "max_retail_price" => Money.new("14.99", currency()),
-            "taxon_id" => taxon.id
+            "taxon_id" => taxon.id,
+            "shipping_category_id" => parent_product.shipping_category_id
           }
         },
         %{
@@ -108,7 +113,8 @@ defmodule Snitch.Data.Schema.ProductTest do
             ],
             "selling_price" => Money.new("12.99", currency()),
             "max_retail_price" => Money.new("14.99", currency()),
-            "taxon_id" => taxon.id
+            "taxon_id" => taxon.id,
+            "shipping_category_id" => parent_product.shipping_category_id
           }
         }
       ]
@@ -129,7 +135,8 @@ defmodule Snitch.Data.Schema.ProductTest do
             ],
             "selling_price" => Money.new("12.99", currency()),
             "max_retail_price" => Money.new("14.99", currency()),
-            "taxon_id" => taxon.id
+            "taxon_id" => taxon.id,
+            "shipping_category_id" => parent_product.shipping_category_id
           }
         }
       ]
@@ -160,7 +167,8 @@ defmodule Snitch.Data.Schema.ProductTest do
             ],
             "selling_price" => Money.new("12.99", currency()),
             "max_retail_price" => Money.new("14.99", currency()),
-            "taxon_id" => taxon.id
+            "taxon_id" => taxon.id,
+            "shipping_category_id" => parent_product.shipping_category_id
           }
         },
         %{
@@ -172,7 +180,8 @@ defmodule Snitch.Data.Schema.ProductTest do
             ],
             "selling_price" => Money.new("12.99", currency()),
             "max_retail_price" => Money.new("14.99", currency()),
-            "taxon_id" => taxon.id
+            "taxon_id" => taxon.id,
+            "shipping_category_id" => parent_product.shipping_category_id
           }
         }
       ]
@@ -196,7 +205,8 @@ defmodule Snitch.Data.Schema.ProductTest do
             ],
             "selling_price" => Money.new("12.99", currency()),
             "max_retail_price" => Money.new("14.99", currency()),
-            "taxon_id" => taxon.id
+            "taxon_id" => taxon.id,
+            "shipping_category_id" => parent_product.shipping_category_id
           }
         }
       ]

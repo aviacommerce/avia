@@ -1,7 +1,7 @@
 defmodule AdminAppWeb.ProductView do
   use AdminAppWeb, :view
   alias Snitch.Data.Model.Product
-  alias Snitch.Data.Schema.Variation
+  alias Snitch.Data.Schema.{Variation, ShippingCategory}
   alias Snitch.Repo
   import Ecto.Query
 
@@ -96,5 +96,12 @@ defmodule AdminAppWeb.ProductView do
 
   def get_stock_locations_option(locations) do
     Enum.map(locations, fn location -> {location.name, location.id} end)
+  end
+
+  def get_shipping_category() do
+    ShippingCategory
+    |> order_by([sc], asc: sc.name)
+    |> Ecto.Query.select([sc], {sc.name, sc.id})
+    |> Repo.all()
   end
 end
