@@ -19,7 +19,8 @@ defmodule SnitchApiWeb.ProductView do
     :selling_price,
     :max_retail_price,
     :images,
-    :rating_summary
+    :rating_summary,
+    :is_orderable
   ])
 
   def selling_price(product) do
@@ -39,6 +40,10 @@ defmodule SnitchApiWeb.ProductView do
 
   def rating_summary(product, _conn) do
     ProductReview.review_aggregate(product)
+  end
+
+  def is_orderable(product, _conn) do
+    Product.is_orderable?(product)
   end
 
   has_one(

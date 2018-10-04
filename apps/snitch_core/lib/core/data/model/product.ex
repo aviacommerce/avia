@@ -249,4 +249,28 @@ defmodule Snitch.Data.Model.Product do
       Map.put(acc, v_id, sp)
     end)
   end
+
+  @doc """
+  Ordering of product depends on many things, for now we just check
+  sufficient stock is available.
+  """
+  def is_orderable?(product) do
+    has_stock?(product)
+  end
+
+  defp has_stock?(product) do
+    product = Repo.preload(product, :stock_items)
+
+    case product.stock_items do
+      [] ->
+        false
+
+      stock ->
+        total_count_on_hand(stock) > 0
+    end
+  end
+
+  defp total_count_on_hand(stocks) do
+    Enum.reduce(stocks, 0, fn stock, acc -> stock.count_on_hand + acc end)
+  end
 end
