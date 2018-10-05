@@ -4,9 +4,9 @@
     <div class="taxon-actions float-right">
       <i class="add-taxon fa fa-plus-square fa-4" aria-hidden="true"></i>
       <i class="edit-taxon fa fa-pencil-square fa-4" aria-hidden="true"></i>
-      <%= if !is_root(@taxonomy) do %>
+      <!-- <%= if !is_root(@taxonomy) do %>
       <i class="fa fa-trash fa-4" aria-hidden="true"></i>
-      <% end %>
+      <% end %> -->
     </div>
   </span>
   <%= if has_children(@taxonomy) do %>
