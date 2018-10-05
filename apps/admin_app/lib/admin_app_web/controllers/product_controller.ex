@@ -4,9 +4,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Repo
   alias Snitch.Data.Model.Product, as: ProductModel
   alias Snitch.Data.Schema.Product, as: ProductSchema
-  alias Snitch.Data.Model.ProductPrototype, as: PrototypeModel
   alias Snitch.Data.Schema.{ProductBrand, StockLocation, VariationTheme}
-  alias Snitch.Tools.Money
   alias Snitch.Data.Model.StockItem, as: StockModel
   alias Snitch.Data.Schema.StockItem, as: StockSchema
 
@@ -15,17 +13,17 @@ defmodule AdminAppWeb.ProductController do
   def index(conn, _params) do
     products =
       ProductModel.get_product_list()
-      |> Repo.preload(variants: :images)
+      |> Repo.preload([:images, [variants: :images]])
 
     render(conn, "index.html", products: products)
   end
 
-  def new(conn, params) do
+  def new(conn, _params) do
     changeset = ProductSchema.create_changeset(%ProductSchema{}, %{})
     render(conn, "new.html", changeset: changeset)
   end
 
-  def create(conn, %{"product" => params} = t) do
+  def create(conn, %{"product" => params}) do
     with {:ok, product} <- ProductModel.create(params) do
       redirect(conn, to: product_path(conn, :edit, product.id))
     else
@@ -45,7 +43,7 @@ defmodule AdminAppWeb.ProductController do
 
   def update(conn, %{"product" => params}) do
     with %ProductSchema{} = product <- ProductModel.get(params["id"]),
-         {:ok, product} <- ProductModel.update(product, params) do
+         {:ok, _product} <- ProductModel.update(product, params) do
       redirect(conn, to: product_path(conn, :index))
     end
   end
@@ -99,7 +97,7 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def delete(conn, %{"id" => id}) do
-    with {:ok, product} <- ProductModel.delete(id) do
+    with {:ok, _product} <- ProductModel.delete(id) do
       conn
       |> put_flash(:info, "Product deleted successfully")
       |> redirect(to: product_path(conn, :index))
@@ -114,7 +112,7 @@ defmodule AdminAppWeb.ProductController do
              "variations" => variant_params,
              "theme_id" => params["theme_id"]
            }) do
-      {:ok, product} = Repo.update(changeset)
+      {:ok, _product} = Repo.update(changeset)
       redirect(conn, to: product_path(conn, :index))
     else
       _ ->
@@ -124,13 +122,13 @@ defmodule AdminAppWeb.ProductController do
     end
   end
 
-  def select_category(conn, params) do
+  def select_category(conn, _params) do
     render(conn, "product_category.html")
   end
 
   def add_stock(conn, %{"stock" => params}) do
     with {:ok, stock} <- check_stock(params["product_id"], params["location_id"]),
-         {:ok, updated_stock} <- StockModel.update(params, stock) do
+         {:ok, _updated_stock} <- StockModel.update(params, stock) do
       redirect(conn, to: product_path(conn, :index))
     end
   end
@@ -148,7 +146,7 @@ defmodule AdminAppWeb.ProductController do
     options =
       options
       |> Map.to_list()
-      |> Enum.map(fn {index, map} ->
+      |> Enum.map(fn {_index, map} ->
         map["value"]
         |> String.trim()
         |> String.split(",")
@@ -204,7 +202,7 @@ defmodule AdminAppWeb.ProductController do
     load(conn, conn.params)
   end
 
-  defp load(conn, params) do
+  defp load(conn, _params) do
     themes = Repo.all(VariationTheme)
 
     brands = Repo.all(ProductBrand)
