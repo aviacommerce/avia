@@ -16,8 +16,8 @@
    </li>
    <% end %>
 </ul>
-<div class="tab-content">
-  <div class="tab-pane fade in active show" id="tab1default">
+<div class="tab-content ">
+  <div class="tab-pane p-3 fade in active show p-3" id="tab1default">
     <%= form_for @changeset, @action, [multipart: true], fn f ->  %>
     <%= hidden_input f, :id %>
     <%= if  @conn.request_path == product_path(@conn, :new) do %>
@@ -94,7 +94,8 @@
     <% end %>
   </div>
   <%= if  @conn.request_path != product_path(@conn, :new) and can_add_variant(@parent_product) do %>
-  <div class="tab-pane fade" id="tab2default" >
+  <div class="tab-pane fade p-3
+  " id="tab2default" >
     <div style="background: #f8f9fa;">
       <div class="form-group required">
         <label>Variation Theme</label>
@@ -156,7 +157,7 @@
   </div>
   <% end %>
   <%= if  @conn.request_path != product_path(@conn, :new) do %>
-  <div class="tab-pane fade" id="tab3default">
+  <div class="tab-pane fade p-3" id="tab3default">
     <div>
       <input id="product-id" name="product-id" type="hidden" value="<%= @parent_product.id %>" >
       <%= form_for @conn, product_path(@conn, :add_images, @parent_product.id),
@@ -205,7 +206,7 @@
   </div>
   <% end %>
   <%= if  @conn.request_path != product_path(@conn, :new) do %>
-  <div class="tab-pane fade pt-2"  id="tab4default">
+  <div class="tab-pane fade pt-2 p-3"  id="tab4default">
     <form accept-charset="UTF-8" action="/product/stock" method="post">
       <%= if is_parent_product(@conn.params["id"]) do %>
       <div class="form-group required">
