@@ -1,24 +1,31 @@
 <div class="login-container">
   <header>
-    <div class="col-4 m-auto p-0">
+    <div class="col-10 col-sm-8 col-lg-3 m-auto p-0">
       <div class="row m-0">
         <div class="float-left col p-0">
-          <img src="/images/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
+          <img src="/images/logo.png" width="60" height="50" class="d-inline-block align-top" alt="">
+          <div class="float-right text-right font-weight-bold">
+            Aviacommerce<br/>Admin Panel
+          </div>
         </div>
       </div>
     </div>
   </header>
-  <div class="login col-4 m-auto pb-3 px-0">
-    <h4 class="pt-3 signin mb-4">Sign In to Continue</h4>
+  <div class="login col-10 col-sm-8 col-lg-3 m-auto pb-3 px-0">
+    <h4 class="pt-3 signin mb-4 mt-2">Sign in to continue</h4>
     <%= form_for @changeset, session_path(@conn, :create), [as: :session],
       fn f -> %>
-    <%= input f, :email %>
-    <%= input f, :password %>
-    <p class="text-lowercase text-capitalize mb-0 forgot">
-      <%= link "Forgot your password?", to: session_path(@conn, :password_reset) %>
-    </p>
-    <%= submit "Submit", class: "btn btn-primary submit-btn col-12" %>    
+      <div class="row">
+        <%= input f, :email %>
+      </div>
+      <div class="row">
+        <%= input f, :password %>
+      </div>
+      <p class="text-lowercase text-capitalize mb-3 forgot">
+        <%= link "Forgot your password?", to: session_path(@conn, :password_reset) %>
+      </p>
+      <%= submit "Sign in", class: "btn btn-primary submit-btn col-12" %>    
     <% end %>
-    <a href="" class="trouble">Trouble signing in?</a>   
+    <a href="#" class="trouble">Trouble signing in?</a>   
   </div>
 </div>
