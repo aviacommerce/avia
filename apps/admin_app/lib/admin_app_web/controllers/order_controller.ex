@@ -367,10 +367,7 @@ defmodule AdminAppWeb.OrderController do
   end
 
   defp resolve_dir_path() do
-    (
-      (@root_path |> File.dir?()) ||
-      (@root_path |> File.mkdir_p())
-    ) in [:ok, true]
+    (@root_path |> File.dir?() || @root_path |> File.mkdir_p()) in [:ok, true]
   end
 
   defp format_error(error), do: :file.format_error(error)

@@ -5,7 +5,7 @@
    </div>
    <h4 class="p-3 m-0">Order Detail</h4>
    <div class="row m-0 order-detail">
-      <div class="col-9">
+      <div class="col-12">
          <div class="row">
             <div class="col-6">
                <h2>Order from <%= order_user_name(@order) %></h2>
@@ -41,50 +41,32 @@
          <h3 class="mt-3">Print</h3>       
          <div class="card col-12 print">
             <div class="print-sub-head">What would you like to print?</div>
-            <div class="media lineitem-detail">
-               <div class="checkbox mx-2 mt-1">
-                  <label>
-                  <input type="checkbox" value="">
-                  <span class="cr"><i class="cr-icon fa fa-check"></i></span>
-                  </label>
-               </div>
+            <div class="media lineitem-detail mx-3">
                <div class="media-body">
                   <a class="mt-0 text-capitalize name">Packing slips</a>
                   <div class="variant">
                      Designed for buyers, add a coupon code and more.
                   </div>
                </div>
-               <a class="btn btn-primary float-right"  href="/orders/<%= @order.number %>/download-packing-slip" > Print </a>
+               <a class="btn btn-primary float-right" style="width: 100px;" href="/orders/<%= @order.number %>/download-packing-slip" > Download </a>
             </div>
-            <div class="media lineitem-detail mt-3">
-               <div class="checkbox mx-2 mt-1">
-                  <label>
-                  <input type="checkbox" value="">
-                  <span class="cr"><i class="cr-icon fa fa-check"></i></span>
-                  </label>
-               </div>
+            <div class="media lineitem-detail mt-3 mx-3">
                <div class="media-body">
                   <a class="mt-0 text-capitalize name">Order Invoice</a>
                   <div class="variant">
                     Designed for buyers, add a coupon code and more.
                   </div>
                </div>
-               <a class="btn btn-primary float-right "href="/orders/<%= @order.number %>/download-invoice"> Print</a>
+               <a class="btn btn-primary float-right " style="width: 100px;" href="/orders/<%= @order.number %>/download-invoice"> Download</a>
             </div>
-            <div class="media lineitem-detail mt-3">
-               <div class="checkbox mx-2 mt-1">
-                  <label>
-                  <input type="checkbox" value="">
-                  <span class="cr"><i class="cr-icon fa fa-check"></i></span>
-                  </label>
-               </div>
+            <div class="media lineitem-detail mt-3 mx-3">
                <div class="media-body">
                   <a class="mt-0 text-capitalize name">Show Packing Slips</a>
                   <div class="variant">
                     Designed for buyers, add a coupon code and more.
                   </div>
                </div>
-               <a class="btn btn-primary float-right " href="/orders/<%= @order.number %>/show-packing-slip">Show</a>
+               <a class="btn btn-primary float-right " style="width: 100px;" href="/orders/<%= @order.number %>/show-packing-slip">Show</a>
             </div>
          </div>
          <h3 class="mt-3">Shipping Details</h3>
@@ -192,36 +174,5 @@
                   </div>
                </div>
          </div>
-      </div>
-      <div class="col-3 rightbar pt-0">
-         <form>
-            <div class="form-group">
-               <label class="label-heading">Sort by</label>
-               <select class="form-control">
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
-               </select>
-            </div>
-            <div class="col-sm-12 p-0">
-               <label class="label-heading">Sort by date</label>
-               <div class="radio">
-                  <label>
-                  <input type="radio" name="o3" value="">
-                  <span class="cr"><i class="cr-icon fa fa-circle"></i></span>
-                  Option1
-                  </label>
-               </div>
-               <div class="radio">
-                  <label>
-                  <input type="radio" name="o3" value="" checked>
-                  <span class="cr"><i class="cr-icon fa fa-circle"></i></span>
-                  Option2
-                  </label>
-               </div>
-            </div>
-         </form>
       </div>
 </div>
