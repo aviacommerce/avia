@@ -21,6 +21,17 @@ ARG HOSTED_PAYMENT_URL
 ARG SENDGRID_API_KEY
 ARG SENDGRID_SENDER_EMAIL
 
+# Install essential packages for application build
+RUN apt-get clean \
+  && apt-get update \
+  && apt-get install -y apt-utils apt-transport-https curl git make inotify-tools gnupg g++ \
+  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+  && curl -sL https://deb.nodesource.com/setup_8.x | bash \
+  && apt-get install -y nodejs yarn \
+  && yarn global add elm@0.18.0 \
+  && elm-package install -y
+
 ENV MIX_ENV=prod \
     PHOENIX_SECRET_KEY_BASE=$PHOENIX_SECRET_KEY_BASE \
     SESSION_COOKIE_NAME=$SESSION_COOKIE_NAME \
@@ -35,15 +46,6 @@ ENV MIX_ENV=prod \
     HOSTED_PAYMENT_URL=$HOSTED_PAYMENT_URL \
     SENDGRID_API_KEY=$SENDGRID_API_KEY \
     SENDGRID_SENDER_EMAIL=$SENDGRID_SENDER_EMAIL
-
-# Install essential packages for application build
-RUN apt-get --fix-missing update && apt-get install -y --fix-missing apt-utils apt-transport-https curl git make inotify-tools gnupg g++
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-      && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
-      && curl -sL https://deb.nodesource.com/setup_8.x | bash \
-      && apt-get install -y nodejs yarn \
-      && yarn global add elm@0.18.0 \
-      && elm-package install -y
 
 WORKDIR /snitch
 
@@ -75,7 +77,8 @@ RUN mix release --env=prod --verbose
 ### Release
 FROM staticfloat/nginx-certbot
 
-RUN apt-get update \
+RUN apt-get clean \
+  && apt-get update \
   && apt-get -y install curl tar file xz-utils build-essential cron \
   && apt-get -y install python-certbot-nginx \
   && apt-get -y install imagemagick wkhtmltopdf xvfb \
@@ -84,7 +87,14 @@ RUN apt-get update \
   && printf '#!/bin/bash\nxvfb-run -a --server-args="-screen 0, 1024x768x24" /usr/bin/wkhtmltopdf -q $*' > /usr/bin/wkhtmltopdf.sh \
   && chmod a+x /usr/bin/wkhtmltopdf.sh \
   && ln -s /usr/bin/wkhtmltopdf.sh /usr/local/bin/wkhtmltopdf \
-  && apt-get purge -y curl file xz-utils build-essential \
+  && apt-get install -y --no-install-recommends locales \
+  # Supress earlang vm waning form locale issue
+  && export LANG=en_US.UTF-8 \
+  && echo $LANG UTF-8 > /etc/locale.gen \
+  && locale-gen \
+  && update-locale LANG=$LANG \
+  # Remove unwanted package after use
+  && apt-get purge -y curl file xz-utils build-essential locales \
   && apt-get -y autoremove \
   && apt-get -y clean
 
