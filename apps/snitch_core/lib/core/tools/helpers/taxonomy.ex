@@ -66,6 +66,18 @@ defmodule Snitch.Tools.Helper.Taxonomy do
     }
   end
 
+  def image_url(taxon) do
+    taxon = Repo.preload(taxon, taxon_image: :image)
+
+    case taxon.taxon_image do
+      nil ->
+        nil
+
+      _ ->
+        TaxonomyDomain.image_url(taxon.taxon_image.image.name, taxon)
+    end
+  end
+
   def convert_taxon([]) do
     []
   end
@@ -78,6 +90,7 @@ defmodule Snitch.Tools.Helper.Taxonomy do
       permlink: "",
       parent_id: taxon.parent_id,
       taxonomy_id: taxon.taxonomy_id,
+      image_url: image_url(taxon),
       taxons: Enum.map(children, &convert_taxon/1)
     }
   end
