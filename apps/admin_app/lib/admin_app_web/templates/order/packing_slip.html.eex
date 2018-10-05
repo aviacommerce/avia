@@ -40,9 +40,9 @@
     <br>
     <div style="border: 1px solid black;">
     <table class="table" style="width: 100%;">
-            <thead class="thead-light" style="width: 100%;">
+            <thead class="thead-light" style="width: 100%; text-align: left; background-color: lavender;">
             <tr>
-                <th scope="col" colspan="2"> Item Description </th>
+                <th scope="col"> Item Description </th>
                 <th scope="col"> Quantity</th>
                 <th scope="col"> Price </th>
             </tr>
@@ -98,9 +98,9 @@
             <tr>
                 <td style="width: 100%;">
                     <table class="table" style="width: 100%;">
-                        <thead class="thead-light" style="width: 100%;">
+                        <thead class="thead-light" style="width: 100%; text-align: left; background-color: lavender;">
                             <tr>
-                                <th scope="col" colspan="2"> Item Description </th>
+                                <th scope="col"> Item Description </th>
                                 <th scope="col"> Quantity</th>
                                 <th scope="col"> Price </th>
                             </tr>
@@ -136,7 +136,7 @@
         <tr>
             <td style="width: 100%;">
                 I hereby confirm that said above goods are being purchased for my internal or personal purpose and not for re-sale. I
-further understand and agree to Aviacommerce Terms and Conditions of Sale available at www.aviacommerce.com or upon request.
+further understand and agree to Aviacommerce Terms and Conditions of Sale available at <a href="<%= get_support_url() %>" >Aviacommerce</a> or upon request.
             </td>
         </tr>
     </table>

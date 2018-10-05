@@ -63,6 +63,10 @@ defmodule AdminAppWeb.OrderView do
     content_tag(:td, product.sku)
   end
 
+  def render_variant_name(product) do
+    content_tag(:td, product.name)
+  end
+
   def line_item_total(line_item) do
     Money.mult!(line_item.unit_price, line_item.quantity)
   end
@@ -202,7 +206,7 @@ defmodule AdminAppWeb.OrderView do
 
   defp render_invoice_line_item(line_item, order) do
     content = [
-      render_variant(line_item.product),
+      render_variant_name(line_item.product),
       render_quantity(line_item),
       content_tag(:td, " #{line_item.unit_price} ")
     ]
@@ -233,5 +237,13 @@ defmodule AdminAppWeb.OrderView do
   def order_total(order) do
     {:ok, total} = Money.to_string(OrderDomain.total_amount(order))
     total
+  end
+
+  def get_support_url() do
+    Application.get_env(:admin_app, AdminAppWeb.Endpoint)[:support_url]
+  end
+
+  def get_support_email() do
+    Application.get_env(:admin_app, AdminAppWeb.Endpoint)[:support_email]
   end
 end

@@ -16,7 +16,9 @@ config :admin_app, AdminAppWeb.Endpoint,
   pubsub: [name: AdminApp.PubSub, adapter: Phoenix.PubSub.PG2],
   token_maximum_age: System.get_env("TOKEN_MAXIMUM_AGE"),
   sendgrid_sender_mail: System.get_env("SENDGRID_SENDER_EMAIL"),
-  password_reset_salt: System.get_env("PASSWORD_RESET_SALT")
+  password_reset_salt: System.get_env("PASSWORD_RESET_SALT"),
+  support_url: System.get_env("SUPPORT_URL"),
+  support_email: System.get_env("SUPPORT_EMAIL")
 
 # Configures Elixir's Logger
 config :logger, :console,
