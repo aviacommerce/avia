@@ -3,6 +3,10 @@
 
 
 .list-container {
+  .tab-content {
+    padding: 10px;
+  }
+
   .back {
     color: $main-sub-color;
     font-size: .875em;
@@ -260,6 +264,10 @@
             font-size: 12px;
           }
 
+          .media-body div:first-child {
+            width: 65%;
+          }
+
           .variant {
             span {
               font-size: 12px;
@@ -377,7 +385,16 @@
     }
 
     .card {
+      .tab-content {
+        padding: 15px;
+      }
+
       padding: 0px !important;
+
+      .card-img-top {
+        width: 100%;
+        height: 178px;
+      }
 
       .card-footer {
         padding: 10px;
@@ -556,7 +573,16 @@
 
       th,
       td {
-        border-top: 0px solid $bordercolor1
+        border-top: 0px solid $bordercolor1;
+
+        .media {
+          .media-body {
+            a {
+              width: 65%;
+            }
+          }
+
+        }
       }
 
       td {
@@ -599,7 +625,7 @@
       }
 
       .paid-via {
-        font-size: 12px;
+        font-size: 14px;
 
         .n-paid {
           color: $main-color;
@@ -646,6 +672,12 @@
         font-weight: normal;
       }
 
+      .lineitem-detail {
+        .media-body div:first-child {
+          width: 65%;
+        }
+      }
+
       .std-shipping {
         font-size: 12px;
         font-weight: bold;
@@ -659,6 +691,11 @@
       .addres-detail {
         font-size: 12px;
       }
+    }
+
+    .orderhead {
+      font-weight: bold;
+      font-size: 13px;
     }
 
     .orderon {
