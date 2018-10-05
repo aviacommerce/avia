@@ -4,9 +4,12 @@
       <td style="width: 50%;">
         <h1>INVOICE</h1>
       </td>
-      <td style="width: 50%;">
+      <td style="width: 50%; text-align: right;">
         <span style="font-weight: bolder;">CONTACT US :</span>
-        <a href="mailto:snitch@aviacommerce.com">snitch@aviacommerce.com</a>
+        <a href="<%= get_support_url() %>" >Aviacommerce</a>
+        <br>
+        <span style="font-weight: bolder;">Email: </span>
+        <%= get_support_email() %>
       </td>
     </tr>
   </table>
@@ -63,9 +66,9 @@
   <hr>
   <br>
   <table class="table" style="width: 100%;">
-        <thead class="thead-light" style="width: 100%;">
+        <thead class="thead-light" style="width: 100%; text-align: left; background-color: lavender;">
           <tr>
-            <th scope="col" colspan="2"> Item Description </th>
+            <th scope="col"> Item Description </th>
             <th scope="col"> Quantity</th>
             <th scope="col"> Price </th>
           </tr>
@@ -78,7 +81,7 @@
   </table>
   <hr>
   <br>
-  <table style="width: 100%;">
+  <table style="width: 100%;" style="width: 100%;">
     <tr>
       <td style="width: 100%;">
         <h3 style="font-weight: bolder;">Order Summary</h3>

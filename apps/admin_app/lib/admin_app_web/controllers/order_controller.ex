@@ -289,36 +289,40 @@ defmodule AdminAppWeb.OrderController do
         send_file_response(
           conn,
           params,
-          @root_path |> Path.join("#{type}_#{params["number"]}.pdf")
+          @root_path |> Path.join("#{type}_#{params["number"]}.pdf"),
+          type
         )
 
       {:ok, {:error, reason}} ->
-        send_pdf_response(conn, params, {:error, reason |> format_error()})
+        send_pdf_response(conn, params, {:error, reason |> format_error()}, type)
 
       {:error, message} ->
-        send_pdf_response(conn, params, {:error, message})
+        send_pdf_response(conn, params, {:error, message}, type)
     end
   end
 
-  defp send_file_response(conn, params, path) do
+  defp send_file_response(conn, params, path, type) do
     case read_file(path) do
-      {:ok, file} -> send_pdf_response(conn, params, {:ok, file})
-      {:error, reason} -> send_pdf_response(conn, params, {:error, reason |> format_error()})
+      {:ok, file} ->
+        send_pdf_response(conn, params, {:ok, file}, type)
+
+      {:error, reason} ->
+        send_pdf_response(conn, params, {:error, reason |> format_error()}, type)
     end
   end
 
-  defp send_pdf_response(conn, params, {:error, msg}) do
+  defp send_pdf_response(conn, params, {:error, msg}, _type) do
     conn
     |> put_flash(:error, msg)
     |> redirect(to: "/orders/#{params["number"]}/detail")
   end
 
-  defp send_pdf_response(conn, params, {:ok, data}) do
+  defp send_pdf_response(conn, params, {:ok, data}, type) do
     conn
     |> put_resp_content_type("application/pdf")
     |> put_resp_header(
       "content-disposition",
-      "attachment; filename=\"invoice_#{params["number"]}.pdf\""
+      "attachment; filename=\"#{type}_#{params["number"]}.pdf\""
     )
     |> send_resp(200, data)
   end
