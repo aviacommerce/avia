@@ -1,16 +1,12 @@
 defmodule AdminAppWeb.ProductView do
   use AdminAppWeb, :view
   alias Snitch.Data.Model.Product
-  alias Snitch.Data.Schema.{Variation, ShippingCategory}
+  alias Snitch.Data.Schema.{ShippingCategory, Variation}
   alias Snitch.Repo
   import Ecto.Query
 
   @currencies ["USD", "INR"]
-
-  def get_image_url(images) do
-    image = images |> List.first()
-    image.url
-  end
+  @dummy_image_url "/images/empty-img.png"
 
   def themes_options(product) do
     Enum.map(product.taxon.variation_themes, fn theme -> {theme.name, theme.id} end)
@@ -88,6 +84,18 @@ defmodule AdminAppWeb.ProductView do
 
   def get_image_url(image, product) do
     Product.image_url(image.name, product)
+  end
+
+  def get_product_display_image(product) do
+    image = product.images |> List.first()
+
+    case image do
+      nil ->
+        @dummy_image_url
+
+      _ ->
+        get_image_url(image, product)
+    end
   end
 
   def get_variant_option(variants) do

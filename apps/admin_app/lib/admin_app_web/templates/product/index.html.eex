@@ -51,7 +51,7 @@
           <%= for item <- @products do %>
           <div class="col-3 px-2 pb-3 m-0">
             <div class="card p-0">
-              <img class="card-img-top" href="#<%= item.id %>" src="/images/empty-img.png" alt="Card image cap">
+              <%= img_tag(get_product_display_image(item), class: "card-img-top") %>
               <div class="card-body">
                 <h5 class="card-title">  <%= item.name %></h5>
                 <div class="card-text">
