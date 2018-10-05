@@ -6,9 +6,10 @@
    <%= input f, :display_name, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
 </div>
 <div class="form-group row stickformbutton">
-   <div class="col-sm-10">  
+   <div class="col-sm-10">
+      <%= button("Cancel", to: option_type_path(@conn, :index), method: "get",
+            class: "btn btn-secondary btn-outline-secondary submit-btn float-left") %>
       <%= submit "Submit", class: "btn btn-primary submit-btn float-right" %>
-      <%= submit "Cancel", class: "btn submit-btn btn-secondary btn-outline-secondary float-left" %>
    </div>
 </div>
 <% end %>
