@@ -3,7 +3,7 @@ defmodule SnitchApiWeb.Plugs.LoadUser do
 
   import Snitch.Factory
 
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias SnitchApi.Accounts
   alias SnitchApiWeb.Plug.LoadUser
 

@@ -5,7 +5,7 @@ defmodule AdminApp.OrderContext do
   alias Snitch.Domain.Order.DefaultMachine
   alias Snitch.Data.Schema.Order
   alias Snitch.Data.Model.Order, as: OrderModel
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Domain.Order, as: OrderDomain
   alias SnitchPayments.PaymentMethodCode
   alias Snitch.Data.Model.Payment

@@ -8,7 +8,7 @@ defmodule AdminAppWeb.OrderController do
   alias BeepBop.Context
   alias Snitch.Domain.Order.DefaultMachine
   alias Snitch.Data.Schema.{Address, Product}
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias AdminAppWeb.OrderView
   alias AdminApp.OrderContext
   alias AdminApp.PackageContext

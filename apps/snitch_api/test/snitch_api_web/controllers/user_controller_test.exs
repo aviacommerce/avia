@@ -4,7 +4,7 @@ defmodule SnitchApiWeb.UserControllerTest do
   import Snitch.Factory
 
   alias SnitchApi.Accounts
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   @invalid_attrs %{email: nil, password: nil}
 

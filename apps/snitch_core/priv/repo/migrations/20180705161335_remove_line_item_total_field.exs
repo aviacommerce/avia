@@ -9,7 +9,7 @@ defmodule Snitch.Repo.Migrations.RemoveLineItemTotalField do
 
   def down do
     alter table("snitch_line_items") do
-      add :total, :money_with_currency, null: false
+      add :total, String.to_atom("#{prefix()||"public"}.money_with_currency"), null: false
     end
   end
 end

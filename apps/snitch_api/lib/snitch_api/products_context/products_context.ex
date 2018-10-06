@@ -2,7 +2,7 @@ defmodule SnitchApi.ProductsContext do
   @moduledoc """
   The JSON-API context.
   """
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.{Product, Review}
 
   import Ecto.Query, only: [from: 2, order_by: 2]

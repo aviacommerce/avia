@@ -5,7 +5,7 @@ defmodule Snitch.Data.Model.WishListTest do
   import Snitch.Factory
 
   alias Snitch.Data.Model.WishListItem
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   setup do
     user = insert(:user)

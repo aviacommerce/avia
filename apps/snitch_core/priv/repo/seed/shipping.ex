@@ -8,7 +8,7 @@ defmodule Snitch.Seed.Shipping do
   alias Snitch.Data.Schema.State, as: StateSchema
   alias Snitch.Data.Schema.ShippingMethod, as: ShippingMethodSchema
   alias Snitch.Data.Schema.{ShippingCategory, Zone}
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   @shipping_categories ~w(light heavy fragile)
 

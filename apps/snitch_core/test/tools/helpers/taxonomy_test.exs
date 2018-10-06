@@ -3,7 +3,7 @@ defmodule Snitch.Tools.Helpers.TaxonomyTest do
   use Snitch.DataCase
 
   alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Tools.Helper.Taxonomy, as: TaxonomyHelper
 
   @brands_taxonomy {"Brands",

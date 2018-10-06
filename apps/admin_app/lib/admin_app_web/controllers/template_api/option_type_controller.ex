@@ -2,13 +2,14 @@ defmodule AdminAppWeb.TemplateApi.OptionTypeController do
   use AdminAppWeb, :controller
 
   alias AdminAppWeb.TemplateApi.OptionTypeView
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Model.{VariationTheme, ProductOptionValue}
   import Phoenix.View, only: [render_to_string: 3]
 
   def index(conn, %{"theme_id" => theme_id} = params) do
     theme =
       VariationTheme.get(theme_id)
-      |> Snitch.Repo.preload(:option_types)
+      |> Repo.preload(:option_types)
 
     product_id = params["product_id"]
 

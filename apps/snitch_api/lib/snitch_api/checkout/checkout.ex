@@ -5,7 +5,7 @@ defmodule SnitchApi.Checkout do
 
   import Ecto.Query, only: [from: 2, order_by: 2]
 
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias SnitchApi.API
   alias Snitch.Data.Schema.Address
 

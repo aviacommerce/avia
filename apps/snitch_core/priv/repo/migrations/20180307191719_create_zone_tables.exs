@@ -2,7 +2,7 @@ defmodule Snitch.Repo.Migrations.CreateZoneTables do
   use Ecto.Migration
 
   @zone_exclusivity_fn ~s"""
-  create function zone_exclusivity(
+  create function #{ prefix() || "public" }.zone_exclusivity(
     in supertype_id bigint,
     in subtype_discriminator varchar(1)
     )
@@ -10,11 +10,11 @@ defmodule Snitch.Repo.Migrations.CreateZoneTables do
   as $$
     select coalesce(
       (select 1
-        from  snitch_zones
+        from  #{ prefix() || "public" }.snitch_zones
         where id = supertype_id
         and   zone_type = subtype_discriminator),
       0)
-  $$                                   
+  $$
   language sql;
   """
 
@@ -41,9 +41,9 @@ defmodule Snitch.Repo.Migrations.CreateZoneTables do
     end
     create unique_index("snitch_country_zone_members", [:zone_id, :country_id])
 
-    execute @zone_exclusivity_fn, "drop function zone_exclusivity;"
+    execute @zone_exclusivity_fn, "drop function #{ prefix() || "public" }.zone_exclusivity;"
 
-    create constraint("snitch_state_zone_members", :state_zone_exclusivity, check: "zone_exclusivity(zone_id, 'S') = 1")
-    create constraint("snitch_country_zone_members", :country_zone_exclusivity, check: "zone_exclusivity(zone_id, 'C') = 1")
+    create constraint("snitch_state_zone_members", :state_zone_exclusivity, check: "#{ prefix() || "public" }.zone_exclusivity(zone_id, 'S') = 1")
+    create constraint("snitch_country_zone_members", :country_zone_exclusivity, check: "#{ prefix() || "public" }.zone_exclusivity(zone_id, 'C') = 1")
   end
 end

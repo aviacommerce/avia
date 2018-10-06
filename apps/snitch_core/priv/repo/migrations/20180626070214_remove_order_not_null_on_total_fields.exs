@@ -3,19 +3,19 @@ defmodule Snitch.Repo.Migrations.RemoveOrderNotNullOnTotalFields do
 
   def up do
     alter table("snitch_orders") do
-      modify :total, :money_with_currency, null: true
-      modify :item_total, :money_with_currency, null: true
-      modify :adjustment_total, :money_with_currency, null: true
-      modify :promo_total, :money_with_currency, null: true
+      modify :total, String.to_atom("#{prefix()||"public"}.money_with_currency"), null: true
+      modify :item_total, String.to_atom("#{prefix()||"public"}.money_with_currency"), null: true
+      modify :adjustment_total, String.to_atom("#{prefix()||"public"}.money_with_currency"), null: true
+      modify :promo_total, String.to_atom("#{prefix()||"public"}.money_with_currency"), null: true
     end
   end
 
   def down do
     alter table("snitch_orders") do
-      modify :total, :money_with_currency, null: false
-      modify :item_total, :money_with_currency, null: false
-      modify :adjustment_total, :money_with_currency, null: false
-      modify :promo_total, :money_with_currency, null: false
+      modify :total, String.to_atom("#{prefix()||"public"}.money_with_currency"), null: false
+      modify :item_total, String.to_atom("#{prefix()||"public"}.money_with_currency"), null: false
+      modify :adjustment_total, String.to_atom("#{prefix()||"public"}.money_with_currency"), null: false
+      modify :promo_total, String.to_atom("#{prefix()||"public"}.money_with_currency"), null: false
     end
   end
 end

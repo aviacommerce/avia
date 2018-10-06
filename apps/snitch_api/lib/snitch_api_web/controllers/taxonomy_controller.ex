@@ -2,7 +2,7 @@ defmodule SnitchApiWeb.TaxonomyController do
   use SnitchApiWeb, :controller
 
   alias Snitch.Data.Schema.Taxonomy
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
 

@@ -7,7 +7,7 @@ defmodule Snitch.Data.Model.Zone do
   use Snitch.Data.Model
   alias Snitch.Data.Model.{CountryZone, StateZone}
   alias Snitch.Data.Schema.Zone
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.MultiQuery
   import Ecto.Query
 
   defmacro __using__(_) do
@@ -39,13 +39,13 @@ defmodule Snitch.Data.Model.Zone do
 
   def creation_multi(zone_changeset, []) do
     Multi.new()
-    |> Multi.insert(:zone, zone_changeset)
+    |> MultiQuery.insert(:zone, zone_changeset)
   end
 
   @spec creation_multi(Ecto.Changeset.t(), [non_neg_integer]) :: Multi.t()
   def creation_multi(zone_changeset, member_ids) do
     Multi.new()
-    |> Multi.insert(:zone, zone_changeset)
+    |> MultiQuery.insert(:zone, zone_changeset)
     |> Multi.run(:members, fn %{zone: zone} ->
       if member_ids != [] do
         multi_run_insert_members(member_ids, zone)
@@ -64,7 +64,7 @@ defmodule Snitch.Data.Model.Zone do
     %{added: added, removed: removed} = update_diff(new_member_ids, zone)
 
     Multi.new()
-    |> Multi.update(:zone, zone_changeset)
+    |> MultiQuery.update(:zone, zone_changeset)
     |> Multi.run(:added, fn _ ->
       multi_run_insert_members(added, zone)
     end)
@@ -92,7 +92,7 @@ defmodule Snitch.Data.Model.Zone do
   defp remove_members_multi(to_be_removed, zone) do
     zone_module = get_zone_module(zone)
     removal_query = zone_module.remove_members_query(to_be_removed, zone)
-    Multi.delete_all(%Multi{}, :removed, removal_query)
+    MultiQuery.delete_all(%Multi{}, :removed, removal_query)
   end
 
   defp update_diff(new_member_ids, current_zone) do

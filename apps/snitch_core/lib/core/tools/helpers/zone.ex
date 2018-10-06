@@ -5,7 +5,7 @@ defmodule Snitch.Tools.Helper.Zone do
 
   alias Ecto.DateTime
   alias Snitch.Data.Schema.{Country, CountryZoneMember, State, StateZoneMember, Zone}
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   @zone %{
     name: nil,

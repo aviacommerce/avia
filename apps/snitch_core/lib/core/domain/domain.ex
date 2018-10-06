@@ -9,7 +9,7 @@ defmodule Snitch.Domain do
       alias Ecto.Multi
       alias Snitch.Data.{Model, Schema}
       alias Snitch.Domain
-      alias Snitch.Repo
+      alias Snitch.Core.Tools.MultiTenancy.Repo
     end
   end
 end

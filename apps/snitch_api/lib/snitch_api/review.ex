@@ -3,7 +3,7 @@ defmodule SnitchApi.Review do
 
   alias Snitch.Data.Model.Rating
   alias Snitch.Data.Model.{ProductReview, Review}
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   @review_attributes ["title", "description", "locale", "name", "user_id"]
 

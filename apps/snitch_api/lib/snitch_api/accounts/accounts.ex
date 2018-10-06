@@ -2,7 +2,7 @@ defmodule SnitchApi.Accounts do
   alias Snitch.Data.Model.Role, as: RoleModel
   alias Snitch.Data.Schema.User
   alias Snitch.Domain.Account
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias SnitchApi.Guardian
 
   @moduledoc """
@@ -61,7 +61,7 @@ defmodule SnitchApi.Accounts do
   def token_sign_in(email, password) do
     case Account.authenticate(email, password) do
       {:ok, user} ->
-        user = Snitch.Repo.preload(user, [:role])
+        user = Repo.preload(user, [:role])
         Guardian.encode_and_sign(user, %{}, ttl: {3, :days})
 
       _ ->

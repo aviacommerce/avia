@@ -1,7 +1,7 @@
 defmodule Snitch.Factory do
   @moduledoc false
 
-  use ExMachina.Ecto, repo: Snitch.Repo
+  use ExMachina.Ecto, repo: Snitch.Core.Tools.MultiTenancy.Repo
 
   use Snitch.Factory.{
     Address,
@@ -35,7 +35,7 @@ defmodule Snitch.Factory do
     ShippingCategory
   }
 
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def currency do
     :USD

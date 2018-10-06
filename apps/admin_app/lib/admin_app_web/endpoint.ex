@@ -2,6 +2,8 @@ defmodule AdminAppWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :admin_app
   use Sentry.Phoenix.Endpoint
 
+  alias Snitch.Core.Tools.MultiTenancy
+
   socket("/socket", AdminAppWeb.UserSocket)
 
   # Serve at "/" the static files from "priv/static" directory.
@@ -48,6 +50,11 @@ defmodule AdminAppWeb.Endpoint do
     store: :cookie,
     key: "_admin_app_key",
     signing_salt: "yum1FuJK"
+  )
+
+  plug(
+    MultiTenancy.Plug,
+    endpoint: __MODULE__
   )
 
   plug(AdminAppWeb.Router)

@@ -3,7 +3,7 @@ defmodule AdminAppWeb.ProductBrandController do
 
   alias Snitch.Data.Model.ProductBrand, as: ProductBrandModel
   alias Snitch.Data.Schema.ProductBrand, as: ProductBrandSchema
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def index(conn, _params) do
     product_brands = ProductBrandModel.get_all()

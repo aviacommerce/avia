@@ -2,6 +2,7 @@ defmodule AdminAppWeb.TaxonomyView do
   use AdminAppWeb, :view
 
   alias Snitch.Data.Schema.{VariationTheme, Taxonomy}
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   import Ecto.Query
 
   def get_taxon_name({taxon, list}) do
@@ -25,7 +26,7 @@ defmodule AdminAppWeb.TaxonomyView do
   end
 
   def get_themes() do
-    Snitch.Repo.all(VariationTheme)
+    Repo.all(VariationTheme)
     |> Enum.map(fn theme -> {theme.name, theme.id} end)
   end
 end

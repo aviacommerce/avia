@@ -8,7 +8,6 @@ defmodule Snitch.Data.Model.Product do
   import Ecto.Query
   alias Ecto.Multi
   alias Snitch.Data.Schema.{Product, Variation}
-  alias Snitch.Repo
   alias Snitch.Tools.Helper.ImageUploader
   alias Snitch.Data.Schema.Image
 

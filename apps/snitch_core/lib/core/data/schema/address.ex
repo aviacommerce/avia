@@ -10,7 +10,6 @@ defmodule Snitch.Data.Schema.Address do
   use Snitch.Data.Schema
 
   alias Snitch.Data.Schema.{Country, State}
-  alias Snitch.Repo
 
   @type t :: %__MODULE__{}
 

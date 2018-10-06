@@ -1,7 +1,7 @@
 defmodule AdminApp.PackageContext do
   import Ecto.Query
   alias Snitch.Data.Schema.Package
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def update_packages(state, order_id) do
     query =

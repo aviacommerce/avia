@@ -3,7 +3,7 @@ defmodule SnitchApiWeb.VariantController do
 
   alias Snitch.Data.Model.WishListItem
   alias Snitch.Data.Schema.Variant
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def favorite_variants(conn, _params) do
     variants = Repo.all(WishListItem.most_favorited_variants())

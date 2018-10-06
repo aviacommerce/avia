@@ -16,7 +16,7 @@ defmodule Snitch.Seed.PaymentMethods do
   """
 
   alias Snitch.Data.Schema.PaymentMethod
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def seed!() do
     methods = [

@@ -6,11 +6,11 @@ defmodule AdminAppWeb.TaxonomyController do
   alias Snitch.Data.Schema.Taxonomy, as: TaxonomySchema
   alias AdminAppWeb.TaxonomyView
   import Ecto.Query
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   import Phoenix.View, only: [render_to_string: 3]
 
   def index(conn, _params) do
-    taxonomies = Snitch.Repo.all(TaxonomySchema)
+    taxonomies = Repo.all(TaxonomySchema)
     render(conn, "index.html", taxonomies: taxonomies)
   end
 

@@ -4,7 +4,6 @@ defmodule Snitch.Data.Schema.Taxon do
   use AsNestedSet, scope: [:taxonomy_id]
 
   import Ecto.Query
-  alias Snitch.Repo
   alias Snitch.Data.Schema.{Image, Taxon, Taxonomy, VariationTheme, TaxonImage}
 
   @type t :: %__MODULE__{}

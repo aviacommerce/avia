@@ -5,7 +5,7 @@ defmodule Snitch.Tools.Helper.Taxonomy do
 
   alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
   alias Snitch.Data.Schema.{Taxon, Taxonomy}
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   @doc """
   Creates taxonomy from the hierarchy passed.

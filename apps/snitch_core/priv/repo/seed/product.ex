@@ -3,7 +3,7 @@ defmodule Snitch.Seed.Product do
   Seeds Products with variants and their images.
   """
   alias Ecto.DateTime
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   alias Snitch.Data.Schema.{
     Image,
@@ -59,7 +59,7 @@ defmodule Snitch.Seed.Product do
       #     %{variant_id: variant_image.variant_id, image_id: image.id}
       #   end)
 
-      # Snitch.Repo.insert_all(
+      # Snitch.Core.Tools.MultiTenancy.Repo.insert_all(
       #   "snitch_variant_images",
       #   variant_image_middle_entries,
       #   returning: [:id]

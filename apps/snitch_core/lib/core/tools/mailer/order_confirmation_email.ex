@@ -4,7 +4,7 @@ defmodule Snitch.Tools.OrderEmail do
   """
   use Bamboo.EEx
   alias Snitch.Tools.Mailer
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   require EEx
 
   email_template =
