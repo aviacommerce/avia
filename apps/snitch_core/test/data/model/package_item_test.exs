@@ -38,7 +38,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
                PackageItem.create(%{@params | line_item_id: -1, product_id: -1, package_id: -1})
 
       refute changeset.valid?
-      assert %{line_item_id: ["does not exist"]} == errors_on(changeset)
+      assert %{package_id: ["does not exist"]} == errors_on(changeset)
 
       assert {:error, changeset} =
                PackageItem.create(%{
