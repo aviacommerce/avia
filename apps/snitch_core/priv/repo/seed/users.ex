@@ -4,7 +4,7 @@ defmodule Snitch.Seed.Users do
   alias Comeonin.Argon2
   alias Ecto.DateTime
   alias Snitch.Data.Model.{Country, State}
-  alias Snitch.Data.Schema.{Address, User}
+  alias Snitch.Data.Schema.{Address, User, Role}
   alias Snitch.Repo
 
   require Logger
@@ -13,21 +13,24 @@ defmodule Snitch.Seed.Users do
   @admin_passwd Argon2.hashpwsalt("wizard")
 
   def seed_users! do
+    admin_role = Repo.get_by!(Role, name: "admin")
+
     users = [
-      user("Harry", "Potter", "admin@snitch.com", @admin_passwd, true)
+      user("Harry", "Potter", "admin@snitch.com", @admin_passwd, true, admin_role.id)
     ]
 
     Repo.insert_all(User, users, on_conflict: :nothing, conflict_target: [:email])
     Logger.info("Inserted #{length(users)} users.")
   end
 
-  def user(first_name, last_name, email, pwd_hash, admin \\ false) do
+  def user(first_name, last_name, email, pwd_hash, admin \\ false, role_id) do
     %{
       first_name: first_name,
       last_name: last_name,
       email: email,
       password_hash: pwd_hash,
       is_admin: admin,
+      role_id: role_id,
       inserted_at: DateTime.utc(),
       updated_at: DateTime.utc()
     }

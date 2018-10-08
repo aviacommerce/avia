@@ -75,7 +75,7 @@ defmodule AdminAppWeb.SessionController do
 
   defp verify_session({:error, changeset}, conn) do
     conn
-    |> put_flash(:error, "Sorry there were some errors !!")
+    |> put_flash(:error, "Sorry there were some errors !")
     |> render("new.html", changeset: %{changeset | action: :insert})
   end
 
@@ -125,16 +125,22 @@ defmodule AdminAppWeb.SessionController do
     |> redirect(to: session_path(conn, :new))
   end
 
+  defp login({:ok, %{role: %{name: "user"}}}, conn) do
+    conn
+    |> put_flash(:error, "Incorrect email/password")
+    |> redirect(to: session_path(conn, :new))
+  end
+
   defp login({:ok, user}, conn) do
     conn
     |> Plug.sign_in(user)
-    |> put_flash(:info, "You are logged in!!")
+    |> put_flash(:info, "You are logged in!")
     |> redirect(to: page_path(conn, :index))
   end
 
   defp login({:error, _}, conn) do
     conn
-    |> put_flash(:error, "Wrong email/password")
+    |> put_flash(:error, "Incorrect email/password")
     |> redirect(to: session_path(conn, :new))
   end
 
@@ -156,7 +162,7 @@ defmodule AdminAppWeb.SessionController do
 
   defp update_password_result({:ok, _}, conn) do
     conn
-    |> put_flash(:info, "Password updated successfully!!")
+    |> put_flash(:info, "Password updated successfully!")
     |> redirect(to: session_path(conn, :new))
   end
 
