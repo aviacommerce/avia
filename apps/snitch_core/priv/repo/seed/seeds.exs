@@ -39,6 +39,9 @@ end)
 # seed payment methods
 # PaymentMethods.seed!()
 
+# seed roles
+Role.seed()
+
 # Users.seed_address!()
 Users.seed_users!()
 
@@ -50,9 +53,6 @@ Shipping.seed!()
 # end)
 
 # Stocks.seed!()
-
-# seed roles
-Role.seed()
 
 # seed products
 # Product.seed()
