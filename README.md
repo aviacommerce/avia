@@ -1,5 +1,5 @@
 <p align="center">
-    <img alt="Snitch logo" title="Snitch Logo" src="http://getdrawings.com/image/golden-snitch-drawing-59.jpg">
+    <img alt="Snitch logo" title="Snitch Logo" src="https://res.cloudinary.com/aviabird/image/upload/v1539065176/aviacommerce/logo/main.png">
 </p>
 <p align="center">
   <a href="https://travis-ci.com/aviacommerce/avia">
