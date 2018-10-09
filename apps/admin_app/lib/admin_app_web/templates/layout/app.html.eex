@@ -9,7 +9,7 @@
     <link rel="icon" href="/favicon.png" type="image/x-icon" />
     <link rel="shortcut icon" href="/favicon.png" type="image/x-icon" />
     <%= csrf_meta_tag %>
-    <title>Snitch | Admin</title>
+    <title>Avia | Admin</title>
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
   </head>
