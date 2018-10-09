@@ -55,10 +55,10 @@ defmodule Snitch.Data.Schema.Card do
   digits (inclusive), according to [ISO/IEC
   7812](https://www.iso.org/obp/ui/#iso:std:iso-iec:7812:-1:ed-5:v1:en)
   """
-  @spec changeset(t, map, :create | :update) :: Ecto.Changeset.t()
-  def changeset(card, params, action)
+  @spec create_changeset(t, map) :: Ecto.Changeset.t()
+  def create_changeset(card, params)
 
-  def changeset(%__MODULE__{} = card, params, :create) do
+  def create_changeset(%__MODULE__{} = card, params) do
     %{year: current_year, month: current_month} = DateTime.utc_now()
 
     card
@@ -76,7 +76,10 @@ defmodule Snitch.Data.Schema.Card do
     |> mask_card
   end
 
-  def changeset(%__MODULE__{} = card, params, :update) do
+  @spec update_changeset(t, map) :: Ecto.Changeset.t()
+  def update_changeset(card, params)
+
+  def update_changeset(%__MODULE__{} = card, params) do
     cast(card, params, @update_fields)
   end
 

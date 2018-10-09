@@ -36,20 +36,20 @@ defmodule Snitch.Data.Schema.CardTest do
     end
 
     test "with valid attributes", %{card: card} do
-      %{valid?: validity} = changeset = Card.changeset(%Card{}, card, :create)
+      %{valid?: validity} = changeset = Card.create_changeset(%Card{}, card)
       assert validity
       assert @expected = apply_changes(changeset)
     end
 
     test "without card_name", %{card: card} do
-      %{valid?: validity} = Card.changeset(%Card{}, card, :create)
+      %{valid?: validity} = Card.create_changeset(%Card{}, card)
       assert validity
     end
 
     test "without name of user", %{card: card} do
       card = Map.delete(card, :name_on_card)
 
-      changeset = %{valid?: validity} = Card.changeset(%Card{}, card, :create)
+      changeset = %{valid?: validity} = Card.create_changeset(%Card{}, card)
 
       refute validity
       assert %{name_on_card: ["can't be blank"]} = errors_on(changeset)
@@ -58,29 +58,28 @@ defmodule Snitch.Data.Schema.CardTest do
     test "without brand", %{card: card} do
       card = Map.delete(card, :brand)
 
-      changeset = %{valid?: validity} = Card.changeset(%Card{}, card, :create)
+      changeset = %{valid?: validity} = Card.create_changeset(%Card{}, card)
 
       refute validity
       assert %{brand: ["can't be blank"]} = errors_on(changeset)
     end
 
     test "without user_id" do
-      changeset = %{valid?: validity} = Card.changeset(%Card{}, @card, :create)
+      changeset = %{valid?: validity} = Card.create_changeset(%Card{}, @card)
 
       refute validity
       assert %{user_id: ["can't be blank"]} = errors_on(changeset)
     end
 
     test "with invalid month", %{card: card} do
-      changeset = %{valid?: validity} = Card.changeset(%Card{}, %{card | month: 13}, :create)
+      changeset = %{valid?: validity} = Card.create_changeset(%Card{}, %{card | month: 13})
 
       refute validity
       assert %{month: ["must be less than or equal to 12"]} = errors_on(changeset)
     end
 
     test "with short card number", %{card: card} do
-      changeset =
-        %{valid?: validity} = Card.changeset(%Card{}, %{card | number: "123456"}, :create)
+      changeset = %{valid?: validity} = Card.create_changeset(%Card{}, %{card | number: "123456"})
 
       refute validity
       assert %{number: ["should be at least 8 character(s)"]} = errors_on(changeset)
@@ -89,7 +88,7 @@ defmodule Snitch.Data.Schema.CardTest do
     test "with long card number", %{card: card} do
       changeset =
         %{valid?: validity} =
-        Card.changeset(%Card{}, %{card | number: "12345678901234567890"}, :create)
+        Card.create_changeset(%Card{}, %{card | number: "12345678901234567890"})
 
       refute validity
       assert %{number: ["should be at most 19 character(s)"]} = errors_on(changeset)
@@ -97,7 +96,7 @@ defmodule Snitch.Data.Schema.CardTest do
 
     test "with invalid card number", %{card: card} do
       changeset =
-        %{valid?: validity} = Card.changeset(%Card{}, %{card | number: "1234AB!56"}, :create)
+        %{valid?: validity} = Card.create_changeset(%Card{}, %{card | number: "1234AB!56"})
 
       refute validity
       assert %{number: ["has invalid format"]} = errors_on(changeset)
@@ -107,21 +106,21 @@ defmodule Snitch.Data.Schema.CardTest do
       %{year: current_year} = DateTime.utc_now()
 
       changeset =
-        %{valid?: validity} = Card.changeset(%Card{}, %{card | year: current_year - 1}, :create)
+        %{valid?: validity} = Card.create_changeset(%Card{}, %{card | year: current_year - 1})
 
       refute validity
       assert %{year: ["must be greater than or equal to #{current_year}"]} == errors_on(changeset)
     end
 
     test "can be disabled", %{card: card} do
-      old_card = Card.changeset(%Card{}, card, :create)
+      old_card = Card.create_changeset(%Card{}, card)
 
       assert %{
                valid?: true,
                changes: %{
                  is_disabled: true
                }
-             } = Card.changeset(apply_changes(old_card), %{is_disabled: true}, :update)
+             } = Card.update_changeset(apply_changes(old_card), %{is_disabled: true})
     end
   end
 end
