@@ -37,7 +37,7 @@ defmodule Snitch.Domain.Order do
   Returns summation of all the `payments` for the order in the supplied `payment`
   state.
   """
-  @spec payments_total(Order.t(), Strin.t()) :: Money.t()
+  @spec payments_total(Order.t(), String.t()) :: Money.t()
   def payments_total(order, payment_state) do
     {:ok, currency} = Defaults.fetch(:currency)
 
@@ -172,5 +172,13 @@ defmodule Snitch.Domain.Order do
 
   def line_items_count(order) do
     length(order.line_items)
+  end
+
+  def order_package_delivered?(order) do
+    order = Repo.preload(order, :packages)
+
+    Enum.all?(order.packages, fn package ->
+      package.state == "delivered"
+    end)
   end
 end

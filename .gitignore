@@ -24,3 +24,4 @@ erl_crash.dump
 .elixir_ls
 
 /env/local.env
+/env/prod.env

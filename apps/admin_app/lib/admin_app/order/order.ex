@@ -1,9 +1,14 @@
 defmodule AdminApp.OrderContext do
   import Ecto.Query
+
+  alias BeepBop.Context
+  alias Snitch.Domain.Order.DefaultMachine
   alias Snitch.Data.Schema.Order
   alias Snitch.Data.Model.Order, as: OrderModel
   alias Snitch.Repo
   alias Snitch.Domain.Order, as: OrderDomain
+  alias SnitchPayments.PaymentMethodCode
+  alias Snitch.Data.Model.Payment
 
   def get_order(%{"number" => number}) do
     %{number: number}
@@ -60,7 +65,7 @@ defmodule AdminApp.OrderContext do
 
     Enum.filter(orders, fn order ->
       Enum.any?(order.packages, fn package ->
-        package.state == "shipped"
+        package.state == "shipped" || package.state == "delivered"
       end)
     end)
   end
@@ -72,7 +77,38 @@ defmodule AdminApp.OrderContext do
         where: order.state == "complete"
       )
 
-    Repo.all(query)
+    load_orders(query)
+  end
+
+  def update_cod_payment(order, state) do
+    order = Repo.preload(order, :payments)
+
+    cod_payment =
+      Enum.find(order.payments, fn payment ->
+        payment.payment_type == PaymentMethodCode.cash_on_delivery()
+      end)
+
+    Payment.update(cod_payment, %{state: state})
+  end
+
+  def state_transition(_state = "complete", order) do
+    order
+    |> Context.new()
+    |> DefaultMachine.complete_order()
+    |> transition_response()
+  end
+
+  defp transition_response(%Context{errors: nil}) do
+    {:ok, "Order moved to Completed"}
+  end
+
+  defp transition_response(%Context{errors: errors}) do
+    errors =
+      Enum.reduce(errors, "", fn {:error, message}, acc ->
+        acc <> " " <> message
+      end)
+
+    {:error, errors}
   end
 
   defp query_confirmed_orders() do
