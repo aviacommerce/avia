@@ -6,6 +6,7 @@ import ProductProduct_categoryView from './product/product_category';
 import ProductEditView from './product/edit';
 import OrderIndexView from './order/index';
 import ZoneNewView from './zone/new';
+import ProductIndexView from './product/index';
 
 // Collection of specific view modules
 const views = {
@@ -14,6 +15,7 @@ const views = {
   Payment_methodNewView,
   ProductProduct_categoryView,
   ProductEditView,
+  ProductIndexView,
   OrderIndexView,
   ZoneNewView
 };

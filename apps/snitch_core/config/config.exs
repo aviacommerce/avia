@@ -20,4 +20,8 @@ config :ex_aws,
 
 config :snitch_core, Snitch.Tools.Mailer, adapter: Bamboo.SendGridAdapter
 
+config :snitch_core, Rummage.Ecto,
+  default_repo: Snitch.Repo,
+  default_per_page: 2
+
 import_config "#{Mix.env()}.exs"
