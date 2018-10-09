@@ -3,6 +3,7 @@ defmodule Snitch.Data.Schema.Order do
   Models an Order
   """
 
+  use Rummage.Ecto
   use Snitch.Data.Schema
 
   alias Ecto.Nanoid
