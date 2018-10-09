@@ -4,6 +4,7 @@ defmodule Snitch.Data.Schema.Product do
   """
 
   use Snitch.Data.Schema
+  use Rummage.Ecto
   alias Snitch.Data.Schema.Product.NameSlug
   alias Snitch.Repo
 
@@ -43,6 +44,7 @@ defmodule Snitch.Data.Schema.Product do
     field(:position, :integer)
     field(:weight, :decimal, default: Decimal.new(0))
     field(:is_active, :boolean, default: true)
+    field(:state, :string, default: "draft")
     timestamps()
 
     has_many(:variations, Variation, foreign_key: :parent_product_id, on_replace: :delete)
@@ -68,7 +70,7 @@ defmodule Snitch.Data.Schema.Product do
   end
 
   @required_fields ~w(name selling_price max_retail_price taxon_id shipping_category_id)a
-  @optional_fields ~w(description meta_description meta_keywords meta_title brand_id height width depth weight)a
+  @optional_fields ~w(description meta_description meta_keywords meta_title brand_id height width depth weight state)a
 
   def create_changeset(model, params \\ %{}) do
     common_changeset(model, params)

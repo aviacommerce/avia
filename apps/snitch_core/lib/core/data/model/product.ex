@@ -3,6 +3,7 @@ defmodule Snitch.Data.Model.Product do
   Product API
   """
   use Snitch.Data.Model
+  use Rummage.Ecto
 
   import Ecto.Query
   alias Ecto.Multi
@@ -38,6 +39,36 @@ defmodule Snitch.Data.Model.Product do
     query = from(p in Product, where: p.is_active == true and p.id not in ^child_product_ids)
     Repo.all(query)
   end
+
+  def get_rummage_product_list(rummage_opts) do
+    opts =
+      if rummage_opts do
+        convert_to_atom_map(rummage_opts)
+      else
+        Map.new()
+      end
+
+    {query, _rummage} = Product.rummage(opts)
+
+    child_product_ids = from(c in Variation, select: c.child_product_id) |> Repo.all()
+
+    query = from(p in query, where: p.is_active == true and p.id not in ^child_product_ids)
+
+    query
+    |> Ecto.Queryable.to_query()
+    |> Repo.all()
+  end
+
+  defp convert_to_atom_map(map), do: to_atom_map("", map)
+
+  defp to_atom_map(_key, map) when is_map(map),
+    do: Map.new(map, fn {k, v} -> {String.to_atom(k), to_atom_map(k, v)} end)
+
+  defp to_atom_map(k, v) when is_bitstring(v) and k == "search_term", do: v
+
+  defp to_atom_map(_k, v) when is_bitstring(v), do: v |> String.to_atom()
+
+  defp to_atom_map(_k, v), do: v
 
   @doc """
   Create a Product with supplied params

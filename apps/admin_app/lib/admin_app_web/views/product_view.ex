@@ -7,6 +7,9 @@ defmodule AdminAppWeb.ProductView do
 
   @currencies ["USD", "INR"]
   @dummy_image_url "/images/empty-img.png"
+  @search_keys ["rummage", "search", "state", "search_term"]
+  @sort_field_keys ["rummage", "sort", "field"]
+  @sort_order_keys ["rummage", "sort", "order"]
 
   def themes_options(product) do
     Enum.map(product.taxon.variation_themes, fn theme -> {theme.name, theme.id} end)
@@ -111,5 +114,72 @@ defmodule AdminAppWeb.ProductView do
     |> order_by([sc], asc: sc.name)
     |> Ecto.Query.select([sc], {sc.name, sc.id})
     |> Repo.all()
+  end
+
+  def make_search_query_string(conn, column, expression, type, term) do
+    query =
+      "&rummage[search][#{column}][search_expr]=#{expression}&rummage[search][#{column}][search_type]=#{
+        type
+      }&rummage[search][#{column}][search_term]=#{term}"
+
+    conn_query =
+      load_query_string(conn, ["rummage", "sort"], ["rummage", "search"])
+      |> Plug.Conn.Query.encode()
+
+    conn.request_path <> "?" <> conn_query <> query
+  end
+
+  def make_sort_query_string(conn, column, order) do
+    query = "&rummage[sort][field]=#{column}&rummage[sort][order]=#{order}"
+
+    conn_query =
+      load_query_string(conn, ["rummage", "search"], ["rummage", "sort"])
+      |> Plug.Conn.Query.encode()
+
+    conn.request_path <> "?" <> conn_query <> query
+  end
+
+  defp load_query_string(conn, get_list, pop_list) do
+    if conn.query_params |> get_in(get_list) do
+      conn.query_params |> pop_in(pop_list) |> elem(1)
+    else
+      Map.new()
+    end
+  end
+
+  def selected_option(
+        conn,
+        option,
+        order,
+        return_string,
+        list1 \\ @sort_field_keys,
+        list2 \\ @sort_order_keys
+      ) do
+    if conn.query_params |> get_val(list1) == option &&
+         conn.query_params |> get_val(list2) == order do
+      " " <> return_string
+    else
+      ""
+    end
+  end
+
+  def selected_radio(conn, option, return_string, list \\ @search_keys) do
+    if conn.query_params |> get_val(list) == option do
+      " " <> return_string
+    else
+      ""
+    end
+  end
+
+  defp map_get(map, key) do
+    map |> Map.get(key, Map.new())
+  end
+
+  defp get_val(map, [head | tail]) do
+    map |> map_get(head) |> get_val(tail)
+  end
+
+  defp get_val(val, []) do
+    val
   end
 end

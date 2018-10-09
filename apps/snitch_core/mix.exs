@@ -91,7 +91,8 @@ defmodule Snitch.Core.Mixfile do
       # unique id generator
       {:nanoid, "~> 1.0.1"},
       {:sentry, "~> 7.0"},
-      {:jason, "~> 1.1"}
+      {:jason, "~> 1.1"},
+      {:rummage_ecto, "~> 2.0.0-rc.0"}
     ]
   end
 

@@ -10,12 +10,25 @@ defmodule AdminAppWeb.ProductController do
 
   plug(:load_resources when action in [:new, :edit])
 
-  def index(conn, _params) do
-    products =
-      ProductModel.get_product_list()
-      |> Repo.preload([:images, [variants: :images]])
+  @rummage_default %{
+    "rummage" => %{
+      "search" => %{
+        "state" => %{"search_expr" => "where", "search_term" => "draft", "search_type" => "eq"}
+      },
+      "sort" => %{"field" => "name", "order" => "asc"}
+    }
+  }
 
-    render(conn, "index.html", products: products)
+  def index(conn, params) do
+    if params["rummage"] do
+      products =
+        ProductModel.get_rummage_product_list(params["rummage"])
+        |> Repo.preload([:images, [variants: :images]])
+
+      render(conn, "index.html", products: products)
+    else
+      redirect_with_updated_conn(conn, @rummage_default)
+    end
   end
 
   def new(conn, _params) do
@@ -44,7 +57,7 @@ defmodule AdminAppWeb.ProductController do
   def update(conn, %{"product" => params}) do
     with %ProductSchema{} = product <- ProductModel.get(params["id"]),
          {:ok, _product} <- ProductModel.update(product, params) do
-      redirect(conn, to: product_path(conn, :index))
+      redirect_with_updated_conn(conn, params)
     end
   end
 
@@ -215,5 +228,14 @@ defmodule AdminAppWeb.ProductController do
     |> assign(:brands, brands)
 
     # |> assign(:prototype, prototype)
+  end
+
+  defp redirect_with_updated_conn(conn, params) do
+    updated_conn =
+      conn
+      |> Map.put(:query_params, params)
+      |> Map.put(:query_string, Plug.Conn.Query.encode(params))
+
+    redirect(updated_conn, to: product_path(updated_conn, :index, params))
   end
 end

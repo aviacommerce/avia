@@ -89,6 +89,7 @@
   "postgrex": {:hex, :postgrex, "0.13.5", "3d931aba29363e1443da167a4b12f06dcd171103c424de15e5f3fc2ba3e6d9c5", [:mix], [{:connection, "~> 1.0", [hex: :connection, repo: "hexpm", optional: false]}, {:db_connection, "~> 1.1", [hex: :db_connection, repo: "hexpm", optional: false]}, {:decimal, "~> 1.0", [hex: :decimal, repo: "hexpm", optional: false]}], "hexpm"},
   "ranch": {:hex, :ranch, "1.3.2", "e4965a144dc9fbe70e5c077c65e73c57165416a901bd02ea899cfd95aa890986", [:rebar3], [], "hexpm"},
   "recase": {:hex, :recase, "0.3.0", "a3a6b2bfc9a1c3047b6f37d49ea52027ea59fd256505254b8e9d63c68d09ab89", [:mix], [], "hexpm"},
+  "rummage_ecto": {:hex, :rummage_ecto, "2.0.0-rc.0", "db7b57a303f98cf5f5326881ecb9349d06ddb3116843e0d4099a40901be27038", [:mix], [{:ecto, "~> 2.2", [hex: :ecto, repo: "hexpm", optional: false]}], "hexpm"},
   "sentry": {:hex, :sentry, "7.0.1", "cf18bfd6df2f5ea7f184d25f1d37fc20b85346ee1ccd28c784412413370e061a", [:mix], [{:hackney, "~> 1.8 or 1.6.5", [hex: :hackney, repo: "hexpm", optional: false]}, {:jason, "~> 1.1", [hex: :jason, repo: "hexpm", optional: true]}, {:phoenix, "~> 1.3", [hex: :phoenix, repo: "hexpm", optional: true]}, {:plug, "~> 1.6", [hex: :plug, repo: "hexpm", optional: true]}], "hexpm"},
   "slugger": {:hex, :slugger, "0.3.0", "efc667ab99eee19a48913ccf3d038b1fb9f165fa4fbf093be898b8099e61b6ed", [:mix], [], "hexpm"},
   "snitch_payments": {:git, "https://github.com/aviacommerce/avia_payments.git", "c91ceccbf01ebb38c796168d624c079dd7d16861", [branch: "develop"]},
