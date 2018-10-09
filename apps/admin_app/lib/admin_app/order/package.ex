@@ -12,7 +12,7 @@ defmodule AdminApp.PackageContext do
 
     case Repo.update_all(query, set: [state: state]) do
       {0, _} ->
-        {:error, "no updates"}
+        {:error, "Update failed"}
 
       _ ->
         {:ok, "updated"}
