@@ -1,5 +1,5 @@
 <p align="center">
-    <img alt="Snitch logo" title="Snitch Logo" src="https://res.cloudinary.com/aviabird/image/upload/v1539065176/aviacommerce/logo/main.png">
+    <img alt="Snitch logo" title="Snitch Logo" src="https://res.cloudinary.com/aviabird/image/upload/h_250/v1539065176/aviacommerce/logo/main.png">
 </p>
 <p align="center">
   <a href="https://travis-ci.com/aviacommerce/avia">
@@ -16,7 +16,7 @@
   </a>
 </p>
 
-# Snitch
+# Avia
 **E-commerce re-invented :zap: in [Elixir][elixir]!**
 > Inspired from [magento][magento], [spree][spree] and [nectar-commerce][nectar]
 
@@ -35,22 +35,20 @@
      cumbersome. Great tooling is the only solution.
 4. First class support for multi-seller/vendor platform.
 
-_You can share feedback and requests [here][feedback]_
+## Documentation
 
-## Contributing
+Documentation for the project can be found on [aviacommerce.org][aviacommerce]. It has developer guides, api specs, advanced guides and much more.
 
-Check out our `CONTRIBUTING.md` to get started and track the project's progress
-on our [pivotal project][pivotal]!
+Give feedback or suggestion to the developer team on [gitter][gitter].
 
-> We regulary update our [Meeting notes][mom] with design decisions that we
-> make. These will turn into wiki pages or help in writing user and developer
-> guides.
+We are also welcoming to the developers who want to contribute in the development. Head over to the [contributing page][contribute] for more info on how can you get started with aviacommerce.
 
 [pivotal]: https://www.pivotaltracker.com/n/projects/2149807
-[mom]: https://docs.google.com/document/d/15aNtYfPDKtdctC6KPLgW1BNN8I6EoBA-Q9KYqymt7gA/edit?usp=sharing
 [elixir]: http://elixir-lang.org/
 [feedback]: https://github.com/aviabird/snitch/issues/66
+[gitter]: https://gitter.im/avia-commerce/support
+[aviacommerce]: https://aviacommerce.org
+[contribute]: https://www.aviacommerce.org/docs/how-to-contribute.html
 
-----
 
-[Logo attribution](http://getdrawings.com/golden-snitch-drawing)
+
