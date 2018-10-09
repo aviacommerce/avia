@@ -26,7 +26,7 @@ defmodule AdminAppWeb.OrderView do
         "1 item"
 
       items ->
-        items <> " items"
+        Integer.to_string(items) <> " items"
     end
   end
 
