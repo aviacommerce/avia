@@ -18,7 +18,8 @@ config :admin_app, AdminAppWeb.Endpoint,
   sendgrid_sender_mail: System.get_env("SENDGRID_SENDER_EMAIL"),
   password_reset_salt: System.get_env("PASSWORD_RESET_SALT"),
   support_url: System.get_env("SUPPORT_URL"),
-  support_email: System.get_env("SUPPORT_EMAIL")
+  support_email: System.get_env("SUPPORT_EMAIL"),
+  docs_url: System.get_env("AVIA_DOCS")
 
 # Configures Elixir's Logger
 config :logger, :console,
