@@ -3,14 +3,12 @@ import MainView from '../main';
 export default class View extends MainView {
     mount() {
       super.mount();
-      console.log('order view mounted');
+      let target_div =  $('.list');
       $('.order-tab .nav-link').on('click', function(e) {
         e.preventDefault();
         $('.order-tab .nav-link').removeClass('active');
         $(this).addClass('active')
-
-        let url = $(this).attr('href');
-        let target_div = $('.list')
+        var url = $(this).attr('href');
         $.ajax({
           url: url,
           type: 'GET',
@@ -19,6 +17,19 @@ export default class View extends MainView {
           }
         })
       })
+      $('.selected-option').on('change', function() {
+        var sort_order = this.value;
+        var url = $(".nav-tabs .active").text().toLowerCase();
+        $.ajax({
+          url: `/orders/${url}`,
+          type: 'GET',
+          data: {sort: sort_order},
+          success: function(data) { 
+            target_div.empty().append(data.html);
+          }
+        })
+      });
+
     }
 
     unmount() {

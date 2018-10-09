@@ -28,12 +28,10 @@
          <form>
             <div class="form-group">
                <label class="label-heading">Sort by</label>
-               <select class="form-control">
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
+               <select class="form-control selected-option">
+                  <option value="null" selected disabled>-- Please select an option --</option>
+                  <option value="desc">Newest</option>
+                  <option value="asc">Oldest</option>
                </select>
             </div>
             <div class="col-sm-12 p-0">
