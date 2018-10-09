@@ -37,8 +37,9 @@ defmodule AdminApp.OrderContext do
     OrderDomain.total_amount(order)
   end
 
-  def order_list("pending") do
-    query = query_confirmed_orders()
+  def order_list("pending", sort_param) do
+    rummage = get_rummage(sort_param)
+    query = query_confirmed_orders(rummage)
     orders = load_orders(query)
 
     Enum.filter(orders, fn order ->
@@ -48,8 +49,9 @@ defmodule AdminApp.OrderContext do
     end)
   end
 
-  def order_list("unshipped") do
-    query = query_confirmed_orders()
+  def order_list("unshipped", sort_param) do
+    rummage = get_rummage(sort_param)
+    query = query_confirmed_orders(rummage)
     orders = load_orders(query)
 
     Enum.filter(orders, fn order ->
@@ -59,8 +61,9 @@ defmodule AdminApp.OrderContext do
     end)
   end
 
-  def order_list("shipped") do
-    query = query_confirmed_orders()
+  def order_list("shipped", sort_param) do
+    rummage = get_rummage(sort_param)
+    query = query_confirmed_orders(rummage)
     orders = load_orders(query)
 
     Enum.filter(orders, fn order ->
@@ -68,16 +71,6 @@ defmodule AdminApp.OrderContext do
         package.state == "shipped" || package.state == "delivered"
       end)
     end)
-  end
-
-  def order_list("complete") do
-    query =
-      from(
-        order in Order,
-        where: order.state == "complete"
-      )
-
-    load_orders(query)
   end
 
   def update_cod_payment(order, state) do
@@ -111,12 +104,30 @@ defmodule AdminApp.OrderContext do
     {:error, errors}
   end
 
-  defp query_confirmed_orders() do
-    from(
-      order in Order,
-      where: order.state == "confirmed",
-      select: order
-    )
+  def order_list("complete", sort_param) do
+    rummage = get_rummage(sort_param)
+    {queryable, _rummage} = Order.rummage(rummage)
+    query = from(p in queryable, where: p.state == "complete")
+    load_orders(query)
+  end
+
+  defp query_confirmed_orders(rummage) do
+    {queryable, _rummage} = Order.rummage(rummage)
+    query = from(p in queryable, where: p.state == "confirmed", select: p)
+  end
+
+  defp get_rummage(sort_param) do
+    case sort_param do
+      nil ->
+        %{}
+
+      _ ->
+        sort_order = String.to_atom(sort_param)
+
+        %{
+          sort: %{field: :inserted_at, order: sort_order}
+        }
+    end
   end
 
   defp load_orders(query) do

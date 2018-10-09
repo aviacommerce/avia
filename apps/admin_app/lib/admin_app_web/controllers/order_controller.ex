@@ -16,7 +16,8 @@ defmodule AdminAppWeb.OrderController do
   @root_path [File.cwd!(), "invoices"] |> Path.join()
 
   def index(conn, %{"category" => category}) do
-    orders = OrderContext.order_list(category)
+    sort_param = conn.query_params["sort"]
+    orders = OrderContext.order_list(category, sort_param)
     token = get_csrf_token()
 
     html =
@@ -34,7 +35,7 @@ defmodule AdminAppWeb.OrderController do
 
   def index(conn, _params) do
     render(conn, "index.html", %{
-      orders: OrderContext.order_list("pending"),
+      orders: OrderContext.order_list("pending", nil),
       token: get_csrf_token()
     })
   end
