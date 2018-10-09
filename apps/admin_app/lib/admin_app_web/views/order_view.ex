@@ -3,6 +3,7 @@ defmodule AdminAppWeb.OrderView do
   alias Snitch.Data.Model.{Country, State}
   alias Snitch.Domain.Order, as: OrderDomain
   alias AdminAppWeb.Helpers
+  alias SnitchPayments.PaymentMethodCode
 
   @bootstrap_contextual_class %{
     "slug" => "light",
@@ -201,6 +202,27 @@ defmodule AdminAppWeb.OrderView do
       order.user.email
     else
       "Guest Order"
+    end
+  end
+
+  def check_for_cod(order) do
+    Enum.any?(order.payments, fn payment ->
+      payment.payment_type == PaymentMethodCode.cash_on_delivery()
+    end)
+  end
+
+  def cod_status(order) do
+    cod_payment =
+      Enum.find(order.payments, fn payment ->
+        payment.payment_type == PaymentMethodCode.cash_on_delivery()
+      end)
+
+    case cod_payment.state do
+      "paid" ->
+        %{display: "Mark as Unpaid", state: "pending"}
+
+      _ ->
+        %{display: "Mark as Paid", state: "paid"}
     end
   end
 

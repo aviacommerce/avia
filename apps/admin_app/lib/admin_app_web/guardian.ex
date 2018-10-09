@@ -29,6 +29,12 @@ defmodule AdminAppWeb.Guardian do
       |> User.get()
       |> Repo.preload(role: [:permissions])
 
-    {:ok, current_user}
+    case current_user do
+      nil ->
+        {:error, "user not found"}
+
+      user ->
+        {:ok, user}
+    end
   end
 end

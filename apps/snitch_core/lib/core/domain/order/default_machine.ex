@@ -105,6 +105,10 @@ defmodule Snitch.Domain.Order.DefaultMachine do
       |> Transitions.send_email_confirmation()
     end)
 
+    event(:complete_order, %{from: [:confirmed], to: :complete}, fn context ->
+      Transitions.check_order_completion(context)
+    end)
+
     event(:captured, %{from: [:processing], to: :rts}, fn context ->
       context
     end)

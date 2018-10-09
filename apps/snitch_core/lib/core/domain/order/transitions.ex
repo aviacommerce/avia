@@ -318,6 +318,38 @@ defmodule Snitch.Domain.Order.Transitions do
 
   def send_email_confirmation(context), do: context
 
+  def check_order_completion(
+        %Context{valid?: true, struct: %Order{} = order, multi: multi} = context
+      ) do
+    context
+    |> order_paid()
+    |> packages_delivered()
+  end
+
+  def check_order_completion(context), do: context
+
+  defp order_paid(%Context{valid?: true, struct: %Order{} = order, multi: multi} = context) do
+    if OrderDomain.payments_total(order, "paid") == OrderDomain.total_amount(order) do
+      context
+    else
+      struct(context, valid?: false, errors: [error: "Payment due for order"])
+    end
+  end
+
+  defp order_paid(context), do: context
+
+  defp packages_delivered(
+         %Context{valid?: true, struct: %Order{} = order, multi: multi} = context
+       ) do
+    if OrderDomain.order_package_delivered?(order) do
+      context
+    else
+      struct(context, valid?: false, errors: [error: "Packages not delivered"])
+    end
+  end
+
+  defp packages_delivered(context), do: context
+
   defp validate_shipping_preferences([], _), do: true
 
   defp validate_shipping_preferences(packages, selection) do

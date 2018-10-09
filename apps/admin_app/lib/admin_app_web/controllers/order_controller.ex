@@ -52,9 +52,10 @@ defmodule AdminAppWeb.OrderController do
   end
 
   def update_package(conn, %{"id" => id, "state" => state}) do
+    order = OrderContext.get_order(%{"id" => id})
+
     case PackageContext.update_packages(state, String.to_integer(id)) do
       {:ok, _} ->
-        order = OrderContext.get_order(%{"id" => id})
         order_total = OrderContext.get_total(order)
 
         conn
@@ -63,13 +64,40 @@ defmodule AdminAppWeb.OrderController do
 
       {:error, _} ->
         put_flash(conn, :error, "update failed!")
-        redirect(conn, to: order_path(conn, :show))
+        redirect(conn, to: order_path(conn, :show, order.number))
     end
   end
 
-  def update_state(conn, %{"id" => id}) do
-    # TODO: complete the function after checking for packages state and
-    # order total
+  def update_state(conn, %{"id" => id, "state" => state}) do
+    order = OrderContext.get_order(%{"id" => id})
+
+    case OrderContext.state_transition(state, order) do
+      {:ok, message} ->
+        conn
+        |> put_flash(:info, message)
+        |> redirect(to: order_path(conn, :show, order.number))
+
+      {:error, message} ->
+        conn
+        |> put_flash(:error, message)
+        |> redirect(to: order_path(conn, :show, order.number))
+    end
+  end
+
+  def cod_payment_update(conn, %{"id" => id, "state" => state}) do
+    order = OrderContext.get_order(%{"id" => id})
+
+    case OrderContext.update_cod_payment(order, state) do
+      {:ok, _} ->
+        conn
+        |> put_flash(:info, "Order Payment marked as #{state}")
+        |> redirect(to: order_path(conn, :show, order.number))
+
+      {:error, _} ->
+        conn
+        |> put_flash(:error, "Update failed!")
+        |> redirect(to: order_path(conn, :show, order.number))
+    end
   end
 
   def create(conn, _params) do

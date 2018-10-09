@@ -43,9 +43,9 @@
       <li>
         <a class="nav-link" href="/variation_themes">Variation Themes</a>
       </li>
-      <li>
+      <!-- <li>
         <a class="nav-link" href="/prototypes">Prototypes</a>
-      </li>
+      </li> -->
       <li>
         <a class="nav-link" href="/product_brands">Product Brands</a>
       </li>

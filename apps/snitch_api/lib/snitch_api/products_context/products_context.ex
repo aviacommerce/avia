@@ -8,7 +8,7 @@ defmodule SnitchApi.ProductsContext do
   import Ecto.Query, only: [from: 2, order_by: 2]
 
   @doc """
-  List out the all products
+  List out all the products
   """
   def list_products(conn, params) do
     query = define_query(params)

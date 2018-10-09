@@ -22,12 +22,12 @@ defmodule AdminAppWeb.PaymentMethodController do
     case PaymentMethod.create(updated_params) do
       {:ok, _} ->
         conn
-        |> put_flash(:info, "Payment Method created!!")
+        |> put_flash(:info, "Payment Method created!")
         |> redirect(to: payment_method_path(conn, :index))
 
       {:error, changeset} ->
         conn
-        |> put_flash(:error, "Sorry there were some errors !!")
+        |> put_flash(:error, "Sorry, there were some errors!")
         |> render("new.html", changeset: %{changeset | action: :insert})
     end
   end
@@ -38,7 +38,7 @@ defmodule AdminAppWeb.PaymentMethodController do
     case PaymentMethod.delete(id) do
       {:ok, _} ->
         conn
-        |> put_flash(:info, "Deleted successfully!!")
+        |> put_flash(:info, "Deleted successfully!")
         |> redirect(to: payment_method_path(conn, :index))
 
       {:error, _} ->
@@ -54,7 +54,7 @@ defmodule AdminAppWeb.PaymentMethodController do
     case payment do
       nil ->
         conn
-        |> put_flash(:error, "Sorry role not found")
+        |> put_flash(:error, "Sorry method not found")
         |> redirect(to: payment_method_path(conn, :index))
 
       payment_method ->
