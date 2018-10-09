@@ -23,7 +23,7 @@
                     <div class="orderon">Ordered <%= format_date(@order.updated_at) %></div>
                     <div class="orderon">Ship to <%= get_country_state(@order) %></div>
                 </div>
-              </div>             
+              </div>
             </div>
          </div>
          <div class="my-3 order-btns">
@@ -75,7 +75,7 @@
                <a class="btn btn-primary float-right " style="width: 100px;" href="/orders/<%= @order.number %>/show-packing-slip">Show</a>
             </div>
          </div>
-         <h3 class="mt-3">Shipping Details afasf</h3>
+         <h3 class="mt-3">Shipping Details</h3>
          <div class="card col-12">
             <div class="row">
                <div class="col-4">
