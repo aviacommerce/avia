@@ -69,7 +69,7 @@
                   <div class="row">
                     <div class="checkbox col-4 pl-4 mt-1">
                       <label>
-                      <input type="checkbox" value="">
+                      <input type="checkbox" value= <%="#{item.id}" %> id=<%="product_#{item.id}" %> >
                       <span class="cr"><i class="cr-icon fa fa-check"></i></span>
                       </label>
                     </div>
@@ -82,7 +82,12 @@
                       </a>
                       <div class="dropdown-menu dropdown-menu-right">
                         <%= link("Edit", to: product_path(@conn, :edit, item.id), class: "dropdown-item") %>
-                        <%= link("Delete", to: product_path(@conn, :delete, item.id), method: :delete, data: [confirm: "Are you sure?"], class: "dropdown-item") %>
+                        <%= if item.state in ["in_active", "draft"] do %>
+                          <%= link("Activate", to: product_path(@conn, :update, item.id, "product": @conn.query_params |> Map.take(["rummage", "id"]) |> Map.merge(%{"state": "active", "id": item.id})), method: :patch, class: "dropdown-item")%>
+                        <% else %>
+                          <%= link("Deactivate", to: product_path(@conn, :update, item.id, "product": @conn.query_params |> Map.take(["rummage", "id"]) |> Map.merge(%{"state": "in_active", "id": item.id})), method: :patch, class: "dropdown-item")%>
+                        <% end %>
+                        <%= link("Delete", to: product_path(@conn, :delete, item.id, @conn.query_params), method: :delete, data: [confirm: "Are you sure?"], class: "dropdown-item") %>
                       </div>
                     </div>
                     <div class="clearfix"></div>
@@ -93,20 +98,20 @@
             <div class="panel-collapse collapse" id="<%= item.id %>">
               <div class="panel-body" style="margin-right: 1rem">
                 <%= for variant <- item.variants do %>
-                <div class="d-flex flex-row align-items-center" style="border: 1px solid #ddd; border-radius: 2px">
-                  <div class="p-2">
-                    <img src="/images/empty-img.png" height="100px" >
-                    <a href="#"><%= variant.name %></a>
+                  <div class="d-flex flex-row align-items-center" style="border: 1px solid #ddd; border-radius: 2px">
+                    <div class="p-2">
+                      <img src="/images/empty-img.png" height="100px" >
+                      <a href="#"><%= variant.name %></a>
+                    </div>
+                    <div class="p-2" style="margin-left: auto">
+                      <%= link("Edit", to: product_path(@conn, :edit, variant.id, "prototype_id": 1), class: "btn btn-primary")%>
+                    </div>
                   </div>
-                  <div class="p-2" style="margin-left: auto">
-                    <%= link("Edit", to: product_path(@conn, :edit, variant.id, "prototype_id": 1), class: "btn btn-primary")%>
-                  </div>
-                </div>
-                <%= end %>
+                <% end %>
               </div>
             </div>
           </div>
-          <%= end %>
+          <% end %>
         </div>
       </div>
     </div>
@@ -115,28 +120,42 @@
       <form>
         <div class="form-group mt-3">
           <label>Sort</label>
-          <select class="form-control">
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5</option>
+          <select class="form-control" id="product-sort-select">
+            <option value=<%= (@conn |> make_sort_query_string("name", "asc"))%><%= selected_option(@conn, "name", "asc", "selected") %> >
+              Name: A to Z
+            </option>
+            <option value=<%= (@conn |> make_sort_query_string("name", "desc"))%><%= selected_option(@conn, "name", "desc", "selected") %> >
+              Name: Z to A
+            </option>
+            <option value=<%= (@conn |> make_sort_query_string("updated_at", "desc"))%><%= selected_option(@conn, "updated_at", "desc", "selected") %> >
+              Updated: latest to oldest
+            </option>
+            <option value=<%= (@conn |> make_sort_query_string("updated_at", "asc"))%><%= selected_option(@conn, "updated_at", "asc", "selected") %> >
+              Updated: oldest to latest
+            </option>
           </select>
         </div>
         <div class="col-sm-12 p-0">
           <label>Listing status</label>
           <div class="radio">
             <label>
-            <input type="radio" name="o3" value="">
-            <span class="cr"><i class="cr-icon fa fa-circle"></i></span>
-            Option1
+                <input type="radio" id="product-listing-draft" name="o3" value=<%= @conn |> make_search_query_string("state", "where", "eq", "draft") %> id="product-listing-draft-radio" <%= selected_radio(@conn, "draft", "checked") %>>
+                <span class="cr"><i class="cr-icon fa fa-circle"></i></span>
+                Draft
             </label>
           </div>
           <div class="radio">
             <label>
-            <input type="radio" name="o3" value="" checked>
-            <span class="cr"><i class="cr-icon fa fa-circle"></i></span>
-            Option2
+                <input type="radio" id="product-listing-active" name="o3" value=<%= @conn |> make_search_query_string("state", "where", "eq", "active") %> id="product-listing-active" <%= selected_radio(@conn, "active", "checked") %>>
+                <span class="cr"><i class="cr-icon fa fa-circle"></i></span>
+                Active
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+                <input type="radio" id="product-listing-inactive" name="o3" value=<%= @conn |> make_search_query_string("state", "where", "eq", "in_active") %> id="product-listing-inactive" <%= selected_radio(@conn, "in_active", "checked") %>>
+                <span class="cr"><i class="cr-icon fa fa-circle"></i></span>
+                In-Active
             </label>
           </div>
         </div>
