@@ -49,6 +49,20 @@ defmodule SnitchApi.ProductsContext do
       )
   end
 
+  def product_by_taxon(taxon_id) do
+    query = from(p in Product, where: p.taxon_id == ^taxon_id and p.is_active == true)
+
+    review_query = from(c in Review, limit: 5, preload: [rating_option_vote: :rating_option])
+
+    Repo.all(query)
+    |> Repo.preload(
+      reviews: review_query,
+      variants: [:images, options: :option_type, theme: [:option_types]],
+      theme: [:option_types],
+      options: :option_type
+    )
+  end
+
   @doc """
   Creates the page. The page comprises all the related pagination links
   """
