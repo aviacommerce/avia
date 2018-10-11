@@ -108,9 +108,13 @@ defmodule Snitch.Domain.Taxonomy do
   end
 
   def delete_taxonomy(id) do
-    id
-    |> get_taxonomy_by_id
-    |> Repo.delete()
+    try do
+      id
+      |> get_taxonomy_by_id
+      |> Repo.delete()
+    rescue
+      e in Ecto.ConstraintError -> {:error, e.message}
+    end
   end
 
   @spec get_all_taxonomy :: [map()]
