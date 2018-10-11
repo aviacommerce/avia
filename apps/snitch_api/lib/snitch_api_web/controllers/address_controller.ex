@@ -35,9 +35,12 @@ defmodule SnitchApiWeb.AddressController do
     render(conn, "show.json-api", address: address)
   end
 
-  def update(conn, %{"id" => id, "address" => address_params}) do
-    address = Checkout.get_address!(id)
-    address_params = JaSerializer.Params.to_attributes(address_params)
+  def update(conn, address_params) do
+    id = address_params["id"]
+
+    address =
+      Checkout.get_address!(id)
+      |> Repo.preload([:country, :state])
 
     with {:ok, %Address{} = address} <- Checkout.update_address(address, address_params) do
       render(conn, "show.json-api", address: address)
