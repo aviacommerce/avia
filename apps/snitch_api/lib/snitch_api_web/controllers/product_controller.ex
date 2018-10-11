@@ -71,13 +71,19 @@ defmodule SnitchApiWeb.ProductController do
   end
 
   def show(conn, %{"product_slug" => slug} = params) do
-    product = Context.product_by_slug!(slug)
+    case Context.product_by_slug(slug) do
+      {:error, :not_found} ->
+        conn
+        |> put_status(:not_found)
+        |> render(SnitchApiWeb.ErrorView, :"404")
 
-    render(
-      conn,
-      "show.json-api",
-      data: product,
-      opts: [include: @include]
-    )
+      {:ok, product} ->
+        render(
+          conn,
+          "show.json-api",
+          data: product,
+          opts: [include: @include]
+        )
+    end
   end
 end

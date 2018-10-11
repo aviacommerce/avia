@@ -63,9 +63,9 @@ defmodule AdminAppWeb.TaxonomyController do
         |> put_flash(:info, "Taxonomy deleted successfully")
         |> redirect(to: taxonomy_path(conn, :index))
 
-      {:error, changeset} ->
+      {:error, _message} ->
         conn
-        |> put_flash(:error, "Taxonomy not deleted. Please try again")
+        |> put_flash(:error, "Taxonomy with associated products cannot be deleted")
         |> redirect(to: taxonomy_path(conn, :index))
     end
   end
