@@ -37,9 +37,7 @@ defmodule AdminAppWeb.GeneralSettingsController do
         handle_nil_response(conn)
 
       _ ->
-        map =
-          general_configuration
-          |> Map.from_struct()
+        map = Map.replace!(Map.from_struct(general_configuration), :sendgrid_api_key, nil)
 
         changeset = GCModel.build_general_configuration(map)
 
