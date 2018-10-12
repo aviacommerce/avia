@@ -31,10 +31,6 @@
         <td><%= @general_configuration.sender_mail %></td>
       </tr> 
       <tr>
-        <td><b>SENDGRID_API_KEY</b></td> 
-        <td><%= @general_configuration.sendgrid_api_key %></td>
-      </tr> 
-      <tr>
         <td><b>CURRENCY</b></td> 
         <td><%= @general_configuration.currency %></td>
       </tr>
