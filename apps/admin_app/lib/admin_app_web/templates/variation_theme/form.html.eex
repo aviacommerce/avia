@@ -1,9 +1,9 @@
 <%= form_for @changeset, @action, fn f ->  %>
   <div class="form-group row ">
-  <%= input f, :name, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
+  <%= input f, :name, nil, is_horizontal: true, description: "Choose a name for the theme." %>
 </div>
   <div class="form-group row ">
-  <%= multi_select f, :option_type_ids, get_option_types(@option_types), nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
+  <%= multi_select f, :option_type_ids, get_option_types(@option_types), "Option Types", is_horizontal: true, description: "Select all the option types which make up the theme." %>
 </div>
 <div class="form-group row stickformbutton">
   <div class="col-sm-10">

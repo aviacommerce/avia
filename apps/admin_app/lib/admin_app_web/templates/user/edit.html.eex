@@ -2,7 +2,7 @@
 <div class="list-container">
   <div class="pt-3 pb-0 pr-3 pl-3 back"> <img src="/images/left-arrow.svg"
    width="20" height="20" class="d-inline-block align-top" alt="">
-   <a href="/prototypes">user</a> </div>
+   <a href="/users">Back</a> </div>
   <h4 class="p-3 m-0">Edit a User</h4>
   <div class="col-12">
     <div class="card col-12">
