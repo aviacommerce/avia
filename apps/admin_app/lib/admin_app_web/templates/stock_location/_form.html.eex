@@ -1,40 +1,40 @@
 <%= form_for @changeset, @action, fn f -> %>
 <div class="form-group row ">
-  <%= input f, :name, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
+  <%= input f, :name, nil, description: "Name to identify your stock location.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <%= input f, :admin_name, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
+  <%= input f, :admin_name, nil, description: "Name to identify stock location within your system.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <%= textarea_input f, :address_line_1, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
+  <%= textarea_input f, :address_line_1, nil, description: "Eg. 319, Amanora chambers", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <%= textarea_input f, :address_line_2, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
+  <%= textarea_input f, :address_line_2, nil, description: "Eg. Amanora mall Magarpatta.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <%= input f, :city, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
+  <%= input f, :city, nil, description: "Eg. Pune.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <%= input f, :zip_code, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
+  <%= input f, :zip_code, nil, description: "Eg. 411014.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <%= input f, :phone, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
+  <%= input f, :phone, nil, description: "Eg. XXXXXXXXXX", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <%= select_input f, :country_id, formatted_list(:country), nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
+  <%= select_input f, :country_id, formatted_list(:country), nil, description: "Eg. India", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <%= select_input f, :state_id, formatted_list(:state), nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
+  <%= select_input f, :state_id, formatted_list(:state), nil, description: "Eg. Maharashtra.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <%= checkbox_input f, :active, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
+  <%= checkbox_input f, :active, nil, description: "Toggle to change the status of stock location to active.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <%= checkbox_input f, :backorderable_default, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
+  <%= checkbox_input f, :backorderable_default, nil, description: "Switching it on will enable back order from this stock location.", is_horizontal: true %>
 </div>
-<div class="form-group row ">
+<!--<div class="form-group row ">
   <%= checkbox_input f, :propagate_all_variants, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
-</div>
+</div>-->
 <div class="form-group row stickformbutton">
   <div class="col-sm-10">
     <%= button("Cancel", to: stock_location_path(@conn, :index), method: "get",

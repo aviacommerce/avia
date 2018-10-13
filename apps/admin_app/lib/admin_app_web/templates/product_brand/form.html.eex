@@ -1,13 +1,13 @@
 <%= form_for @changeset, @action,[multipart: true], fn f ->  %>
 <div class="form-group row ">
-  <%= input f, :name, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
+  <%= input f, :name, nil, is_horizontal: true, description: "Product brand name." %>
 </div>
 <div class="form-group row ">
   <label for="inputEmail3" class="col-sm-3 col-form-label">
     <div class="label">
       Image
     </div>
-    <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+    <div class="label-txt">Select appropriate image for the brand.</div>
   </label>
   <div class="col-sm-9">           
     <%= file_input f, :image, class: "form-control" %>

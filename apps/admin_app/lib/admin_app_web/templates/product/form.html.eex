@@ -24,17 +24,18 @@
     <%= hidden_input :taxon_id, :taxon_id, value: get_taxon(@conn), name: "product[taxon_id]" %>
     <% end %>
     <div class="form-group row ">
-      <%= input f, :name, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
+      <%= input f, :name, "Title", is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
     </div>
     <div class="form-group row ">
-      <%= textarea_input f, :description, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
+      <%= textarea_input f, :description, nil, is_horizontal: true, description: "
+        Start with a brief overview that describes your item's finest features.List details like dimensions and key features in easy-to-read bullet points.Tell buyers a bit about your process or the story behind this item.", rows: "10" %>
     </div>
     <div class="form-group row ">
       <label  class="col-sm-3 col-form-label">
         <div class="label">
           Selling Price
         </div>
-        <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+        <div class="label-txt">The price at which product is being currently sold(After any promotional discounts).</div>
       </label>
       <div class="col-sm-9 input-group">
         <%= text_input :selling_price, :amount, value: get_amount(f.data.selling_price), class: "form-control", name: "product[selling_price][amount]" %>
@@ -48,7 +49,7 @@
         <div class="label">
           Maximum Retail Price
         </div>
-        <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+        <div class="label-txt">The original cost of the product.</div>
       </label>
       <div class="col-sm-9 input-group">
         <%= text_input :max_retail_price, :amount, value: get_amount(f.data.max_retail_price), class: "form-control", name: "product[max_retail_price][amount]" %>
@@ -58,31 +59,31 @@
       </div>
     </div>
     <div class="form-group row ">
-      <%= select_input f, :shipping_category_id, get_shipping_category(), nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
+      <%= select_input f, :shipping_category_id, get_shipping_category(), nil, is_horizontal: true, description: "Select appropriate shipping method for the product eg. Heavy for Washing Machine, Light for T-shirt." %>
     </div>
     <div class="form-group row ">
-      <%= textarea_input f, :meta_description, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
+      <%= select_input f, :brand_id, get_brand_options(@brands), nil, is_horizontal: true, description: "Select branch of the product Eg. Levi's." %>
     </div>
     <div class="form-group row ">
-      <%= select_input f, :brand_id, get_brand_options(@brands), nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
+      <%= input f, :meta_title_, nil, is_horizontal: true, description: "A short title which helps improve the SEO of the product." %>
     </div>
     <div class="form-group row ">
-      <%= input f, :meta_keywords, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
+      <%= textarea_input f, :meta_description, nil, is_horizontal: true, description: "Meta description is the short text which helps to improve SEO of the product." %>
     </div>
     <div class="form-group row ">
-      <%= input f, :meta_title_, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
+      <%= input f, :meta_keywords, nil, is_horizontal: true, description: "Meta keywords are tags which helps to improve SEO of the product." %>
     </div>
     <div class="form-group row ">
-      <%= input f, :height, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
+      <%= input f, :height, nil, is_horizontal: true, description: "Specifies height of the product." %>
     </div>
     <div class="form-group row ">
-      <%= input f, :width, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
+      <%= input f, :width, nil, is_horizontal: true, description: "Specifies width of the product." %>
     </div>
     <div class="form-group row ">
-      <%= input f, :depth, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
+      <%= input f, :depth, nil, is_horizontal: true, description: "Specifies depth of the product." %>
     </div>
     <div class="form-group row ">
-      <%= input f, :weight, nil, is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
+      <%= input f, :weight, nil, is_horizontal: true, description: "Specifies weight of the product." %>
     </div>
     <div class="form-group row stickformbutton">
       <div class="col-sm-10">

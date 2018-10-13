@@ -13,7 +13,7 @@ defmodule AdminAppWeb.ProductController do
   @rummage_default %{
     "rummage" => %{
       "search" => %{
-        "state" => %{"search_expr" => "where", "search_term" => "draft", "search_type" => "eq"}
+        "state" => %{"search_expr" => "where", "search_term" => "active", "search_type" => "eq"}
       },
       "sort" => %{"field" => "name", "order" => "asc"}
     }

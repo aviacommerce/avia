@@ -5,21 +5,16 @@
       <img src="/images/shop_manager.001.svg" width="32" height="32" class="d-inline-block align-top" alt="">
       <span>Shop Manager</span>
       </a>
-      <div class="dropdown-menu shopdpdown">
+      <!--<div class="dropdown-menu shopdpdown">
         <a class="dropdown-item" href="#">Action</a>
         <a class="dropdown-item" href="#">Another action</a>
         <a class="dropdown-item" href="#">Something else here</a>
-      </div>
+      </div>-->
     </div>
   </li>
   <li>
     <a class="nav-link" href="/orders">
     <i class="fa fa-clipboard-list" aria-hidden="true"></i> <span> Orders</span>
-    </a>
-  </li>
-  <li>
-    <a class="nav-link" href="#">
-    <i class="fa fa-exchange-alt" aria-hidden="true"></i> <span> Returns</span>
     </a>
   </li>
   <li>
@@ -51,11 +46,6 @@
     </ul>
   </li>
   <li>
-    <a class="nav-link" href="#">
-    <i class="fa fa-chart-bar" aria-hidden="true"></i>  <span> Reports</span>
-    </a>
-  </li>
-  <li>
     <a class="nav-link" href="/users">
     <i class="fa fa-users" aria-hidden="true"></i>  <span> Users</span>
     </a>
@@ -75,13 +65,7 @@
         </li>
       <% end %>
       <li>
-        <a class="nav-link" href="#">Stock Items</a>
-      </li>
-      <li>
         <a class="nav-link" href="/stock_locations">Stock Locations</a>
-      </li>
-      <li>
-        <a class="nav-link" href="#">Stock Movements</a>
       </li>
       <li>
         <a class="nav-link" href="/roles">Roles</a>
@@ -109,8 +93,9 @@
         </span>
         </a>
         <div class="dropdown-menu p-0 ">
-          <a class="dropdown-item" href="#">Back to store</a>
-          <a class="dropdown-item" href="#">Account</a><%= link("LogOut", to: session_path(@conn, :new), method: :delete, class: "dropdown-item")%>
+          <!--<a class="dropdown-item" href="#">Back to store</a>
+          <a class="dropdown-item" href="#">Account</a>-->
+          <%= link("LogOut", to: session_path(@conn, :new), method: :delete, class: "dropdown-item")%>
         </div>
       </li>
       <li>
