@@ -47,7 +47,10 @@ defmodule Snitch.Data.Model.Product do
         Map.new()
       end
 
-    {query, _rummage} = Product.rummage(opts)
+    {query, _rummage} =
+      from(p in Product)
+      |> Map.put(:prefix, Repo.get_prefix())
+      |> Rummage.Ecto.rummage(opts)
 
     child_product_ids = from(c in Variation, select: c.child_product_id) |> Repo.all()
 
