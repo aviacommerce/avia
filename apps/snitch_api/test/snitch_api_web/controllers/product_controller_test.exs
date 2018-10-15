@@ -4,7 +4,7 @@ defmodule SnitchApiWeb.ProductControllerTest do
   import Snitch.Factory
 
   alias Snitch.Data.Schema.Product
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   setup %{conn: conn} do
     conn =

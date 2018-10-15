@@ -9,10 +9,10 @@ defmodule Core.Repo.Migrations.CreateOrdersTable do
       add :confirmed?, :boolean, default: false
 
       # various prices and totals
-      add :total, :money_with_currency, null: false
-      add :item_total, :money_with_currency, null: false
-      add :adjustment_total, :money_with_currency, null: false
-      add :promo_total, :money_with_currency, null: false
+      add :total, String.to_atom("#{prefix()||"public"}.money_with_currency"), null: false
+      add :item_total, String.to_atom("#{prefix()||"public"}.money_with_currency"), null: false
+      add :adjustment_total, String.to_atom("#{prefix()||"public"}.money_with_currency"), null: false
+      add :promo_total, String.to_atom("#{prefix()||"public"}.money_with_currency"), null: false
       timestamps()
     end
   end

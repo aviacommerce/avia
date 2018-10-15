@@ -2,7 +2,7 @@ defmodule SnitchApiWeb.ProductController do
   use SnitchApiWeb, :controller
 
   alias Snitch.Data.Model.{Product, ProductReview}
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias SnitchApi.ProductsContext, as: Context
 
   plug(SnitchApiWeb.Plug.DataToAttributes)

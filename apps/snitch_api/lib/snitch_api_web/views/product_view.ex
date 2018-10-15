@@ -2,6 +2,7 @@ defmodule SnitchApiWeb.ProductView do
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
   alias Snitch.Data.Model.{Product, ProductReview}
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   location("/products/:slug")
 
@@ -32,7 +33,7 @@ defmodule SnitchApiWeb.ProductView do
   end
 
   def images(product, _conn) do
-    product = product |> Snitch.Repo.preload(:images)
+    product = product |> Repo.preload(:images)
 
     product.images
     |> Enum.map(fn image -> %{"product_url" => Product.image_url(image.name, product)} end)

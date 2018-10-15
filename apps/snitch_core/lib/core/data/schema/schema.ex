@@ -8,6 +8,7 @@ defmodule Snitch.Data.Schema do
       use Ecto.Schema
       import Ecto.Changeset
       import Snitch.Tools.Validations
+      alias Snitch.Core.Tools.MultiTenancy.Repo
     end
   end
 end

@@ -8,11 +8,11 @@ defmodule Snitch.Repo.Migrations.CreatePackagesTable do
       add :shipped_at, :utc_datetime
       add :tracking, :map
       add :shipping_methods, :jsonb, default: "[]"
-      add :cost, :money_with_currency
-      add :total, :money_with_currency
-      add :tax_total, :money_with_currency
-      add :adjustment_total, :money_with_currency
-      add :promo_total, :money_with_currency
+      add :cost, String.to_atom("#{prefix()||"public"}.money_with_currency")
+      add :total, String.to_atom("#{prefix()||"public"}.money_with_currency")
+      add :tax_total, String.to_atom("#{prefix()||"public"}.money_with_currency")
+      add :adjustment_total, String.to_atom("#{prefix()||"public"}.money_with_currency")
+      add :promo_total, String.to_atom("#{prefix()||"public"}.money_with_currency")
 
       add :order_id, references("snitch_orders", on_delete: :nothing), null: false
       add :origin_id, references("snitch_stock_locations", on_delete: :nothing), null: false

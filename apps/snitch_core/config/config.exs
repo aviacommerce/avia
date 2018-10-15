@@ -24,4 +24,9 @@ config :snitch_core, Rummage.Ecto,
   default_repo: Snitch.Repo,
   default_per_page: 2
 
+config :triplex,
+  repo: Snitch.Repo,
+  reserved_tenants: ["www", "api", "demo", "admin"],
+  migrations_path: "migrations"
+
 import_config "#{Mix.env()}.exs"

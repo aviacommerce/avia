@@ -22,10 +22,11 @@ defmodule Snitch.Domain.ShipmentEngine do
   [csp]: https://en.wikipedia.org/wiki/Constraint_Satisfaction_Problem
   """
 
+  use Snitch.Domain
+
   alias Aruspex.Problem
   alias Aruspex.Strategy.SimulatedAnnealing
   alias Snitch.Data.Schema.Order
-  alias Snitch.Repo
 
   @domain [true, false]
 

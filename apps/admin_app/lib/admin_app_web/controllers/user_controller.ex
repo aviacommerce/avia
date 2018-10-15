@@ -3,7 +3,7 @@ defmodule AdminAppWeb.UserController do
   alias Snitch.Data.Schema.User
   alias Snitch.Data.Model.User, as: UserModel
   alias Snitch.Domain.Account
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def index(conn, _params) do
     users = UserModel.get_all()

@@ -3,7 +3,7 @@ defmodule Snitch.Seed.ProductRating do
   Seed file for product rating and rating options.
   """
 
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.Rating
   alias Snitch.Data.Schema.RatingOption
 

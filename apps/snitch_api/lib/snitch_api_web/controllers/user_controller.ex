@@ -4,7 +4,7 @@ defmodule SnitchApiWeb.UserController do
   alias Snitch.Data.Schema.User
   alias SnitchApi.Accounts
   alias SnitchApi.Guardian
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Model.User, as: UserModel
 
   plug(SnitchApiWeb.Plug.DataToAttributes)

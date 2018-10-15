@@ -2,6 +2,8 @@ defmodule SnitchApiWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :snitch_api
   use Sentry.Phoenix.Endpoint
 
+  alias Snitch.Core.Tools.MultiTenancy
+
   socket("/socket", SnitchApiWeb.UserSocket)
 
   # Serve at "/" the static files from "priv/static" directory.
@@ -43,6 +45,11 @@ defmodule SnitchApiWeb.Endpoint do
     store: :cookie,
     key: "_snitch_api_key",
     signing_salt: "39wcx/Xj"
+  )
+
+  plug(
+    MultiTenancy.Plug,
+    endpoint: __MODULE__
   )
 
   plug(ApiWeb.CORS)

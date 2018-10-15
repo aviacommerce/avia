@@ -86,7 +86,7 @@ defmodule Snitch.Data.Model.LineItem do
   ```
 
   ```
-  iex> product = Snitch.Repo.one(Snitch.Data.Schema.Product)
+  iex> product = Snitch.Core.Tools.MultiTenancy.Repo.one(Snitch.Data.Schema.Product)
   iex> product.selling_price
   #Money<:USD, 12.99000000>
   iex> [priced_item] = Model.LineItem.update_unit_price(

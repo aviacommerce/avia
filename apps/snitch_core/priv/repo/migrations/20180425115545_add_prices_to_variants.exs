@@ -7,8 +7,8 @@ defmodule Snitch.Repo.Migrations.AddPricesToVariants do
   def change do
     alter table(:snitch_variants) do
       remove :is_master
-      add :selling_price, :money_with_currency, null: false
-      modify :cost_price, :money_with_currency, null: false
+      add :selling_price, String.to_atom("#{prefix()||"public"}.money_with_currency"), null: false
+      modify :cost_price, String.to_atom("#{prefix()||"public"}.money_with_currency"), null: false
       modify :sku, :string, null: false
       modify :weight, :decimal, precision: 8, scale: 2
     end

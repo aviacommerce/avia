@@ -2,6 +2,7 @@ defmodule SnitchApiWeb.OrderView do
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
   alias Snitch.Domain.Order
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   location("/orders/:id")
 
@@ -49,7 +50,7 @@ defmodule SnitchApiWeb.OrderView do
 
   def line_items(struct, _conn) do
     struct
-    |> Snitch.Repo.preload(:line_items)
+    |> Repo.preload(:line_items)
     |> Map.get(:line_items)
   end
 

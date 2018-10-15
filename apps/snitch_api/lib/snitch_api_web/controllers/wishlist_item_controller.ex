@@ -2,7 +2,7 @@ defmodule SnitchApiWeb.WishListItemController do
   use SnitchApiWeb, :controller
 
   alias Snitch.Data.Model.WishListItem
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   plug(SnitchApiWeb.Plug.DataToAttributes)
   # plug(SnitchApiWeb.Plug.LoadUser)

@@ -2,7 +2,7 @@ defmodule SnitchApiWeb.OrderControllerTest do
   use SnitchApiWeb.ConnCase, async: true
   import Snitch.Factory
   alias Snitch.Data.Model.Order, as: OrderModel
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias SnitchApi.Accounts
   alias SnitchApi.{Accounts, Guardian}
 

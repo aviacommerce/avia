@@ -2,7 +2,7 @@ defmodule AdminAppWeb.RoleController do
   use AdminAppWeb, :controller
   alias Snitch.Data.Model.Role
   alias Snitch.Data.Schema.Role, as: RoleSchema
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def index(conn, _params) do
     roles = Role.get_all()

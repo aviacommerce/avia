@@ -4,7 +4,7 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
   alias Snitch.Domain.Taxonomy
   alias AdminAppWeb.TemplateApi.TaxonomyView
   alias Snitch.Data.Schema.Taxon
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   import Phoenix.View, only: [render_to_string: 3]
 
   def index(conn, %{"taxon_id" => taxon_id}) do

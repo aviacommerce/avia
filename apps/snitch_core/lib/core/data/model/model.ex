@@ -6,7 +6,7 @@ defmodule Snitch.Data.Model do
   defmacro __using__(_) do
     quote do
       import Ecto.Query
-      alias Snitch.Repo
+      alias Snitch.Core.Tools.MultiTenancy.Repo
       alias Snitch.Tools
       alias Tools.Helper.Query, as: QH
     end

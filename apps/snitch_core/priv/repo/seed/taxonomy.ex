@@ -4,7 +4,7 @@ defmodule Snitch.Seed.Taxonomy do
   """
 
   alias Snitch.Data.Schema.Taxonomy
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Tools.Helper.Taxonomy, as: TaxonomyHelper
 
   @product_category {

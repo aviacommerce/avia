@@ -14,6 +14,7 @@ defmodule Snitch.Data.Model.CardPayment do
   alias Snitch.Data.Schema.{CardPayment, Payment}
   alias Snitch.Data.Model.Payment, as: PaymentModel
   alias Snitch.Data.Model.PaymentMethod, as: PaymentMethodModel
+  alias Snitch.Core.Tools.MultiTenancy.MultiQuery
   alias Ecto.Multi
 
   @doc """
@@ -44,7 +45,7 @@ defmodule Snitch.Data.Model.CardPayment do
     payment_changeset = Payment.create_changeset(payment, more_payment_params)
 
     Multi.new()
-    |> Multi.insert(:payment, payment_changeset)
+    |> MultiQuery.insert(:payment, payment_changeset)
     |> Multi.run(:card_payment, fn %{payment: payment} ->
       all_card_params = Map.put(card_params, :payment_id, payment.id)
       QH.create(CardPayment, all_card_params, Repo)
@@ -70,7 +71,7 @@ defmodule Snitch.Data.Model.CardPayment do
     card_payment_changeset = CardPayment.update_changeset(card_payment, card_params)
 
     Multi.new()
-    |> Multi.update(:card_payment, card_payment_changeset)
+    |> MultiQuery.update(:card_payment, card_payment_changeset)
     |> Multi.run(:payment, fn _ ->
       PaymentModel.update(nil, Map.put(payment_params, :id, card_payment.payment_id))
     end)

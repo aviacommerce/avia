@@ -12,10 +12,10 @@ defmodule Snitch.Repo.Migrations.RemoveOrderTotalFields do
 
   def down do
     alter table("snitch_orders") do
-      add :total, :money_with_currency
-      add :item_total, :money_with_currency
-      add :promo_total, :money_with_currency
-      add :adjustment_total, :money_with_currency
+      add :total, String.to_atom("#{prefix()||"public"}.money_with_currency")
+      add :item_total, String.to_atom("#{prefix()||"public"}.money_with_currency")
+      add :promo_total, String.to_atom("#{prefix()||"public"}.money_with_currency")
+      add :adjustment_total, String.to_atom("#{prefix()||"public"}.money_with_currency")
     end
   end
 end

@@ -2,7 +2,7 @@ defmodule SnitchApiWeb.TaxonController do
   use SnitchApiWeb, :controller
 
   alias Snitch.Data.Schema.Taxon
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   action_fallback(SnitchApiWeb.FallbackController)
 

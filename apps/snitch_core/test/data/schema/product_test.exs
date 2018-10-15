@@ -2,7 +2,7 @@ defmodule Snitch.Data.Schema.ProductTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.Product
   import Snitch.Factory
 
