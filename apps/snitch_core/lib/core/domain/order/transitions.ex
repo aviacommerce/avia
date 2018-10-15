@@ -319,9 +319,38 @@ defmodule Snitch.Domain.Order.Transitions do
 
   def send_email_confirmation(context), do: context
 
-  def check_order_completion(
-        %Context{valid?: true, struct: %Order{} = order, multi: multi} = context
-      ) do
+  def update_stock(%Context{valid?: true, struct: %Order{} = order, multi: multi} = context) do
+    order = order |> Repo.preload(packages: :items)
+
+    packages =
+      Repo.transaction(fn ->
+        order.packages
+        |> Stream.map(&PackageDomain.update_items_stock/1)
+        |> Enum.each(fn result ->
+          result
+          |> fail_fast_reduce()
+          |> case do
+            {:error, error} ->
+              Repo.rollback(error)
+
+            {:ok, package} ->
+              package
+          end
+        end)
+      end)
+
+    case packages do
+      {:ok, _} ->
+        struct(context, state: context.state)
+
+      {:error, changeset} ->
+        struct(context, valid?: false, errors: changeset)
+    end
+  end
+
+  def update_stock(context), do: context
+
+  def check_order_completion(%Context{valid?: true} = context) do
     context
     |> order_paid()
     |> packages_delivered()
@@ -329,7 +358,7 @@ defmodule Snitch.Domain.Order.Transitions do
 
   def check_order_completion(context), do: context
 
-  defp order_paid(%Context{valid?: true, struct: %Order{} = order, multi: multi} = context) do
+  defp order_paid(%Context{valid?: true, struct: %Order{} = order} = context) do
     if OrderDomain.payments_total(order, "paid") == OrderDomain.total_amount(order) do
       context
     else
