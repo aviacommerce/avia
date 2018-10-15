@@ -63,7 +63,7 @@ defmodule Snitch.Data.Model.StockItem do
   Returns a `total available inventory count` for stock items
   present in all active stock locations only.
 
-  The total count can also be negetive based on backorderable.
+  The total count can also be negative based on backorderable.
   """
   @spec total_on_hand(non_neg_integer) :: integer
   def total_on_hand(variant_id) do
