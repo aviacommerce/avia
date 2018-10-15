@@ -1,7 +1,7 @@
 defmodule AdminAppWeb.ProductController do
   use AdminAppWeb, :controller
 
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Model.Product, as: ProductModel
   alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Data.Schema.{ProductBrand, StockLocation, VariationTheme}

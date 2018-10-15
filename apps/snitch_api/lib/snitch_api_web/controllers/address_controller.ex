@@ -4,7 +4,7 @@ defmodule SnitchApiWeb.AddressController do
   alias SnitchApi.Checkout
   alias Snitch.Data.Schema.Address
   alias Snitch.Data.Model.Country
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   action_fallback(SnitchApiWeb.FallbackController)
   plug(SnitchApiWeb.Plug.DataToAttributes)

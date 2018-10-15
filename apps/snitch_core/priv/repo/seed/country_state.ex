@@ -3,7 +3,7 @@ defmodule Snitch.Seed.CountryState do
 
   import Ecto.Query
 
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.Country, as: CountrySchema
   alias Snitch.Data.Schema.State, as: StateSchema
   alias ExRegion.{Country, Subdivision}

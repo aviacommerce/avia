@@ -18,7 +18,10 @@ defmodule Snitch.Core.Mixfile do
       package: package(),
       deps: deps(),
       test_coverage: [tool: ExCoveralls],
-      docs: docs()
+      docs: docs(),
+      preferred_cli_env: [
+        "test.multi": :test
+      ]
     ]
   end
 
@@ -92,7 +95,11 @@ defmodule Snitch.Core.Mixfile do
       {:nanoid, "~> 1.0.1"},
       {:sentry, "~> 7.0"},
       {:jason, "~> 1.1"},
-      {:rummage_ecto, "~> 2.0.0-rc.0"}
+      {:rummage_ecto, "~> 2.0.0-rc.0"},
+
+      # Multi tenancy
+      {:triplex, github: "ramansah/triplex"},
+      {:mariaex, "~> 0.8.2"}
     ]
   end
 
@@ -138,7 +145,18 @@ defmodule Snitch.Core.Mixfile do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seed/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       "ecto.rebuild": ["ecto.drop", "ecto.create --quiet", "ecto.migrate"],
-      test: ["ecto.create --quiet", "ecto.migrate", "test"]
+      test: ["ecto.create --quiet", "ecto.migrate", "test"],
+      "test.multi": [
+        "ecto.drop --quiet",
+        "ecto.create --quiet",
+        "ecto.migrate",
+        "run test/support/multitenancy_setup.exs amazon",
+        "test"
+      ],
+      "seed.multi": [
+        "run test/support/multitenancy_setup.exs amazon",
+        "run priv/repo/seed/seeds.exs"
+      ]
     ]
   end
 end

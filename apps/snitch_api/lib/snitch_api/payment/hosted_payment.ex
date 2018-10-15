@@ -9,7 +9,7 @@ defmodule SnitchApi.Payment.HostedPayment do
   alias Snitch.Data.Model.Payment
   alias Snitch.Data.Model.PaymentMethod
   alias Snitch.Domain.Order.DefaultMachine
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def payment_order_context(%{status: "success"} = params) do
     payment_params = %{state: "paid"}

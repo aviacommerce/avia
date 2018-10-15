@@ -5,7 +5,7 @@ defmodule Snitch.Seed.Users do
   alias Ecto.DateTime
   alias Snitch.Data.Model.{Country, State}
   alias Snitch.Data.Schema.{Address, User, Role}
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   require Logger
 

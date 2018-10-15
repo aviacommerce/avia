@@ -1,7 +1,7 @@
 defmodule SnitchApiWeb.LineItemControllerTest do
   use SnitchApiWeb.ConnCase, async: true
   import Plug.Conn
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias SnitchApi.Accounts
   import Snitch.Factory
   # alias Snitch.Data.Model.Order, as: OrderModel

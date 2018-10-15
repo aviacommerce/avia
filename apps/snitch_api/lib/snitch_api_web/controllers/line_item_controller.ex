@@ -4,7 +4,7 @@ defmodule SnitchApiWeb.LineItemController do
   alias Snitch.Data.Model.LineItem, as: LineItemModel
   alias Snitch.Data.Model.Order, as: OrderModel
   alias Snitch.Data.Schema.{LineItem, Variant, Product}
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   import Ecto.Query
   alias SnitchApi.Order, as: OrderContext
 

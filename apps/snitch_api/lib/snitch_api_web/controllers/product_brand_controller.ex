@@ -3,7 +3,7 @@ defmodule SnitchApiWeb.ProductBrandController do
 
   alias SnitchApiWeb.ProductBrandView
   alias Snitch.Data.Model.ProductBrand
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def index(conn, _params) do
     brands = ProductBrand.get_all() |> Repo.preload(:image)

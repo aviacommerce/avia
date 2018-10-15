@@ -7,7 +7,7 @@
 #   import Snitch.Factory
 #
 #   alias Snitch.Data.Schema.Variant
-#   alias Snitch.Repo
+#   alias Snitch.Core.Tools.MultiTenancy.Repo
 #
 #   @valid_params %{
 #     sku: "shoes-nike-sz-9",

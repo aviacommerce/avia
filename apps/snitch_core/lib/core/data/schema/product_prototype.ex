@@ -13,7 +13,6 @@ defmodule Snitch.Data.Schema.ProductPrototype do
   use Snitch.Data.Schema
   import Ecto.Query
   alias Snitch.Data.Schema.{Property, Taxon, VariationTheme}
-  alias Snitch.Repo
 
   @type t :: %__MODULE__{}
 

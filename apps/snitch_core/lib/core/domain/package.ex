@@ -7,6 +7,7 @@ defmodule Snitch.Domain.Package do
 
   import Ecto.Query
   alias Ecto.Multi
+  alias Snitch.Core.Tools.MultiTenancy.MultiQuery
   alias Snitch.Data.Schema.Package
   alias Snitch.Tools.Money, as: MoneyTools
 
@@ -53,6 +54,6 @@ defmodule Snitch.Domain.Package do
         where: package.order_id == ^order.id
       )
 
-    Multi.update_all(multi, :update_package_params, query, set: params)
+    MultiQuery.update_all(multi, :update_package_params, query, set: params)
   end
 end

@@ -3,7 +3,7 @@ defmodule Snitch.Seed.Role do
   @roles %{"user" => "normal user role", "admin" => "can manage everything"}
 
   alias Snitch.Data.Schema.Role
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   require Logger
 

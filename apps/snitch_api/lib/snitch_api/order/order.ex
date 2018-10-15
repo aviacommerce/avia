@@ -5,7 +5,7 @@ defmodule SnitchApi.Order do
 
   import Ecto.Query
 
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Model.LineItem, as: LineItemModel
   alias Snitch.Data.Model.Order, as: OrderModel
   alias BeepBop.Context

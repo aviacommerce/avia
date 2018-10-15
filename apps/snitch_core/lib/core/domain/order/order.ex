@@ -20,7 +20,7 @@ defmodule Snitch.Domain.Order do
   def validate_change(%{valid?: true} = changeset) do
     prepare_changes(changeset, fn changeset ->
       with {_, order_id} <- fetch_field(changeset, :order_id),
-           %Order{state: order_state} <- changeset.repo.get(Order, order_id) do
+           %Order{state: order_state} <- Repo.get(Order, order_id) do
         if order_state in @editable_states do
           changeset
         else

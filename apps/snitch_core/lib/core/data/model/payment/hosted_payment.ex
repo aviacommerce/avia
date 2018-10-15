@@ -13,6 +13,7 @@ defmodule Snitch.Data.Model.HostedPayment do
   alias Snitch.Data.Model.Payment, as: PaymentModel
   alias Snitch.Data.Model.PaymentMethod, as: PaymentMethodModel
   alias SnitchPayments.PaymentMethodCode, as: Codes
+  alias Snitch.Core.Tools.MultiTenancy.MultiQuery
 
   @doc """
   Creates both `Payment` and `HostedPayment` records in a transaction for Order
@@ -42,7 +43,7 @@ defmodule Snitch.Data.Model.HostedPayment do
     payment_changeset = Payment.create_changeset(payment, more_payment_params)
 
     Multi.new()
-    |> Multi.insert(:payment, payment_changeset)
+    |> MultiQuery.insert(:payment, payment_changeset)
     |> Multi.run(:hosted_payment, fn %{payment: payment} ->
       hosted_method_params = Map.put(hosted_method_params, :payment_id, payment.id)
       QH.create(HostedPayment, hosted_method_params, Repo)
@@ -76,7 +77,7 @@ defmodule Snitch.Data.Model.HostedPayment do
       HostedPayment.update_changeset(hosted_payment, hosted_method_params)
 
     Multi.new()
-    |> Multi.update(:hosted_payment, hosted_payment_changeset)
+    |> MultiQuery.update(:hosted_payment, hosted_payment_changeset)
     |> Multi.run(:payment, fn _ ->
       PaymentModel.update(nil, Map.put(payment_params, :id, hosted_payment.payment_id))
     end)

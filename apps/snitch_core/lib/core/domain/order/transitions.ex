@@ -11,6 +11,7 @@ defmodule Snitch.Domain.Order.Transitions do
   use Snitch.Domain
 
   alias BeepBop.Context
+  alias Snitch.Core.Tools.MultiTenancy.MultiQuery
   alias Snitch.Data.Model.Package
   alias Snitch.Data.Schema.Order
   alias Snitch.Data.Model.Payment, as: PaymentModel
@@ -49,7 +50,7 @@ defmodule Snitch.Domain.Order.Transitions do
         shipping_address: shipping
       })
 
-    struct(context, multi: Multi.update(multi, :order, changeset))
+    struct(context, multi: MultiQuery.update(multi, :order, changeset))
   end
 
   def associate_address(%Context{} = context), do: struct(context, valid?: false)

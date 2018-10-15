@@ -5,7 +5,7 @@ defmodule Snitch.Seed.Orders do
 
   alias Ecto.DateTime
   alias Snitch.Data.Schema.{LineItem, Order, ShippingCategory, User, Product, Taxon}
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   require Logger
 

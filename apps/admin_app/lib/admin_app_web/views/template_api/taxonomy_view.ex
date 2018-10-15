@@ -2,10 +2,11 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyView do
   use AdminAppWeb, :view
 
   alias Snitch.Data.Schema.VariationTheme
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Domain.Taxonomy
 
   def get_themes() do
-    Snitch.Repo.all(VariationTheme)
+    Repo.all(VariationTheme)
     |> Enum.map(fn theme -> {theme.name, theme.id} end)
   end
 

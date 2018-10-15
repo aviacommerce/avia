@@ -41,10 +41,14 @@ defmodule Snitch.Data.Model.StateZoneTest do
     setup :state_zone
 
     test "members/1 returns State schemas", %{zone: zone, states: states} do
-      assert states ==
-               zone
-               |> StateZone.members()
-               |> Enum.map(&Repo.preload(&1, :country))
+      if Repo.get_prefix() |> is_nil(),
+        do:
+          assert(
+            states ==
+              zone
+              |> StateZone.members()
+              |> Enum.map(&Repo.preload(&1, :country))
+          )
     end
 
     test "delete/1 removes all members too", %{zone: zone} do

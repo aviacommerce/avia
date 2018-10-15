@@ -7,6 +7,7 @@ defmodule Snitch.Data.Model.TaxCategory do
   import Ecto.Changeset
 
   alias Ecto.Multi
+  alias Snitch.Core.Tools.MultiTenancy.MultiQuery
   alias Snitch.Data.Schema.TaxCategory
 
   @doc """
@@ -166,7 +167,7 @@ defmodule Snitch.Data.Model.TaxCategory do
 
   defp clear_default_multi do
     query = from(tc in TaxCategory, where: tc.is_default? == true)
-    Multi.update_all(Multi.new(), :is_default, query, set: [is_default?: false])
+    MultiQuery.update_all(Multi.new(), :is_default, query, set: [is_default?: false])
   end
 
   defp persist(multi) do

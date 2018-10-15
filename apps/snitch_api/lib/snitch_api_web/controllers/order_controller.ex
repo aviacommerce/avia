@@ -5,7 +5,7 @@ defmodule SnitchApiWeb.OrderController do
   alias Snitch.Data.Schema.LineItem
   alias Snitch.Data.Schema.Order
   alias SnitchApi.Order, as: OrderContext
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   import Ecto.Query
 
   action_fallback(SnitchApiWeb.FallbackController)
@@ -28,7 +28,7 @@ defmodule SnitchApiWeb.OrderController do
   end
 
   def show(conn, %{"id" => id}) do
-    order = Snitch.Repo.get!(Order, id)
+    order = Repo.get!(Order, id)
 
     render(
       conn,

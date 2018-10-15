@@ -2,10 +2,12 @@ defmodule Snitch.Domain.Payment do
   @moduledoc """
   Helper functions and utlities for handling payments.
   """
+
+  use Snitch.Domain
+
   alias Snitch.Data.Model.HostedPayment
   alias SnitchPayments.PaymentMethodCode
   alias Snitch.Data.Schema.{Order, PaymentMethod, Payment}
-  alias Snitch.Repo
 
   @hosted_payment PaymentMethodCode.hosted_payment()
   @cod_payment PaymentMethodCode.cash_on_delivery()

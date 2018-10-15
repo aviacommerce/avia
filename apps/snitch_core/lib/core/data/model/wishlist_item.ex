@@ -55,6 +55,7 @@ defmodule Snitch.Data.Model.WishListItem do
         select: item.product_id,
         order_by: [desc: count(item.id)]
       )
+      |> Map.put(:prefix, Repo.get_prefix())
 
     from(
       variant in Product,

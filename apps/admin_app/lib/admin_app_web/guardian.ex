@@ -3,7 +3,7 @@ defmodule AdminAppWeb.Guardian do
 
   use Guardian, otp_app: :admin_app
   alias Snitch.Data.Model.User
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def subject_for_token(nil, _) do
     {:error, :resource_not_found}

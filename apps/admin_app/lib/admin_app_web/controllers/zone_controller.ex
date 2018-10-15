@@ -3,7 +3,7 @@ defmodule AdminAppWeb.ZoneController do
 
   alias Snitch.Data.Model.Zone
   alias Snitch.Data.Schema.Zone, as: ZoneSchema
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def index(conn, _params) do
     zones = Zone.get_all()

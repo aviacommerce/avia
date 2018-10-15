@@ -3,8 +3,8 @@ defmodule Snitch.Repo.Migrations.AddProductSellingPrice do
 
   def change do
     alter table("snitch_products") do
-      add :selling_price, :money_with_currency, null: false
-      add :max_retail_price, :money_with_currency, null: false
+      add :selling_price, String.to_atom("#{prefix()||"public"}.money_with_currency"), null: false
+      add :max_retail_price, String.to_atom("#{prefix()||"public"}.money_with_currency"), null: false
     end
   end
 end

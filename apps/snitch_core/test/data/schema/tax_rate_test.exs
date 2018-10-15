@@ -6,7 +6,7 @@ defmodule Snitch.Data.Schema.TaxRateTest do
   import Mox
 
   alias Snitch.Data.Schema.TaxRate
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   @valid_params %{
     name: "North America",

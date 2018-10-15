@@ -2,7 +2,7 @@ defmodule SnitchApi.CodPayment do
   alias BeepBop.Context
   alias Snitch.Data.Model.Order
   alias Snitch.Domain.Order.DefaultMachine
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def make_payment(order_id) do
     with order when not is_nil(order) <- Order.get(order_id) do

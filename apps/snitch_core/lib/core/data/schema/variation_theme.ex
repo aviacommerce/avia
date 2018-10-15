@@ -9,7 +9,6 @@ defmodule Snitch.Data.Schema.VariationTheme do
   import Ecto.Query
 
   alias Snitch.Data.Schema.OptionType
-  alias Snitch.Repo
 
   @type t :: %__MODULE__{}
 

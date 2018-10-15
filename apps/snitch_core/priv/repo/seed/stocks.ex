@@ -3,7 +3,7 @@ defmodule Snitch.Seed.Stocks do
 
   alias Snitch.Data.Model.{Country, State}
   alias Snitch.Data.Schema.{StockItem, StockLocation, Variant}
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   require Logger
 

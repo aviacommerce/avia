@@ -3,10 +3,11 @@ defmodule Snitch.Tools.Helper.Shipment do
   Test helpers to insert shipping related schemas.
   """
 
+  use Snitch.Domain
+
   alias Ecto.DateTime
   alias Snitch.Data.Model.ShippingMethod
   alias Snitch.Data.Schema.ShippingCategory
-  alias Snitch.Repo
 
   @shipping_category %{
     name: nil,

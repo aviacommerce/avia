@@ -3,7 +3,7 @@ defmodule SnitchApiWeb.TaxonomyControllerTest do
 
   import Snitch.Factory
 
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias SnitchApi.Accounts
 
   setup %{conn: conn} do

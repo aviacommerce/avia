@@ -2,7 +2,7 @@ defmodule SnitchApiWeb.RatingController do
   use SnitchApiWeb, :controller
 
   alias Snitch.Data.Model.Rating
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   plug(SnitchApiWeb.Plug.DataToAttributes)
 
