@@ -8,6 +8,7 @@ defmodule Snitch.Core.Tools.MultiTenancy.Repo do
 
   alias Snitch.Repo
 
+  defrepo(:aggregate, [:arg1, :arg2, :arg3], :append)
   defrepo(:get, [:arg1, :arg2], :append)
   defrepo(:get!, [:arg1, :arg2], :append)
   defrepo(:get_by, [:arg1, :arg2], :append)
