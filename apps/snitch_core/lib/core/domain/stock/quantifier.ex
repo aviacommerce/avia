@@ -4,6 +4,7 @@ defmodule Snitch.Domain.Stock.Quantifier do
   """
 
   use Snitch.Domain
+  import Ecto.Changeset
   alias Model.StockItem, as: StockItemModel
 
   @doc """
@@ -15,5 +16,23 @@ defmodule Snitch.Domain.Stock.Quantifier do
 
   def total_on_hand(variant_id) when is_integer(variant_id) do
     StockItemModel.total_on_hand(variant_id)
+  end
+
+  @doc """
+  Checks if there are enough stock item on hand for the `product_id`
+  and quantity present in the supplied changeset.
+  """
+  @spec validate_in_stock(Ecto.Changeset.t()) :: Ecto.Changeset.t()
+  def validate_in_stock(%Ecto.Changeset{valid?: false} = changeset), do: changeset
+
+  def validate_in_stock(%Ecto.Changeset{valid?: true} = changeset) do
+    with {_, product_id} <- fetch_field(changeset, :product_id),
+         {_, quantity} <- fetch_field(changeset, :quantity),
+         total when quantity <= total and not is_nil(total) <- total_on_hand(product_id) do
+      changeset
+    else
+      _ ->
+        add_error(changeset, :stock, "Stock Insufficient")
+    end
   end
 end

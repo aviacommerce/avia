@@ -12,7 +12,6 @@ defmodule Snitch.Domain.Order do
   alias Snitch.Data.Schema.{Order, Payment}
   alias Snitch.Data.Model.Product
   alias Snitch.Tools.Defaults
-  alias Snitch.Tools.UrlValidator
 
   @spec validate_change(Ecto.Changeset.t()) :: Ecto.Changeset.t()
   def validate_change(%{valid?: false} = changeset), do: changeset

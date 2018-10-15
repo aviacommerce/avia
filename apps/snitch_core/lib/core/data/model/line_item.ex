@@ -10,6 +10,7 @@ defmodule Snitch.Data.Model.LineItem do
   alias Snitch.Data.Schema.LineItem
   alias Snitch.Domain.Order
   alias Snitch.Tools.Money, as: MoneyTools
+  alias Snitch.Domain.Stock.Quantifier
 
   @doc """
   Creates a new `line_item` for an existing order referenced by `params.order_id`.
@@ -25,6 +26,7 @@ defmodule Snitch.Data.Model.LineItem do
     %LineItem{}
     |> LineItem.create_changeset(params)
     |> Order.validate_change()
+    |> Quantifier.validate_in_stock()
     |> Repo.insert()
   end
 
@@ -39,6 +41,7 @@ defmodule Snitch.Data.Model.LineItem do
     line_item
     |> LineItem.update_changeset(params)
     |> Order.validate_change()
+    |> Quantifier.validate_in_stock()
     |> Repo.update()
   end
 
