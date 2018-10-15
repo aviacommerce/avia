@@ -58,44 +58,53 @@ defmodule Snitch.Data.Model.LineItemTest do
 
   describe "create/1" do
     setup :variants
+    setup :stock_items_setup
 
-    @tag variant_count: 1
-    test "fails without an existing order or variant", %{variants: [v]} do
-      assert {:error, changeset} = LineItem.create(%{line_item_params(v) | order_id: -1})
+    @tag stock_item_count: 1
+    test "fails without an existing order or variant", %{stock_items: [si]} do
+      product = si.product
+      assert {:error, changeset} = LineItem.create(%{line_item_params(product) | order_id: -1})
 
       assert %{order: ["does not exist"]} == errors_on(changeset)
 
-      assert {:error, changeset} = LineItem.create(line_item_params(v))
+      assert {:error, changeset} = LineItem.create(line_item_params(product))
       assert %{order_id: ["can't be blank"]} == errors_on(changeset)
 
       order = insert(:order)
 
       assert {:error, changeset} =
-               LineItem.create(%{line_item_params(v) | product_id: -1, order_id: order.id})
-
-      assert %{product: ["does not exist"]} == errors_on(changeset)
-
-      assert {:error, changeset} =
-               LineItem.create(%{line_item_params(v) | product_id: nil, order_id: order.id})
+               LineItem.create(%{line_item_params(product) | product_id: nil, order_id: order.id})
 
       assert %{product_id: ["can't be blank"]} == errors_on(changeset)
     end
 
-    @tag variant_count: 1
-    test "for an empty order", %{variants: [v]} do
+    test "for an empty order" do
+      stock_item = insert(:stock_item)
+      variant = stock_item.product
       order = insert(:order, line_items: [])
 
-      assert {:ok, _} = LineItem.create(%{line_item_params(v) | order_id: order.id})
+      assert {:ok, lineitem} = LineItem.create(%{line_item_params(variant) | order_id: order.id})
+    end
+
+    @tag variant_count: 1
+    test "fails if stock insufficient", %{variants: [variant]} do
+      order = insert(:order, line_items: [])
+
+      assert {:error, changeset} =
+               LineItem.create(%{line_item_params(variant) | order_id: order.id})
+
+      assert %{stock: ["Stock Insufficient"]} = errors_on(changeset)
     end
   end
 
   describe "update/1" do
-    setup :variants
     setup :orders
 
-    @tag variant_count: 1
-    test "with valid params", %{variants: [v], orders: [order]} do
-      order = struct(order, line_items(%{order: order, variants: [v]}))
+    test "with valid params", %{orders: [order]} do
+      stock_item = insert(:stock_item, count_on_hand: 5)
+
+      product = stock_item.product
+      order = struct(order, line_items(%{order: order, variants: [product]}))
 
       [li] = order.line_items
 

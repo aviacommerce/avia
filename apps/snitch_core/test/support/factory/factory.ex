@@ -250,6 +250,11 @@ defmodule Snitch.Factory do
     [variants: insert_list(count, :product)]
   end
 
+  def stock_items_setup(context) do
+    count = Map.get(context, :stock_item_count, 3)
+    [stock_items: insert_list(count, :stock_item)]
+  end
+
   def orders(context) do
     count = Map.get(context, :order_count, 1)
     [orders: insert_list(count, :order)]
