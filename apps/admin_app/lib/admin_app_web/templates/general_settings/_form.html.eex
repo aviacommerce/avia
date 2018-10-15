@@ -1,12 +1,13 @@
 <h2 class="col">GENERAL SETTINGS</h2>
-<%= form_for @changeset, @action, [as: :settings, id: "settings-form", method: @method], fn f -> %>
+<%= form_for @changeset, @action, [as: :settings, id: "settings-form", method: @method, multipart: true], fn f -> %>
     
     <%= input f, :name %>
-    <%= input f, :meta_description %>
-    <%= input f, :meta_keywords %>
-    <%= input f, :seo_title %>
     <%= input f, :sender_mail %>
-    <%= input f, :sendgrid_api_key %>
+    <%= input f, :frontend_url %>
+    <%= input f, :backend_url %>
+    <%= input f, :seo_title %>
+    <%= input f, :hosted_payment_url %>
     <%= input f, :currency %>
     <%= submit "Submit", class: "btn btn-primary"%>
 <% end %>
+

@@ -18,7 +18,9 @@ config :ex_aws,
     region: System.get_env("AWS_REGION")
   ]
 
-config :snitch_core, Snitch.Tools.Mailer, adapter: Bamboo.SendGridAdapter
+config :snitch_core, Snitch.Tools.Mailer,
+  adapter: Bamboo.SendGridAdapter,
+  api_key: System.get_env("SENDGRID_API_KEY")
 
 config :snitch_core, Rummage.Ecto,
   default_repo: Snitch.Repo,
