@@ -5,7 +5,7 @@ defmodule Snitch.Domain.Account do
   alias Snitch.Data.Model.User
   alias Snitch.Data.Schema.User, as: UserSchema
   alias Comeonin.Argon2
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   @doc """
   Registers a `user` with supplied `params`.
