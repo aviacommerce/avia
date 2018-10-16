@@ -7,6 +7,8 @@ import ProductEditView from './product/edit';
 import OrderIndexView from './order/index';
 import ZoneNewView from './zone/new';
 import ProductIndexView from './product/index';
+import Shipping_policyIndexView from './shipping_policy/index';
+import Shipping_policyEditView from './shipping_policy/edit';
 
 // Collection of specific view modules
 const views = {
@@ -17,7 +19,9 @@ const views = {
   ProductEditView,
   ProductIndexView,
   OrderIndexView,
-  ZoneNewView
+  ZoneNewView,
+  Shipping_policyIndexView,
+  Shipping_policyEditView
 };
 
 export default function loadView(viewName) {

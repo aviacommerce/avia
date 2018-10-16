@@ -22,7 +22,8 @@ alias Snitch.Seed.{
   Role,
   Shipping,
   Product,
-  ProductRating
+  ProductRating,
+  ShippingRules
 }
 
 variant_count = 9
@@ -46,6 +47,10 @@ Role.seed()
 Users.seed_users!()
 
 Shipping.seed!()
+
+ShippingRules.seed!()
+
+ShippingRules.seed!()
 
 # Repo.transaction(fn ->
 #   Orders.seed_variants!()
