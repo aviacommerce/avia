@@ -10,6 +10,7 @@ defmodule Snitch.Domain.Package do
   alias Snitch.Core.Tools.MultiTenancy.MultiQuery
   alias Snitch.Data.Schema.Package
   alias Snitch.Tools.Money, as: MoneyTools
+  alias Snitch.Data.Model.StockItem
 
   @doc """
   Saves
@@ -55,5 +56,23 @@ defmodule Snitch.Domain.Package do
       )
 
     MultiQuery.update_all(multi, :update_package_params, query, set: params)
+  end
+
+  @doc """
+  Updates `stock_items` for all the `items` in the package.
+
+  """
+  def update_items_stock(package) do
+    stock_location_id = package.origin_id
+
+    Stream.map(package.items, fn item ->
+      stock_item =
+        StockItem.get(%{product_id: item.product_id, stock_location_id: stock_location_id})
+
+      # count_on_hand needs to be negative while updating
+      # stock item count
+      count_on_hand = 0 - item.quantity
+      StockItem.update(%{count_on_hand: count_on_hand}, stock_item)
+    end)
   end
 end

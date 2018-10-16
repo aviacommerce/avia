@@ -1,6 +1,6 @@
 defmodule AdminAppWeb.ProductView do
   use AdminAppWeb, :view
-  alias Snitch.Data.Model.Product
+  alias Snitch.Data.Model.{Product, StockItem}
   alias Snitch.Data.Schema.{ShippingCategory, Variation}
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
@@ -169,6 +169,20 @@ defmodule AdminAppWeb.ProductView do
       " " <> return_string
     else
       ""
+    end
+  end
+
+  def count_on_hand(conn) do
+    product_id = String.to_integer(conn.params["id"])
+
+    case StockItem.with_active_stock_location(product_id) do
+      [] ->
+        # condition when product is created for the first time
+        # and there are no stock items
+        0
+
+      [stock_item] ->
+        stock_item.count_on_hand
     end
   end
 

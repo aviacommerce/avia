@@ -8,7 +8,9 @@ defmodule Snitch.Domain.Order.TransitionsTest do
   alias BeepBop.Context
   alias Ecto.Multi
   alias Snitch.Data.Schema.{Order, OrderAddress}
+  alias Snitch.Data.Schema.StockItem, as: StockItemSchema
   alias Snitch.Domain.Order.Transitions
+  alias Snitch.Repo
 
   @patna %{
     first_name: "someone",
@@ -202,5 +204,105 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       |> Transitions.persist_shipping_preferences()
 
     assert result.valid?
+  end
+
+  describe "update_stock/1" do
+    setup :zones
+    setup :shipping_methods
+    setup :embedded_shipping_methods
+
+    test "successful on making payment for order with right params",
+         %{embedded_shipping_methods: methods} do
+      stock_item_1 = insert(:stock_item, count_on_hand: 5)
+      stock_item_2 = insert(:stock_item, count_on_hand: 5)
+
+      product_1 = stock_item_1.product
+      product_2 = stock_item_2.product
+
+      order = insert(:order)
+      line_item_1 = insert(:line_item, order: order, product: product_1, quantity: 2)
+      line_item_2 = insert(:line_item, order: order, product: product_2, quantity: 2)
+
+      package_1 =
+        insert(:package,
+          shipping_methods: methods,
+          order: order,
+          items: [],
+          origin: stock_item_1.stock_location
+        )
+
+      package_2 =
+        insert(:package,
+          shipping_methods: methods,
+          order: order,
+          items: [],
+          origin: stock_item_2.stock_location
+        )
+
+      package_item_1 =
+        insert(:package_item,
+          quantity: 2,
+          product: product_1,
+          line_item: line_item_1,
+          package: package_1
+        )
+
+      package_item_2 =
+        insert(:package_item,
+          quantity: 2,
+          product: product_2,
+          line_item: line_item_2,
+          package: package_2
+        )
+
+      result =
+        order
+        |> Context.new()
+        |> Transitions.update_stock()
+
+      assert result.valid?
+      updated_stock_item_1 = Repo.get(StockItemSchema, stock_item_1.id)
+
+      assert updated_stock_item_1.count_on_hand ==
+               stock_item_1.count_on_hand - package_item_1.quantity
+
+      updated_stock_item_2 = Repo.get(StockItemSchema, stock_item_2.id)
+
+      assert updated_stock_item_2.count_on_hand ==
+               stock_item_2.count_on_hand - package_item_2.quantity
+    end
+
+    test " fails on making payment for order with wrong package items",
+         %{embedded_shipping_methods: methods} do
+      stock_item = insert(:stock_item, count_on_hand: 5)
+
+      product = stock_item.product
+
+      order = insert(:order)
+      line_item = insert(:line_item, order: order, product: product, quantity: 2)
+
+      package =
+        insert(:package,
+          shipping_methods: methods,
+          order: order,
+          items: [],
+          origin: stock_item.stock_location
+        )
+
+      package_item =
+        insert(:package_item,
+          quantity: 7,
+          product: product,
+          line_item: line_item,
+          package: package
+        )
+
+      result =
+        order
+        |> Context.new()
+        |> Transitions.update_stock()
+
+      refute result.valid?
+    end
   end
 end

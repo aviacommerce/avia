@@ -217,6 +217,19 @@
       <% else %>
       <%= hidden_input :stock, :product_id, value: @conn.params["id"] %>
       <% end %>
+
+      <div class="form-group row ">
+        <label  class="col-sm-3 col-form-label">
+          <div class="label required">
+            Count on hand
+          </div>
+          <div class="label-txt">Total count for all the products at all stock locations</div>
+          <div class="col-sm-9">
+            <p><%= count_on_hand(@conn) %></p>
+          </div>
+        </label>
+      </div>
+
       <div class="form-group row ">
         <label  class="col-sm-3 col-form-label">
           <div class="label required">
