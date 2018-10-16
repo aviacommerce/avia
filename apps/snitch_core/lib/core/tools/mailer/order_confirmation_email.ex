@@ -29,12 +29,18 @@ defmodule Snitch.Tools.OrderEmail do
         backend_base_url: backend_base_url
       })
 
-    new_email()
-    |> to(user_email)
-    |> from({"AviaCommerce", sender_email})
-    |> subject("Order Confirmation - Your Order with Aviacommerce has been successfully placed!
-            ")
-    |> html_body(mail_template)
-    |> Mailer.deliver_now()
+    email =
+      new_email()
+      |> to(user_email)
+      |> from({"AviaCommerce", sender_email})
+      |> subject("Order Confirmation - Your Order with Aviacommerce has been successfully placed!
+              ")
+      |> html_body(mail_template)
+
+    try do
+      email |> Mailer.deliver_now()
+    rescue
+      e in ArgumentError -> nil
+    end
   end
 end
