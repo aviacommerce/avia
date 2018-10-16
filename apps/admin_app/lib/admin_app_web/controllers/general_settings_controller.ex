@@ -2,7 +2,7 @@ defmodule AdminAppWeb.GeneralSettingsController do
   use AdminAppWeb, :controller
 
   alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def index(conn, _params) do
     general_configuration = GCModel.list_general_configuration() |> List.first()

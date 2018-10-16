@@ -2,7 +2,7 @@ defmodule Snitch.StartupCode do
   @moduledoc """
   Code that runs just after the app starts
   """
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.GeneralConfiguration, as: GC
 
   def run do

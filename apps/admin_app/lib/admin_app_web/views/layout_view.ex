@@ -2,7 +2,7 @@ defmodule AdminAppWeb.LayoutView do
   use AdminAppWeb, :view
   alias AdminAppWeb.Guardian
   alias Snitch.Data.Schema.GeneralConfiguration
-  alias Snitch.Repo
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   @doc """
   Generates name for the JavaScript view we want to use

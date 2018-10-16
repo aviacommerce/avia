@@ -121,11 +121,8 @@ ENV MIX_ENV=prod \
     BACKEND_URL=$BACKEND_URL
 
 # nginx conf
-COPY config/deploy/live/conf.d/* /etc/nginx/conf.d/
-RUN mkdir -p /etc/letsencrypt/live/admin.aviacommerce.org \
-  && mkdir -p /etc/letsencrypt/live/api.aviacommerce.org
-COPY config/deploy/live/admin.aviacommerce.org/* /etc/letsencrypt/live/admin.aviacommerce.org/
-COPY config/deploy/live/api.aviacommerce.org/* /etc/letsencrypt/live/api.aviacommerce.org/
+COPY config/deploy/conf.d /etc/nginx/conf.d
+COPY config/deploy/letsencrypt /etc/letsencrypt
 
 WORKDIR /snitch
 
