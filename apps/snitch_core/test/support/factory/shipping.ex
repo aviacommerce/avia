@@ -30,7 +30,8 @@ defmodule Snitch.Factory.Shipping do
           quantity: 1,
           delta: 0,
           product: build(:product),
-          line_item: build(:line_item)
+          line_item: build(:line_item),
+          backordered?: false
         }
       end
 
@@ -43,6 +44,7 @@ defmodule Snitch.Factory.Shipping do
           shipping_methods: [],
           order: build(:order, user: build(:user)),
           origin: build(:stock_location),
+          items: [],
           shipping_category: build(:shipping_category)
         }
       end

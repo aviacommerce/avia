@@ -75,6 +75,7 @@ defmodule Snitch.Data.Schema.PackageItem do
     field(:number, Nanoid, autogenerate: true)
     field(:state, :string)
     field(:quantity, :integer, default: 0)
+    # The field should be tracked in some other way
     field(:delta, :integer, default: 0)
     field(:backordered?, :boolean)
     field(:tax, Money.Ecto.Composite.Type)

@@ -96,12 +96,14 @@ defmodule Snitch.Domain.Order.DefaultMachine do
       context
       |> Transitions.confirm_order_payment_status()
       |> Transitions.process_shipments()
+      |> Transitions.update_stock()
       |> Transitions.send_email_confirmation()
     end)
 
     event(:confirm_cod_payment, %{from: [:payment], to: :confirmed}, fn context ->
       context
       |> Transitions.process_shipments()
+      |> Transitions.update_stock()
       |> Transitions.send_email_confirmation()
     end)
 
