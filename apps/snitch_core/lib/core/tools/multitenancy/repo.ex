@@ -1,14 +1,13 @@
 defmodule Snitch.Core.Tools.MultiTenancy.Repo do
   @moduledoc """
-    Alternative Repo to support multi tenancy.
-    By default, all functions will insert :prefix in options.
+  Alternative Repo to support multi tenancy.
+  By default, all functions will insert :prefix in options.
   """
 
   import Snitch.Core.Tools.MultiTenancy.Helper
 
   alias Snitch.Repo
 
-  defrepo(:aggregate, [:arg1, :arg2, :arg3], :append)
   defrepo(:get, [:arg1, :arg2], :append)
   defrepo(:get!, [:arg1, :arg2], :append)
   defrepo(:get_by, [:arg1, :arg2], :append)
@@ -21,6 +20,7 @@ defmodule Snitch.Core.Tools.MultiTenancy.Repo do
   defrepo(:update_all, [:arg1, :arg2], :append)
   defrepo(:delete, [:arg1], :append)
   defrepo(:delete_all, [:arg1], :append)
+  defrepo(:aggregate, [:arg1, :arg2, :arg3], :append)
 
   defrepo(:load, [:arg1, :arg2], :pass)
   defrepo(:rollback, [:arg1], :pass)
@@ -47,7 +47,6 @@ defmodule Snitch.Core.Tools.MultiTenancy.Repo do
   end
 
   def get_prefix() do
-    Application.get_env(:snitch, :multitenancy_test)[:tenant] ||
-      Process.get({__MODULE__, :prefix})
+    Process.get({__MODULE__, :prefix})
   end
 end
