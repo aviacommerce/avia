@@ -1,6 +1,6 @@
 defmodule SnitchApiWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :snitch_api
-  use Sentry.Phoenix.Endpoint
+  # use Sentry.Phoenix.Endpoint
 
   alias Snitch.Core.Tools.MultiTenancy
 

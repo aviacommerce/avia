@@ -70,7 +70,8 @@ defmodule Snitch.Domain.Order do
   @spec total_amount(Order.t()) :: Money.t()
   def total_amount(%Order{state: state} = order) when state in ["cart", "address"] do
     order = Repo.preload(order, :line_items)
-    line_item_total(order)
+    total = line_item_total(order)
+    total
   end
 
   def total_amount(%Order{} = order) do

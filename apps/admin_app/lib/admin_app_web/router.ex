@@ -1,7 +1,7 @@
 defmodule AdminAppWeb.Router do
   use AdminAppWeb, :router
   use Plug.ErrorHandler
-  use Sentry.Plug
+  # use Sentry.Plug
 
   pipeline :browser do
     plug(:accepts, ["html"])
@@ -94,6 +94,11 @@ defmodule AdminAppWeb.Router do
       ProductController,
       :delete_property
     )
+
+    # get("/shipping-policy", ShippingPolicyController, :index)
+    get("/shipping-policy/new", ShippingPolicyController, :new)
+    get("/shipping-policy/:id/edit", ShippingPolicyController, :edit)
+    put("/shipping-policy/:id", ShippingPolicyController, :update)
   end
 
   scope "/", AdminAppWeb do

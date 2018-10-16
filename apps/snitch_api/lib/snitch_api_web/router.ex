@@ -1,7 +1,7 @@
 defmodule SnitchApiWeb.Router do
   use SnitchApiWeb, :router
   use Plug.ErrorHandler
-  use Sentry.Plug
+  # use Sentry.Plug
 
   alias SnitchApiWeb.Guardian
 

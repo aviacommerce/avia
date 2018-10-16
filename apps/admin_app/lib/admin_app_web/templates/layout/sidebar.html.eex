@@ -65,6 +65,9 @@
         </li>
       <% end %>
       <li>
+        <a class="nav-link" href="/shipping-policy/new">Shipping Policy</a>
+      </li>
+      <li>
         <a class="nav-link" href="/stock_locations">Stock Locations</a>
       </li>
       <li>
