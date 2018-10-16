@@ -16,7 +16,7 @@ defmodule Snitch.DataCase do
 
   alias Ecto.Adapters.SQL.Sandbox
   alias Ecto.Changeset
-  alias Snitch.Core.Tools.MultiTenancy.Repo
+  alias Snitch.Repo
 
   using do
     quote do
