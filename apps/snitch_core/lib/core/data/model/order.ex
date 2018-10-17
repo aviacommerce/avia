@@ -216,4 +216,28 @@ defmodule Snitch.Data.Model.Order do
   defp update_line_item_costs(line_items) when is_list(line_items) do
     LineItemModel.update_unit_price(line_items)
   end
+
+  def get_order_count_by_state(start_date, end_date) do
+    Order
+    |> where([o], o.inserted_at >= ^start_date and o.inserted_at <= ^end_date)
+    |> group_by([o], o.state)
+    |> order_by([o], asc: o.state)
+    |> select([o], %{state: o.state, count: count(o.id)})
+    |> Repo.all()
+  end
+
+  defmacro to_char(field, format) do
+    quote do
+      fragment("to_char(?, ?)", unquote(field), unquote(format))
+    end
+  end
+
+  def get_order_count_by_date(start_date, end_date) do
+    Order
+    |> where([o], o.inserted_at >= ^start_date and o.inserted_at <= ^end_date)
+    |> group_by([o], to_char(o.inserted_at, "DD MON YYYY"))
+    |> select([o], %{date: to_char(o.inserted_at, "DD MON YYYY"), count: count(o.id)})
+    |> Repo.all()
+    |> Enum.sort_by(&{Map.get(&1, :date)})
+  end
 end

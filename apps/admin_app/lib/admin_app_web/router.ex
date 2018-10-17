@@ -83,6 +83,8 @@ defmodule AdminAppWeb.Router do
     get("/products/:product_id/property/:property_id/edit", ProductController, :edit_property)
     post("/products/:product_id/property/create", ProductController, :create_property)
 
+    get("/dashboard", DashboardController, :index)
+
     post(
       "/products/:product_id/property/:property_id/update",
       ProductController,
