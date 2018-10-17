@@ -129,6 +129,48 @@ defmodule Snitch.Data.Model.OrderTest do
     end
   end
 
+  describe "order" do
+    test "count by state", %{order_params: params, variants: vs} do
+      {:ok, order} = Order.create(params)
+
+      next_date =
+        order.inserted_at
+        |> NaiveDateTime.to_date()
+        |> Date.add(1)
+        |> Date.to_string()
+        |> get_naive_date_time()
+
+      order_state_count =
+        Order.get_order_count_by_state(order.inserted_at, next_date) |> List.first()
+
+      assert order_state_count.count == 1
+      assert order_state_count.state == "cart"
+    end
+
+    test "count by date", %{order_params: params, variants: vs} do
+      {:ok, order} = Order.create(params)
+
+      next_date =
+        order.inserted_at
+        |> NaiveDateTime.to_date()
+        |> Date.add(1)
+        |> Date.to_string()
+        |> get_naive_date_time()
+
+      order_date_count =
+        Order.get_order_count_by_date(order.inserted_at, next_date) |> List.first()
+
+      assert order_date_count.count == 1
+    end
+  end
+
+  defp get_naive_date_time(date) do
+    Date.from_iso8601(date)
+    |> elem(1)
+    |> NaiveDateTime.new(~T[00:00:00])
+    |> elem(1)
+  end
+
   defp line_item_params(%{variants: variants}) do
     line_items =
       variants

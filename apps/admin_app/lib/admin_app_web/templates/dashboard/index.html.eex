@@ -1,0 +1,99 @@
+<script type="text/javascript">
+     window.barchart = <%= raw(Poison.encode!(@order_datepoints)) %>
+     window.linechart = <%= raw(Poison.encode!(@payment_datapoints)) %>
+</script>
+<div class="list-container">
+   <div class="row m-0 list-header">
+      <div class="col-10 p-0">
+        <h2>Dashboard</h2>
+      </div>
+  </div>
+  <div class="row">
+    <div class="col">
+    </div>
+    <div class="col-5">
+      <form action="/dashboard">
+        From:
+        <input type="date" name="from" value=<%= get_date(@conn.query_params, "from") %> onchange="this.form.submit()">
+        To:
+        <input type="date" name="to" value=<%= get_date(@conn.query_params, "to") %> onchange="this.form.submit()">
+      </form> 
+    </div>
+  </div>
+  <br>
+  <br>
+  <div class="row">
+    <div style="width:45%;float:left;margin-left:5%;">
+      Order states with count.
+      <div class="table-contaner orderlist">
+        <div class="row">
+          <table class="table" style="width: 90%;">
+            <thead style="width: 100%; text-align: left;">
+              <tr>
+                <th scope="col"> State </th>
+                <th scope="col"> Count</th>
+              </tr>
+            </thead>
+            <tbody style="width: 100%;" class="text-capitalize">
+              <%= if @order_state_counts != [] do %>
+                <%= for order_state_count <- @order_state_counts do %>
+                  <tr>
+                    <td>
+                      <%= order_state_count.state %> 
+                    </td>
+                    <td>
+                      <%= order_state_count.count %>
+                    </td>
+                  </tr>
+                <% end %>
+              <% else %>
+                <tr><td>No records found for the date.</td></tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div style="width:45%;float:left;margin-right:5%;">
+      Product line items state with count.
+      <div class="table-contaner orderlist">
+        <div class="row">
+          <table class="table" style="width: 90%;">
+            <thead style="width: 100%; text-align: left;">
+              <tr>
+                <th scope="col"> State </th>
+                <th scope="col"> Count</th>
+              </tr>
+            </thead>
+            <tbody style="width: 100%;" class="text-capitalize">
+              <%= if @product_state_counts != [] do %>
+                <%= for product_state_count <- @product_state_counts do %>
+                  <tr>
+                    <td>
+                      <%= product_state_count.state %> 
+                    </td>
+                    <td>
+                      <%= product_state_count.count %>
+                    </td>
+                  </tr>
+                <% end %>
+              <% else %>
+                <tr><td>No records found for the date.</td></tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>     
+  <br>
+  <br> 
+  <div class="row">
+    <div style="width:45%;float:left;margin-right:5%;">
+      <canvas id="barChart"></canvas>
+    </div>
+    <div style="width:45%;float:left;margin-right:5%;">
+      <canvas id="lineChart"></canvas>
+    </div>
+  </div>
+</div>

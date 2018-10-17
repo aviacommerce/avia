@@ -13,6 +13,7 @@ defmodule Snitch.Data.Model.Payment do
     `Snitch.Data.Schema.Payment.PaymentMethod`
   """
   use Snitch.Data.Model
+  import Snitch.Tools.Helper.QueryFragment
 
   alias Snitch.Data.Schema.Payment
   alias Snitch.Data.Model.CardPayment, as: CardPaymentModel
@@ -61,5 +62,17 @@ defmodule Snitch.Data.Model.Payment do
 
   def to_subtype(%Payment{payment_type: "ccd"} = payment) do
     CardPaymentModel.from_payment(payment.id)
+  end
+
+  def get_payment_count_by_date(start_date, end_date) do
+    Payment
+    |> where([p], p.inserted_at >= ^start_date and p.inserted_at <= ^end_date)
+    |> group_by([p], to_char(p.inserted_at, "DD MON YYYY"))
+    |> select([p], %{
+      date: to_char(p.inserted_at, "DD MON YYYY"),
+      count: type(sum(p.amount), p.amount)
+    })
+    |> Repo.all()
+    |> Enum.sort_by(&{Map.get(&1, :date)})
   end
 end
