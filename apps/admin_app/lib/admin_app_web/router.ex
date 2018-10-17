@@ -99,6 +99,7 @@ defmodule AdminAppWeb.Router do
     get("/shipping-policy/new", ShippingPolicyController, :new)
     get("/shipping-policy/:id/edit", ShippingPolicyController, :edit)
     put("/shipping-policy/:id", ShippingPolicyController, :update)
+    get("/product/import/etsy", ProductImportController, :import_etsy)
   end
 
   scope "/", AdminAppWeb do

@@ -54,7 +54,8 @@ defmodule AdminApp.Mixfile do
       {:snitch_payments, github: "aviacommerce/avia_payments", branch: "develop"},
       {:pdf_generator, ">=0.3.7"},
       {:sentry, "~> 7.0"},
-      {:jason, "~> 1.1"}
+      {:jason, "~> 1.1"},
+      {:oauther, "~> 1.1"}
     ]
   end
 end
