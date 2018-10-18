@@ -159,7 +159,7 @@ defmodule Snitch.Domain.ShippingCalculator do
     if Money.cmp!(min_amount, total_order_cost) == :lt do
       Money.new!(currency_code, 0)
     else
-      min_amount
+      shipping_rule.shipping_cost
     end
   end
 

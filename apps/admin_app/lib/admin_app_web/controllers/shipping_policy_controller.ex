@@ -1,14 +1,16 @@
 defmodule AdminAppWeb.ShippingPolicyController do
   use AdminAppWeb, :controller
 
+  import Ecto.Query
+
   alias Snitch.Core.Tools.MultiTenancy.Repo
-  alias Snitch.Data.Model.ShippingRule
   alias Snitch.Data.Schema.ShippingCategory
   alias Snitch.Data.Model.ShippingCategory, as: ScModel
 
   def new(conn, _params) do
     shipping_category =
       ShippingCategory
+      |> order_by([sc], asc: sc.name)
       |> Repo.all()
       |> List.first()
 
@@ -53,17 +55,11 @@ defmodule AdminAppWeb.ShippingPolicyController do
   end
 
   def shipping_category_params(id, policy) do
-    rules = Map.values(policy) |> set_cost_only_in_active()
+    rules = Map.values(policy)
 
     %{
       id: String.to_integer(id),
       shipping_rules: rules
     }
-  end
-
-  def set_cost_only_in_active(rules) do
-    Enum.map(rules, fn rule ->
-      Map.drop(rule, ["shipping_cost"])
-    end)
   end
 end

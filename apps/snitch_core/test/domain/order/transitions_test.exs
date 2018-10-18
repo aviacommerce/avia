@@ -193,7 +193,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
          } = context do
       expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
 
-      set_cost = Money.new!(:USD, 0)
+      set_cost = Money.new!(:USD, 100)
       quantity = 3
 
       %{order: order, package: package, shipping_rule: shipping_rule} =
@@ -225,7 +225,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       assert final_order_total ==
                Money.add!(
                  order_total,
-                 Money.new!(:USD, shipping_rule.lower_limit)
+                 shipping_rule.shipping_cost
                )
     end
 
