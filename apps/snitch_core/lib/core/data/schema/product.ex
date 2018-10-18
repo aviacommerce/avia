@@ -81,6 +81,20 @@ defmodule Snitch.Data.Schema.Product do
     |> cast_assoc(:images, with: &Image.changeset/2)
   end
 
+  def associate_image_changeset(product, images) do
+    product = Repo.preload(product, [:images])
+
+    product
+    |> change
+    |> put_assoc(:images, images)
+  end
+
+  def associate_theme_changeset(product, params) do
+    product
+    |> change
+    |> put_change(:theme_id, params.theme_id)
+  end
+
   def variant_create_changeset(parent_product, params) do
     parent_product
     |> Repo.preload([:variants, :options])

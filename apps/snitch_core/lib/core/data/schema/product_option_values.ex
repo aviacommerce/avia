@@ -16,7 +16,7 @@ defmodule Snitch.Data.Schema.ProductOptionValue do
 
   def changeset(model, params) do
     model
-    |> cast(params, [:option_type_id, :value])
+    |> cast(params, [:option_type_id, :product_id, :value])
     |> validate_required([:option_type_id, :value])
   end
 

@@ -1,0 +1,3 @@
+first_name,last_name,email,pwd,admin,role
+Harry,Potter,admin@aviacommerce.com,wizard123,true,admin
+Tony,Stark,tony@aviacommerce.com,avenger123,false,user
