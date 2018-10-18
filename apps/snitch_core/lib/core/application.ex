@@ -5,7 +5,6 @@ defmodule Snitch.Application do
   The Snitch system business domain lives in this application.
   """
   use Application
-  alias Snitch.StartupCode
 
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
@@ -19,7 +18,6 @@ defmodule Snitch.Application do
         name: Snitch.Supervisor
       )
 
-    StartupCode.run()
     {:ok, pid}
   end
 end

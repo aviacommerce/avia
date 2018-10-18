@@ -20,6 +20,7 @@ defmodule Snitch.Factory do
     Address,
     Card,
     CardPayment,
+    GeneralConfiguration,
     HostedPayment,
     LineItem,
     Order,
@@ -196,6 +197,18 @@ defmodule Snitch.Factory do
     }
   end
 
+  def general_config_factory do
+    %GeneralConfiguration{
+      name: "store",
+      sender_mail: "hello@aviabird.com",
+      frontend_url: "https://abc.com",
+      backend_url: "https://abc.com",
+      seo_title: "store",
+      currency: "USD",
+      hosted_payment_url: "https://abc.com"
+    }
+  end
+
   def role_factory do
     %Role{
       name: sequence("nobody"),
@@ -240,6 +253,18 @@ defmodule Snitch.Factory do
       address: insert(:address),
       user: insert(:user)
     }
+  end
+
+  def order_with_user(_context) do
+    attrs = %{user: build(:user)}
+
+    [order_with_user: insert(:order, attrs)]
+  end
+
+  def order_with_lineitem(context) do
+    %{order_with_user: order} = context
+
+    [order_with_lineitem: insert(:line_item, order: order, quantity: 2)]
   end
 
   def line_items(context) do

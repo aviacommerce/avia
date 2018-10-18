@@ -4,6 +4,8 @@ defmodule Snitch.Data.Schema.GeneralConfiguration do
   """
   use Snitch.Data.Schema
 
+  alias Snitch.Data.Schema.StoreLogo
+
   # TODO : The approach to handle general settings needs
   #       to be optimized!
 
@@ -11,17 +13,17 @@ defmodule Snitch.Data.Schema.GeneralConfiguration do
 
   schema "snitch_general_configurations" do
     field(:name, :string)
-    field(:meta_description, :string)
-    field(:meta_keywords, :string)
-    field(:seo_title, :string)
     field(:sender_mail, :string)
-    field(:sendgrid_api_key, :string)
+    field(:seo_title, :string)
+    field(:frontend_url, :string)
+    field(:backend_url, :string)
     field(:currency, :string)
+    field(:hosted_payment_url, :string)
 
     timestamps()
   end
 
-  @required_fields ~w(name meta_description meta_keywords seo_title sender_mail sendgrid_api_key currency)a
+  @required_fields ~w(name sender_mail seo_title frontend_url backend_url currency hosted_payment_url)a
 
   @spec create_changeset(t, map) :: Ecto.Changeset.t()
   def create_changeset(%__MODULE__{} = general_configuration, params) do

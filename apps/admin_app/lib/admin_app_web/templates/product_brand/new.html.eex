@@ -6,11 +6,11 @@
   <h4 class="p-3 m-0">Add a Brand</h4> 
   <div class="col-12">
     <div class="card col-12">
-          <%= render "form.html",
-                changeset: @changeset,
-                conn: @conn,
-                action: product_brand_path(@conn, :create)
-            %>
+      <%= render "form.html",
+        changeset: @changeset,
+        conn: @conn,
+        action: product_brand_path(@conn, :create)
+      %>
     </div>
   <div>
 </div>
