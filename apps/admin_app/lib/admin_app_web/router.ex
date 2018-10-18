@@ -1,7 +1,7 @@
 defmodule AdminAppWeb.Router do
   use AdminAppWeb, :router
   use Plug.ErrorHandler
-  # use Sentry.Plug
+  use Sentry.Plug
 
   pipeline :browser do
     plug(:accepts, ["html"])
