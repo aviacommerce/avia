@@ -37,7 +37,7 @@ defmodule Snitch.Core.Mixfile do
 
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support", "priv/repo/seed"]
-  defp elixirc_paths(_), do: ["lib", "priv/repo/seed", "priv/tasks"]
+  defp elixirc_paths(_), do: ["lib", "priv/repo/seed", "priv/repo/demo", "priv/tasks"]
 
   # Specifies your project dependencies.
   #
@@ -96,7 +96,7 @@ defmodule Snitch.Core.Mixfile do
       {:nanoid, "~> 1.0.1"},
       {:sentry, "~> 7.0"},
       {:jason, "~> 1.1"},
-      {:rummage_ecto, "~> 2.0.0-rc.0"},
+      {:nimble_csv, "~> 0.1.0"},
 
       # Multi tenancy
       {:triplex, github: "ramansah/triplex"},

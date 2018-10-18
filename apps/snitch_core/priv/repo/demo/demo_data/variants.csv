@@ -1,0 +1,7 @@
+name,width,height,depth,selling_price,weight,maximum_retail_price,taxon,parent_sku,image
+Men White Shirt,50,70,0,480,1,570,Shirts,Men Checked Round Neck T-shirt,white_shirt.jpeg
+Men Blue Shirt,54,71,0,480,1,560,Shirts,Men Checked Round Neck T-shirt,blue_shirt.jpeg
+Women Striped Top,45,65,0,790,1,890,Western Wear,Women White & Black Top,striped_tshirt.jpeg
+Women Polka Top,47,66,0,790,1,890,Western Wear,Women White & Black Top,polkadot.jpg
+Neotea Cocoa Powder,0,0,0,600,0.4,800,Diet & Nutrition,Cocoa Powder,neotia.jpg
+looms&weaves - Special Dark Cocoa Powder,0,0,0,660,0.6,760,Diet & Nutrition,Cocoa Powder,looms&weaves.jpg
