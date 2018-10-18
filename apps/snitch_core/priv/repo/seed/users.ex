@@ -10,13 +10,13 @@ defmodule Snitch.Seed.Users do
   require Logger
 
   @user_passwd Argon2.hashpwsalt("avenger")
-  @admin_passwd Argon2.hashpwsalt("wizard")
+  @admin_passwd Argon2.hashpwsalt("wizard123")
 
   def seed_users! do
     admin_role = Repo.get_by!(Role, name: "admin")
 
     users = [
-      user("Harry", "Potter", "admin@snitch.com", @admin_passwd, true, admin_role.id)
+      user("Harry", "Potter", "admin@aviacommerce.com", @admin_passwd, true, admin_role.id)
     ]
 
     Repo.insert_all(User, users, on_conflict: :nothing, conflict_target: [:email])
