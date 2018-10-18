@@ -5,6 +5,7 @@ defmodule Snitch.Tools.OrderEmail do
   use Bamboo.EEx
   alias Snitch.Tools.Mailer
   alias Snitch.Core.Tools.MultiTenancy.Repo
+  alias Snitch.Data.Schema.GeneralConfiguration, as: GC
   require EEx
 
   email_template =
@@ -16,25 +17,33 @@ defmodule Snitch.Tools.OrderEmail do
   EEx.function_from_file(:defp, :order_email, email_template, [:assigns])
 
   def order_confirmation_mail(order) do
-    frontend_base_url = Application.get_env(:snitch_core, Snitch.BaseUrl)[:frontend_url]
-    backend_base_url = Application.get_env(:snitch_core, Snitch.BaseUrl)[:backend_url]
-    sender_email = Application.get_env(:snitch_core, Snitch.Tools.Mailer)[:sendgrid_sender_mail]
+    general_config = Repo.all(GC) |> List.first()
+    send_mail(general_config, order)
+  end
+
+  defp send_mail(nil, order), do: nil
+
+  defp send_mail(general_config, order) do
+    sender_email = general_config.sender_mail
     order = Repo.preload(order, [:user, line_items: [product: :images]])
     user_email = order.user.email
 
     mail_template =
       order_email(%{
         order: order,
-        frontend_base_url: frontend_base_url,
-        backend_base_url: backend_base_url
+        frontend_base_url: general_config.frontend_url,
+        backend_base_url: general_config.backend_url
       })
+
+    store_name = general_config.name
 
     email =
       new_email()
       |> to(user_email)
-      |> from({"AviaCommerce", sender_email})
-      |> subject("Order Confirmation - Your Order with Aviacommerce has been successfully placed!
-              ")
+      |> from({"#{store_name}", sender_email})
+      |> subject(
+        "Order Confirmation - Your Order with #{store_name} has been successfully placed!"
+      )
       |> html_body(mail_template)
 
     try do

@@ -15,11 +15,11 @@
 <% end %>
   <div class="col-12">
     <div class="card col-12">
-         <%= render "form.html",
-    changeset: @changeset,
-    conn: @conn,
-    action: product_brand_path(@conn, :update, @changeset.data.id)
-%>
+      <%= render "form.html",
+        changeset: @changeset,
+        conn: @conn,
+        action: product_brand_path(@conn, :update, @changeset.data.id)
+      %>
     </div>
   <div>
 </div>
