@@ -9,4 +9,8 @@ defmodule SnitchApiWeb.HostedPaymentView do
   def render("payubiz-url.json-api", %{error: message}) do
     %{error: message}
   end
+
+  def render("stripe.json-api", %{publishable_key: key}) do
+    %{publishable_key: key}
+  end
 end

@@ -2,7 +2,7 @@ defmodule SnitchApiWeb.HostedPaymentController do
   use SnitchApiWeb, :controller
   alias SnitchApi.Payment.HostedPayment
   alias SnitchPayments
-  alias SnitchPayments.Gateway.PayuBiz
+  alias SnitchPayments.Gateway.{PayuBiz, Stripe}
   alias SnitchPayments.Provider
 
   plug(SnitchApiWeb.Plug.DataToAttributes)
@@ -27,6 +27,33 @@ defmodule SnitchApiWeb.HostedPaymentController do
 
       {_, location} ->
         render(conn, "payubiz-url.json-api", url: location)
+    end
+  end
+
+  def stripe_request_params(conn, %{"id" => id}) do
+    id = String.to_integer(id)
+    preferences = HostedPayment.get_payment_preferences(id)
+    key = preferences[:credentials]["publishable_key"]
+    render(conn, "stripe.json-api", publishable_key: key)
+  end
+
+  def stripe_purchase(conn, params) do
+    source = Provider.provider(:stripe)
+
+    amount = Money.new!(:USD, params["amount"])
+    preferences = HostedPayment.get_payment_preferences(params["payment_method_id"])
+    secret = preferences[:credentials]["secret_key"]
+    params = stripe_params_setup(params)
+    token = params["token"]
+
+    case Stripe.purchase(token, secret, amount, params) do
+      %{"error" => _error} = response ->
+        response = updated_stripe_response(response, params)
+        payment_error(conn, response)
+
+      response ->
+        respose = updated_stripe_response(response, params)
+        payment_success(conn, response)
     end
   end
 
@@ -60,6 +87,21 @@ defmodule SnitchApiWeb.HostedPaymentController do
       {:error, _} ->
         redirect(conn, external: url <> "?error=error")
     end
+  end
+
+  ############# Private Functions ###############
+
+  defp stripe_params_setup(params) do
+    address = params["address"]
+    email = params["email"]
+    [receipt_email: email, address: address]
+  end
+
+  defp updated_stripe_response(response, params) do
+    response
+    |> Map.put("order_id", params["order_id"])
+    |> Map.put("payment_id", params["payment_id"])
+    |> Map.put("source", "stripe")
   end
 
   defp payubiz_params_setup(params) do

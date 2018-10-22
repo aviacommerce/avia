@@ -58,5 +58,7 @@ defmodule SnitchApiWeb.Router do
     resources("/addresses", AddressController, only: [:index, :show, :create, :update, :delete])
     get("/payment/payment-methods", PaymentController, :payment_methods)
     post("/payment/cod_payment", PaymentController, :cod_payment)
+    get("/hosted-payment/stripe-request", HostedPaymentController, :stripe_request_params)
+    post("/hosted-payment/stripe-pay", HostedPaymentController, :stripe_purchase)
   end
 end
