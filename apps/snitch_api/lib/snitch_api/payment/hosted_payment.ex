@@ -27,7 +27,14 @@ defmodule SnitchApi.Payment.HostedPayment do
 
   def payment_order_context(%{status: "failure"} = params) do
     payment_params = %{state: "failed"}
-    update_hosted_payment(params, payment_params)
+
+    case update_hosted_payment(params, payment_params) do
+      {:ok, order, _} ->
+        {:ok, order}
+
+      {:error, _} ->
+        error
+    end
   end
 
   def get_payment_preferences(payment_method_id) do

@@ -41,16 +41,16 @@ defmodule SnitchApiWeb.HostedPaymentController do
     amount = Money.new!(:USD, params["amount"])
     preferences = HostedPayment.get_payment_preferences(params["payment_method_id"])
     secret = preferences[:credentials]["secret_key"]
-    params = stripe_params_setup(params)
+    request_params = stripe_params_setup(params)
     token = params["token"]
 
-    case Stripe.purchase(token, secret, amount, params) do
+    case Stripe.purchase(token, secret, amount, request_params) do
       %{"error" => _error} = response ->
         response = updated_stripe_response(response, params)
         payment_error(conn, response)
 
       response ->
-        respose = updated_stripe_response(response, params)
+        response = updated_stripe_response(response, params)
         payment_success(conn, response)
     end
   end
@@ -70,7 +70,7 @@ defmodule SnitchApiWeb.HostedPaymentController do
       {:error, message} ->
         redirect(
           conn,
-          external: url <> "?order-failed?reason=#{message}"
+          external: url <> "order-failed?reason=#{message}"
         )
     end
   end
@@ -79,8 +79,11 @@ defmodule SnitchApiWeb.HostedPaymentController do
     response = SnitchPayments.data_parser(params)
     url = Application.fetch_env!(:snitch_api, :frontend_checkout_url)
 
-    with {:ok, _, _} <- HostedPayment.payment_order_context(response) do
-      redirect(conn, external: url <> "?info=payment_failed")
+    with {:ok, order} <- HostedPayment.payment_order_context(response) do
+      redirect(conn,
+        external:
+          url <> "order-failed?orderReferance=#{order.number}&reason=#{response.error_reason}"
+      )
     else
       {:error, _} ->
         redirect(conn, external: url <> "?error=error")
