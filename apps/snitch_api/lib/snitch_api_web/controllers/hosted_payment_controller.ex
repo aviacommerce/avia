@@ -47,11 +47,11 @@ defmodule SnitchApiWeb.HostedPaymentController do
     case Stripe.purchase(token, secret, amount, request_params) do
       %{"error" => _error} = response ->
         response = updated_stripe_response(response, params)
-        payment_error(conn, response)
+        non_hpm_purchase_response("success", conn, response)
 
       response ->
         response = updated_stripe_response(response, params)
-        payment_success(conn, response)
+        non_hpm_purchase_response("error", conn, response)
     end
   end
 
@@ -91,6 +91,30 @@ defmodule SnitchApiWeb.HostedPaymentController do
   end
 
   ############# Private Functions ###############
+
+  defp non_hpm_purchase_response("success", conn, params) do
+    response = SnitchPayments.data_parser(params)
+
+    with {:ok, order} <- HostedPayment.payment_order_context(response) do
+      render(
+        conn,
+        OrderView,
+        "show.json-api",
+        data: order
+      )
+    end
+  end
+
+  defp non_hpm_purchase_response("error", conn, params) do
+    response = SnitchPayments.data_parser(params)
+
+    with {:ok, order} <- HostedPayment.payment_order_context(response) do
+      render(conn, "payment_failure.json-api",
+        order: order,
+        reason: response.error_reason
+      )
+    end
+  end
 
   defp stripe_params_setup(params) do
     address = params["address"]

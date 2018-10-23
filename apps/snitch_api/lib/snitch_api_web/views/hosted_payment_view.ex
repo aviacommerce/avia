@@ -13,4 +13,13 @@ defmodule SnitchApiWeb.HostedPaymentView do
   def render("stripe.json-api", %{publishable_key: key}) do
     %{publishable_key: key}
   end
+
+  def render("payment_failure.json-api", %{order: order, reason: reason}) do
+    %{
+      error: %{
+        order_number: order.number,
+        reason: reason
+      }
+    }
+  end
 end

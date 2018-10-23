@@ -20,8 +20,8 @@ defmodule SnitchApi.Payment.HostedPayment do
         transition = DefaultMachine.confirm_purchase_payment(context)
         transition_response(transition)
 
-      {:error, _} = error ->
-        error
+      {:error, message} = error ->
+        {:error, %{message: message}}
     end
   end
 
@@ -32,8 +32,8 @@ defmodule SnitchApi.Payment.HostedPayment do
       {:ok, order, _} ->
         {:ok, order}
 
-      {:error, _} ->
-        error
+      {:error, message} = error ->
+        {:error, %{message: params.error_reason <> ", " <> message}}
     end
   end
 
