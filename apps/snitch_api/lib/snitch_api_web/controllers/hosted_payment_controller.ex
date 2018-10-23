@@ -38,8 +38,6 @@ defmodule SnitchApiWeb.HostedPaymentController do
   end
 
   def stripe_purchase(conn, params) do
-    source = Provider.provider(:stripe)
-
     amount = Money.new!(:USD, params["amount"])
     preferences = HostedPayment.get_payment_preferences(params["payment_method_id"])
     secret = preferences[:credentials]["secret_key"]
@@ -98,10 +96,12 @@ defmodule SnitchApiWeb.HostedPaymentController do
   end
 
   defp updated_stripe_response(response, params) do
+    source = Provider.provider(:stripe)
+
     response
     |> Map.put("order_id", params["order_id"])
     |> Map.put("payment_id", params["payment_id"])
-    |> Map.put("source", "stripe")
+    |> Map.put("payment_source", source)
   end
 
   defp payubiz_params_setup(params) do
