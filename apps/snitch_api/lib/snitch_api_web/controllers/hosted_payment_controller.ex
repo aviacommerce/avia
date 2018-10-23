@@ -47,11 +47,11 @@ defmodule SnitchApiWeb.HostedPaymentController do
     case Stripe.purchase(token, secret, amount, request_params) do
       %{"error" => _error} = response ->
         response = updated_stripe_response(response, params)
-        non_hpm_purchase_response("success", conn, response)
+        non_hpm_purchase_response("error", conn, response)
 
       response ->
         response = updated_stripe_response(response, params)
-        non_hpm_purchase_response("error", conn, response)
+        non_hpm_purchase_response("success", conn, response)
     end
   end
 
