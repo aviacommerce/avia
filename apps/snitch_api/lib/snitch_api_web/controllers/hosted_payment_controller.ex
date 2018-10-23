@@ -96,12 +96,7 @@ defmodule SnitchApiWeb.HostedPaymentController do
     response = SnitchPayments.data_parser(params)
 
     with {:ok, order} <- HostedPayment.payment_order_context(response) do
-      render(
-        conn,
-        OrderView,
-        "show.json-api",
-        data: order
-      )
+      render(conn, "payment_success.json-api", order: order)
     end
   end
 
@@ -110,7 +105,7 @@ defmodule SnitchApiWeb.HostedPaymentController do
 
     with {:ok, order} <- HostedPayment.payment_order_context(response) do
       render(conn, "payment_failure.json-api",
-        order: order,
+        order: order.number,
         reason: response.error_reason
       )
     end

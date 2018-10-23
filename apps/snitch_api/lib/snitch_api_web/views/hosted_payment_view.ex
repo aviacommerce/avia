@@ -22,4 +22,13 @@ defmodule SnitchApiWeb.HostedPaymentView do
       }
     }
   end
+
+  def render("payment_success.json-api", %{order: order}) do
+    %{
+      order: %{
+        status: "success",
+        order_number: order.number
+      }
+    }
+  end
 end
