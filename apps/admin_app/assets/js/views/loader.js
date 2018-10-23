@@ -7,8 +7,8 @@ import ProductEditView from './product/edit';
 import OrderIndexView from './order/index';
 import ZoneNewView from './zone/new';
 import ProductIndexView from './product/index';
-import Shipping_policyIndexView from './shipping_policy/index';
-import Shipping_policyEditView from './shipping_policy/edit';
+import Shipping_policyIndexView from './shipping_policy/index_edit';
+import Shipping_policyEditView from './shipping_policy/index_edit';
 
 // Collection of specific view modules
 const views = {
