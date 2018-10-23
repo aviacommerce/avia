@@ -11,4 +11,9 @@ defmodule AdminAppWeb.ShippingPolicyView do
     order_identifers = ShippingRuleIdentifier.order_identifiers()
     shipping_rule.shipping_rule_identifier.code in order_identifers
   end
+
+  def show_amount(money) do
+    money = money |> Money.round()
+    money.amount
+  end
 end

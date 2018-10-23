@@ -7,6 +7,8 @@ defmodule AdminAppWeb.ShippingPolicyController do
   alias Snitch.Data.Schema.ShippingCategory
   alias Snitch.Data.Model.ShippingCategory, as: ScModel
 
+  @defaults Application.get_env(:snitch_core, :defaults_module)
+
   def new(conn, _params) do
     shipping_category =
       ShippingCategory
@@ -47,7 +49,7 @@ defmodule AdminAppWeb.ShippingPolicyController do
         |> put_flash(:info, "Shipping Category updated with rules!")
         |> redirect(to: shipping_policy_path(conn, :edit, category.id))
 
-      {:error, changeset} ->
+      {:error, _changeset} ->
         conn
         |> put_flash(:error, "Some error occured")
         |> redirect(to: shipping_policy_path(conn, :edit, category.id))
@@ -55,11 +57,21 @@ defmodule AdminAppWeb.ShippingPolicyController do
   end
 
   def shipping_category_params(id, policy) do
-    rules = Map.values(policy)
+    rules = Map.values(policy) |> set_shipping_amount()
 
     %{
       id: String.to_integer(id),
       shipping_rules: rules
     }
+  end
+
+  def set_shipping_amount(rules) do
+    {:ok, currency} = @defaults.fetch(:currency)
+
+    Enum.map(rules, fn rule ->
+      amount = rule["shipping_cost"] || 0.00
+      shipping_cost = Money.new!(currency, amount)
+      %{rule | "shipping_cost" => shipping_cost}
+    end)
   end
 end

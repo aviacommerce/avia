@@ -9,7 +9,7 @@
             
             <%= shipping_rule.shipping_rule_identifier.code %>
           <%= text_input f, :for, placeholder: "Shipping Cost", class: "form-control",
-          name: "shipping_policy[#{shipping_rule.id}][shipping_cost]", value: "#{shipping_rule.shipping_cost}" %>
+          name: "shipping_policy[#{shipping_rule.id}][shipping_cost]", value: show_amount(shipping_rule.shipping_cost) %>
           <%= text_input f, :for, placeholder: "Lower limit", class: "form-control",
           name: "shipping_policy[#{shipping_rule.id}][lower_limit]", value: "#{shipping_rule.lower_limit}" %>
           <%= text_input f, :for, placeholder: "Upper limit", class: "form-control",
@@ -28,7 +28,7 @@
             
             <%= shipping_rule.shipping_rule_identifier.code %>
           <%= text_input f, :for, placeholder: "Shipping Cost", class: "form-control",
-          name: "shipping_policy[#{shipping_rule.id}][shipping_cost]", value: "#{shipping_rule.shipping_cost}" %>
+          name: "shipping_policy[#{shipping_rule.id}][shipping_cost]", value: show_amount(shipping_rule.shipping_cost) %>
           <%= text_input f, :for, placeholder: "Lower limit", class: "form-control",
           name: "shipping_policy[#{shipping_rule.id}][lower_limit]", value: "#{shipping_rule.lower_limit}" %>
           <%= text_input f, :for, placeholder: "Upper limit", class: "form-control",
