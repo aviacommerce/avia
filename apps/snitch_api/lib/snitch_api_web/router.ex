@@ -23,9 +23,8 @@ defmodule SnitchApiWeb.Router do
     get("/variants/favorites", VariantController, :favorite_variants)
     resources("/products", ProductController, except: [:new, :edit], param: "product_slug")
     get("/orders/:order_number", OrderController, :fetch_guest_order)
-    post("/hosted-payment/payubiz-request", HostedPaymentController, :payubiz_request_url)
-    post("/hosted-payment/:source/success", HostedPaymentController, :payment_success)
-    post("/hosted-payment/:source/error", HostedPaymentController, :payment_error)
+    post("/hosted-payment/:payment_source/success", HostedPaymentController, :payment_success)
+    post("/hosted-payment/:payment_source/error", HostedPaymentController, :payment_error)
     resources("/taxonomies", TaxonomyController, only: [:index, :show])
     resources("/taxons", TaxonController, only: [:index, :show])
     get("/countries", AddressController, :countries)
@@ -58,5 +57,19 @@ defmodule SnitchApiWeb.Router do
     resources("/addresses", AddressController, only: [:index, :show, :create, :update, :delete])
     get("/payment/payment-methods", PaymentController, :payment_methods)
     post("/payment/cod_payment", PaymentController, :cod_payment)
+
+    # TODO: https://github.com/aviacommerce/avia/issues/283
+    # We have fixed the routes as per the payment providers for now.
+    # This needs to be refactored such that there is just one endpoint
+    # for success and one for failure
+    # At controller level, the handling should be generic. Any provider
+    # specific code should go inside
+    # 1. avia_payments https://github.com/aviacommerce/avia_payments
+    #                             OR
+    # 2. gringotts https://github.com/aviabird/gringotts/
+
+    post("/hosted-payment/payubiz-request", HostedPaymentController, :payubiz_request_url)
+    get("/hosted-payment/stripe-request", HostedPaymentController, :stripe_request_params)
+    post("/hosted-payment/stripe-pay", HostedPaymentController, :stripe_purchase)
   end
 end
