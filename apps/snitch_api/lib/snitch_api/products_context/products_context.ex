@@ -7,6 +7,10 @@ defmodule SnitchApi.ProductsContext do
 
   import Ecto.Query, only: [from: 2, order_by: 2]
 
+  @filter_allowables ~w(taxon_id brand_id)a
+  @partial_search_allowables ~w(name)a
+  @default_filter [is_active: true]
+
   @doc """
   List out all the products
   """
@@ -184,13 +188,37 @@ defmodule SnitchApi.ProductsContext do
           order_by(Product, asc: :name)
       end
 
-    query =
-      case params["filter"] do
-        %{"name" => filter} ->
-          from(p in query, where: ilike(p.name, ^"%#{filter}%"))
+    filter_query(query, params["filter"], @filter_allowables)
+    |> like_query(params["filter"], @partial_search_allowables)
+  end
 
-        _ ->
-          query
-      end
+  defp filter_query(query, nil, _allowables), do: query
+
+  defp filter_query(query, filter_params, allowables) do
+    filter_params = @default_filter ++ make_filter_params_list(filter_params, allowables)
+
+    from(q in query, where: ^filter_params)
+  end
+
+  defp like_query(query, nil, _allowables), do: query
+
+  defp like_query(query, filter_params, allowables) do
+    filter_params = make_filter_params_list(filter_params, allowables)
+
+    Enum.reduce(filter_params, query, fn {key, value}, nquery ->
+      from(q in nquery, where: ilike(fragment("CAST(? AS TEXT)", field(q, ^key)), ^"%#{value}%"))
+    end)
+  end
+
+  defp get_value("true"), do: true
+
+  defp get_value("false"), do: false
+
+  defp get_value(value), do: value
+
+  defp make_filter_params_list(filter_params, allowables) do
+    filter_params
+    |> Enum.into([], fn x -> {String.to_atom(elem(x, 0)), get_value(elem(x, 1))} end)
+    |> Enum.reject(fn x -> elem(x, 0) not in allowables end)
   end
 end
