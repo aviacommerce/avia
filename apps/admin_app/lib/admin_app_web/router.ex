@@ -94,6 +94,10 @@ defmodule AdminAppWeb.Router do
       ProductController,
       :delete_property
     )
+
+    get("/shipping-policy/new", ShippingPolicyController, :new)
+    get("/shipping-policy/:id/edit", ShippingPolicyController, :edit)
+    put("/shipping-policy/:id", ShippingPolicyController, :update)
   end
 
   scope "/", AdminAppWeb do

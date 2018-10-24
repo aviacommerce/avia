@@ -1,0 +1,42 @@
+<%= form_for @conn, shipping_policy_path(@conn, :update, @shipping_category.id),
+  [method: "put", as: "shipping_policy", id: "shipping_policy_form"],  fn f -> %>
+  
+  <div class="table-contaner col-12 p-3 mb-2">
+    <%= for shipping_rule <- @shipping_rules do %>
+      <%= if check_identifier(:product, shipping_rule) do %>
+        <input type="checkbox" name=<%= "shipping_policy[#{shipping_rule.id}][active?]" %> value=<%= "#{shipping_rule.active?}" %> class="product_chb" >
+        <input type="hidden" name=<%= "shipping_policy[#{shipping_rule.id}][id]" %> value=<%= "#{shipping_rule.id}" %> >
+            
+            <%= shipping_rule.shipping_rule_identifier.code %>
+          <%= text_input f, :for, placeholder: "Shipping Cost", class: "form-control",
+          name: "shipping_policy[#{shipping_rule.id}][shipping_cost]", value: show_amount(shipping_rule.shipping_cost) %>
+          <%= text_input f, :for, placeholder: "Lower limit", class: "form-control",
+          name: "shipping_policy[#{shipping_rule.id}][lower_limit]", value: "#{shipping_rule.lower_limit}" %>
+          <%= text_input f, :for, placeholder: "Upper limit", class: "form-control",
+          name: "shipping_policy[#{shipping_rule.id}][upper_limit]", value: "#{shipping_rule.upper_limit}" %>
+        
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="table-contaner col-12 p-3 mb-2">
+    <%= for shipping_rule <- @shipping_rules do %>
+      <%= if check_identifier(:order, shipping_rule) do %>
+
+        <input type="checkbox" name=<%= "shipping_policy[#{shipping_rule.id}][active?]" %> value=<%= "#{shipping_rule.active?}" %> class="order_chb" >
+        <input type="hidden" name=<%= "shipping_policy[#{shipping_rule.id}][id]" %> value=<%= "#{shipping_rule.id}" %> >
+            
+            <%= shipping_rule.shipping_rule_identifier.code %>
+          <%= text_input f, :for, placeholder: "Shipping Cost", class: "form-control",
+          name: "shipping_policy[#{shipping_rule.id}][shipping_cost]", value: show_amount(shipping_rule.shipping_cost) %>
+          <%= text_input f, :for, placeholder: "Lower limit", class: "form-control",
+          name: "shipping_policy[#{shipping_rule.id}][lower_limit]", value: "#{shipping_rule.lower_limit}" %>
+          <%= text_input f, :for, placeholder: "Upper limit", class: "form-control",
+          name: "shipping_policy[#{shipping_rule.id}][upper_limit]", value: "#{shipping_rule.upper_limit}" %>
+        
+      <% end %>
+    <% end %>
+  </div>
+
+  <button type="submit" class="btn_submit">Submit</button>
+<% end %>

@@ -5,7 +5,7 @@ defmodule Snitch.Data.Schema.ShippingCategory do
 
   use Snitch.Data.Schema
 
-  alias Snitch.Data.Schema.{Product}
+  alias Snitch.Data.Schema.{Product, ShippingRule}
 
   @type t :: %__MODULE__{}
 
@@ -13,6 +13,7 @@ defmodule Snitch.Data.Schema.ShippingCategory do
     field(:name, :string)
 
     has_many(:products, Product)
+    has_many(:shipping_rules, ShippingRule, on_delete: :delete_all, on_replace: :delete)
 
     timestamps()
   end
@@ -39,5 +40,6 @@ defmodule Snitch.Data.Schema.ShippingCategory do
     shipping_category
     |> cast(params, @update_fields)
     |> unique_constraint(:name)
+    |> cast_assoc(:shipping_rules)
   end
 end
