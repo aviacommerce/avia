@@ -24,7 +24,8 @@ defmodule Snitch.Mixfile do
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
       {:inch_ex, "~> 0.5.6", only: [:docs, :dev]},
-      {:distillery, "~> 2.0", runtime: false}
+      {:distillery, "~> 2.0", runtime: false},
+      {:xml_builder, "~> 2.0.0", override: true}
     ]
   end
 

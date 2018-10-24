@@ -20,14 +20,21 @@ defmodule SnitchApi.Payment.HostedPayment do
         transition = DefaultMachine.confirm_purchase_payment(context)
         transition_response(transition)
 
-      {:error, _} = error ->
-        error
+      {:error, message} = error ->
+        {:error, %{message: message}}
     end
   end
 
   def payment_order_context(%{status: "failure"} = params) do
     payment_params = %{state: "failed"}
-    update_hosted_payment(params, payment_params)
+
+    case update_hosted_payment(params, payment_params) do
+      {:ok, order, _} ->
+        {:ok, order}
+
+      {:error, message} = error ->
+        {:error, %{message: params.error_reason <> ", " <> message}}
+    end
   end
 
   def get_payment_preferences(payment_method_id) do
