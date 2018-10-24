@@ -9,6 +9,7 @@ defmodule Snitch.Domain.Package do
   alias Ecto.Multi
   alias Snitch.Core.Tools.MultiTenancy.MultiQuery
   alias Snitch.Data.Schema.Package
+  alias Snitch.Domain.ShippingCalculator
   alias Snitch.Tools.Money, as: MoneyTools
   alias Snitch.Data.Model.StockItem
 
@@ -27,8 +28,10 @@ defmodule Snitch.Domain.Package do
         id == shipping_method_id
       end)
 
+    shipping_cost = ShippingCalculator.calculate(package)
+
     params = %{
-      cost: shipping_method.cost,
+      cost: shipping_cost,
       shipping_tax: shipping_tax(package),
       shipping_method_id: shipping_method.id
     }

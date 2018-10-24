@@ -10,7 +10,8 @@ defmodule Snitch.Domain.Order.TransitionsTest do
   alias Snitch.Data.Schema.{Order, OrderAddress}
   alias Snitch.Data.Schema.StockItem, as: StockItemSchema
   alias Snitch.Domain.Order.Transitions
-  alias Snitch.Repo
+  alias Snitch.Domain.Order, as: OrderDomain
+  alias Snitch.Data.Model.Order, as: OrderModel
 
   @patna %{
     first_name: "someone",
@@ -162,8 +163,8 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     setup :embedded_shipping_methods
 
     setup %{embedded_shipping_methods: methods} do
+      Application.put_env(:snitch_core, :defaults, currency: :USD)
       order = insert(:order)
-
       [order: order, packages: [insert(:package, shipping_methods: methods, order: order)]]
     end
 
@@ -173,7 +174,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
         %{package_id: package.id, shipping_method_id: sm.id}
       ]
 
-      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :USD} end)
+      expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
 
       result =
         order
@@ -183,6 +184,49 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       assert result.valid?
       assert [packages: {:run, _}] = Multi.to_list(result.multi)
       assert {:ok, %{packages: _}} = Repo.transaction(result.multi)
+    end
+
+    @tag shipping_method_count: 1
+    test "check order total after tranisition",
+         %{
+           shipping_methods: [sm]
+         } = context do
+      expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
+
+      set_cost = Money.new!(:USD, 100)
+      quantity = 3
+
+      %{order: order, package: package, shipping_rule: shipping_rule} =
+        setup_package_with_shipping(context, quantity, set_cost)
+
+      preference = [
+        %{package_id: package.id, shipping_method_id: sm.id}
+      ]
+
+      order_total = OrderDomain.total_amount(order)
+
+      result =
+        order
+        |> Context.new(state: %{shipping_preferences: preference})
+        |> Transitions.persist_shipping_preferences()
+
+      assert {:ok, %{packages: _}} = Repo.transaction(result.multi)
+
+      {:ok, order} = OrderModel.partial_update(order, %{state: "delivery"})
+
+      order = Repo.preload(order, [:packages, :line_items])
+      line_item_total = OrderDomain.line_item_total(order)
+      [package] = order.packages
+
+      final_order_total = line_item_total |> Money.add!(package.cost) |> Money.round()
+
+      assert result.valid?
+
+      assert final_order_total ==
+               Money.add!(
+                 order_total,
+                 shipping_rule.shipping_cost
+               )
     end
 
     test "fails with invalid preferences", %{order: order} do
@@ -304,5 +348,50 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
       refute result.valid?
     end
+  end
+
+  defp setup_package_with_shipping(context, quantity, shipping_cost) do
+    %{embedded_shipping_methods: embedded_shipping_methods} = context
+
+    # setup stock for product
+    stock_item = insert(:stock_item, count_on_hand: 10)
+
+    # setup shipping category, identifier, rules
+    shipping_identifier = insert(:shipping_identifier)
+
+    shipping_category = insert(:shipping_category)
+
+    shipping_rule =
+      insert(:shipping_rule,
+        lower_limit: 100,
+        active?: true,
+        shipping_cost: shipping_cost,
+        shipping_rule_identifier: shipping_identifier,
+        shipping_category: shipping_category
+      )
+
+    # make order and it's packages
+    product = stock_item.product
+    order = insert(:order, state: "address")
+    line_item = insert(:line_item, order: order, product: product, quantity: quantity)
+
+    package =
+      insert(:package,
+        shipping_methods: embedded_shipping_methods,
+        order: order,
+        items: [],
+        origin: stock_item.stock_location,
+        shipping_category: shipping_category
+      )
+
+    package_item =
+      insert(:package_item,
+        quantity: quantity,
+        product: product,
+        line_item: line_item,
+        package: package
+      )
+
+    %{order: order, package: package, shipping_rule: shipping_rule}
   end
 end

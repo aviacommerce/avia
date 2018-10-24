@@ -1,0 +1,11 @@
+<div class="list-container">
+  <div class="row m-0 list-header">
+    <div class="col-10 p-0">
+        <h2>Shipping Policy</h2>
+    </div>
+  </div>
+  <div class="row m-0 list">
+    <%= render "form.html", conn: @conn, shipping_rules: @shipping_rules,
+    shipping_category: @shipping_category %>
+  </div>
+</div>
