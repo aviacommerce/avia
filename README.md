@@ -50,5 +50,3 @@ We are also welcoming to the developers who want to contribute in the developmen
 [aviacommerce]: https://aviacommerce.org
 [contribute]: https://www.aviacommerce.org/docs/how-to-contribute.html
 
-
-
