@@ -35,7 +35,8 @@ defmodule Snitch.Factory do
     Product,
     ShippingCategory,
     ProductProperty,
-    Property
+    Property,
+    Taxon
   }
 
   alias Snitch.Core.Tools.MultiTenancy.Repo
@@ -97,6 +98,12 @@ defmodule Snitch.Factory do
     %Order{
       number: sequence("order"),
       state: "cart"
+    }
+  end
+
+  def taxon_factory do
+    %Taxon{
+      name: sequence("taxon")
     }
   end
 

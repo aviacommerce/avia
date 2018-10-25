@@ -13,6 +13,11 @@
     </div>
   </li>
   <li>
+    <a class="nav-link" href="/dashboard">
+    <i class="fa fa-clipboard-list" aria-hidden="true"></i> <span> Dashboard</span>
+    </a>
+  </li>
+  <li>
     <a class="nav-link" href="/orders">
     <i class="fa fa-clipboard-list" aria-hidden="true"></i> <span> Orders</span>
     </a>
