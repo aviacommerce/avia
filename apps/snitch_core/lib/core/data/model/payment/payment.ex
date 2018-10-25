@@ -13,6 +13,7 @@ defmodule Snitch.Data.Model.Payment do
     `Snitch.Data.Schema.Payment.PaymentMethod`
   """
   use Snitch.Data.Model
+  import Snitch.Tools.Helper.DateFormatter
 
   alias Snitch.Data.Schema.Payment
   alias Snitch.Data.Model.CardPayment, as: CardPaymentModel
@@ -61,12 +62,6 @@ defmodule Snitch.Data.Model.Payment do
 
   def to_subtype(%Payment{payment_type: "ccd"} = payment) do
     CardPaymentModel.from_payment(payment.id)
-  end
-
-  defmacro to_char(field, format) do
-    quote do
-      fragment("to_char(?, ?)", unquote(field), unquote(format))
-    end
   end
 
   def get_payment_count_by_date(start_date, end_date) do

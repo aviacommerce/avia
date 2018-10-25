@@ -7,17 +7,12 @@ defmodule AdminAppWeb.DashboardController do
   def index(conn, params) do
     {start_date, end_date} = get_date_from_params(params)
 
-    order_state_counts = get_order_state_count(start_date, end_date)
-    product_state_counts = get_product_state_count(start_date, end_date)
-    order_datepoints = get_order_datapoints(start_date, end_date)
-    payment_datapoints = get_payment_datapoints(start_date, end_date)
-
-    render(conn, "index.html",
-      order_state_counts: order_state_counts,
-      product_state_counts: product_state_counts,
-      order_datepoints: order_datepoints,
-      payment_datapoints: payment_datapoints
-    )
+    conn
+    |> assign(:order_state_counts, get_order_state_count(start_date, end_date))
+    |> assign(:product_state_counts, get_product_state_count(start_date, end_date))
+    |> assign(:order_datepoints, get_order_datapoints(start_date, end_date))
+    |> assign(:payment_datapoints, get_payment_datapoints(start_date, end_date))
+    |> render("index.html")
   end
 
   defp get_naive_date_time(date) do

@@ -3,6 +3,7 @@ defmodule Snitch.Data.Model.Order do
   Order API
   """
   use Snitch.Data.Model
+  import Snitch.Tools.Helper.DateFormatter
 
   alias Snitch.Data.Schema.Order
   alias Snitch.Data.Model.LineItem, as: LineItemModel
@@ -224,12 +225,6 @@ defmodule Snitch.Data.Model.Order do
     |> order_by([o], asc: o.state)
     |> select([o], %{state: o.state, count: count(o.id)})
     |> Repo.all()
-  end
-
-  defmacro to_char(field, format) do
-    quote do
-      fragment("to_char(?, ?)", unquote(field), unquote(format))
-    end
   end
 
   def get_order_count_by_date(start_date, end_date) do
