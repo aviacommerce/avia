@@ -3,7 +3,7 @@ defmodule Snitch.Data.Model.Order do
   Order API
   """
   use Snitch.Data.Model
-  import Snitch.Tools.Helper.DateFormatter
+  import Snitch.Tools.Helper.QueryFragment
 
   alias Snitch.Data.Schema.Order
   alias Snitch.Data.Model.LineItem, as: LineItemModel

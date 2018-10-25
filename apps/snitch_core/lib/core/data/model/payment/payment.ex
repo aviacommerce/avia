@@ -13,7 +13,7 @@ defmodule Snitch.Data.Model.Payment do
     `Snitch.Data.Schema.Payment.PaymentMethod`
   """
   use Snitch.Data.Model
-  import Snitch.Tools.Helper.DateFormatter
+  import Snitch.Tools.Helper.QueryFragment
 
   alias Snitch.Data.Schema.Payment
   alias Snitch.Data.Model.CardPayment, as: CardPaymentModel
