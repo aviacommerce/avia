@@ -85,7 +85,7 @@ defmodule Snitch.Core.Mixfile do
       # image uploading
       {:arc, "~> 0.10.0"},
       {:arc_ecto, "~> 0.10.0"},
-      {:ex_aws, "~> 2.0"},
+      {:ex_aws, "~> 2.1"},
       {:ex_aws_s3, "~> 2.0"},
       {:hackney, "~> 1.9"},
       {:sweet_xml, "~> 0.6"},
@@ -100,7 +100,10 @@ defmodule Snitch.Core.Mixfile do
 
       # Multi tenancy
       {:triplex, github: "ramansah/triplex"},
-      {:mariaex, "~> 0.8.2"}
+      {:mariaex, "~> 0.8.2"},
+
+      # xml
+      {:xml_builder, "~> 2.1", override: true}
     ]
   end
 
