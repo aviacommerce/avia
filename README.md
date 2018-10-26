@@ -41,7 +41,7 @@ Documentation for the project can be found on [aviacommerce.org][aviacommerce]. 
 
 Give feedback or suggestion to the developer team on [gitter][gitter].
 
-We are also welcoming to the developers who want to contribute in the development. Head over to the [contributing page][contribute] for more info on how can you get started with aviacommerce.
+We are also welcoming to the developers who want to contribute in the development. Head over to the [contributing page][contribute] for more info on how can you get started with aviacommerce. Pick `good first issue` from the issue tracker.	
 
 [pivotal]: https://www.pivotaltracker.com/n/projects/2149807
 [elixir]: http://elixir-lang.org/
