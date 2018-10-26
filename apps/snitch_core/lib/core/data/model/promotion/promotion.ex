@@ -130,8 +130,6 @@ defmodule Snitch.Data.Model.Promotion do
     end)
   end
 
-  ############################ Private Functions ####################
-
   defp check_for_error_in_preference(changeset) do
     {:ok, rules} = fetch_change(changeset, :rules)
 
@@ -147,4 +145,5 @@ defmodule Snitch.Data.Model.Promotion do
 
   defp is_changeset?(%Ecto.Changeset{}), do: true
   defp is_changeset?(_), do: false
+
 end
