@@ -15,7 +15,7 @@ defmodule Snitch.Demo.Product do
         |> CSV.parse_string
         |> Enum.filter(fn x -> x != "" end)
         |> Enum.each(fn [name, width, height, depth, selling_price,
-        weight, maximum_retail_price, taxon, image] ->
+        weight, maximum_retail_price, state, taxon, image] ->
 
             width = Decimal.new(width)
             height = Decimal.new(height)
@@ -26,12 +26,12 @@ defmodule Snitch.Demo.Product do
             {:ok, updated_taxon} =  Taxonomy.update_taxon(taxon, %{variation_theme_ids: theme_id, image: nil})
             selling_price = Money.new(selling_price, :USD)
             maximum_retail_price = Money.new(maximum_retail_price, :USD)
-            product = create_product!(name, width, height, depth, selling_price, weight, maximum_retail_price, updated_taxon, image)
+            product = create_product!(name, width, height, depth, selling_price, weight, maximum_retail_price, state, updated_taxon, image)
             associate_theme(product, variation_theme.id)
             create_variants(product)
         end)
     end
-    
+
     defp associate_theme(product, theme_id) do
         params = %{
             theme_id: theme_id
@@ -52,17 +52,18 @@ defmodule Snitch.Demo.Product do
             height = Decimal.new(height)
             depth = Decimal.new(depth)
             taxon = Repo.get_by(Taxon, name: taxon)
+            state = product.state
             selling_price = Money.new(selling_price, :USD)
             maximum_retail_price = Money.new(maximum_retail_price, :USD)
             variant = create_product!(name, width, height, depth, selling_price,
-            weight, maximum_retail_price, taxon, image)
+            weight, maximum_retail_price, state, taxon, image)
             create_product_option_value(variant, product)
             associate_product_variant(variant, product)
 
         end)
     end
 
-    defp create_product!(name, width, height, depth, selling_price, weight, maximum_retail_price, taxon, image) do
+    defp create_product!(name, width, height, depth, selling_price, weight, maximum_retail_price, state, taxon, image) do
         light = Repo.get_by(ShippingCategory, name: "light")
         image = [create_image(image)]
         params = %{
@@ -70,6 +71,7 @@ defmodule Snitch.Demo.Product do
 			"width": width,
 			"height": height,
             "depth": depth,
+            "state": state,
             "selling_price": selling_price,
             "weight": weight,
             "shipping_category_id": light.id,

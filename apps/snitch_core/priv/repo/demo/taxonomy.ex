@@ -65,7 +65,14 @@ defmodule Snitch.Demo.Taxonomy do
             }
           ]
         },
-
+        {
+          "Kids",
+          [
+            {"Kids Costumes", []},
+            {"Toys", []},
+            {"Kids Footwear", []}
+          ]
+        },
         {
           "Beauty, Health, Grocery",
           [
