@@ -1,4 +1,4 @@
-defmodule Snitch.Data.Schema.PrmotionRule.OrderTotal do
+defmodule Snitch.Data.Schema.PromotionRule.OrderTotal do
   @moduledoc false
 
   use Snitch.Data.Schema

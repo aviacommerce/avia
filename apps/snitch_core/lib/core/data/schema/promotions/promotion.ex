@@ -18,9 +18,10 @@ defmodule Snitch.Data.Schema.Promotion do
     field(:starts_at, :utc_datetime)
     field(:expires_at, :utc_datetime)
     field(:usage_limit, :integer, default: 0)
+    field(:current_usage_count, :integer, default: 0)
     field(:match_policy, :string, default: "all")
     field(:active, :boolean, default: false)
-    embeds_many(:rules, PromotionRule)
+    embeds_many(:rules, PromotionRule, on_replace: :delete)
     # field(:actions, {:array, :map}, default: [])
     # TODO add code for actions once it is done for rulestry with rules first.
 
