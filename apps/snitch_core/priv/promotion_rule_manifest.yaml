@@ -1,0 +1,9 @@
+## Promotion rules
+
+---
+- order total:
+    Elixir.Snitch.Data.Schema.PrmotionRule.OrderTotal
+- product:
+    Elixir.Snitch.Data.Schema.PrmotionRule.Product
+
+...
