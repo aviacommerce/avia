@@ -37,7 +37,7 @@ defmodule Snitch.Data.Schema.PromotionRule do
   def validate_preference_with_target(changeset), do: changeset
 
   defp add_preferences_change(%Ecto.Changeset{valid?: true} = pref_changeset, changeset) do
-    data = Map.from_struct(pref_changeset.data)
+    data = pref_changeset.changes
     put_change(changeset, :preferences, data)
   end
 

@@ -69,4 +69,47 @@ defmodule Snitch.Data.Schema.PromotionTest do
     display_list = Map.keys(result)
     assert length(display_list) == 2
   end
+
+  describe "add_promo_rules/2" do
+    test "successfully" do
+      promotion = insert(:promotion)
+      rules = set_rules()
+      assert {:ok, result} = Promotion.add_promo_rules(promotion, rules)
+    end
+
+    test "fails if error on preferences under rule" do
+      promotion = insert(:promotion)
+
+      rules = rules_with_bad_preference()
+
+      assert {:error, result} = Promotion.add_promo_rules(promotion, rules)
+    end
+  end
+
+  defp set_rules() do
+    [
+      %{
+        name: "order total",
+        module: Snitch.Data.Schema.PromotionRule.OrderTotal,
+        preferences: %{
+          lower_range: 10,
+          upper_range: 1000
+        }
+      }
+    ]
+  end
+
+  defp rules_with_bad_preference() do
+    [
+      %{
+        name: "order total",
+        module: Snitch.Data.Schema.PromotionRule.OrderTotal,
+        preferences: %{
+          # should be decimal
+          lower_range: "a",
+          upper_range: 1000
+        }
+      }
+    ]
+  end
 end

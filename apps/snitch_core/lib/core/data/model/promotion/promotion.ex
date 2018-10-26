@@ -4,6 +4,9 @@ defmodule Snitch.Data.Model.Promotion do
   """
 
   use Snitch.Data.Model
+  import Ecto.Changeset
+
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.Promotion
 
   @doc """
@@ -28,6 +31,57 @@ defmodule Snitch.Data.Model.Promotion do
           | {:error, Ecto.Changeset.t()}
   def update(params, instance \\ nil) do
     QH.update(Promotion, params, instance, Repo)
+  end
+
+  @doc """
+  Adds the rules for existing promotion.
+
+  Expects the promotion struct for which the rule has to be added and
+  a list or rules.
+
+  ## Caution!
+  The rules of a promotion are casted with `cast_embed` and invokes the
+  `on_replace: delete` check. Hence, if the supplied `rules` list does not
+  include previously added rules then they would be deleted.
+
+  If initially the prmotion struct had rules
+  ```
+  Promotion{
+    rules: [
+      %Snitch.Data.Schema.PromotionRule{
+       id: "6664d057-c61b-4481-8c61-3b29d10450ab",
+       module: Snitch.Data.Schema.PromotionRule.OrderTotal,
+       name: "order total",
+       preferences: %{lower_range: #Decimal<10>, upper_range: #Decimal<1000>}
+     }
+    ]
+  }
+  ```
+  Then the rule list should have the old rule along with new ones.
+
+  ```
+    [
+    %{
+       module: Snitch.Data.Schema.PromotionRule.OrderTotal,
+       name: "order total",
+       preferences: %{lower_range: #Decimal<10>, upper_range: #Decimal<1000>}
+     },
+     %{another rule here}
+    ]
+  ```
+  """
+  @spec add_promo_rules(Promotion.t(), [map]) :: {:ok, Promotion.t()} | {:error, Promotion.t()}
+  def add_promo_rules(promotion, rules) do
+    params = %{rules: rules}
+    changeset = Promotion.rule_update_changeset(promotion, params)
+
+    case check_for_error_in_preference(changeset) do
+      {:ok, changeset} ->
+        Repo.update(changeset)
+
+      {:error, _} = error ->
+        error
+    end
   end
 
   @doc """
@@ -75,4 +129,22 @@ defmodule Snitch.Data.Model.Promotion do
       Map.merge(acc, rule)
     end)
   end
+
+  ############################ Private Functions ####################
+
+  defp check_for_error_in_preference(changeset) do
+    {:ok, rules} = fetch_change(changeset, :rules)
+
+    if Enum.any?(rules, fn rule_changeset ->
+         {:ok, preference} = fetch_change(rule_changeset, :preferences)
+         is_changeset?(preference)
+       end) do
+      {:error, changeset}
+    else
+      {:ok, changeset}
+    end
+  end
+
+  defp is_changeset?(%Ecto.Changeset{}), do: true
+  defp is_changeset?(_), do: false
 end
