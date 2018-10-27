@@ -20,10 +20,10 @@ defmodule AdminAppWeb.PromotionController do
     updated_params = get_date_from_params(params["promotion"])
 
     case Model.Promotion.create(updated_params) do
-      {:ok, _} ->
+      {:ok, changeset} ->
         conn
         |> put_flash(:info, "Promotion created!!")
-        |> redirect(to: promotion_path(conn, :index))
+        |> redirect(to: promotion_path(conn, :edit, changeset.id))
 
       {:error, changeset} ->
         conn
@@ -33,18 +33,17 @@ defmodule AdminAppWeb.PromotionController do
   end
 
   def edit(conn, %{"id" => id}) do
-    # case Zone.get(id) do
-    #   %ZoneSchema{} = zone ->
-    #     members = zone |> Zone.members() |> Enum.into([], fn x -> x.id end)
-    #     changeset = ZoneSchema.update_changeset(zone, %{members: members})
+    case Model.Promotion.get(id) do
+      %Schema.Promotion{} = promotion ->
+        changeset = Schema.Promotion.update_changeset(promotion, %{})
 
-    #     render(conn, "edit.html", changeset: changeset, id: id, zone: zone)
+        render(conn, "edit.html", changeset: changeset, id: id, promotion: promotion)
 
-    #   nil ->
-    #     conn
-    #     |> put_flash(:info, "Zone not found")
-    #     |> redirect(to: zone_path(conn, :index))
-    # end
+      nil ->
+        conn
+        |> put_flash(:info, "Promotion not found")
+        |> redirect(to: promotion_path(conn, :index))
+    end
   end
 
   def update(conn, params) do
