@@ -10,8 +10,7 @@ defmodule AdminAppWeb.DashboardView do
   defp get_time(params, "from", nil) do
     start_time = Ecto.DateTime.utc()
 
-    start =
-      %{start_time | month: start_time.month - 1}
+   %{start_time | month: start_time.month - 1}
       |> Ecto.DateTime.to_date()
       |> to_string
   end
