@@ -32,6 +32,24 @@ defmodule AdminAppWeb.PromotionController do
     end
   end
 
+  def rule_create(conn, params) do
+    promotions = Model.Promotion.get_all()
+    render(conn, "index.html", promotions: promotions)
+    # updated_params = get_date_from_params(params["promotion"])
+
+    # case Model.Promotion.create(updated_params) do
+    #   {:ok, changeset} ->
+    #     conn
+    #     |> put_flash(:info, "Promotion created!!")
+    #     |> redirect(to: promotion_path(conn, :edit, changeset.id))
+
+    #   {:error, changeset} ->
+    #     conn
+    #     |> put_flash(:error, "Sorry there were some errors !!")
+    #     |> render("new.html", changeset: changeset)
+    # end
+  end
+
   def edit(conn, %{"id" => id}) do
     case Model.Promotion.get(id) do
       %Schema.Promotion{} = promotion ->

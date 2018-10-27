@@ -6,5 +6,8 @@
           <%= render "form.html", changeset: @changeset,
             conn: @conn, action: promotion_path(@conn, :create) %>
     </div>
+    <div class="card col-12">
+        <%= render "rule_form.html", conn: @conn, action: promotion_path(@conn, :rule_create, @id) %>
+    </div>
   </div>
 </div>
