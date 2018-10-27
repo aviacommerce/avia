@@ -33,8 +33,8 @@ defmodule AdminAppWeb.RoleHelper do
   end
 
   defp load_role_manifest do
-    File.cwd!()
-    |> Path.join("/priv/role_manifest.yaml")
+    :code.priv_dir(:admin_app)
+    |> Path.join("role_manifest.yaml")
     |> YamlElixir.read_from_file()
   end
 end

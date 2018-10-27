@@ -121,8 +121,8 @@ defmodule Snitch.Data.Model.Promotion do
   """
   def load_promotion_manifest do
     {:ok, rules} =
-      File.cwd!()
-      |> Path.join("/priv/promotion_rule_manifest.yaml")
+      :code.priv_dir(:snitch_core)
+      |> Path.join("promotion_rule_manifest.yaml")
       |> YamlElixir.read_from_file()
 
     Enum.reduce(rules, %{}, fn rule, acc ->
