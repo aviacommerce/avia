@@ -15,7 +15,7 @@ defmodule AdminAppWeb.DashboardController do
     |> render("index.html")
   end
 
-  defp get_naive_date_time(date) do
+  def get_naive_date_time(date) do
     Date.from_iso8601(date)
     |> elem(1)
     |> NaiveDateTime.new(~T[00:00:00])

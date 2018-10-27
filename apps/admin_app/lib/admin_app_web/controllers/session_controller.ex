@@ -135,7 +135,7 @@ defmodule AdminAppWeb.SessionController do
     conn
     |> Plug.sign_in(user)
     |> put_flash(:info, "You are logged in!")
-    |> redirect(to: page_path(conn, :index))
+    |> redirect(to: dashboard_path(conn, :index))
   end
 
   defp login({:error, _}, conn) do
