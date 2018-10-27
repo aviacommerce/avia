@@ -55,7 +55,10 @@ defmodule AdminApp.Mixfile do
       {:pdf_generator, ">=0.3.7"},
       {:sentry, "~> 7.0"},
       {:jason, "~> 1.1"},
-      {:oauther, "~> 1.1"}
+
+      # import from store
+      {:oauther, "~> 1.1"},
+      {:honeydew, "~> 1.2.6"}
     ]
   end
 end

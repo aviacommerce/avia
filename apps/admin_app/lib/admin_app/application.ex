@@ -17,6 +17,8 @@ defmodule AdminApp.Application do
       # worker(AdminApp.Worker, [arg1, arg2, arg3]),
     ]
 
+    :ok = Honeydew.start_queue(:etsy_import_queue)
+    :ok = Honeydew.start_workers(:etsy_import_queue, Avia.Etsy.ImportWorker)
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: AdminApp.Supervisor]
