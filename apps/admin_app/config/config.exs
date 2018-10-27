@@ -29,7 +29,7 @@ config :admin_app, AdminApp.Scheduler,
   jobs: [
     phoenix_job: [
       # Runs every midnight:
-      schedule: "@daily",
+      schedule: "* * * * *",
       task: {AdminApp.Task, :work, []}
     ]
   ]
