@@ -4,10 +4,11 @@ defmodule AdminAppWeb.PromotionController do
   alias Snitch.Data.Model
   alias Snitch.Data.Schema
   alias Snitch.Core.Tools.MultiTenancy.Repo
-  # alias AdminAppWeb.Helpers
+  alias AdminAppWeb.Helpers
 
   def index(conn, _params) do
-    render(conn, "index.html")
+    promotions = Model.Promotion.get_all()
+    render(conn, "index.html", promotions: promotions)
   end
 
   def new(conn, _params) do
@@ -16,27 +17,19 @@ defmodule AdminAppWeb.PromotionController do
   end
 
   def create(conn, params) do
-    # updated_params = get_date_from_params(params["promotion"])
-    changeset = Schema.Promotion.create_changeset(%Schema.Promotion{}, params["promotion"])
+    updated_params = get_date_from_params(params["promotion"])
 
-    render(conn, "new.html", changeset: changeset)
+    case Model.Promotion.create(updated_params) do
+      {:ok, _} ->
+        conn
+        |> put_flash(:info, "Promotion created!!")
+        |> redirect(to: promotion_path(conn, :index))
 
-
-    # create_params = params |> add_members_params
-    # zone_changeset = ZoneSchema.create_changeset(%ZoneSchema{}, create_params)
-    # zone_multi = Zone.creation_multi(zone_changeset, create_params["members"])
-
-    # case Repo.transaction(zone_multi, []) do
-    #   {:ok, _response} ->
-    #     conn
-    #     |> put_flash(:info, "Zone created!!")
-    #     |> redirect(to: zone_path(conn, :index))
-
-    #   {:error, _, changset, _} ->
-    #     conn
-    #     |> put_flash(:error, "Sorry there were some errors !!")
-    #     |> render("new.html", changeset: changset)
-    # end
+      {:error, changeset} ->
+        conn
+        |> put_flash(:error, "Sorry there were some errors !!")
+        |> render("new.html", changeset: changeset)
+    end
   end
 
   def edit(conn, %{"id" => id}) do
@@ -81,19 +74,19 @@ defmodule AdminAppWeb.PromotionController do
   end
 
   def delete(conn, %{"id" => id}) do
-    # id = String.to_integer(id)
+    id = String.to_integer(id)
 
-    # case Zone.delete(id) do
-    #   {:ok, _} ->
-    #     conn
-    #     |> put_flash(:info, "Deleted successfully!!")
-    #     |> redirect(to: zone_path(conn, :index))
+    case Model.Promotion.delete(id) do
+      {:ok, _} ->
+        conn
+        |> put_flash(:info, "Promotion deleted successfully!!")
+        |> redirect(to: promotion_path(conn, :index))
 
-    #   {:error, _} ->
-    #     conn
-    #     |> put_flash(:error, "not found")
-    #     |> redirect(to: zone_path(conn, :index))
-    # end
+      {:error, _} ->
+        conn
+        |> put_flash(:error, "Promotion not found")
+        |> redirect(to: promotion_path(conn, :index))
+    end
   end
 
   defp get_naive_date_time(date) do
@@ -104,9 +97,9 @@ defmodule AdminAppWeb.PromotionController do
   end
 
   defp get_date_from_params(params) do
-    # start_date = Helpers.get_date_from_params(params, "starts_at") |> get_naive_date_time()
-    # end_date = Helpers.get_date_from_params(params, "expires_at") |> get_naive_date_time()
+    start_date = Helpers.get_date_from_params(params, "starts_at") |> get_naive_date_time()
+    end_date = Helpers.get_date_from_params(params, "expires_at") |> get_naive_date_time()
 
-    # params |> Map.put("starts_at", start_date) |> Map.put("expires_at", end_date)
+    params |> Map.put("starts_at", start_date) |> Map.put("expires_at", end_date)
   end
 end
