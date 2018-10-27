@@ -1,0 +1,45 @@
+<%= form_for @changeset, @action, fn f -> %>
+<div class="form-group row ">
+   <%= input f, :code, nil, is_horizontal: false %>
+</div>
+<div class="form-group row ">
+   <%= checkbox_input f, :active, nil, is_horizontal: false %>
+</div>
+<div class="form-group row ">
+   <%= input f, :current_usage_count, nil, is_horizontal: false %>
+</div>
+<div class="form-group row ">
+   <%= input f, :usage_count, nil, is_horizontal: false %>
+</div>
+<div class="form-group row">
+   <%= input f, :description, nil, is_horizontal: false %>
+</div>
+<div class="form-group row ">
+   <label for="inputEmail3" class="col-sm-3 col-form-label">
+      <div class="label">
+         Starts At
+      </div>
+   </label>
+   <div class="col-sm-9"> 
+      <input type="date" name="promotion[starts_at]" value=<%= get_date(@conn, ["promotion", "starts_at"])  %>>
+   </div>
+</div>
+<div class="form-group row ">
+   <label for="inputEmail3" class="col-sm-3 col-form-label">
+      <div class="label">
+         Expires At
+      </div>
+   </label>
+   <div class="col-sm-9"> 
+      <input type="date" name="promotion[expires_at]" value=<%= get_date(@conn, ["promotion", "expires_at"])  %>>
+   </div>
+</div>
+
+<div class="form-group row stickformbutton">
+   <div class="col-sm-10">
+      <%= submit "Submit", class: "btn btn-primary submit-btn float-right"%>
+      
+   </div>
+</div>
+</form>
+<% end %>

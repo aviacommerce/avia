@@ -1,0 +1,13 @@
+<div class="list-container">
+   <div class="row m-0 list-header">
+      <div class="col-10 p-0">
+         <h2>Promotions</h2>
+      </div>
+      <div class="col-2 p-0 float-right text-right">
+         <%= link(raw("<i class='fas fa-plus'></i> Add a Promotion"), to: "/promotions/new", class: "btn btn-primary")%>
+      </div>
+   </div>
+   <div class="row m-0 list">
+      
+   </div>
+</div>

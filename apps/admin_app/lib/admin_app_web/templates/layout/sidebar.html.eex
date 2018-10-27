@@ -70,6 +70,9 @@
         </li>
       <% end %>
       <li>
+        <a class="nav-link" href="/promotions">Promotions</a>
+      </li>
+      <li>
         <a class="nav-link" href="/shipping-policy/new">Shipping Policy</a>
       </li>
       <li>
