@@ -12,8 +12,18 @@ defmodule AdminAppWeb.ShippingPolicyView do
     shipping_rule.shipping_rule_identifier.code in order_identifers
   end
 
+  def check_identifier(:free, shipping_rule) do
+    identifiers = ShippingRuleIdentifier.free_identifiers()
+    shipping_rule.shipping_rule_identifier.code in identifiers
+  end
+
   def show_amount(money) do
     money = money |> Money.round()
     money.amount
+  end
+
+  ## TODO: handle the requirement gracefully for showing description
+  def identfier_detail(code) do
+    ShippingRuleIdentifier.identifer_description(code)
   end
 end

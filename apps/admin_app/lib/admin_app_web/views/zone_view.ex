@@ -2,6 +2,8 @@ defmodule AdminAppWeb.ZoneView do
   use AdminAppWeb, :view
 
   alias Snitch.Data.Model.{State, Country, Zone}
+  alias Snitch.Data.Schema.Zone, as: ZoneSchema
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def get_zones() do
     [Country: "C", State: "S"]
@@ -42,5 +44,9 @@ defmodule AdminAppWeb.ZoneView do
       "C" -> "Country"
       "S" -> "State"
     end
+  end
+
+  def check_min_zones() do
+    length(Repo.all(ZoneSchema)) > 1
   end
 end

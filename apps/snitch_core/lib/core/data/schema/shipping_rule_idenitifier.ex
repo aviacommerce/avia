@@ -12,8 +12,9 @@ defmodule Snitch.Data.Schema.ShippingRuleIdentifier do
   # fsro -> free shipping on order above some amount
 
   @product_identifiers ~w(fsrp)a
-  @order_identifiers ~w(fiso fsro fso)a
-  @codes @product_identifiers ++ @order_identifiers
+  @order_identifiers ~w(fiso fsro)a
+  @free_identifiers ~w(fso)a
+  @codes @product_identifiers ++ @order_identifiers ++ @free_shipping
 
   schema "snitch_shipping_rule_identifiers" do
     field(:code, Ecto.Atom)
@@ -43,5 +44,18 @@ defmodule Snitch.Data.Schema.ShippingRuleIdentifier do
 
   def order_identifiers() do
     @order_identifiers
+  end
+
+  def free_identifiers() do
+    @free_identifiers
+  end
+
+  def identifer_description(code) do
+    case code do
+      :fso -> "free shipping for order"
+      :fsrp -> "flat shipping rate for each product"
+      :fiso -> "fixed shipping rate for order"
+      :fsro -> "free shipping on order above amount"
+    end
   end
 end
