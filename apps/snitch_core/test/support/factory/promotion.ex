@@ -10,6 +10,7 @@ defmodule Snitch.Factory.Promotion do
           starts_at: DateTime.utc_now(),
           expires_at: Timex.shift(DateTime.utc_now(), years: 1),
           usage_limit: 10,
+          current_usage_count: 0,
           match_policy: "all",
           active: true,
           rules: []
