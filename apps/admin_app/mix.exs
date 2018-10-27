@@ -46,8 +46,6 @@ defmodule AdminApp.Mixfile do
       {:snitch_core, "~> 0.0.1", in_umbrella: true},
       {:guardian, "~> 1.0"},
       {:params, "~> 2.0"},
-      {:quantum, "~> 2.3"},
-      {:timex, "~> 3.0"},
       {:yaml_elixir, "~> 2.1.0"},
       # email
       {:swoosh, "~> 0.15"},

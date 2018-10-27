@@ -25,15 +25,6 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
-config :admin_app, AdminApp.Scheduler,
-  jobs: [
-    phoenix_job: [
-      # Runs every midnight:
-      schedule: "@daily",
-      task: {AdminApp.Task, :work, []}
-    ]
-  ]
-
 # Configure Guardian
 config :admin_app, AdminAppWeb.Guardian,
   issuer: "admin_app",

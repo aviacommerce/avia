@@ -47,18 +47,6 @@ defmodule Snitch.Core.Tools.MultiTenancy.Repo do
   end
 
   def get_prefix() do
-    if Mix.env() == :test do
-      "public"
-    else
-      prefix = Process.get({__MODULE__, :prefix})
-
-      case Triplex.all() |> Enum.member?(prefix) do
-        true ->
-          prefix
-
-        false ->
-          "default_db"
-      end
-    end
+    Process.get({__MODULE__, :prefix})
   end
 end
