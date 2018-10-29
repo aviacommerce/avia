@@ -44,7 +44,7 @@ defmodule AdminAppWeb.ShippingPolicyController do
     category = ScModel.get_with_rules(update_params.id)
 
     case ScModel.update(update_params, category) do
-      {:ok, _} ->
+      {:ok, category} ->
         conn
         |> put_flash(:info, "Shipping Category updated with rules!")
         |> redirect(to: shipping_policy_path(conn, :edit, category.id))
@@ -69,9 +69,9 @@ defmodule AdminAppWeb.ShippingPolicyController do
     {:ok, currency} = @defaults.fetch(:currency)
 
     Enum.map(rules, fn rule ->
-      amount = rule["shipping_cost"] || 0.00
+      amount = rule["shipping_cost"] || "0.00"
       shipping_cost = Money.new!(currency, amount)
-      %{rule | "shipping_cost" => shipping_cost}
+      Map.put(rule, "shipping_cost", shipping_cost)
     end)
   end
 end

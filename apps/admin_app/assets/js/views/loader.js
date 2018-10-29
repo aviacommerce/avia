@@ -7,8 +7,6 @@ import ProductEditView from './product/edit';
 import OrderIndexView from './order/index';
 import ZoneNewView from './zone/new';
 import ProductIndexView from './product/index';
-import Shipping_policyIndexView from './shipping_policy/index_edit';
-import Shipping_policyEditView from './shipping_policy/index_edit';
 import DashboardIndexView from './dashboard/index';
 
 
@@ -22,8 +20,6 @@ const views = {
   ProductIndexView,
   OrderIndexView,
   ZoneNewView,
-  Shipping_policyIndexView,
-  Shipping_policyEditView,
   DashboardIndexView
 };
 
