@@ -357,13 +357,12 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     stock_item = insert(:stock_item, count_on_hand: 10)
 
     # setup shipping category, identifier, rules
-    shipping_identifier = insert(:shipping_identifier)
+    shipping_identifier = insert(:shipping_identifier, code: :fiso)
 
     shipping_category = insert(:shipping_category)
 
     shipping_rule =
       insert(:shipping_rule,
-        lower_limit: 100,
         active?: true,
         shipping_cost: shipping_cost,
         shipping_rule_identifier: shipping_identifier,
