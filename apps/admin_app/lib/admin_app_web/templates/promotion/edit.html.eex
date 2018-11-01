@@ -4,10 +4,10 @@
   <div class="col-12">
     <div class="card col-12">
           <%= render "form.html", changeset: @changeset,
-            conn: @conn, action: promotion_path(@conn, :create) %>
+            conn: @conn, action: promotion_path(@conn, :update, @id) %>
     </div>
     <div class="card col-12">
-        <%= render "rule_form.html", conn: @conn, action: promotion_path(@conn, :rule_create, @id) %>
+        <%= render "rule_form.html", conn: Map.put(@conn, :action, :rule_create), action: promotion_path(@conn, :rule_create, @id), method: "post" %>
     </div>
   </div>
 </div>

@@ -5,6 +5,7 @@ defmodule AdminAppWeb.PromotionController do
   alias Snitch.Data.Schema
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias AdminAppWeb.Helpers
+  alias AdminAppWeb.PromotionView
 
   def index(conn, _params) do
     promotions = Model.Promotion.get_all()
@@ -33,21 +34,48 @@ defmodule AdminAppWeb.PromotionController do
   end
 
   def rule_create(conn, params) do
-    promotions = Model.Promotion.get_all()
-    render(conn, "index.html", promotions: promotions)
-    # updated_params = get_date_from_params(params["promotion"])
+    rule_create_params =
+      params["rules"] |> Map.put("module", String.to_atom(params["rules"]["module"]))
 
-    # case Model.Promotion.create(updated_params) do
-    #   {:ok, changeset} ->
-    #     conn
-    #     |> put_flash(:info, "Promotion created!!")
-    #     |> redirect(to: promotion_path(conn, :edit, changeset.id))
+    with %Schema.Promotion{} = promotion <- Model.Promotion.get(params["id"]),
+         {:ok, %Schema.Promotion{} = _promotion_with_rule} <-
+           Model.Promotion.add_promo_rules(promotion, List.wrap(rule_create_params)) do
+      conn
+      |> put_flash(:info, "Promotion rule added!")
+      |> redirect(to: promotion_path(conn, :index))
+    else
+      {:error, changeset} ->
+        conn
+        |> put_flash(:error, "Sorry there were some errors !!")
+        |> render("edit.html", changeset: changeset, id: params["id"])
 
-    #   {:error, changeset} ->
-    #     conn
-    #     |> put_flash(:error, "Sorry there were some errors !!")
-    #     |> render("new.html", changeset: changeset)
-    # end
+      {:error, _, changeset, _} ->
+        conn
+        |> put_flash(:error, "Sorry there were some errors !!")
+        |> render("edit.html", changeset: changeset, id: params["id"])
+
+      nil ->
+        conn
+        |> put_flash(:info, "Promotion not found")
+        |> redirect(to: promotion_path(conn, :index))
+    end
+  end
+
+  def render_form(conn, params) do
+    token = get_csrf_token()
+
+    html =
+      Phoenix.View.render_to_string(
+        PromotionView,
+        "input_form.html",
+        conn: conn,
+        data: params,
+        token: token
+      )
+
+    conn
+    |> put_status(200)
+    |> json(%{html: html})
   end
 
   def edit(conn, %{"id" => id}) do
@@ -65,29 +93,24 @@ defmodule AdminAppWeb.PromotionController do
   end
 
   def update(conn, params) do
-    # with %ZoneSchema{} = zone <- Zone.get(params["id"]),
-    #      zone_changeset <-
-    #        ZoneSchema.update_changeset(
-    #          zone,
-    #          params["zone"]
-    #        ),
-    #      {:ok, _response} <-
-    #        Zone.update_multi(zone, zone_changeset, zone |> member_list_from_params(params))
-    #        |> Repo.transaction() do
-    #   conn
-    #   |> put_flash(:info, "Zone updated!!")
-    #   |> redirect(to: zone_path(conn, :index))
-    # else
-    #   {:error, _, changeset, _} ->
-    #     conn
-    #     |> put_flash(:error, "Sorry there were some errors !!")
-    #     |> render("edit.html", changeset: changeset, id: params["id"])
+    with %Schema.Promotion{} = promotion <- Model.Promotion.get(params["id"]),
+         {:ok, %Schema.Promotion{} = _updated_promotion} <-
+           Model.Promotion.add_promo_rules(promotion, params) do
+      conn
+      |> put_flash(:info, "Promotion updated!!")
+      |> redirect(to: promotion_path(conn, :index))
+    else
+      {:error, changeset} ->
+        conn
+        |> put_flash(:error, "Sorry there were some errors !!")
+        |> render("edit.html", changeset: changeset, id: params["id"])
 
-    #   nil ->
-    #     conn
-    #     |> put_flash(:info, "Zone not found")
-    #     |> redirect(to: zone_path(conn, :index))
-    # end
+      # make available promotion here in above render
+      nil ->
+        conn
+        |> put_flash(:info, "Zone not found")
+        |> redirect(to: promotion_path(conn, :index))
+    end
   end
 
   def delete(conn, %{"id" => id}) do

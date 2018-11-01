@@ -68,8 +68,13 @@ defmodule AdminAppWeb.Router do
     resources("/product_brands", ProductBrandController)
     resources("/payment_methods", PaymentMethodController)
     resources("/zones", ZoneController, only: [:index, :new, :create, :edit, :update, :delete])
-    resources("/promotions", PromotionController, only: [:index, :new, :create, :edit, :update, :delete])
+
+    resources("/promotions", PromotionController,
+      only: [:index, :new, :create, :edit, :update, :delete]
+    )
+
     post("/promotions/:id/edit/rule/create", PromotionController, :rule_create)
+    get("/promotions/:id/edit/rule/render-form", PromotionController, :render_form)
     resources("/general_settings", GeneralSettingsController)
     post("/payment-provider-inputs", PaymentMethodController, :payment_preferences)
     get("/product/category", ProductController, :select_category)
