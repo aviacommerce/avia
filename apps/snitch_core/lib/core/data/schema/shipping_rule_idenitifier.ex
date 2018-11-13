@@ -14,7 +14,7 @@ defmodule Snitch.Data.Schema.ShippingRuleIdentifier do
   @product_identifiers ~w(fsrp)a
   @order_identifiers ~w(fiso fsro)a
   @free_identifiers ~w(fso)a
-  @codes @product_identifiers ++ @order_identifiers ++ @free_shipping
+  @codes @product_identifiers ++ @order_identifiers ++ @free_identifiers
 
   schema "snitch_shipping_rule_identifiers" do
     field(:code, Ecto.Atom)
