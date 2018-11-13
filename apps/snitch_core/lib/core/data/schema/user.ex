@@ -80,6 +80,7 @@ defmodule Snitch.Data.Schema.User do
   def update_changeset(user, params) do
     user
     |> cast(params, @update_fields)
+    |> validate_required([:first_name, :last_name, :email])
     |> common_changeset()
   end
 
