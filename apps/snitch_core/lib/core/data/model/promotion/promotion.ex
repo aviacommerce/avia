@@ -132,7 +132,7 @@ defmodule Snitch.Data.Model.Promotion do
 
   ############################ Private Functions ####################
 
-  defp check_for_error_in_preference(changeset) do
+  defp check_for_error_in_preference(%Ecto.Changeset{valid?: true} = changeset) do
     {:ok, rules} = fetch_change(changeset, :rules)
 
     if Enum.any?(rules, fn rule_changeset ->
@@ -143,6 +143,10 @@ defmodule Snitch.Data.Model.Promotion do
     else
       {:ok, changeset}
     end
+  end
+
+  defp check_for_error_in_preference(changeset) do
+    {:error, changeset}
   end
 
   defp is_changeset?(%Ecto.Changeset{}), do: true

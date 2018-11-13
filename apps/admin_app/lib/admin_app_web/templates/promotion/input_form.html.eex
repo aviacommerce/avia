@@ -2,15 +2,15 @@
     <form id="input_form">
     <input type="hidden" value="<%= @token %>" name="_csrf_token"/>
     <input type="hidden" name="rules[module]" value=<%= @data["option"] %>>
-    <%= if @data["option"] == "Elixir.Snitch.Data.Schema.PrmotionRule.OrderTotal" do %>
+    <%= if @data["option"] == "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal" do %>
     Name: <input type="text" name="rules[name]"><br>
-    Lower Limit: <input type="text" name="rules[preferences][lower_limit]"><br>
-    Upper Limit: <input type="text" name="rules[preferences][upper_limit]"><br>
+    Lower Range: <input type="text" name="rules[preferences][lower_range]"><br>
+    Upper Range: <input type="text" name="rules[preferences][upper_range]"><br>
     <% end %>
-    <%= if @data["option"] == "Elixir.Snitch.Data.Schema.PrmotionRule.Product" do %>
+    <%= if @data["option"] == "Elixir.Snitch.Data.Schema.PromotionRule.Product" do %>
     Name: <input type="text" name="name"><br>
-    Lower Limit: <input type="text" name="rules[preferences][lower_limit]"><br>
-    Upper Limit: <input type="text" name="rules[preferences][upper_limit]"><br>
+    Lower Range: <input type="text" name="rules[preferences][lower_range]"><br>
+    Upper Range: <input type="text" name="rules[preferences][upper_range]"><br>
     <% end %>
     </form>
 </div>

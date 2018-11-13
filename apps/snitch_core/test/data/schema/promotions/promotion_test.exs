@@ -36,7 +36,7 @@ defmodule Snitch.Data.Schema.PromotionTest do
         rules: [
           %{
             name: 1,
-            module: Snitch.Data.Schema.PrmotionRule.OrderTotal,
+            module: Snitch.Data.Schema.PromotionRule.OrderTotal,
             preferences: %{
               lower_range: "a",
               upper_range: 100
