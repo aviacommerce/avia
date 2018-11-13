@@ -22,8 +22,8 @@
                   </div>
                   <div class="media-body">
                      <div class="row">
-                        <div class="col-5">   <%= user.first_name<>" "<>user.last_name %>  </div>
-                        <div class="col-4">    <%= user.email%>  </div>
+                        <div class="col-5">   <%= user.first_name %> <%= user.last_name %>  </div>
+                        <div class="col-4">    <%= user.email %>  </div>
                      </div>
                   </div>
                </div>
