@@ -45,12 +45,12 @@ defmodule Snitch.Data.Schema.StockItem do
 
   defp handle_count(changeset) do
     case get_change(changeset, :count_on_hand) do
+      nil ->
+        changeset
+
       count ->
         count_on_hand = changeset.data.count_on_hand + count
         put_change(changeset, :count_on_hand, count_on_hand)
-
-      nil ->
-        changeset
     end
   end
 
