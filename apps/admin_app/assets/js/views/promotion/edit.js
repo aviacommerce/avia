@@ -22,14 +22,14 @@ export default class View extends MainView {
             target_div.empty().append(data.html);
           }
         });
-        
-        document.getElementById("rule_module_submit_btn").onclick = function(){
-          let input_form = document.getElementById("input_form");
-          input_form.action = input_form.action + "/rule/create";
-          input_form.enctype = "multipart/form-data";
-          input_form.method = "post";
-          document.getElementById("input_form").submit();          
-        }
+      }
+
+      document.getElementById("rule_module_submit_btn").onclick = function(){
+        let input_form = document.getElementById("input_form");
+        input_form.action = input_form.action + "/rule/create";
+        input_form.enctype = "multipart/form-data";
+        input_form.method = "post";
+        document.getElementById("input_form").submit();          
       }
       }
 

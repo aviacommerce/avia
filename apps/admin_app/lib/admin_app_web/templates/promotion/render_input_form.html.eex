@@ -1,0 +1,18 @@
+<%= if @rule.module == "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal"
+     || @rule.module == "Elixir.Snitch.Data.Schema.PromotionRule.Product" do %>
+     <input type="hidden" name=<%= 'rules[#{@rule.module}][module]' %> value=<%= @rule.module %> >
+    <table>
+        <tr>
+            <td>Name: </td>
+            <td><input type="text" name=<%= 'rules[#{@rule.module}][name]' %> value=<%= @rule.name %> ></td>
+        </tr>
+        <tr>
+            <td>Lower Range: </td>
+            <td><input type="text" name=<%= 'rules[#{@rule.module}][preferences][lower_range]' %> value=<%= @rule.preferences["lower_range"] %> ></td>
+        </tr>
+        <tr>
+            <td>Upper Range: </td>
+            <td><input type="text" name=<%= 'rules[#{@rule.module}][preferences][upper_range]' %> value=<%= @rule.preferences["upper_range"] %> ></td>
+        </tr>
+    </table>
+<% end %>
