@@ -35,7 +35,7 @@ defmodule AdminAppWeb.PromotionController do
 
   def rule_create(conn, params) do
     rule_create_params =
-      params["rules"] |> Map.put("module", String.to_atom(params["rules"]["module"]))
+      params["rules"] |> Map.put("module", params["rules"]["module"])
 
     with %Schema.Promotion{} = promotion <- Model.Promotion.get(params["id"]),
          {:ok, %Schema.Promotion{} = _promotion_with_rule} <-

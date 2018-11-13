@@ -145,7 +145,7 @@ defmodule Snitch.Data.Model.Promotion do
     end
   end
 
-  defp check_for_error_in_preference(changeset) do
+  defp check_for_error_in_preference(%Ecto.Changeset{valid?: false} = changeset) do
     {:error, changeset}
   end
 
