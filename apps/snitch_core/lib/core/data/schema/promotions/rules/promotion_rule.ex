@@ -25,7 +25,7 @@ defmodule Snitch.Data.Schema.PromotionRule do
 
   def validate_preference_with_target(%Ecto.Changeset{valid?: true} = changeset) do
     with {:ok, preferences} <- fetch_change(changeset, :preferences) do
-      module = get_field(changeset, :module) |> String.to_atom()
+      module = changeset |> get_field(:module) |> String.to_existing_atom()
       preference_changeset = module.changeset(struct(module), preferences)
       add_preferences_change(preference_changeset, changeset)
     else
