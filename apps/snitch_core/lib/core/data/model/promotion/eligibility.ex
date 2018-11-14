@@ -25,9 +25,9 @@ defmodule Snitch.Data.Model.Promotion.Eligbility do
   then runs a check on the rules of the promotion on the basis
   of match_policy.
   A match policy of type "all" checks that all the rules should
-  be satisfied.
+  be satisfied to apply the promotion.
   A match policy of type "any" checks that any one of the rules
-  should be satisfied.
+  should be satisfied to apply the promotions.
   """
   @spec eligible(Order.t(), Promotion.t()) ::
           {true, String.t()}
@@ -42,6 +42,10 @@ defmodule Snitch.Data.Model.Promotion.Eligbility do
       {false, _} = error ->
         error
     end
+  end
+
+  defp check_eligibility(_, order, %{rules: []}) do
+    {true, @success_message}
   end
 
   defp check_eligibility("all", order, promotion) do
@@ -62,13 +66,22 @@ defmodule Snitch.Data.Model.Promotion.Eligbility do
   defp check_eligibility("any", order, promotion) do
     rules = promotion.rules
 
-    # Enum.reduce(rules, true, fn rule, acc ->
-    #   acc or rule_eligibility?(order, rule)
-    # end)
+    Enum.reduce_while(rules, {false, @error_message.invalid_promotion}, fn rule, _ ->
+      case rule_eligibility(order, rule) do
+        {false, _reason} = reason ->
+          acc = reason
+          {:cont, acc}
+
+        {true, _reason} = reason ->
+          acc = reason
+          {:halt, acc}
+      end
+    end)
   end
 
   defp rule_eligibility(order, rule) do
-    rule.module.eligible?(order, rule.preferences)
+    module = String.to_existing_atom(rule.module)
+    module.eligible(order, rule.preferences)
   end
 
   defp promotion_level_check(promotion) do

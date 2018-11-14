@@ -1,4 +1,4 @@
-defmodule Snitch.Data.Schema.PromotionTest do
+defmodule Snitch.Data.Model.PromotionTest do
   use ExUnit.Case
   use Snitch.DataCase
 

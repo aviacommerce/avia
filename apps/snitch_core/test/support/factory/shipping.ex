@@ -31,7 +31,8 @@ defmodule Snitch.Factory.Shipping do
           delta: 0,
           product: build(:product),
           line_item: build(:line_item),
-          backordered?: false
+          backordered?: false,
+          tax: Money.new!(:USD, 0)
         }
       end
 
@@ -45,7 +46,9 @@ defmodule Snitch.Factory.Shipping do
           order: build(:order, user: build(:user)),
           origin: build(:stock_location),
           items: [],
-          shipping_category: build(:shipping_category)
+          shipping_category: build(:shipping_category),
+          shipping_tax: Money.new!(:USD, 0),
+          cost: Money.new!(:USD, 0)
         }
       end
 
