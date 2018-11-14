@@ -132,10 +132,14 @@ defmodule Snitch.Data.Model.Promotion do
 
   ############################ Private Functions ####################
 
+  defp check_for_error_in_preference(%{action: nil} = changeset), do: {:ok, changeset}
+
   defp check_for_error_in_preference(changeset) do
     {:ok, rules} = fetch_change(changeset, :rules)
 
-    if Enum.any?(rules, fn rule_changeset ->
+    if rules
+       |> Stream.filter(fn rule -> rule.action == :insert end)
+       |> Enum.any?(fn rule_changeset ->
          {:ok, preference} = fetch_change(rule_changeset, :preferences)
          is_changeset?(preference)
        end) do

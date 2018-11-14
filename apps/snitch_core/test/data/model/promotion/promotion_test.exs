@@ -75,6 +75,7 @@ defmodule Snitch.Data.Schema.PromotionTest do
       promotion = insert(:promotion)
       rules = set_rules()
       assert {:ok, result} = Promotion.add_promo_rules(promotion, rules)
+      assert {:ok, result} = Promotion.add_promo_rules(result, rules)
     end
 
     test "fails if error on preferences under rule" do
@@ -90,7 +91,7 @@ defmodule Snitch.Data.Schema.PromotionTest do
     [
       %{
         name: "order total",
-        module: Snitch.Data.Schema.PromotionRule.OrderTotal,
+        module: "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal",
         preferences: %{
           lower_range: 10,
           upper_range: 1000
@@ -103,7 +104,7 @@ defmodule Snitch.Data.Schema.PromotionTest do
     [
       %{
         name: "order total",
-        module: Snitch.Data.Schema.PromotionRule.OrderTotal,
+        module: "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal",
         preferences: %{
           # should be decimal
           lower_range: "a",
