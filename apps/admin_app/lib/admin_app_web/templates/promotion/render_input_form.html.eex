@@ -1,6 +1,7 @@
 <%= if @rule.module == "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal"
      || @rule.module == "Elixir.Snitch.Data.Schema.PromotionRule.Product" do %>
      <input type="hidden" name=<%= 'rules[#{@rule.module}][module]' %> value=<%= @rule.module %> >
+     <input type="hidden" name=<%= 'rules[#{@rule.module}][id]' %> value=<%= @rule.id %> >
     <table>
         <tr>
             <td>Name: </td>
