@@ -1,6 +1,6 @@
 defmodule Snitch.Service.StoreImporter do
   @moduledoc false
-  
+
   use Supervisor
 
   def start_link do

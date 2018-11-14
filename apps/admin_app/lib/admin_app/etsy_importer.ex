@@ -12,18 +12,48 @@ defmodule Avia.Etsy.Importer do
   alias Snitch.Repo
   alias Snitch.Data.Schema.{Product, Taxon, Image}
   alias Snitch.Tools.Helper.ImageUploader
+  alias Snitch.Domain.Taxonomy
 
   def import do
     with {:ok, user} <- get_user(),
-         {:ok, shop} <- get_user_shops(user["user_id"]),
-         {:ok, listings_response} <- get_shop_listing(shop["shop_id"], 1, :active) do
-      t = import_products(listings_response, "active")
+         {:ok, shop} <- get_user_shops(user["user_id"]) do
+      products_import(1, shop["shop_id"])
+
       require IEx
       IEx.pry()
     else
       t ->
         require IEx
         IEx.pry()
+    end
+  end
+
+  def products_import(page_number, shop_id) do
+    with {:ok, listings_response} <-
+      get_shop_listing(shop_id, page_number, :active) do
+        import_products(listings_response, "active")
+        next_page = listings_response["pagination"]["next_page"]
+
+        if(next_page != nil and next_page <= 3) do
+          products_import(next_page, shop_id)
+        end
+      end
+  end
+
+  def insert_taxonomy(parent, []) do
+    parent
+  end
+
+  def insert_taxonomy(parent, [head | t]) do
+    case Taxonomy.get_taxon_by_name(head) do
+      %Taxon{id: id} = taxon ->
+        insert_taxonomy(taxon, t)
+
+      nil ->
+        new_taxon =
+          Taxonomy.add_taxon(parent |> Repo.preload(:taxonomy), %Taxon{name: head}, :child)
+
+        insert_taxonomy(new_taxon, t)
     end
   end
 
@@ -92,11 +122,11 @@ defmodule Avia.Etsy.Importer do
   end
 
   defp map_listing(listing, product_state) do
-    # This temporary till the taxonomy are not seeded
-    taxon = Repo.get_by(Taxon, name: "Shirt")
+    taxon = Repo.get(Taxon, 1)
 
     listing
     |> Enum.map(fn x ->
+      product_taxon = insert_taxonomy(taxon, x["taxonomy_path"])
 
       product = %{
         name: x["title"],
@@ -106,7 +136,7 @@ defmodule Avia.Etsy.Importer do
         selling_price: Money.new(x["price"], x["currency_code"]),
         max_retail_price: Money.new(x["price"], x["currency_code"]),
         state: product_state,
-        taxon_id: taxon.id,
+        taxon_id: product_taxon.id,
         has_variants: x["has_variations"],
         listing_id: x["listing_id"]
       }
@@ -228,7 +258,7 @@ defmodule Avia.Etsy.Importer do
   # /shops/#{shop_id}/listings/active?page=#{page_number}
   def get_shop_listing(shop_id, page_number, :active) do
     with {:ok, body} <-
-           request_resource("get", "/listings/active?api_key=msq6hm200eisgeww328nag61"),
+           request_resource("get", "/shops/#{shop_id}/listings/active?page=#{page_number}"),
          {:ok, json} <- Jason.decode(body) do
       {:ok, json}
     end
