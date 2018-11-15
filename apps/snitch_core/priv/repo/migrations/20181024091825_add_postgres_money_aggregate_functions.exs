@@ -35,11 +35,14 @@ defmodule Snitch.Repo.Migrations.AddPostgresMoneyAggregateFunctions do
     """
 
     execute """
-      CREATE AGGREGATE sum(money_with_currency)
-      (
-        sfunc = money_state_function,
-        stype = money_with_currency
-      );
+      DO $$ BEGIN
+        CREATE AGGREGATE sum(money_with_currency) (
+          sfunc = money_state_function,
+          stype = money_with_currency
+        );
+      EXCEPTION
+        WHEN duplicate_function THEN NULL;
+      END $$;
     """
   end
 

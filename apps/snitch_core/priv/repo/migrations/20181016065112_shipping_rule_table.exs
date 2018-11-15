@@ -5,7 +5,7 @@ defmodule Snitch.Repo.Migrations.ShippingRuleTable do
     create table("snitch_shipping_rules") do
       add(:lower_limit, :decimal)
       add(:upper_limit, :decimal)
-      add(:shipping_cost, String.to_atom("#{prefix()||"public"}.money_with_currency"))
+      add(:shipping_cost, String.to_atom("money_with_currency"))
       add(:active?, :boolean)
       add(:shipping_rule_identifier_id, references("snitch_shipping_rule_identifiers", on_delete: :restrict))
       add(:shipping_category_id, references("snitch_shipping_categories", on_delete: :delete_all))
