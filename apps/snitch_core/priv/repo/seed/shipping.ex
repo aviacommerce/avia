@@ -10,7 +10,7 @@ defmodule Snitch.Seed.Shipping do
   alias Snitch.Data.Schema.{ShippingCategory, Zone}
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
-  @shipping_categories ~w(light heavy fragile)
+  @shipping_categories ~w(light)
 
   @zone_manifest %{
     "apac" => %{zone_type: "C"},
@@ -19,14 +19,14 @@ defmodule Snitch.Seed.Shipping do
   }
 
   def seed! do
-    all_categories = [light, _heavy, fragile] = seed_shipping_categories!()
+    [light] = seed_shipping_categories!()
     all_zones = [apac, india, north_india] = seed_zones!()
 
     manifest = %{
       "smuggle" => {[apac], [light]},
-      "priority" => {all_zones, [light, fragile]},
-      "regular" => {[india, north_india], all_categories},
-      "hyperloop" => {[north_india], [light, fragile]}
+      "priority" => {all_zones, [light]},
+      "regular" => {[india, north_india], [light]},
+      "hyperloop" => {[north_india], [light]}
     }
 
     Enum.map(manifest, fn {name, {zones, categories}} ->
