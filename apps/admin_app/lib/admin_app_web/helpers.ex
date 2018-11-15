@@ -32,7 +32,7 @@ defmodule AdminAppWeb.Helpers do
   end
 
   def month_name(month_number) when month_number in 1..12 do
-    Enum.at(@months, month_number + 1)
+    Enum.at(@months, month_number - 1)
   end
 
   @doc """
