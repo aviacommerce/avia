@@ -5,6 +5,7 @@ defmodule Snitch.Data.Model.PromotionTest do
   import Snitch.Factory
 
   alias Snitch.Data.Model.Promotion
+  alias Snitch.Data.Schema.Promotion, as: PromotionSchema
 
   @params %{
     "code" => "INDEPENDENCE",
@@ -82,8 +83,8 @@ defmodule Snitch.Data.Model.PromotionTest do
       promotion = insert(:promotion)
 
       rules = rules_with_bad_preference()
-
-      assert {:error, result} = Promotion.add_promo_rules(promotion, rules)
+      promotion = Repo.get(PromotionSchema, promotion.id)
+      assert {:error, _} = Promotion.add_promo_rules(promotion, rules)
     end
   end
 

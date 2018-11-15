@@ -7,6 +7,10 @@ defmodule Snitch.Data.Model.Promotion.EligibilityTest do
   alias Snitch.Data.Model.Promotion.Eligbility
   alias Snitch.Data.Schema.PromotionRule
 
+  setup do
+    Application.put_env(:snitch_core, :defaults, currency: :USD)
+  end
+
   describe "eligible/2" do
     setup :zones
     setup :shipping_methods
