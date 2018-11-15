@@ -227,10 +227,10 @@
             Count on hand
           </div>
           <div class="label-txt">Total count for all the products at all stock locations</div>
-          <div class="col-sm-9">
-            <p><%= count_on_hand(@conn) %></p>
-          </div>
         </label>
+        <div class="col-sm-6">
+          <p><%= count_on_hand(@conn) %></p>
+        </div>
       </div>
 
       <div class="form-group row ">
