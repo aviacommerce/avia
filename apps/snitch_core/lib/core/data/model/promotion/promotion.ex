@@ -79,7 +79,7 @@ defmodule Snitch.Data.Model.Promotion do
       {:ok, changeset} ->
         Repo.update(changeset)
 
-      {:error, _} = error ->
+      {:error, _changeset} = error ->
         error
     end
   end
@@ -132,20 +132,21 @@ defmodule Snitch.Data.Model.Promotion do
 
   ############################ Private Functions ####################
 
-  defp check_for_error_in_preference(%{action: nil} = changeset), do: {:ok, changeset}
-
   defp check_for_error_in_preference(changeset) do
-    {:ok, rules} = fetch_change(changeset, :rules)
-
-    if rules
-       |> Stream.filter(fn rule -> rule.action == :insert end)
-       |> Enum.any?(fn rule_changeset ->
-         {:ok, preference} = fetch_change(rule_changeset, :preferences)
-         is_changeset?(preference)
-       end) do
-      {:error, changeset}
+    with {:ok, rules} <- fetch_change(changeset, :rules) do
+      if rules
+         |> Stream.filter(fn rule -> rule.action == :insert end)
+         |> Enum.any?(fn rule_changeset ->
+           {:ok, preference} = fetch_change(rule_changeset, :preferences)
+           is_changeset?(preference)
+         end) do
+        {:error, changeset}
+      else
+        {:ok, changeset}
+      end
     else
-      {:ok, changeset}
+      _ ->
+        {:ok, changeset}
     end
   end
 

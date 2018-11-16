@@ -7,7 +7,11 @@ defmodule Snitch.Data.Model.Promotion.EligibilityTest do
   alias Snitch.Data.Model.Promotion.Eligbility
   alias Snitch.Data.Schema.PromotionRule
 
-  describe "eligible?/2" do
+  setup do
+    Application.put_env(:snitch_core, :defaults, currency: :USD)
+  end
+
+  describe "eligible/2" do
     setup :zones
     setup :shipping_methods
     setup :embedded_shipping_methods
@@ -41,7 +45,7 @@ defmodule Snitch.Data.Model.Promotion.EligibilityTest do
     # Per user usage
     test "returns false for per user usage_count exceeded", context do
       %{products: products} = context
-      promotion = promotion_with_rules(products)
+      # promotion = promotion_with_rules(products, "all")
     end
 
     test "returns false for inactive promotion", context do
@@ -53,61 +57,102 @@ defmodule Snitch.Data.Model.Promotion.EligibilityTest do
     end
 
     # OR
-    test "returns false, policy 'any'" do
+    test "returns true, policy 'any', all rules match", context do
+      %{order: order, products: products} = context
+      promotion = promotion_with_rules({10, 100}, products, "any")
+      assert {true, message} = Eligbility.eligible(order, promotion)
+      assert message == "applicable"
     end
 
     # OR
-    test "returns true, policy 'any'" do
+    test "returns true, policy 'any', one rule matches", context do
+      %{order: order} = context
+      products = insert_list(2, :product)
+
+      promotion = promotion_with_rules({10, 100}, products, "any")
+
+      assert {true, message} = Eligbility.eligible(order, promotion)
+      assert message == "applicable"
+    end
+
+    test "returns false, policy 'any', no rule matches", context do
+      %{order: order} = context
+      products = insert_list(2, :product)
+
+      promotion = promotion_with_rules({5000, 10_000}, products, "any")
+
+      assert {false, message} = Eligbility.eligible(order, promotion)
     end
 
     # AND
-    test "returns false, policy 'all'", context do
+    test "returns true, policy 'all'", context do
       %{order: order, products: products} = context
-      promotion = promotion_with_rules(products, "all")
-      result = Eligbility.eligible(order, promotion)
-      require IEx
-      IEx.pry()
+      promotion = promotion_with_rules({10, 100}, products, "all")
+
+      assert {true, message} = Eligbility.eligible(order, promotion)
+      assert message == "applicable"
     end
 
     # AND
-    test "returns true, policy 'all'" do
+    test "returns false, policy 'all', one of the rules fails", context do
+      %{order: order} = context
+      products = insert_list(2, :product)
+
+      promotion = promotion_with_rules({10, 100}, products, "all")
+      assert {false, _message} = Eligbility.eligible(order, promotion)
     end
 
-    #
-    test "returns true, if no rules set" do
+    test "returns true, if no rules set for promotion", context do
+      %{order: order} = context
+
+      promotion =
+        insert(:promotion,
+          match_policy: "any"
+        )
+
+      assert {true, message} = Eligbility.eligible(order, promotion)
+      assert message == "applicable"
+
+      promotion =
+        insert(:promotion,
+          match_policy: "all"
+        )
+
+      assert {true, message} = Eligbility.eligible(order, promotion)
+      assert message == "applicable"
     end
   end
 
-  defp promotion_with_rules(products, policy) do
+  defp promotion_with_rules(order_range, products, policy) do
     product_rule = product_rule(products)
-    order_total_rule = order_total_rule()
+    order_total_rule = order_total_rule(order_range)
 
     promotion =
       insert(:promotion,
-        rule: [product_rule, order_total_rule],
+        rules: [product_rule, order_total_rule],
         match_policy: policy
       )
   end
 
   defp product_rule(products) do
-    [product_1, product2] = products
+    [product_1, product_2] = products
 
     %PromotionRule{
-      module: Snitch.Data.Schema.PromotionRule.Product,
+      module: "Elixir.Snitch.Data.Schema.PromotionRule.Product",
       name: "products",
       preferences: %{
-        product_list: [product1.id, product2.id]
+        product_list: [product_1.id, product_2.id]
       }
     }
   end
 
-  defp order_total_rule() do
+  defp order_total_rule({lower_range, upper_range}) do
     %PromotionRule{
-      module: Snitch.Data.Schema.PromotionRule.OrderTotal,
+      module: "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal",
       name: "order total",
       preferences: %{
-        lower_range: 10,
-        uppper_range: 100
+        lower_range: lower_range,
+        uppper_range: upper_range
       }
     }
   end
@@ -148,7 +193,8 @@ defmodule Snitch.Data.Model.Promotion.EligibilityTest do
         order: order,
         items: [],
         origin: stock_item_1.stock_location,
-        shipping_category: shipping_category
+        shipping_category: shipping_category,
+        shipping_tax: Money.new!(:USD, 0)
       )
 
     package_item_1 =
