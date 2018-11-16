@@ -10,7 +10,7 @@ defmodule AdminAppWeb.TaxonomyController do
   import Phoenix.View, only: [render_to_string: 3]
 
   def show_default_taxonomy(conn, _params) do
-    case get_default_taxonomy() do
+    case dump_default_taxonomy() do
       {:ok, taxonomy} ->
         token = get_csrf_token()
         render(conn, "taxonomy.html", taxonomy: taxonomy, token: token)
@@ -22,7 +22,7 @@ defmodule AdminAppWeb.TaxonomyController do
     end
   end
 
-  defp get_default_taxonomy do
+  defp dump_default_taxonomy do
     with %TaxonomySchema{} = taxonomy <- Taxonomy.all_taxonomy() |> List.first(),
          taxonomy_dump <- Taxonomy.dump_taxonomy(taxonomy.id) do
       {:ok, taxonomy_dump}
