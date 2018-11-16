@@ -74,9 +74,9 @@ defmodule AdminAppWeb.Router do
     post("/product-images/:product_id", ProductController, :add_images)
     delete("/product-images/", ProductController, :delete_image)
 
-    delete("/taxonomy/delete", TaxonomyController, :delete_taxonomy)
-    resources("/taxonomy", TaxonomyController, except: [:update])
-    post("/taxonomy/create", TaxonomyController, :create_taxonomy)
+    # delete("/taxonomy/delete", TaxonomyController, :delete_taxonomy)
+    resources("/taxonomy", TaxonomyController, only: [:edit, :create])
+    # post("/taxonomy/create", TaxonomyController, :create_taxonomy)
 
     get("/products/:product_id/property", ProductController, :index_property)
     get("/products/:product_id/property/new", ProductController, :new_property)
