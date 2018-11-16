@@ -191,7 +191,7 @@
                 <div>Add Images</div>
               </label>
               <%= file_input f, :images, multiple: true, class: "file-upload__input",
-                id: "product-images" %>
+                id: "product-images", onchange: "form.submit()" %>
             </div>
             <div id="img-selected-container" class="img-selected-container row m-0 col-12 p-0">
             </div>
