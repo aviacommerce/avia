@@ -10,7 +10,7 @@ defmodule Core.Repo.Migrations.CreatePaymentTables do
   as $$
     select coalesce(
       (select 1
-        from  snitch_payments
+      from  #{ prefix() || "public" }.snitch_payments
         where id = supertype_id
         and   payment_type = subtype_discriminator),
       0)
