@@ -100,6 +100,8 @@ defmodule Snitch.Domain.Taxonomy do
     Repo.get_by(Taxonomy, name: name)
   end
 
+  def all_taxonomy, do: Repo.all(Taxonomy)
+
   @doc """
   Get taxonomy by id
   """

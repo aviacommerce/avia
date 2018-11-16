@@ -33,11 +33,9 @@
       <li>
         <a class="nav-link" href="/option_types">Option Types</a>
       </li>
-      <%= if (taxonomy = get_default_taxonomy()) != nil do %>
-        <li>
-          <a class="nav-link" href=<%= taxonomy_path(@conn, :edit, taxonomy) %> >Product Taxonomy</a>
-        </li>
-      <% end %>
+      <li>
+        <a class="nav-link" href="/taxonomy" >Product Taxonomy</a>
+      </li>
       <li>
         <a class="nav-link" href="/properties">Properties</a>
       </li>
