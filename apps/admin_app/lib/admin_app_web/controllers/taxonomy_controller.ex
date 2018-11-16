@@ -34,9 +34,16 @@ defmodule AdminAppWeb.TaxonomyController do
   end
 
   def edit(conn, %{"id" => id}) do
-    taxonomy = Taxonomy.dump_taxonomy(id)
-    token = get_csrf_token()
-    render(conn, "taxonomy.html", taxonomy: taxonomy, token: token)
+    case Taxonomy.dump_taxonomy(id) do
+      [] ->
+        conn
+        |> put_flash(:error, "Taxonomy not found")
+        |> redirect(to: "/")
+
+      taxonomy ->
+        token = get_csrf_token()
+        render(conn, "taxonomy.html", taxonomy: taxonomy, token: token)
+    end
   end
 
   def create(conn, %{"id" => id, "image" => image, "name" => name, "themes" => themes}) do
