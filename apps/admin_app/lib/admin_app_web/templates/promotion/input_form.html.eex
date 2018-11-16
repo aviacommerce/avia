@@ -32,7 +32,7 @@
         <tr>
             <td>Product List: </td>
             <td>
-            <%= multiple_select(:rules, "#{@data["option"]} preferences product_list", value: get_product_list()) %>
+            <%= multiple_select(:rules, "#{@data["option"]}][preferences][product_list", get_product_list()) %>
             </td>
         </tr>
     </table>

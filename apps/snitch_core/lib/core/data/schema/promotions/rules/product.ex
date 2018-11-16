@@ -12,7 +12,7 @@ defmodule Snitch.Data.Schema.PromotionRule.Product do
 
   def changeset(%__MODULE__{} = data, params) do
     data
-    |> cast(params, [:product])
+    |> cast(params, [:product_list])
   end
 
   @doc """

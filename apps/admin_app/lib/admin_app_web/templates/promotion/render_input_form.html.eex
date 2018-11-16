@@ -21,6 +21,7 @@
 <% end %>
 <%= if @rule.module == "Elixir.Snitch.Data.Schema.PromotionRule.Product" do %>
      <input type="hidden" name=<%= 'rules[#{@rule.module}][module]' %> value=<%= @rule.module %>>
+     <input type="hidden" name=<%= 'rules[#{@rule.module}][id]' %> value=<%= @rule.id %> >
     <input type="hidden" name=<%= 'rules[#{@rule.module}][name]' %> value=<%= @rule.name %>>
     <table>
         <tr>
@@ -31,7 +32,7 @@
         <tr>
             <td>Product List: </td>
             <td>
-            <%= multiple_select(:rules, "#{@data["option"]} preferences product_list", value: get_product_list()) %>
+            <%= multiple_select(:rules, "#{@rule.module}][preferences][product_list", get_product_list(), selected: get_selected_product(@rule.preferences["product_list"])) %>
             </td>
         </tr>
     </table>

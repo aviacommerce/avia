@@ -13,6 +13,10 @@ defmodule AdminAppWeb.PromotionView do
   end
 
   def get_product_list() do
-    Model.Product.get_all() |> Enum.into([], fn x -> x.id end)
+    Model.Product.get_all() |> Enum.into([], fn x -> {x.name, x.id} end)
+  end
+
+  def get_selected_product(rule) do
+    rule |> Enum.into([], fn x -> trunc(x) |> to_string() end)
   end
 end
