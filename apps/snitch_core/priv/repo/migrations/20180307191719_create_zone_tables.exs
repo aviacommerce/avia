@@ -10,7 +10,7 @@ defmodule Snitch.Repo.Migrations.CreateZoneTables do
   as $$
     select coalesce(
       (select 1
-        from  snitch_zones
+        from  #{ prefix() || "public" }.snitch_zones
         where id = supertype_id
         and   zone_type = subtype_discriminator),
       0)
