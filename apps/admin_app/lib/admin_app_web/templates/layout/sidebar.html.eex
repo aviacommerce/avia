@@ -34,7 +34,7 @@
         <a class="nav-link" href="/option_types">Option Types</a>
       </li>
       <li>
-        <a class="nav-link" href="/taxonomy">Product Taxonomy</a>
+        <a class="nav-link" href="/taxonomy" >Product Taxonomy</a>
       </li>
       <li>
         <a class="nav-link" href="/properties">Properties</a>
@@ -109,7 +109,7 @@
       <li>
         <a id="drawertoggle"><i class="fas fa-angle-double-left"></i></a>
       </li>
-    </ul>  
+    </ul>
   </li>
- 
+
 </ul>

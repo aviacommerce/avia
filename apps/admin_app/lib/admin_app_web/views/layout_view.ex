@@ -1,7 +1,7 @@
 defmodule AdminAppWeb.LayoutView do
   use AdminAppWeb, :view
   alias AdminAppWeb.Guardian
-  alias Snitch.Data.Schema.GeneralConfiguration
+  alias Snitch.Data.Schema.{GeneralConfiguration, Taxonomy}
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
   @doc """
@@ -36,6 +36,10 @@ defmodule AdminAppWeb.LayoutView do
 
   def check_general_settings() do
     Repo.all(GeneralConfiguration) |> List.first()
+  end
+
+  def get_default_taxonomy() do
+    Repo.all(Taxonomy) |> List.first()
   end
 
   def get_user_name(conn) do

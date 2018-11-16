@@ -4,7 +4,7 @@
     <div class="taxon-actions float-right">
       <i class="add-taxon fa fa-plus-square fa-4" aria-hidden="true"></i>
       <i class="edit-taxon fa fa-pencil-square fa-4" aria-hidden="true"></i>
-      <i class="fa fa-trash fa-4" aria-hidden="true"></i>
+      <!-- <i class="fa fa-trash fa-4" aria-hidden="true"></i> -->
     </div>
   </span>
   <ul data-parent_id="<%= @taxon.id %>">

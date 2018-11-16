@@ -9,34 +9,26 @@ defmodule AdminAppWeb.TaxonomyController do
   alias Snitch.Core.Tools.MultiTenancy.Repo
   import Phoenix.View, only: [render_to_string: 3]
 
-  def index(conn, _params) do
-    taxonomies = Repo.all(TaxonomySchema)
-    render(conn, "index.html", taxonomies: taxonomies)
-  end
-
-  def new(conn, _params) do
-    token = get_csrf_token()
-    render(conn, "new.html", token: token)
-  end
-
-  def create_taxonomy(conn, %{"taxonomy" => taxonomy_params}) do
-    case Taxonomy.create_taxonomy(taxonomy_params["name"]) do
+  def show_default_taxonomy(conn, _params) do
+    case dump_default_taxonomy() do
       {:ok, taxonomy} ->
-        conn
-        |> put_flash(:info, "Taxonomy created successfully")
-        |> redirect(to: taxonomy_path(conn, :index))
+        token = get_csrf_token()
+        render(conn, "taxonomy.html", taxonomy: taxonomy, token: token)
 
-      {:error, changeset} ->
+      {:error, :not_found} ->
         conn
-        |> put_flash(:error, "Please try again")
-        |> redirect(to: taxonomy_path(conn, :new))
+        |> put_flash(:error, "Taxonomy not found")
+        |> redirect(to: "/")
     end
   end
 
-  def edit(conn, %{"id" => id}) do
-    taxonomy = Taxonomy.dump_taxonomy(id)
-    token = get_csrf_token()
-    render(conn, "taxonomy.html", taxonomy: taxonomy, token: token)
+  defp dump_default_taxonomy do
+    with %TaxonomySchema{} = taxonomy <- Taxonomy.all_taxonomy() |> List.first(),
+         taxonomy_dump <- Taxonomy.dump_taxonomy(taxonomy.id) do
+      {:ok, taxonomy_dump}
+    else
+      nil -> {:error, :not_found}
+    end
   end
 
   def create(conn, %{"id" => id, "image" => image, "name" => name, "themes" => themes}) do
@@ -54,20 +46,6 @@ defmodule AdminAppWeb.TaxonomyController do
     conn
     |> put_status(200)
     |> json(%{html: html})
-  end
-
-  def delete_taxonomy(conn, %{"id" => id}) do
-    case Taxonomy.delete_taxonomy(id) do
-      {:ok, taxonomy} ->
-        conn
-        |> put_flash(:info, "Taxonomy deleted successfully")
-        |> redirect(to: taxonomy_path(conn, :index))
-
-      {:error, _message} ->
-        conn
-        |> put_flash(:error, "Taxonomy with associated products cannot be deleted")
-        |> redirect(to: taxonomy_path(conn, :index))
-    end
   end
 
   def delete(conn, %{"id" => id}) do
