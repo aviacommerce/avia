@@ -25,6 +25,7 @@ alias Snitch.Seed.{
   ProductRating,
   ShippingRules
 }
+
 alias Snitch.Tools.Helper.Taxonomy, as: TaxonomyHelper
 
 variant_count = 9
