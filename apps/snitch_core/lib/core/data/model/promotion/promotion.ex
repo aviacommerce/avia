@@ -132,7 +132,6 @@ defmodule Snitch.Data.Model.Promotion do
 
   ############################ Private Functions ####################
 
-
   defp check_for_error_in_preference(%{action: nil} = changeset), do: {:ok, changeset}
 
   defp check_for_error_in_preference(changeset) do

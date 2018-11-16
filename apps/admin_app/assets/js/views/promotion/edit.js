@@ -19,7 +19,7 @@ export default class View extends MainView {
           },
           data: form_type,
           success: function(data){
-            target_div.empty().append(data.html);
+            target_div.append(data.html);
           }
         });
       }

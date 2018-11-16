@@ -11,4 +11,8 @@ defmodule AdminAppWeb.PromotionView do
   def get_module_list() do
     Model.Promotion.load_promotion_manifest()
   end
+
+  def get_product_list() do
+    Model.Product.get_all() |> Enum.into([], fn x -> x.id end)
+  end
 end

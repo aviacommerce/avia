@@ -1,11 +1,13 @@
-<%= if @rule.module == "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal"
-     || @rule.module == "Elixir.Snitch.Data.Schema.PromotionRule.Product" do %>
+<br>
+<%= if @rule.module == "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal" do %>
      <input type="hidden" name=<%= 'rules[#{@rule.module}][module]' %> value=<%= @rule.module %> >
      <input type="hidden" name=<%= 'rules[#{@rule.module}][id]' %> value=<%= @rule.id %> >
+     <input type="hidden" name=<%= 'rules[#{@rule.module}][name]' %> value=<%= @rule.name %>>
     <table>
         <tr>
-            <td>Name: </td>
-            <td><input type="text" name=<%= 'rules[#{@rule.module}][name]' %> value=<%= @rule.name %> ></td>
+            <th>
+            <%= @rule.name |> String.split(".") |> List.last %>
+            </th>
         </tr>
         <tr>
             <td>Lower Range: </td>
@@ -14,6 +16,23 @@
         <tr>
             <td>Upper Range: </td>
             <td><input type="text" name=<%= 'rules[#{@rule.module}][preferences][upper_range]' %> value=<%= @rule.preferences["upper_range"] %> ></td>
+        </tr>
+    </table>
+<% end %>
+<%= if @rule.module == "Elixir.Snitch.Data.Schema.PromotionRule.Product" do %>
+     <input type="hidden" name=<%= 'rules[#{@rule.module}][module]' %> value=<%= @rule.module %>>
+    <input type="hidden" name=<%= 'rules[#{@rule.module}][name]' %> value=<%= @rule.name %>>
+    <table>
+        <tr>
+            <th>
+            <%= @rule.name |> String.split(".") |> List.last %>
+            </th>
+        </tr>
+        <tr>
+            <td>Product List: </td>
+            <td>
+            <%= multiple_select(:rules, "#{@data["option"]} preferences product_list", value: get_product_list()) %>
+            </td>
         </tr>
     </table>
 <% end %>

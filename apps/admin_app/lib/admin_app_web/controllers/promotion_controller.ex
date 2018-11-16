@@ -34,13 +34,11 @@ defmodule AdminAppWeb.PromotionController do
   end
 
   def rule_create(conn, params) do
-    rule_create_params = params["rules"] |> Map.values
-      # params["rules"] |> Map.put("module", params["rules"]["module"])
+    rule_create_params = params["rules"] |> Map.values()
 
     with %Schema.Promotion{} = promotion <- Model.Promotion.get(params["id"]),
          {:ok, %Schema.Promotion{} = _promotion_with_rule} <-
            Model.Promotion.add_promo_rules(promotion, rule_create_params) do
-            # Model.Promotion.add_promo_rules(promotion, List.wrap(rule_create_params)) do
       conn
       |> put_flash(:info, "Promotion rule added!")
       |> redirect(to: promotion_path(conn, :index))
