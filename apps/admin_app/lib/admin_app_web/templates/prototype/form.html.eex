@@ -14,7 +14,7 @@
 <div class="form-group row stickformbutton">
    <div class="col-sm-10">
      <%= button("Cancel", to: prototype_path(@conn, :index), method: "get",
-            class: "btn btn-secondary btn-outline-secondary submit-btn float-left") %>
+            class: "btn btn-secondary btn-outline-secondary submit-btn float-left", type: "button") %>
       <%= submit "Submit", class: "btn btn-primary submit-btn float-right" %>
    </div>
 </div>
