@@ -3,8 +3,8 @@ import MainView from '../main';
 export default class View extends MainView {
     mount() {
       super.mount();
-      get_categories(1)
       handle_category_click();
+      $(`#category_loader`).removeClass(`loader`).hide();
 
       // Specific logic here
       console.log('ProductProduct_categoryView mounted');

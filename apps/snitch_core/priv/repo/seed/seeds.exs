@@ -26,6 +26,8 @@ alias Snitch.Seed.{
   ShippingRules
 }
 
+alias Snitch.Tools.Helper.Taxonomy, as: TaxonomyHelper
+
 variant_count = 9
 
 # seeds the taxonomy
@@ -64,3 +66,5 @@ ShippingRules.seed!()
 
 # seeds a product rating and it's types
 ProductRating.seed()
+
+TaxonomyHelper.create_taxonomy({"Category", []})

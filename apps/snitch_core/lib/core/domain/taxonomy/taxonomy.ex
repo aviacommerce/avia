@@ -100,6 +100,18 @@ defmodule Snitch.Domain.Taxonomy do
     Repo.get_by(Taxonomy, name: name)
   end
 
+  def all_taxonomy, do: Repo.all(Taxonomy)
+
+  def get_default_taxonomy do
+    case all_taxonomy() |> List.first() do
+      %Taxonomy{} = taxonomy ->
+        {:ok, taxonomy}
+
+      nil ->
+        {:error, :not_found}
+    end
+  end
+
   @doc """
   Get taxonomy by id
   """
