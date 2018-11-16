@@ -9,7 +9,7 @@
   <div class="form-group row">
     <div class="col-sm-10">
       <%= submit "Submit", class: "btn btn-primary submit-btn col-2" %>
-      <%= link("Cancel", to: product_path(@conn, :index), class: "btn btn-primary col-2") %>
+      <%= link("Cancel", to: product_path(@conn, :index), class: "btn btn-primary col-2", type: "button") %>
     </div>
   </div>
 </form>
