@@ -6,6 +6,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Data.Model
   alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Data.Model.ProductPrototype, as: PrototypeModel
+  alias Snitch.Domain.Taxonomy
 
   alias Snitch.Data.Schema.{
     ProductBrand,
@@ -147,7 +148,16 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def select_category(conn, _params) do
-    render(conn, "product_category.html")
+    with {:ok, taxonomy} <- Taxonomy.get_default_taxonomy(),
+         taxonomy <- Repo.preload(taxonomy, :root),
+         taxons <- Taxonomy.get_child_taxons(taxonomy.root.id) do
+      render(conn, "product_category.html", taxons: taxons)
+    else
+      {:error, :not_found} ->
+        conn
+        |> put_flash(:error, "Taxonomy not found")
+        |> redirect(to: "/")
+    end
   end
 
   def add_stock(conn, %{"stock" => params}) do
