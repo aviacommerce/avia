@@ -2,7 +2,7 @@
     <input type="hidden" value="<%= @token %>" name="_csrf_token"/>
     <br>
     <%= if @data["option"] == "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal" do %>
-     <input type="hidden" name=<%= 'rules[#{@data["option"]}][module]' %> value=<%= @data["option"] %>>
+     <input type="hidden" name=<%= 'rules[#{@data["option"]}][module]' %> value=<%= @data["option"] %> class="rule_module_name">
      <input type="hidden" name=<%= 'rules[#{@data["option"]}][name]' %> value=<%= @data["option"] %>>
     <table>
         <tr>
@@ -21,7 +21,7 @@
     </table>
     <% end %>
     <%= if @data["option"] == "Elixir.Snitch.Data.Schema.PromotionRule.Product" do %>
-     <input type="hidden" name=<%= 'rules[#{@data["option"]}][module]' %> value=<%= @data["option"] %>>
+     <input type="hidden" name=<%= 'rules[#{@data["option"]}][module]' %> value=<%= @data["option"] %> class="rule_module_name">
      <input type="hidden" name=<%= 'rules[#{@data["option"]}][name]' %> value=<%= @data["option"] %>>
     <table>
         <tr>

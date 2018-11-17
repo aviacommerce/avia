@@ -1,6 +1,6 @@
 <br>
 <%= if @rule.module == "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal" do %>
-     <input type="hidden" name=<%= 'rules[#{@rule.module}][module]' %> value=<%= @rule.module %> >
+     <input type="hidden" name=<%= 'rules[#{@rule.module}][module]' %> value=<%= @rule.module %> class="rule_module_name">
      <input type="hidden" name=<%= 'rules[#{@rule.module}][id]' %> value=<%= @rule.id %> >
      <input type="hidden" name=<%= 'rules[#{@rule.module}][name]' %> value=<%= @rule.name %>>
     <table>
@@ -20,7 +20,7 @@
     </table>
 <% end %>
 <%= if @rule.module == "Elixir.Snitch.Data.Schema.PromotionRule.Product" do %>
-     <input type="hidden" name=<%= 'rules[#{@rule.module}][module]' %> value=<%= @rule.module %>>
+     <input type="hidden" name=<%= 'rules[#{@rule.module}][module]' %> value=<%= @rule.module %> class="rule_module_name">
      <input type="hidden" name=<%= 'rules[#{@rule.module}][id]' %> value=<%= @rule.id %> >
     <input type="hidden" name=<%= 'rules[#{@rule.module}][name]' %> value=<%= @rule.name %>>
     <table>
