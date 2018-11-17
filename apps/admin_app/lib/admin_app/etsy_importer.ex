@@ -29,15 +29,14 @@ defmodule Avia.Etsy.Importer do
   end
 
   def products_import(page_number, shop_id) do
-    with {:ok, listings_response} <-
-      get_shop_listing(shop_id, page_number, :active) do
-        import_products(listings_response, "active")
-        next_page = listings_response["pagination"]["next_page"]
+    with {:ok, listings_response} <- get_shop_listing(shop_id, page_number, :active) do
+      import_products(listings_response, "active")
+      next_page = listings_response["pagination"]["next_page"]
 
-        if(next_page != nil and next_page <= 3) do
-          products_import(next_page, shop_id)
-        end
+      if(next_page != nil and next_page <= 3) do
+        products_import(next_page, shop_id)
       end
+    end
   end
 
   def insert_taxonomy(parent, []) do
@@ -66,21 +65,33 @@ defmodule Avia.Etsy.Importer do
     # so dropping the listing with variation
     listings =
       listing_json["results"]
-      |> Enum.drop_while(fn listing -> listing["has_variation"] == false end)
+      |> Enum.filter(fn listing -> listing["has_variations"] == false end)
 
-    avia_products = map_listing(listings, product_state)
+    t =
+      listings
+      |> Enum.map(fn listing -> listing["listing_id"] end)
+      |> Enum.map(fn listing_id -> save_product(listing_id, product_state) end)
 
-    product =
-      avia_products
-      |> Enum.map(&save_product/1)
+    # avia_products = map_listing(listings, product_state)
+
+    # product =
+    #   avia_products
+    #   |> Enum.map(&save_product/1)
   end
 
-  defp save_product(avia_product) do
+  defp save_product(listing_id, product_state) do
+    {:ok, listing_json} = get_listing_product_inventory(listing_id)
+
+    {:ok, inventory_json} = get_listing_inventory(listing_id)
+
+    avia_product =
+      inventory_json["results"]["products"]
+      |> Enum.map(fn x -> map_listing(listing_json["results"], product_state, x) end)
+      |> List.first
+
     {_, product} = Repo.insert_all(Product, [product(avia_product)], returning: [:id])
 
-    {:ok, json} = get_listing_product_inventory(avia_product.listing_id)
-
-    save_images(json, product |> List.first())
+    save_images(listing_json, product |> List.first())
   end
 
   defp product(avia_product) do
@@ -93,7 +104,9 @@ defmodule Avia.Etsy.Importer do
       :max_retail_price,
       :state,
       :slug,
-      :taxon_id
+      :taxon_id,
+      :store,
+      :import_product_id
     ])
     |> Map.merge(timestamps)
   end
@@ -121,26 +134,26 @@ defmodule Avia.Etsy.Importer do
     end
   end
 
-  defp map_listing(listing, product_state) do
+  defp map_listing(listing, product_state, etsy_product) do
     taxon = Repo.get(Taxon, 1)
+    listing = List.first(listing)
 
-    listing
-    |> Enum.map(fn x ->
-      product_taxon = insert_taxonomy(taxon, x["taxonomy_path"])
+    product_taxon = insert_taxonomy(taxon, listing["taxonomy_path"])
 
-      product = %{
-        name: x["title"],
-        slug: get_slug(x["url"], x["listing_id"]),
-        description: x["description"],
-        sku: List.first(x["sku"]) || "",
-        selling_price: Money.new(x["price"], x["currency_code"]),
-        max_retail_price: Money.new(x["price"], x["currency_code"]),
-        state: product_state,
-        taxon_id: product_taxon.id,
-        has_variants: x["has_variations"],
-        listing_id: x["listing_id"]
-      }
-    end)
+    product = %{
+      name: listing["title"],
+      slug: get_slug(listing["url"], listing["listing_id"]),
+      description: listing["description"],
+      sku: List.first(listing["sku"]) || "",
+      selling_price: Money.new(listing["price"], listing["currency_code"]),
+      max_retail_price: Money.new(listing["price"], listing["currency_code"]),
+      state: product_state,
+      taxon_id: product_taxon.id,
+      import_product_id: "#{etsy_product["product_id"]}",
+      has_variants: listing["has_variations"],
+      listing_id: listing["listing_id"],
+      store: "etsy"
+    }
   end
 
   defp save_images(listing_details, product) do
@@ -247,8 +260,7 @@ defmodule Avia.Etsy.Importer do
   end
 
   defp get_listing_product_inventory(listing_id) do
-    with {:ok, body} <-
-           request_resource("get", "/listings/#{listing_id}?includes=Inventory,Images"),
+    with {:ok, body} <- request_resource("get", "/listings/#{listing_id}?includes=Images"),
          {:ok, json} <- Jason.decode(body) do
       {:ok, json}
     end
@@ -258,7 +270,18 @@ defmodule Avia.Etsy.Importer do
   # /shops/#{shop_id}/listings/active?page=#{page_number}
   def get_shop_listing(shop_id, page_number, :active) do
     with {:ok, body} <-
-           request_resource("get", "/shops/#{shop_id}/listings/active?page=#{page_number}"),
+           request_resource("get", "/listings/active?api_key="),
+         {:ok, json} <- Jason.decode(body) do
+      {:ok, json}
+    end
+  end
+
+  def get_listing_inventory(listing_id) do
+    with {:ok, body} <-
+           request_resource(
+             "get",
+             "/listings/#{listing_id}/inventory?write_missing_inventory=true"
+           ),
          {:ok, json} <- Jason.decode(body) do
       {:ok, json}
     end
