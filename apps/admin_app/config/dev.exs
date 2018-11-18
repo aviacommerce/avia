@@ -42,7 +42,7 @@ config :admin_app, AdminAppWeb.Endpoint,
 config :admin_app, AdminAppWeb.Endpoint,
   live_reload: [
     patterns: [
-      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
+      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg|sass|scss|cur)$},
       ~r{priv/gettext/.*(po)$},
       ~r{lib/admin_app_web/views/.*(ex)$},
       ~r{lib/admin_app_web/templates/.*(eex)$}

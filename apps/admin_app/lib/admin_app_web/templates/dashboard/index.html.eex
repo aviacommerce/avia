@@ -1,99 +1,119 @@
 <script type="text/javascript">
-     window.barchart = <%= raw(Poison.encode!(@order_datepoints)) %>
-     window.linechart = <%= raw(Poison.encode!(@payment_datapoints)) %>
+  window.barchart = <%= raw(Poison.encode!(@order_datepoints)) %>
+    window.linechart = <%= raw(Poison.encode!(@payment_datapoints)) %>
 </script>
+
 <div class="list-container">
-   <div class="row m-0 list-header">
-      <div class="col-10 p-0">
-        <h2>Dashboard</h2>
+  <div class="row m-0 list-header">
+    <div class="col-10 p-0">
+      <h2>Dashboard</h2>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col"></div>
+      <div class="col">
+        <form action="/dashboard" class="form-inline my-2 float-sm-right">
+          <div class="form-group p-2">
+            <label for="from" class="col-form-label-sm pr-2">From : </label>
+            <input class="form-control form-control-sm" type="date" name="from" value=<%=get_date(@conn.query_params,
+              "from" ) %> onchange="this.form.submit()">
+          </div>
+          <div class="form-group p-2">
+            <label for="to" class="col-form-label-sm pr-2">To : </label>
+            <input class="form-control form-control-sm" type="date" name="to" value=<%=get_date(@conn.query_params,
+              "to" ) %> onchange="this.form.submit()">
+          </div>
+        </form>
       </div>
-  </div>
-  <div class="row">
-    <div class="col">
     </div>
-    <div class="col-5">
-      <form action="/dashboard">
-        From:
-        <input type="date" name="from" value=<%= get_date(@conn.query_params, "from") %> onchange="this.form.submit()">
-        To:
-        <input type="date" name="to" value=<%= get_date(@conn.query_params, "to") %> onchange="this.form.submit()">
-      </form> 
-    </div>
-  </div>
-  <br>
-  <br>
-  <div class="row">
-    <div style="width:45%;float:left;margin-left:5%;">
-      Order states with count.
-      <div class="table-contaner orderlist">
-        <div class="row">
-          <table class="table" style="width: 90%;">
-            <thead style="width: 100%; text-align: left;">
-              <tr>
-                <th scope="col"> State </th>
-                <th scope="col"> Count</th>
-              </tr>
-            </thead>
-            <tbody style="width: 100%;" class="text-capitalize">
-              <%= if @order_state_counts != [] do %>
-                <%= for order_state_count <- @order_state_counts do %>
+    <div class="row">
+      <div class="col">
+        <h5>Orders Status</h5>
+        <hr />
+        <div class="table-contaner orderlist">
+          <div class="row">
+            <div class="col-12">
+              <table class="table table-striped">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col"> State </th>
+                    <th scope="col"> Count</th>
+                  </tr>
+                </thead>
+                <tbody style="width: 100%;" class="text-capitalize">
+                  <%= if @order_state_counts != [] do %>
+                  <%= for order_state_count <- @order_state_counts do %>
                   <tr>
                     <td>
-                      <%= order_state_count.state %> 
+                      <%= order_state_count.state %>
                     </td>
                     <td>
                       <%= order_state_count.count %>
                     </td>
                   </tr>
-                <% end %>
-              <% else %>
-                <tr><td>No records found for the date.</td></tr>
-              <% end %>
-            </tbody>
-          </table>
+                  <% end %>
+                  <% else %>
+                  <tr>
+                    <td colSpan="2" class="text-center">
+                      No records found for the date.
+                    </td>
+                  </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-12">
+              <div class="card p-2">
+                <canvas id="barChart"></canvas>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-    <div style="width:45%;float:left;margin-right:5%;">
-      Product line items state with count.
-      <div class="table-contaner orderlist">
-        <div class="row">
-          <table class="table" style="width: 90%;">
-            <thead style="width: 100%; text-align: left;">
-              <tr>
-                <th scope="col"> State </th>
-                <th scope="col"> Count</th>
-              </tr>
-            </thead>
-            <tbody style="width: 100%;" class="text-capitalize">
-              <%= if @product_state_counts != [] do %>
-                <%= for product_state_count <- @product_state_counts do %>
+      <div class="col">
+        <h5>Products Status</h5>
+        <hr />
+        <div class="table-contaner orderlist">
+          <div class="row">
+            <div class="col-12">
+              <table class="table table-striped">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col"> State </th>
+                    <th scope="col"> Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <%= if @product_state_counts != [] do %>
+                  <%= for product_state_count <- @product_state_counts do %>
                   <tr>
                     <td>
-                      <%= product_state_count.state %> 
+                      <%= product_state_count.state %>
                     </td>
                     <td>
                       <%= product_state_count.count %>
                     </td>
                   </tr>
-                <% end %>
-              <% else %>
-                <tr><td>No records found for the date.</td></tr>
-              <% end %>
-            </tbody>
-          </table>
+                  <% end %>
+                  <% else %>
+                  <tr>
+                    <td colSpan="2" class="text-center">
+                      No records found for the date.
+                    </td>
+                  </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-12">
+              <div class="card p-2">
+                <canvas id="lineChart"></canvas>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>     
-  <br>
-  <br> 
-  <div class="row">
-    <div style="width:45%;float:left;margin-right:5%;">
-      <canvas id="barChart"></canvas>
-    </div>
-    <div style="width:45%;float:left;margin-right:5%;">
-      <canvas id="lineChart"></canvas>
     </div>
   </div>
 </div>
