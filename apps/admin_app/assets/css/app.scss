@@ -8,3 +8,6 @@
 @import "sidebar";
 @import "listing";
 
+.in-progress {
+  cursor: url(/images/in-progress.cur) 25 15, auto !important;
+}

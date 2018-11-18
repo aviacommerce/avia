@@ -23,7 +23,7 @@ exports.config = {
     stylesheets: {
       joinTo: "css/app.css",
       order: {
-        after: ["priv/static/css/app.scss"]
+        after: ["priv/static/css/app.css"]
       }
     },
     templates: {
@@ -60,6 +60,7 @@ exports.config = {
       ignore: [/vendor/, "js/elm.js"],
     },
     sass: {
+      mode: "native", // This is the important part!
       options: {
           includePaths: [
             "node_modules/bootstrap/scss",
