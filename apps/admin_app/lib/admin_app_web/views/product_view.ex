@@ -218,7 +218,7 @@ defmodule AdminAppWeb.ProductView do
 
     with %Taxon{} = taxon <- Repo.get(Taxon, taxon_id),
          {:ok, ancestors} <- Taxonomy.get_ancestors(taxon_id) do
-      ancestors ++ [taxon]
+      (ancestors ++ [taxon])
       |> generate_taxon_text("")
     else
       _ ->

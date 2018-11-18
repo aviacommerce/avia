@@ -31,7 +31,7 @@ defmodule SnitchApiWeb.ProductControllerTest do
   end
 
   test "Products in Descending Order", %{conn: conn} do
-    product = insert(:product)
+    product = insert(:product, %{state: "active"})
 
     params = %{"sort" => "Z-A"}
 
@@ -45,7 +45,7 @@ defmodule SnitchApiWeb.ProductControllerTest do
   end
 
   test "Products in Ascending Order", %{conn: conn} do
-    product = insert(:product)
+    product = insert(:product, %{state: "active"})
 
     params = %{"sort" => "A-Z"}
 
@@ -59,9 +59,9 @@ defmodule SnitchApiWeb.ProductControllerTest do
   end
 
   test "Products, search contains name and pagination", %{conn: conn} do
-    product1 = insert(:product)
-    product2 = insert(:product)
-    product3 = insert(:product)
+    product1 = insert(:product, %{state: "active"})
+    product2 = insert(:product, %{state: "active"})
+    product3 = insert(:product, %{state: "active"})
 
     params = %{
       "filter" => %{"name" => "product"},
@@ -78,7 +78,7 @@ defmodule SnitchApiWeb.ProductControllerTest do
   end
 
   test "Products, sort by newly inserted", %{conn: conn} do
-    product = insert(:product)
+    product = insert(:product, %{state: "active"})
 
     params = %{
       "sort" => "date"

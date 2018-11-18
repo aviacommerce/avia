@@ -11,12 +11,12 @@ defmodule SnitchApi.ProductsContext do
   List out all the products
   """
   def list_products(conn, params) do
-    #TODO Here we are skipping the products that are child product but
+    # TODO Here we are skipping the products that are child product but
     # this can be easily handled by product types once it is introduced
     child_product_ids = from(c in Variation, select: c.child_product_id) |> Repo.all()
 
     query = define_query(params)
-    query = from(p in query, where: p.is_active == true and p.id not in ^child_product_ids)
+    query = from(p in query, where: p.state == "active" and p.id not in ^child_product_ids)
 
     page = create_page(query, %{}, conn)
     products = paginate_collection(query, params)
