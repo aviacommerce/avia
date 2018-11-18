@@ -3,7 +3,7 @@ defmodule SnitchApi.ProductsContext do
   The JSON-API context.
   """
   alias Snitch.Core.Tools.MultiTenancy.Repo
-  alias Snitch.Data.Schema.{Product, Review}
+  alias Snitch.Data.Schema.{Product, Review, Variation}
 
   import Ecto.Query, only: [from: 2, order_by: 2]
 
@@ -11,15 +11,20 @@ defmodule SnitchApi.ProductsContext do
   List out all the products
   """
   def list_products(conn, params) do
+    #TODO Here we are skipping the products that are child product but
+    # this can be easily handled by product types once it is introduced
+    child_product_ids = from(c in Variation, select: c.child_product_id) |> Repo.all()
+
     query = define_query(params)
-    query = from(p in query, where: p.is_active == true)
+    query = from(p in query, where: p.is_active == true and p.id not in ^child_product_ids)
+
     page = create_page(query, %{}, conn)
     products = paginate_collection(query, params)
     {products, page}
   end
 
   @doc """
-  Gives the product with matched `slug` as {:ok, product} tuple or 
+  Gives the product with matched `slug` as {:ok, product} tuple or
   returns an {:error, :not_found} tuple if product is not found.
   """
   @spec product_by_slug(String.t()) :: map
