@@ -3,6 +3,7 @@ defmodule AdminAppWeb.LayoutView do
   alias AdminAppWeb.Guardian
   alias Snitch.Data.Schema.{GeneralConfiguration, Taxonomy}
   alias Snitch.Core.Tools.MultiTenancy.Repo
+  alias AdminAppWeb.Helpers
 
   @doc """
   Generates name for the JavaScript view we want to use
@@ -45,16 +46,5 @@ defmodule AdminAppWeb.LayoutView do
   def get_user_name(conn) do
     user = conn.private.guardian_default_resource
     "#{user.first_name} #{user.last_name}"
-  end
-
-  def date_days_before(days) do
-    Date.utc_today()
-    |> Date.add(-1 * days)
-    |> Date.to_string()
-  end
-
-  def date_today() do
-    Date.utc_today()
-    |> Date.to_string()
   end
 end
