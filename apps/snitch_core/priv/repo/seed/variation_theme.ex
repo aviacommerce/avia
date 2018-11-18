@@ -1,5 +1,4 @@
 defmodule Snitch.Seed.VariationTheme do
-
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.VariationTheme
   alias Snitch.Data.Schema.OptionType
@@ -10,9 +9,18 @@ defmodule Snitch.Seed.VariationTheme do
 
   def seed!() do
     option_types = get_option_type
-    option_ids = for option <- option_types, do: to_string(option.id)
-    option_names = for option <- option_types, do: option.name
-    for option <- option_types, do: create_variation_theme(option.name, [to_string(option.id)])
+
+    for i <- 1..length(option_types),
+        do: option_types |> Combination.combine(i) |> create_variations
+  end
+
+  def create_variations(option_combination) do
+    for options <- option_combination, do: create_variation(options)
+  end
+
+  def create_variation(options) do
+    option_ids = for option <- options, do: to_string(option.id)
+    option_names = for option <- options, do: option.name
     create_variation_theme(Enum.join(option_names, "-"), option_ids)
   end
 
@@ -21,7 +29,7 @@ defmodule Snitch.Seed.VariationTheme do
       "name" => name,
       "option_type_ids" => option_type_ids
     }
-    %VariationTheme{} |> VariationTheme.create_changeset(params) |> Repo.insert!
-end
 
+    %VariationTheme{} |> VariationTheme.create_changeset(params) |> Repo.insert!()
+  end
 end
