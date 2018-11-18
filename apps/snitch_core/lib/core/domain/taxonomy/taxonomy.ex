@@ -142,6 +142,21 @@ defmodule Snitch.Domain.Taxonomy do
     Repo.all(from(taxon in Taxon, where: taxon.parent_id == ^taxon_id))
   end
 
+  def get_ancestors(taxon_id) do
+    case Repo.get(Taxon, taxon_id) do
+      nil ->
+        {:error, :not_found}
+
+      taxon ->
+        ancestors =
+          taxon
+          |> AsNestedSet.ancestors()
+          |> AsNestedSet.execute(Repo)
+
+        {:ok, ancestors}
+    end
+  end
+
   @doc """
   Get taxon by id
   """
