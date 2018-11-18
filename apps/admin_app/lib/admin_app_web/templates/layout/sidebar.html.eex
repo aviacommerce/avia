@@ -1,9 +1,9 @@
 <ul id="drilldown" class="nav nav-pills nav-stacked">
   <li>
     <div class="dropdown navshophead">
-      <a class="dropdown-toggle toggle"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      <img src="/images/shop_manager.001.svg" width="32" height="32" class="d-inline-block align-top" alt="">
-      <span>Shop Manager</span>
+      <a class="dropdown-toggle toggle in-progress"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <img src="/images/shop_manager.001.svg" width="32" height="32" class="d-inline-block align-top" alt="">
+        <span>Shop Manager</span>
       </a>
       <!--<div class="dropdown-menu shopdpdown">
         <a class="dropdown-item" href="#">Action</a>
@@ -107,7 +107,9 @@
         </div>
       </li>
       <li>
-        <a id="drawertoggle"><i class="fas fa-angle-double-left"></i></a>
+        <a id="drawertoggle" class=" in-progress">
+          <i class="fas fa-angle-double-left"></i>
+        </a>
       </li>
     </ul>
   </li>
