@@ -11,7 +11,7 @@ defmodule SnitchApi.ProductsContext do
   List out all the products
   """
   def list_products(conn, params) do
-    #TODO Here we are skipping the products that are child product but
+    # TODO Here we are skipping the products that are child product but
     # this can be easily handled by product types once it is introduced
     child_product_ids = from(c in Variation, select: c.child_product_id) |> Repo.all()
 

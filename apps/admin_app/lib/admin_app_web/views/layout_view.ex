@@ -46,4 +46,15 @@ defmodule AdminAppWeb.LayoutView do
     user = conn.private.guardian_default_resource
     "#{user.first_name} #{user.last_name}"
   end
+
+  def date_days_before(days) do
+    Date.utc_today()
+    |> Date.add(-1 * days)
+    |> Date.to_string()
+  end
+
+  def date_today() do
+    Date.utc_today()
+    |> Date.to_string()
+  end
 end
