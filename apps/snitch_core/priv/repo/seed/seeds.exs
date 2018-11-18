@@ -15,6 +15,8 @@ alias Snitch.Core.Tools.MultiTenancy.Repo
 alias Snitch.Seed.{
   CountryState,
   PaymentMethods,
+  OptionType,
+  VariationTheme,
   Orders,
   Users,
   Stocks,
@@ -44,6 +46,10 @@ end)
 
 # seed roles
 Role.seed()
+
+OptionType.seed!()
+
+VariationTheme.seed!()
 
 # Users.seed_address!()
 Users.seed_users!()

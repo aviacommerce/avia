@@ -27,7 +27,9 @@ export default class View extends MainView {
 
       $(".taxonomy")
         .on("click", ".add-taxon", function(e){
-        $("#taxon-modal").modal({show: true})
+        $("#taxon-modal").modal({show: true});
+        $('.modal-body select').val('').trigger("change");
+        $(".modal-body input[type=text], input[type=file]").val("");
         var id = $(this).closest('li').data("taxon_id");
         let chidren_selector = `ul[data-parent_id="` + id +`"]`;
         children_ul = $(chidren_selector)
