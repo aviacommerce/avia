@@ -13,7 +13,7 @@
     </div>
   </li>
   <li>
-    <a class="nav-link" href="/dashboard">
+    <a class="nav-link" href=<%= "/dashboard?from=#{Helpers.date_days_before(30)}&to=#{Helpers.date_today()}" %>>
     <i class="fa fa-clipboard-list" aria-hidden="true"></i> <span> Dashboard</span>
     </a>
   </li>

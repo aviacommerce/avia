@@ -51,4 +51,15 @@ defmodule AdminAppWeb.Helpers do
   defp select_date(today, ""), do: today
 
   defp select_date(_today, date_from_params), do: date_from_params
+
+  def date_today() do
+    Date.utc_today()
+    |> Date.to_string()
+  end
+
+  def date_days_before(days) do
+    Date.utc_today()
+    |> Date.add(-1 * days)
+    |> Date.to_string()
+  end
 end
