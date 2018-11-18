@@ -90,8 +90,6 @@ defmodule SnitchApiWeb.ProductControllerTest do
       json_response(conn, 200)["data"]
       |> List.first()
 
-    require IEx
-    IEx.pry()
     assert response["attributes"]["name"] == product.name
   end
 end
