@@ -20,7 +20,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Data.Model.StockItem, as: StockModel
   alias Snitch.Data.Schema.StockItem, as: StockSchema
 
-  plug(:load_resources when action in [:new, :edit])
+  plug(:load_resources when action in [:new, :edit, :create])
 
   @rummage_default %{
     "rummage" => %{
@@ -53,6 +53,7 @@ defmodule AdminAppWeb.ProductController do
       redirect(conn, to: product_path(conn, :edit, product.id))
     else
       {:error, changeset} ->
+        conn = %{conn | request_path: product_path(conn, :new)}
         render(conn, "new.html", changeset: %{changeset | action: :new})
     end
   end

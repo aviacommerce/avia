@@ -1,8 +1,9 @@
 defmodule AdminAppWeb.ProductView do
   use AdminAppWeb, :view
 
-  alias Snitch.Data.Schema.{ShippingCategory, Variation}
+  alias Snitch.Data.Schema.{ShippingCategory, Variation, Taxon}
   alias Snitch.Core.Tools.MultiTenancy.Repo
+  alias Snitch.Domain.Taxonomy
 
   alias Snitch.Data.Model.{Product, ProductProperty, Property, StockItem}
   alias Snitch.Data.Schema
@@ -210,5 +211,26 @@ defmodule AdminAppWeb.ProductView do
 
   def get_properties() do
     Property.get_formatted_list()
+  end
+
+  def get_product_category(conn) do
+    taxon_id = conn.params["taxon"]
+
+    with %Taxon{} = taxon <- Repo.get(Taxon, taxon_id),
+         {:ok, ancestors} <- Taxonomy.get_ancestors(taxon_id) do
+      ancestors ++ [taxon]
+      |> generate_taxon_text("")
+    else
+      _ ->
+        "NA"
+    end
+  end
+
+  defp generate_taxon_text([], acc), do: acc
+
+  defp generate_taxon_text([last | []], acc), do: acc <> "#{last.name}"
+
+  defp generate_taxon_text([head | tail], acc) do
+    generate_taxon_text(tail, acc <> "#{head.name} > ")
   end
 end
