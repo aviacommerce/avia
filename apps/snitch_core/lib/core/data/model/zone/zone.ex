@@ -101,7 +101,7 @@ defmodule Snitch.Data.Model.Zone do
     old_members =
       current_zone
       |> zone_module.member_ids()
-      |> Enum.map(fn x -> Integer.to_string(x) end)
+      |> Enum.map(&Integer.to_string/1)
       |> MapSet.new()
 
     new_members = new_member_ids |> get_new_members_mapset()
