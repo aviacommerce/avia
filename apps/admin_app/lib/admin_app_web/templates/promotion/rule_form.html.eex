@@ -2,7 +2,7 @@
 <%= form_for @conn, @action, fn f -> %>
 <div class="form-group row ">
   <input type="hidden", name="id" value=<% #{@id} %>>
-  <%= select_input f, :module, get_module_list(), nil, is_horizontal: false, id: "rule_module" %>
+  <%= select_input f, :module, get_module_list(), nil, is_horizontal: false, id: "rule_module", prompt: "Select any module" %>
   <button type="button" class="btn btn-primary submit-btn float-right", id="rule_module_add_btn">Add</button> 
 </div>
 <div class="form-group row">

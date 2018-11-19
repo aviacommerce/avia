@@ -21,8 +21,9 @@ export default class View extends MainView {
           data: form_type,
           success: function(data){
             target_div.append(data.html);
-            toggle_element("rule_module_submit_btn");
-            remove_rule_module_option(rule_module.selectedIndex);
+            toggle_element("rule_module_submit_btn", false);
+            toggle_element("rule_module_add_btn", true);
+            disable_rule_module_option(rule_module.selectedIndex);
           }
         });
       }
@@ -35,16 +36,29 @@ export default class View extends MainView {
         document.getElementById("input_form").submit();          
       }
 
-      toggle_element("rule_module_submit_btn");
+      toggle_element("rule_module_submit_btn", true);
+      toggle_element("rule_module_add_btn", true);
 
-      document.getElementById("input_form").onchange = function() {
-        toggle_element("rule_module_submit_btn");
+      document.getElementById("input_form").oninput = function() {
+          toggle_element("rule_module_submit_btn", false);        
+      }
+
+      document.getElementById("rule_module").onchange = function() {
+        let rule_module = document.getElementById("rule_module");
+        if (rule_module.selectedIndex > 0) {
+          toggle_element("rule_module_add_btn", false);
+        }
+        if (rule_module.selectedIndex == 0) {
+          toggle_element("rule_module_add_btn", true);
+        }
       }
 
       document.onreadystatechange = function () {
         if (document.readyState == "complete") {
           var rule_module_list = get_existing_promotion_rule_modules();
-          remove_rule_module_option_from(rule_module_list);
+          disable_rule_module_option_from(rule_module_list);
+          let rule_module = document.getElementById("rule_module");
+          rule_module.selectedIndex = 0;
       }
     }
       }
@@ -59,38 +73,25 @@ export default class View extends MainView {
 }
 
 
-export function toggle_element(id) {
+export function toggle_element(id, is_disabled) {
   var x = document.getElementById(id);
-  if (x.disabled === true) {
-    x.disabled = false;
-  } else {
-    x.disabled = true;
-  }
+  x.disabled = is_disabled;
 }
 
-export function remove_rule_module_option(index) {
+export function disable_rule_module_option(index) {
   let rule_module = document.getElementById("rule_module");
-  rule_module.remove(index);
-  if (rule_module.length == 0) {
-    toggle_element("rule_module_add_btn");
-    toggle_element("rule_module");
-  }
+  rule_module[index].disabled = true;
+  rule_module.selectedIndex = 0;
 }
 
-export function remove_rule_module_option_from(rule_module_list) {
+export function disable_rule_module_option_from(rule_module_list) {
   let rule_module = document.getElementById("rule_module");
   var i;
   var len = rule_module.length;
-  let index_list = [];
   for(i=0; i < len; i++) {
     if (rule_module_list.indexOf(rule_module[i].value) != -1) {
-      // remove_rule_module_option(i);
-      index_list.push(i);
+      disable_rule_module_option(i);
     }
-  }
-
-  for(i=0; i < index_list.length; i++) {
-    remove_rule_module_option(index_list[i]);
   }
 }
 
