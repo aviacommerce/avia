@@ -9,6 +9,12 @@ defmodule SnitchApiWeb.ProductBrandView do
   ])
 
   def image_url(brand, conn) do
-    ProductBrand.image_url(brand.image.name, brand)
+    case brand.image do
+      nil ->
+        nil
+
+      _ ->
+        ProductBrand.image_url(brand.image.name, brand)
+    end
   end
 end
