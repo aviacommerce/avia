@@ -56,6 +56,7 @@ function handleSubmitImage(){
     processData: false,
     contentType: false,
     success: function(json) {
+      console.log("Image uploaded successfully");
       $(`#show-upload-response`)
       .empty()
       .append(json.html)
