@@ -63,7 +63,8 @@ defmodule SnitchApiWeb.AddressController do
     zones = CountryZone.get_all()
 
     countries =
-      Enum.map(zones, fn zone -> CountryZone.members(zone) end)
+      zones
+      |> Enum.map(&CountryZone.members/1)
       |> List.flatten()
       |> Enum.uniq()
       |> Enum.sort_by(& &1.name)
