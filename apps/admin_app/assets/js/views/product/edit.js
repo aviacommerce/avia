@@ -6,6 +6,8 @@ export default class View extends MainView {
 
     // Specific logic here
     console.log('ProductEditView mounted');
+    imageOnEnter();
+    imageOnSubmit();
     handleImageSelect();
     deleteImage();
     setup_product();
@@ -21,6 +23,50 @@ export default class View extends MainView {
 
 var selDiv
 var storedFile = []
+
+export function imageOnEnter(){
+  $("#product-image").keydown(function(event) { 
+
+    if (event.keyCode == 13) {
+      event.preventDefault();
+      handleSubmitImage();
+    }
+  });
+}
+
+export function imageOnSubmit(){
+  $("#product-image").submit(function(event){
+    event.preventDefault();
+    handleSubmitImage();
+  });
+}
+
+function handleSubmitImage(){
+  var product_id = $("#product-id").val();
+  var form_data = new FormData();
+  var image_files = $("#product-image").find('#product-images.file-upload__input')[0].files[0];
+  var csrf = $("meta[name='csrf-token']").attr("content");
+  form_data.append('product_images', image_files);
+  form_data.append('product_id', product_id);
+  form_data.append('_csrf_token', csrf);
+  $.ajax({
+    url: `/product-images/${product_id}`,
+    type: "POST",
+    data: form_data,
+    processData: false,
+    contentType: false,
+    success: function(json) {
+      $(`#show-upload-response`)
+      .empty()
+      .append(json.html)
+    },
+    error: function(json) {
+      $(`#show-upload-response`)
+      .empty()
+      .append(json.html)
+    } 
+  });
+}
 
 export function handleImageSelect() {
   document.querySelector('#product-images').addEventListener('change', selectedFile, false);

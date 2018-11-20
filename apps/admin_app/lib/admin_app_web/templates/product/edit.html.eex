@@ -13,7 +13,8 @@
             parent_product: @parent_product,
             brands: @brands,
             stock_locations: @stock_locations,
-            themes: @themes
+            themes: @themes,
+            token: @token
         %>
     </div>
   <div>

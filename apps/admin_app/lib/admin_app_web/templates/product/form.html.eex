@@ -170,48 +170,49 @@
   <div class="tab-pane fade p-3" id="tab3default">
     <div>
       <input id="product-id" name="product-id" type="hidden" value="<%= @parent_product.id %>" >
-      <%= form_for @conn, product_path(@conn, :add_images, @parent_product.id),
-        [as: :product_images, multipart: true], fn f -> %>
-      <div class="form-group row ">
-        <label  class="col-sm-3 col-form-label">
-          <div class="label required">
-            Images
-          </div>
-          <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
-        </label>
-        <div class="col-sm-9">
-          <div class="row imgcol">
-            <%= if length(@parent_product.images) > 0 do %>
-            <%= for image <- @parent_product.images do %>
-            <div class="img-wrap col-3 p-1">
-              <span class="product-delete">&times;
-              <input name="delete-image-id" type="hidden" value="<%= image.id %>" >
-              </span>
-              <%= img_tag(get_image_url(image, @parent_product), class: "img-thumbnail") %>
+      <form id="product-image" accept-charset="UTF-8" enctype="multipart/form-data" method="post" >
+        <input type="hidden" value="<%= @token %>" name="_csrf_token"/>
+        <div id="show-upload-response">
+        </div>
+        <div class="form-group row ">
+          <label  class="col-sm-3 col-form-label">
+            <div class="label required">
+              Images
             </div>
-            <% end %>
-            <% end %>
-            <div class="file-upload col-3 p-1">
-              <label for="upload" class="file-upload__label">
-                <div><i class="fas fa-camera"></i></div>
-                <div>Add Images</div>
-              </label>
-              <%= file_input f, :images, multiple: true, class: "file-upload__input",
-                id: "product-images", onchange: "form.submit()" %>
-            </div>
-            <div id="img-selected-container" class="img-selected-container row m-0 col-12 p-0">
+            <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+          </label>
+          <div class="col-sm-9">
+            <div class="row imgcol">
+              <%= if length(@parent_product.images) > 0 do %>
+              <%= for image <- @parent_product.images do %>
+              <div class="img-wrap col-3 p-1">
+                <span class="product-delete">&times;
+                <input name="delete-image-id" type="hidden" value="<%= image.id %>" >
+                </span>
+                <%= img_tag(get_image_url(image, @parent_product), class: "img-thumbnail") %>
+              </div>
+              <% end %>
+              <% end %>
+              <div class="file-upload col-3 p-1">
+                <label for="upload" class="file-upload__label">
+                  <div><i class="fas fa-camera"></i></div>
+                  <div>Add Images</div>
+                </label>
+                <input type="file" name="product_images[images]" id="product-images" class="file-upload__input" multiple>
+              </div>
+              <div id="img-selected-container" class="img-selected-container row m-0 col-12 p-0">
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="form-group row stickformbutton">
-        <div class="col-sm-10">
-          <%= button("Cancel", to: product_path(@conn, :index), method: "get", type: "button",
-            class: "btn btn-secondary btn-outline-secondary submit-btn float-left") %>
-          <%= submit "Submit", class: "btn  btn-primary submit-btn float-right" %>
+        <div class="form-group row stickformbutton">
+          <div class="col-sm-10">
+            <%= button("Cancel", to: product_path(@conn, :index), method: "get", type: "button",
+              class: "btn btn-secondary btn-outline-secondary submit-btn float-left") %>
+            <button type="submit" class="btn btn-primary submit-btn float-right">Submit</button>
+          </div>
         </div>
-      </div>
-      <% end %>
+      </form>
     </div>
   </div>
   <% end %>

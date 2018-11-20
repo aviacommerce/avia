@@ -20,6 +20,10 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Data.Model.StockItem, as: StockModel
   alias Snitch.Data.Schema.StockItem, as: StockSchema
 
+  #import Phoenix.View, only: [render_to_string: 3]
+  import Phoenix.HTML.Format
+  import Phoenix.HTML
+
   plug(:load_resources when action in [:new, :edit, :create])
 
   @rummage_default %{
@@ -81,16 +85,25 @@ defmodule AdminAppWeb.ProductController do
       |> ProductModel.get()
       |> Repo.preload(:images)
 
-    images = (product_images["images"] ++ product.images) |> parse_images()
+    images = ([product_images] ++ product.images) |> parse_images()
 
     params = %{"images" => images}
 
     case ProductModel.add_images(product, params) do
       {:ok, _} ->
-        redirect(conn, to: product_path(conn, :index))
+        opts = [wrapper_tag: :div, attributes: [class: "alert alert-success"]]
+        html = text_to_html("Image uploaded succesully", opts) |> safe_to_string
+
+        conn
+        |> put_status(200)
+        |> json(%{html: html})
 
       {:error, _} ->
-        redirect(conn, to: product_path(conn, :index))
+        opts = [wrapper_tag: :div, attributes: [class: "alert alert-danger"]]
+        html = text_to_html("Problem uploading image", opts) |> safe_to_string
+        conn
+        |> put_status(500)
+        |> json(%{html: html})
     end
   end
 
@@ -245,6 +258,7 @@ defmodule AdminAppWeb.ProductController do
     stock_locations = Repo.all(StockLocation)
 
     conn
+    |> assign(:token, get_csrf_token())
     |> assign(:themes, themes)
     |> assign(:stock_locations, stock_locations)
     |> assign(:brands, brands)
