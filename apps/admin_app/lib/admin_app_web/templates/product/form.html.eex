@@ -9,9 +9,11 @@
       <a class="nav-link active" href="#tab1default" data-toggle="tab">Product Detail</a>
    </li>
    <%= if  @conn.request_path != product_path(@conn, :new) do %>
-   <li class="nav-item">
-     <a class="nav-link" href="#tab2default" data-toggle="tab">Variants</a>
-   </li>
+   <%= if !is_child_product(@parent_product) do %>
+    <li class="nav-item">
+      <a class="nav-link" href="#tab2default" data-toggle="tab">Variants</a>
+    </li>
+   <% end %>
    <%= if can_add_variant(@parent_product) do %>
    <% end %>
    <li class="nav-item">
@@ -167,12 +169,14 @@
       <% end %>
     </div>
    <% else %>
-    <div class="tab-pane fade p-3" id="tab2default" >
-      <div class="alert alert-info">
-        You can add Product Variants by adding Variation Themes to <span class="badge badge-info"> <%= get_product_category(@parent_product.taxon_id) %> </span> category.
-        <br> Click to <%= link("Add variation theme", to: "/taxonomy?taxon_id=#{@parent_product.taxon_id}", class: "btn btn-primary") %>
+    <%= if !is_child_product(@parent_product) do %>
+      <div class="tab-pane fade p-3" id="tab2default" >
+        <div class="alert alert-info">
+          You can add Product Variants by adding Variation Themes to <span class="badge badge-info"> <%= get_product_category(@parent_product.taxon_id) %> </span> category.
+          <br> Click to <%= link("Add variation theme", to: "/taxonomy?taxon_id=#{@parent_product.taxon_id}", class: "btn btn-primary") %>
+        </div>
       </div>
-    </div>
+    <% end %>
    <% end %>
   <% end %>
   <%= if  @conn.request_path != product_path(@conn, :new) do %>
