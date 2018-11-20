@@ -101,11 +101,13 @@ defmodule Snitch.Data.Model.Zone do
     old_members =
       current_zone
       |> zone_module.member_ids()
+      |> Enum.map(&Integer.to_string/1)
       |> MapSet.new()
 
     new_members = new_member_ids |> get_new_members_mapset()
     added = set_difference(new_members, old_members)
     removed = set_difference(old_members, new_members)
+
     %{added: added, removed: removed}
   end
 
