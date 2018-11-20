@@ -60,10 +60,14 @@ defmodule SnitchApiWeb.AddressController do
   end
 
   def countries(conn, _params) do
-    query = from z in "snitch_zones", where: z.zone_type == "C", select: z.id
-    zone_ids = Repo.all(query)
-    zones = Enum.map(zone_ids, fn id -> Repo.get_by(Zone, id: id) end)
-    countries = Enum.map(zones, fn zone -> CountryZone.members(zone) end) |> List.flatten
+    zones = CountryZone.get_all()
+
+    countries =
+      Enum.map(zones, fn zone -> CountryZone.members(zone) end)
+      |> List.flatten()
+      |> Enum.uniq()
+      |> Enum.sort_by(& &1.name)
+
     render(conn, SnitchApiWeb.CountryView, "index.json-api", data: countries)
   end
 
