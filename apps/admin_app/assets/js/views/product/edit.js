@@ -56,13 +56,11 @@ function handleSubmitImage(){
     processData: false,
     contentType: false,
     success: function(json) {
-      console.log("Image uploaded successfully");
       $(`#show-upload-response`)
       .empty()
       .append(json.html)
     },
     error: function(json) {
-      console.log("Problem loading image");
       $(`#show-upload-response`)
       .empty()
       .append(json.html)
