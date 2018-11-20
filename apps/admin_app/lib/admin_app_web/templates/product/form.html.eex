@@ -1,7 +1,7 @@
 <%= if  @conn.request_path == product_path(@conn, :new) do %>
   <div style="margin-bottom:1rem">
     <span>Product Category </span>
-    <span class="badge badge-secondary"><%= get_product_category(@conn) %></span>
+    <span class="badge badge-secondary"><%= get_product_category(@conn.params["taxon"]) %></span>
   </div>
 <% end %>
 <ul class="nav nav-tabs">
@@ -104,7 +104,8 @@
     <% end %>
   </div>
 
-  <%= if  @conn.request_path != product_path(@conn, :new) and can_add_variant(@parent_product) do %>
+  <%= if  @conn.request_path != product_path(@conn, :new) do %>
+   <%= if can_add_variant(@parent_product)  do %>
     <div class="tab-pane fade p-3" id="tab2default" >
       <div style="background: #f8f9fa;">
         <div class="form-group required">
@@ -165,12 +166,14 @@
       </div>
       <% end %>
     </div>
-  <% else %>
+   <% else %>
     <div class="tab-pane fade p-3" id="tab2default" >
       <div class="alert alert-info">
-        You can add product variaton by adding themes. Click here to <%= link("Add variation theme", to: variation_theme_path(@conn, :index)) %>
+        You can add Product Variants by adding Variation Themes to <span class="badge badge-info"> <%= get_product_category(@parent_product.taxon_id) %> </span> category.
+        <br> Click to <%= link("Add variation theme", to: "/taxonomy?taxon_id=#{@parent_product.taxon_id}", class: "btn btn-primary") %>
       </div>
     </div>
+   <% end %>
   <% end %>
   <%= if  @conn.request_path != product_path(@conn, :new) do %>
   <div class="tab-pane fade p-3" id="tab3default">

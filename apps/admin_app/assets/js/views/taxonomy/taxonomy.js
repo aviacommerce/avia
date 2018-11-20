@@ -4,6 +4,7 @@ import select2Selector from './../../form-helpers/select2-selector';
 export default class View extends MainView {
     mount() {
       super.mount();
+
       let children_ul = null
 
       $(".taxonomy").on("click", ".edit-taxon", function(e){
@@ -69,6 +70,7 @@ export default class View extends MainView {
 
       $("#taxon-edit-body").on("submit", ".edittaxonform", function(event){
         event.preventDefault();
+        
         var form_data = new FormData();
         var name = $(this).find("#editform-taxon-name").val();
         var themes = $("#taxon-edit-body #taxons_taxons").val();
@@ -118,8 +120,39 @@ export default class View extends MainView {
           e.stopPropagation();
       });
 
+      // handle taxon_id from query from URl
+      let params = this.get_query_params()
+      if(params["taxon_id"] != undefined)
+      {
+        $("#edittaxon-modal").modal({show: true})
+        var id = params["taxon_id"];
+        $(`#taxon-edit-loader`).addClass(`loader`).show();
+        fetch('/api/taxon/' + id)
+        .then(function(response) {
+          return response.json()
+        })
+        .then(function(json) {
+          $(`#taxon-edit-body`)
+          .empty()
+          .append(json.html)
+          $(`#taxon-edit-loader`).removeClass(`loader`).hide();
+          select2Selector()
+        })
+      }
+
       // Specific logic here
       console.log('TaxonomyTaxonomyView mounted');
+    }
+
+    get_query_params() {
+      let pairs = window.location.search.slice(1).split('&');
+
+      var result = {};
+      pairs.forEach(function(pair){
+        pair = pair.split('=');
+        result[pair[0]] = decodeURIComponent(pair[1] || "");
+      })
+      return result;
     }
 
     unmount() {
