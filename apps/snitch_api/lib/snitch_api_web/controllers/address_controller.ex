@@ -2,11 +2,9 @@ defmodule SnitchApiWeb.AddressController do
   use SnitchApiWeb, :controller
 
   alias SnitchApi.Checkout
-  alias Snitch.Data.Schema.{Address, Zone}
+  alias Snitch.Data.Schema.Address
   alias Snitch.Data.Model.{Country, CountryZone}
   alias Snitch.Core.Tools.MultiTenancy.Repo
-
-  import Ecto.Query
 
   action_fallback(SnitchApiWeb.FallbackController)
   plug(SnitchApiWeb.Plug.DataToAttributes)
