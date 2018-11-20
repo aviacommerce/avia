@@ -3,7 +3,7 @@ defmodule SnitchApiWeb.AddressController do
 
   alias SnitchApi.Checkout
   alias Snitch.Data.Schema.Address
-  alias Snitch.Data.Model.Country
+  alias Snitch.Data.Model.{Country, CountryZone}
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
   action_fallback(SnitchApiWeb.FallbackController)
@@ -58,7 +58,15 @@ defmodule SnitchApiWeb.AddressController do
   end
 
   def countries(conn, _params) do
-    countries = Country.get_all()
+    zones = CountryZone.get_all()
+
+    countries =
+      zones
+      |> Enum.map(&CountryZone.members/1)
+      |> List.flatten()
+      |> Enum.uniq()
+      |> Enum.sort_by(& &1.name)
+
     render(conn, SnitchApiWeb.CountryView, "index.json-api", data: countries)
   end
 
