@@ -2,9 +2,11 @@ defmodule SnitchApiWeb.AddressController do
   use SnitchApiWeb, :controller
 
   alias SnitchApi.Checkout
-  alias Snitch.Data.Schema.Address
-  alias Snitch.Data.Model.Country
+  alias Snitch.Data.Schema.{Address, Zone}
+  alias Snitch.Data.Model.{Country, CountryZone}
   alias Snitch.Core.Tools.MultiTenancy.Repo
+
+  import Ecto.Query
 
   action_fallback(SnitchApiWeb.FallbackController)
   plug(SnitchApiWeb.Plug.DataToAttributes)
@@ -58,7 +60,10 @@ defmodule SnitchApiWeb.AddressController do
   end
 
   def countries(conn, _params) do
-    countries = Country.get_all()
+    query = from z in "snitch_zones", where: z.zone_type == "C", select: z.id
+    zone_ids = Repo.all(query)
+    zones = Enum.map(zone_ids, fn id -> Repo.get_by(Zone, id: id) end)
+    countries = Enum.map(zones, fn zone -> CountryZone.members(zone) end) |> List.flatten
     render(conn, SnitchApiWeb.CountryView, "index.json-api", data: countries)
   end
 
