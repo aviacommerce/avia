@@ -20,7 +20,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Data.Model.StockItem, as: StockModel
   alias Snitch.Data.Schema.StockItem, as: StockSchema
 
-  #import Phoenix.View, only: [render_to_string: 3]
+  # import Phoenix.View, only: [render_to_string: 3]
   import Phoenix.HTML.Format
   import Phoenix.HTML
 
@@ -101,6 +101,7 @@ defmodule AdminAppWeb.ProductController do
       {:error, _} ->
         opts = [wrapper_tag: :div, attributes: [class: "alert alert-danger"]]
         html = text_to_html("Problem uploading image", opts) |> safe_to_string
+
         conn
         |> put_status(500)
         |> json(%{html: html})

@@ -2,7 +2,7 @@ defmodule SnitchApiWeb.HostedPaymentController do
   use SnitchApiWeb, :controller
   alias SnitchApi.Payment.HostedPayment
   alias SnitchPayments
-  alias SnitchPayments.Gateway.{PayuBiz, Stripe}
+  alias SnitchPayments.Gateway.{PayuBiz, RazorPay, Stripe}
   alias SnitchPayments.Provider
 
   plug(SnitchApiWeb.Plug.DataToAttributes)
@@ -38,6 +38,7 @@ defmodule SnitchApiWeb.HostedPaymentController do
   end
 
   def stripe_purchase(conn, params) do
+    ## TODO get the currency set for store here and use that.
     amount = Money.new!(:USD, params["amount"])
     preferences = HostedPayment.get_payment_preferences(params["payment_method_id"])
     secret = preferences[:credentials]["secret_key"]
@@ -51,6 +52,36 @@ defmodule SnitchApiWeb.HostedPaymentController do
 
       response ->
         response = updated_stripe_response(response, params)
+        non_hpm_purchase_response("success", conn, response)
+    end
+  end
+
+  def rzpay_request_params(conn, %{"id" => id}) do
+    id = String.to_integer(id)
+    preferences = HostedPayment.get_payment_preferences(id)
+    key = preferences[:credentials]["key_id"]
+    render(conn, "rzpay.json-api", key_id: key)
+  end
+
+  def rzpay_purchase(conn, params) do
+    # At present we are providing support only for INR, may need to change
+    # later.
+    amount = Money.new!(:INR, params["amount"])
+    preferences = HostedPayment.get_payment_preferences(params["payment_method_id"])
+    key_id = preferences[:credentials]["key_id"]
+    key_secret = preferences[:credentials]["key_secret"]
+
+    token = params["token"]
+
+    request_params = %{amount: amount, payment_id: token}
+
+    case RazorPay.purchase(request_params, key_id, key_secret) do
+      {:error, response} ->
+        response = updated_rzpay_response(response, params)
+        non_hpm_purchase_response("error", conn, response)
+
+      {:ok, response} ->
+        response = updated_rzpay_response(response, params)
         non_hpm_purchase_response("success", conn, response)
     end
   end
@@ -105,7 +136,7 @@ defmodule SnitchApiWeb.HostedPaymentController do
 
     with {:ok, order} <- HostedPayment.payment_order_context(response) do
       render(conn, "payment_failure.json-api",
-        order: order.number,
+        order: order,
         reason: response.error_reason
       )
     end
@@ -119,6 +150,15 @@ defmodule SnitchApiWeb.HostedPaymentController do
 
   defp updated_stripe_response(response, params) do
     source = Provider.provider(:stripe)
+
+    response
+    |> Map.put("order_id", params["order_id"])
+    |> Map.put("payment_id", params["payment_id"])
+    |> Map.put("payment_source", source)
+  end
+
+  defp updated_rzpay_response(response, params) do
+    source = Provider.provider(:rzpay)
 
     response
     |> Map.put("order_id", params["order_id"])
