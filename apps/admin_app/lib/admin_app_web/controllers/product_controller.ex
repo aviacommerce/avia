@@ -79,8 +79,7 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def add_images(conn, %{"product_images" => product_images, "product_id" => id}) do
-    # require IEx
-    # IEx.pry
+
     product =
       id
       |> String.to_integer()
