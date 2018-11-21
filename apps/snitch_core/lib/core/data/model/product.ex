@@ -224,7 +224,8 @@ defmodule Snitch.Data.Model.Product do
     if Enum.any?(uploads, fn upload ->
          case upload do
            {:error, _} -> true
-           _ -> false
+           _ ->
+            false
          end
        end) do
       {:error, "upload error"}

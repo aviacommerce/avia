@@ -20,7 +20,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Data.Model.StockItem, as: StockModel
   alias Snitch.Data.Schema.StockItem, as: StockSchema
 
-  #import Phoenix.View, only: [render_to_string: 3]
+  # import Phoenix.View, only: [render_to_string: 3]
   import Phoenix.HTML.Format
   import Phoenix.HTML
 
@@ -79,14 +79,15 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def add_images(conn, %{"product_images" => product_images, "product_id" => id}) do
+    # require IEx
+    # IEx.pry
     product =
       id
       |> String.to_integer()
       |> ProductModel.get()
       |> Repo.preload(:images)
 
-    images = ([product_images] ++ product.images) |> parse_images()
-
+    images = (product_images["images"] ++ product.images) |> parse_images()
     params = %{"images" => images}
 
     case ProductModel.add_images(product, params) do
@@ -100,9 +101,13 @@ defmodule AdminAppWeb.ProductController do
 
       {:error, _} ->
         opts = [wrapper_tag: :div, attributes: [class: "alert alert-danger"]]
-        html = text_to_html("Problem uploading image", opts) |> safe_to_string
+
+        html =
+          text_to_html("Problem uploading image, try a valid image format", opts)
+          |> safe_to_string
+
         conn
-        |> put_status(500)
+        |> put_status(422)
         |> json(%{html: html})
     end
   end

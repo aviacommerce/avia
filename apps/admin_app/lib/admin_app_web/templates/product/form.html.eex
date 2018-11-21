@@ -198,7 +198,7 @@
                   <div><i class="fas fa-camera"></i></div>
                   <div>Add Images</div>
                 </label>
-                <input type="file" name="product_images[images]" id="product-images" class="file-upload__input" multiple>
+                <input type="file" name="product_images[images][]" id="product-images" class="file-upload__input" multiple>
               </div>
               <div id="img-selected-container" class="img-selected-container row m-0 col-12 p-0">
               </div>
