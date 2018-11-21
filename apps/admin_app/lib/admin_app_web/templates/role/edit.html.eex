@@ -5,17 +5,17 @@
 <div class="card col-12">
   <%= form_for @changeset, role_path(@conn, :update, @role), [as: :role], fn f -> %>
   <div class="form-group row ">
-    <%= input f, :name, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
+    <%= input f, :name, nil, description: "Give name for this role.", is_horizontal: true %>
   </div>
   <div class="form-group row ">
-    <%= input f, :description, nil, description: "Include keywords that buyers would use to search for your item.", is_horizontal: true %>
+    <%= input f, :description, nil, description: "Add a short description for this role.", is_horizontal: true %>
   </div>
   <div class="form-group row ">
     <label for="inputEmail3" class="col-sm-3 col-form-label">
       <div class="label ">
         Permissions
       </div>
-      <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+      <div class="label-txt">Select permission/s for this role.</div>
     </label>
     <div class="col-sm-9">           
       <%= multiple_select(f, :permissions, formatted_list(:permissions),
