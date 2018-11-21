@@ -1,5 +1,7 @@
 <br>
 <%= if @rule.module == "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal" do %>
+<div>
+    <button class="delete_btn">Delete</button>
      <input type="hidden" name=<%= 'rules[#{@rule.module}][module]' %> value=<%= @rule.module %> class="rule_module_name">
      <input type="hidden" name=<%= 'rules[#{@rule.module}][id]' %> value=<%= @rule.id %> >
      <input type="hidden" name=<%= 'rules[#{@rule.module}][name]' %> value=<%= @rule.name %>>
@@ -18,8 +20,11 @@
             <td><input type="text" name=<%= 'rules[#{@rule.module}][preferences][upper_range]' %> value=<%= @rule.preferences["upper_range"] %> ></td>
         </tr>
     </table>
+</div>
 <% end %>
 <%= if @rule.module == "Elixir.Snitch.Data.Schema.PromotionRule.Product" do %>
+<div>
+    <button class="delete_btn">Delete</button>
      <input type="hidden" name=<%= 'rules[#{@rule.module}][module]' %> value=<%= @rule.module %> class="rule_module_name">
      <input type="hidden" name=<%= 'rules[#{@rule.module}][id]' %> value=<%= @rule.id %> >
     <input type="hidden" name=<%= 'rules[#{@rule.module}][name]' %> value=<%= @rule.name %>>
@@ -36,4 +41,5 @@
             </td>
         </tr>
     </table>
+</div>
 <% end %>

@@ -34,29 +34,30 @@ defmodule AdminAppWeb.PromotionController do
   end
 
   def rule_create(conn, params) do
-    rule_create_params = params["rules"] |> Map.values()
+    rules = params["rules"] || Map.new()
+    rule_create_params = rules |> Map.values()
 
     with %Schema.Promotion{} = promotion <- Model.Promotion.get(params["id"]),
          {:ok, %Schema.Promotion{} = _promotion_with_rule} <-
            Model.Promotion.add_promo_rules(promotion, rule_create_params) do
       conn
-      |> put_flash(:info, "Promotion rule added!")
-      |> redirect(to: promotion_path(conn, :index))
+      |> put_status(200)
+      |> json(%{message: "Promotion rule added!"})
     else
-      {:error, changeset} ->
+      {:error, _changeset} ->
         conn
-        |> put_flash(:error, "Sorry there were some errors !!")
-        |> render("edit.html", changeset: changeset, id: params["id"])
+        |> put_status(200)
+        |> json(%{message: "Sorry there were some errors !!"})
 
-      {:error, _, changeset, _} ->
+      {:error, _, _changeset, _} ->
         conn
-        |> put_flash(:error, "Sorry there were some errors !!")
-        |> render("edit.html", changeset: changeset, id: params["id"])
+        |> put_status(200)
+        |> json(%{message: "Sorry there were some errors !!"})
 
       nil ->
         conn
-        |> put_flash(:info, "Promotion not found")
-        |> redirect(to: promotion_path(conn, :index))
+        |> put_status(200)
+        |> json(%{message: "Promotion not found"})
     end
   end
 

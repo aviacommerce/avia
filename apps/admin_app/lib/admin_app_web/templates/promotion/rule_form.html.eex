@@ -6,11 +6,22 @@
   <button type="button" class="btn btn-primary submit-btn float-right", id="rule_module_add_btn">Add</button> 
 </div>
 <div class="form-group row">
-  <div id="rule_module_content">
-    <%= for rule <- @rules do %>
-      <%= render "render_input_form.html", rule: rule %>
-    <% end %>
-  </div>
+  <table>
+    <tr>
+      <th>
+        Rules
+      </th>
+    </tr>
+    <tr>
+      <td>
+        <div id="rule_module_content">
+          <%= for rule <- @rules do %>
+            <%= render "render_input_form.html", rule: rule %>
+          <% end %>
+        </div>
+      </td>
+    </tr>
+  </table>
 </div>
 <div class="form-group row">
   <button type="button" class="btn btn-primary submit-btn" id="rule_module_submit_btn">Update</button> 
