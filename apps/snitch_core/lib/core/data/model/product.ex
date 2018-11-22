@@ -29,7 +29,6 @@ defmodule Snitch.Data.Model.Product do
   Return following product
   - Standalone product.(Product that do not have variants)
   - Parent product (Product that has variants)
-
   In short returns product excluding the variant products
   """
   @spec get_product_list() :: [Product.t()]
@@ -90,7 +89,6 @@ defmodule Snitch.Data.Model.Product do
 
   @doc """
   Returns an Product
-
   Takes Product id as input
   """
   @spec get(integer) :: Product.t() | nil
@@ -100,7 +98,6 @@ defmodule Snitch.Data.Model.Product do
 
   @doc """
   Discontinues a product
-
   Takes Product id as input
   """
   @spec get(integer) :: {:ok, Product.t()} | {:error, Ecto.Changeset.t()} | nil
@@ -113,13 +110,10 @@ defmodule Snitch.Data.Model.Product do
 
   @doc """
   Handles creating new images and associating them with the product.
-
   The function stores the name of the image in the `snitch_images` table
   and stores the image file at a location specified in `Arc` Configuartion.
-
   #### See
   `Snitch.Tools.Helper.ImageUploader`
-
   The functions expects a `Product.t()` struct and a `params` map.
   To add new images the `params` map expects a list of images as a `%Plug.Upload{}`
   struct under the "images" key.
@@ -129,7 +123,6 @@ defmodule Snitch.Data.Model.Product do
       "image" => %Plug.UPload{}
   ]}
   ```
-
   ## Caution!
   In case some images are added to the product and you wish to retain them then
   they need to be passed in the map in the following format.
@@ -142,7 +135,6 @@ defmodule Snitch.Data.Model.Product do
   ```
   In case you want to delete the images associated with the product,
   consider using the `delete_image/2` method.
-
   ## TODO
   Handle return properly for `product`.
   """
@@ -160,7 +152,6 @@ defmodule Snitch.Data.Model.Product do
 
   @doc """
   Returns the url of the location where image is stored.
-
   Takes as input `name` of the image and the `Product.t()`
   struct.
   """
@@ -171,9 +162,7 @@ defmodule Snitch.Data.Model.Product do
 
   @doc """
   Delete an image associated with a product.
-
   Takes as input id of the `image` to be deleted and the `product` id.
-
   Removes the image from the "snitch_images" table and removes the association
   between the product and the image from the assocation table.
   Also, removes the image file from the location where it is stored.
