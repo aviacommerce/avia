@@ -18,12 +18,12 @@ defmodule AdminAppWeb.DashboardController do
   defp get_naive_date_time(date) do
     Date.from_iso8601(date)
     |> elem(1)
-    |> NaiveDateTime.new(~T[00:00:00])
+    |> NaiveDateTime.new(~T[23:59:59])
     |> elem(1)
   end
 
   defp get_date_from_params(params) do
-    start_date = Helpers.get_date_from_params(params, "from") |> get_naive_date_time()
+    start_date = params |> Map.get("from", Helpers.date_days_before(30)) |> get_naive_date_time()
 
     end_date = Helpers.get_date_from_params(params, "to") |> get_naive_date_time()
 
