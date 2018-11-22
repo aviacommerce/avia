@@ -70,7 +70,7 @@ export default class View extends MainView {
 
       $("#taxon-edit-body").on("submit", ".edittaxonform", function(event){
         event.preventDefault();
-        
+
         var form_data = new FormData();
         var name = $(this).find("#editform-taxon-name").val();
         var themes = $("#taxon-edit-body #taxons_taxons").val();
@@ -124,19 +124,28 @@ export default class View extends MainView {
       let params = this.get_query_params()
       if(params["taxon_id"] != undefined)
       {
-        $("#edittaxon-modal").modal({show: true})
         var id = params["taxon_id"];
         $(`#taxon-edit-loader`).addClass(`loader`).show();
         fetch('/api/taxon/' + id)
         .then(function(response) {
+
+          if(!response.ok){
+            $("#edittaxon-modal").modal('hide')
+            throw Error("Api failed");
+          }
+
           return response.json()
         })
         .then(function(json) {
+          $("#edittaxon-modal").modal({show: true})
           $(`#taxon-edit-body`)
           .empty()
           .append(json.html)
           $(`#taxon-edit-loader`).removeClass(`loader`).hide();
           select2Selector()
+        })
+        .catch(function(error) {
+          console.log("Taxon not found");
         })
       }
 
