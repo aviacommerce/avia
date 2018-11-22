@@ -17,7 +17,7 @@ defmodule Snitch.Tools.OrderEmail do
   EEx.function_from_file(:defp, :order_email, email_template, [:assigns])
 
   def order_confirmation_mail(order) do
-    general_config = Repo.all(GC) |> List.first()
+    general_config = Repo.all(GC) |> List.first() |> Repo.preload(:image)
     send_mail(general_config, order)
   end
 
@@ -32,11 +32,11 @@ defmodule Snitch.Tools.OrderEmail do
       order_email(%{
         order: order,
         frontend_base_url: general_config.frontend_url,
-        backend_base_url: general_config.backend_url
+        backend_base_url: general_config.backend_url,
+        general_config: general_config
       })
 
     store_name = general_config.name
-
     email =
       new_email()
       |> to(user_email)
