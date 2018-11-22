@@ -25,17 +25,14 @@ var selDiv
 var storedFile = []
 
 export function imageOnEnter(){
-  $("#product-image").keydown(function(event) { 
-
-    if (event.keyCode == 13) {
+  $(document).delegate('#product-images', 'change', function(event){
       event.preventDefault();
       handleSubmitImage();
-    }
   });
 }
 
 export function imageOnSubmit(){
-  $("#product-image").submit(function(event){
+  $(document).delegate('#product-image', 'submit', function(event){
     event.preventDefault();
     handleSubmitImage();
   });
@@ -44,9 +41,11 @@ export function imageOnSubmit(){
 function handleSubmitImage(){
   var product_id = $("#product-id").val();
   var form_data = new FormData();
-  var image_files = $("#product-image").find('#product-images.file-upload__input')[0].files[0];
+  var image_files = $("#product-image").find('#product-images.file-upload__input')[0].files;
+  $.each(image_files, function(i, file) {
+    form_data.append('product_images[images][]', file);
+  });
   var csrf = $("meta[name='csrf-token']").attr("content");
-  form_data.append('product_images', image_files);
   form_data.append('product_id', product_id);
   form_data.append('_csrf_token', csrf);
   $.ajax({
@@ -56,14 +55,17 @@ function handleSubmitImage(){
     processData: false,
     contentType: false,
     success: function(json) {
+      $(`.file-upload`).parent()
+      .prepend(json.images);
       $(`#show-upload-response`)
       .empty()
-      .append(json.html)
+      .append(json.html);
+      $("#img-selected-container").empty();
     },
     error: function(json) {
       $(`#show-upload-response`)
       .empty()
-      .append(json.html)
+      .append(json.responseJSON.html)
     } 
   });
 }
@@ -95,7 +97,7 @@ function selectedFile(e) {
 }
 
 export function deleteImage() {
-  $(".product-delete").click(function () {
+  $(document).delegate('.product-delete', 'click', function(){
     let product_id = $("#product-id").val();
     let image_id = $(this).find("input").val()
     delete_product_image(product_id, image_id, this)
