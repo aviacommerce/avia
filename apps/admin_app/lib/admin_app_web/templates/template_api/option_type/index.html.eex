@@ -11,7 +11,7 @@
                   <div class="label required">
                      <%= item.display_name %>
                   </div>
-                  <div class="label-txt">Include keywords that buyers would use to search for your item.</div>
+                  <div class="label-txt"></div>
                </label>
                <div class="col-sm-9">           
                   <input name="options[<%= idx %>][option_type_id]" type="hidden" value="<%= item.id %>" required>
