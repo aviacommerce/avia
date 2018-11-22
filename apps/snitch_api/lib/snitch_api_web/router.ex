@@ -71,5 +71,7 @@ defmodule SnitchApiWeb.Router do
     post("/hosted-payment/payubiz-request", HostedPaymentController, :payubiz_request_url)
     get("/hosted-payment/stripe-request", HostedPaymentController, :stripe_request_params)
     post("/hosted-payment/stripe-pay", HostedPaymentController, :stripe_purchase)
+    get("/hosted-payment/rzpay-request", HostedPaymentController, :rzpay_request_params)
+    post("/hosted-payment/rzpay", HostedPaymentController, :rzpay_purchase)
   end
 end

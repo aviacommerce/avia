@@ -14,6 +14,10 @@ defmodule SnitchApiWeb.HostedPaymentView do
     %{publishable_key: key}
   end
 
+  def render("rzpay.json-api", %{key_id: key}) do
+    %{key_id: key}
+  end
+
   def render("payment_failure.json-api", %{order: order, reason: reason}) do
     %{
       error: %{
