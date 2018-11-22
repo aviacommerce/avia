@@ -198,7 +198,7 @@
                   <div><i class="fas fa-camera"></i></div>
                   <div>Add Images</div>
                 </label>
-                <input type="file" name="product_images[images]" id="product-images" class="file-upload__input" multiple>
+                <input type="file" name="product_images[images][]" id="product-images" class="file-upload__input" multiple>
               </div>
               <div id="img-selected-container" class="img-selected-container row m-0 col-12 p-0">
               </div>
@@ -209,7 +209,6 @@
           <div class="col-sm-10">
             <%= button("Cancel", to: product_path(@conn, :index), method: "get", type: "button",
               class: "btn btn-secondary btn-outline-secondary submit-btn float-left") %>
-            <button type="submit" class="btn btn-primary submit-btn float-right">Submit</button>
           </div>
         </div>
       </form>
