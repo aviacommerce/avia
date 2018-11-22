@@ -19,8 +19,9 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Tools.Money
   alias Snitch.Data.Model.StockItem, as: StockModel
   alias Snitch.Data.Schema.StockItem, as: StockSchema
+  alias AdminAppWeb.ProductView
 
-  # import Phoenix.View, only: [render_to_string: 3]
+  import Phoenix.View, only: [render_to_string: 3]
   import Phoenix.HTML.Format
   import Phoenix.HTML
 
@@ -78,6 +79,15 @@ defmodule AdminAppWeb.ProductController do
     end
   end
 
+  defp get_html_string(product, image) do
+    render_to_string(
+      ProductView,
+      "upload_image.html",
+      parent_product: product,
+      image: image
+    )
+  end
+
   def add_images(conn, %{"product_images" => product_images, "product_id" => id}) do
     product =
       id
@@ -90,12 +100,17 @@ defmodule AdminAppWeb.ProductController do
 
     case ProductModel.add_images(product, params) do
       {:ok, _} ->
+        associated_images = product.images
+        product = product |> Repo.preload(:images, force: true)
+        product_images = product.images -- associated_images
+        image_div = Enum.map(product_images, fn image -> get_html_string(product, image) end)
+        images = Enum.join(image_div, " ")
         opts = [wrapper_tag: :div, attributes: [class: "alert alert-success"]]
         html = text_to_html("Image uploaded succesully", opts) |> safe_to_string
 
         conn
         |> put_status(200)
-        |> json(%{html: html})
+        |> json(%{html: html, images: images})
 
       {:error, _} ->
         opts = [wrapper_tag: :div, attributes: [class: "alert alert-danger"]]

@@ -25,14 +25,14 @@ var selDiv
 var storedFile = []
 
 export function imageOnEnter(){
-  $("#product-images").change(function(event) { 
+  $(document).delegate('#product-images', 'change', function(event){
       event.preventDefault();
       handleSubmitImage();
   });
 }
 
 export function imageOnSubmit(){
-  $("#product-image").submit(function(event){
+  $(document).delegate('#product-image', 'submit', function(event){
     event.preventDefault();
     handleSubmitImage();
   });
@@ -55,9 +55,12 @@ function handleSubmitImage(){
     processData: false,
     contentType: false,
     success: function(json) {
+      $(`.file-upload`).parent()
+      .prepend(json.images);
       $(`#show-upload-response`)
       .empty()
       .append(json.html);
+      $("#img-selected-container").empty();
     },
     error: function(json) {
       $(`#show-upload-response`)
@@ -94,7 +97,7 @@ function selectedFile(e) {
 }
 
 export function deleteImage() {
-  $(".product-delete").click(function () {
+  $(document).delegate('.product-delete', 'click', function(){
     let product_id = $("#product-id").val();
     let image_id = $(this).find("input").val()
     delete_product_image(product_id, image_id, this)
