@@ -4,7 +4,7 @@ defmodule Snitch.Seed.StockLocation do
 
   def seed!() do
     Repo.delete_all(StockLocation)
-    state = get_random_state
+    state = get_state
 
     create_stock_location!(
       "default",
@@ -22,11 +22,10 @@ defmodule Snitch.Seed.StockLocation do
     )
   end
 
-  defp get_random_state do
+  defp get_state do
     State
-    |> Repo.all()
+    |> Repo.get_by(name: "Oregon")
     |> Repo.preload([:country])
-    |> Enum.random()
   end
 
   def create_stock_location!(
