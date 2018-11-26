@@ -26,12 +26,19 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
   end
 
   def taxon_edit(conn, %{"taxon_id" => taxon_id}) do
-    taxon = Repo.get(Taxon, taxon_id) |> Repo.preload([:variation_themes, :image])
-    html = render_to_string(TaxonomyView, "taxon_edit_form.html", %{conn: conn, taxon: taxon})
+    case Repo.get(Taxon, taxon_id) |> Repo.preload([:variation_themes, :image]) do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: %{message: "Taxon not found"}})
 
-    conn
-    |> put_status(200)
-    |> json(%{html: html})
+      taxon ->
+        html = render_to_string(TaxonomyView, "taxon_edit_form.html", %{conn: conn, taxon: taxon})
+
+        conn
+        |> put_status(200)
+        |> json(%{html: html})
+    end
   end
 
   def update_taxon(conn, %{"taxon" => %{"taxon" => taxon_name, "taxon_id" => taxon_id} = params}) do

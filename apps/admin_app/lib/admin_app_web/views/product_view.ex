@@ -213,9 +213,9 @@ defmodule AdminAppWeb.ProductView do
     Property.get_formatted_list()
   end
 
-  def get_product_category(conn) do
-    taxon_id = conn.params["taxon"]
+  def get_product_category(nil), do: "NA"
 
+  def get_product_category(taxon_id) do
     with %Taxon{} = taxon <- Repo.get(Taxon, taxon_id),
          {:ok, ancestors} <- Taxonomy.get_ancestors(taxon_id) do
       (ancestors ++ [taxon])
