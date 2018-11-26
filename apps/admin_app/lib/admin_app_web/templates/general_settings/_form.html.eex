@@ -24,9 +24,9 @@
             <div class="form-group row ">
                 <%= input f, :currency, nil, is_horizontal: true, description: "Default currency for the store."  %>
             </div>
-            <%= if @general_configuration do %>
+            <%= if @changeset.data.image != nil do %>
                 <div class="img-wrap col-3 p-1">
-                    <%= img_tag(get_image_url(@general_configuration.image, @general_configuration), class: "img-thumbnail",) %>
+                    <%= img_tag(get_image_url(@changeset.data.image, @changeset.data), class: "img-thumbnail",) %>
                 </div>
             <% end %>
             <div class="form-group row col-sm-9">

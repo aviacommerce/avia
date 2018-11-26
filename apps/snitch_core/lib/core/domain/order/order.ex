@@ -101,11 +101,6 @@ defmodule Snitch.Domain.Order do
 
   defp packages_total_cost(packages, currency) do
     packages
-    |> Enum.filter(fn %Package{
-        items: items,
-        shipping_tax: shipping_tax,
-        cost: cost
-      } -> shipping_tax != nil || cost != nil end)
     |> Enum.reduce(Money.new(currency, 0), fn %{
                                                 items: items,
                                                 shipping_tax: shipping_tax,

@@ -25,16 +25,6 @@ defmodule Snitch.Data.Model.GeneralConfiguration do
     Repo.all(GC)
   end
 
-  # @spec create(map) :: {:ok, GC.t()} | {:error, Ecto.Changeset.t()}
-  # def create(params) do
-  #   QH.create(GC, params, Repo)
-  # end
-
-  # @spec update_general_configuration(GC.t(), map) :: {:ok, GC.t()} | {:error, Ecto.Changeset.t()}
-  # def update_general_configuration(params, store) do
-  #   QH.update(GC, params, store, Repo)
-  # end
-
   @spec delete_general_configuration(integer) :: {:ok, GC.t()} | {:error, Ecto.Changeset.t()}
   def delete_general_configuration(id) do
     QH.delete(GC, id, Repo)

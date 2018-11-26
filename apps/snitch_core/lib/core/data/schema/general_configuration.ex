@@ -32,6 +32,7 @@ defmodule Snitch.Data.Schema.GeneralConfiguration do
   @spec create_changeset(t, map) :: Ecto.Changeset.t()
   def create_changeset(%__MODULE__{} = general_configuration, params) do
     general_configuration
+    |> Repo.preload([:image])
     |> cast(params, @required_fields)
     |> validate_required(@required_fields)
     |> cast_assoc(:store_image, with: &StoreLogo.changeset/2)
