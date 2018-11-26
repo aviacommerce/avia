@@ -7,9 +7,9 @@ defmodule SnitchApi.ProductsContext do
 
   import Ecto.Query, only: [from: 2, order_by: 2]
 
-  @filter_allowables ~w(taxon_id brand_id)a
+  @filter_allowables ~w(taxon_id brand_id slug)a
   @partial_search_allowables ~w(name)a
-  @default_filter [is_active: true]
+  @default_filter [state: "active"]
 
   @doc """
   List out all the products
@@ -25,61 +25,6 @@ defmodule SnitchApi.ProductsContext do
     page = create_page(query, %{}, conn)
     products = paginate_collection(query, params)
     {products, page}
-  end
-
-  @doc """
-  Gives the product with matched `slug` as {:ok, product} tuple or
-  returns an {:error, :not_found} tuple if product is not found.
-  """
-  @spec product_by_slug(String.t()) :: map
-  def product_by_slug(slug) do
-    case Repo.get_by(Product, slug: slug) do
-      nil ->
-        {:error, :not_found}
-
-      product ->
-        review_query = from(c in Review, limit: 5, preload: [rating_option_vote: :rating_option])
-
-        product =
-          product
-          |> Repo.preload(
-            reviews: review_query,
-            variants: [:images, options: :option_type, theme: [:option_types]],
-            theme: [:option_types],
-            options: :option_type
-          )
-
-        {:ok, product}
-    end
-  end
-
-  def product_by_brand(brand_id) do
-    query = from(p in Product, where: p.brand_id == ^brand_id and p.is_active == true)
-
-    review_query = from(c in Review, limit: 5, preload: [rating_option_vote: :rating_option])
-
-    product =
-      Repo.all(query)
-      |> Repo.preload(
-        reviews: review_query,
-        variants: [:images, options: :option_type, theme: [:option_types]],
-        theme: [:option_types],
-        options: :option_type
-      )
-  end
-
-  def product_by_taxon(taxon_id) do
-    query = from(p in Product, where: p.taxon_id == ^taxon_id and p.is_active == true)
-
-    review_query = from(c in Review, limit: 5, preload: [rating_option_vote: :rating_option])
-
-    Repo.all(query)
-    |> Repo.preload(
-      reviews: review_query,
-      variants: [:images, options: :option_type, theme: [:option_types]],
-      theme: [:option_types],
-      options: :option_type
-    )
   end
 
   @doc """

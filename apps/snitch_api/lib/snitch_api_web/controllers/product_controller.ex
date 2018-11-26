@@ -33,29 +33,6 @@ defmodule SnitchApiWeb.ProductController do
     end
   end
 
-  def index(conn, %{"product_brand" => brand_id}) do
-    products = Context.product_by_brand(brand_id)
-
-    render(
-      conn,
-      "index.json-api",
-      data: products
-    )
-  end
-
-  def index(conn, %{"taxon" => taxon_id}) do
-    products =
-      taxon_id
-      |> String.to_integer()
-      |> Context.product_by_taxon()
-
-    render(
-      conn,
-      "index.json-api",
-      data: products
-    )
-  end
-
   @include ~s(reviews,reviews.rating_option_vote, variants,variants.images,
   variants.options,variants.options.option_type,options,options.option_type,
   theme,theme.option_types,reviews.rating_option_vote.rating_option)
@@ -71,17 +48,17 @@ defmodule SnitchApiWeb.ProductController do
   end
 
   def show(conn, %{"product_slug" => slug} = params) do
-    case Context.product_by_slug(slug) do
-      {:error, :not_found} ->
+    case Context.list_products(conn, params |> Map.put("filter", %{"slug" => slug})) do
+      {[], _page} ->
         conn
         |> put_status(:not_found)
         |> render(SnitchApiWeb.ErrorView, :"404")
 
-      {:ok, product} ->
+      {product, _} ->
         render(
           conn,
           "show.json-api",
-          data: product,
+          data: List.first(product),
           opts: [include: @include]
         )
     end
