@@ -6,6 +6,7 @@ defmodule Snitch.Tools.OrderEmail do
   alias Snitch.Tools.Mailer
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.GeneralConfiguration, as: GC
+  alias Snitch.Tools.Helper.ImageUploader
   require EEx
 
   email_template =
@@ -28,12 +29,14 @@ defmodule Snitch.Tools.OrderEmail do
     order = Repo.preload(order, [:user, line_items: [product: :images]])
     user_email = order.user.email
 
+    logo = if general_config.image != nil, do: general_config.image.name, else: nil
     mail_template =
       order_email(%{
         order: order,
         frontend_base_url: general_config.frontend_url,
         backend_base_url: general_config.backend_url,
-        general_config: general_config
+        general_config: general_config,
+        logo: logo
       })
 
     store_name = general_config.name
