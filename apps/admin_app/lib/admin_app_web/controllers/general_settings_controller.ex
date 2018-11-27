@@ -2,10 +2,13 @@ defmodule AdminAppWeb.GeneralSettingsController do
   use AdminAppWeb, :controller
 
   alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
+  alias Snitch.Data.Schema.GeneralConfiguration, as: GCSchema
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def index(conn, _params) do
-    general_configuration = GCModel.list_general_configuration() |> List.first()
+    general_configuration =
+      GCModel.list_general_configuration() |> List.first() |> Repo.preload(:image)
+
     render(conn, "index.html", general_configuration: general_configuration)
   end
 
@@ -17,7 +20,8 @@ defmodule AdminAppWeb.GeneralSettingsController do
   def create(conn, %{"settings" => params}) do
     case GCModel.create(params) do
       {:ok, general_configuration} ->
-        general_configuration = GCModel.list_general_configuration() |> List.first()
+        general_configuration =
+          GCModel.list_general_configuration() |> List.first() |> Repo.preload(:image)
 
         conn
         |> put_flash(:info, "General configuration created successfully")
@@ -30,16 +34,14 @@ defmodule AdminAppWeb.GeneralSettingsController do
   end
 
   def edit(conn, %{"id" => id}) do
-    general_configuration = GCModel.get_general_configuration(id)
+    general_configuration = GCModel.get_general_configuration(id) |> Repo.preload(:image)
 
     case general_configuration do
       nil ->
         handle_nil_response(conn)
 
       _ ->
-        map = Map.from_struct(general_configuration)
-
-        changeset = GCModel.build_general_configuration(map)
+        changeset = GCSchema.update_changeset(general_configuration, %{})
 
         render(
           conn,
@@ -51,14 +53,18 @@ defmodule AdminAppWeb.GeneralSettingsController do
   end
 
   def update(conn, %{"id" => id, "settings" => params}) do
-    general_configuration = GCModel.get_general_configuration(id)
+    general_configuration = GCModel.get_general_configuration(id) |> Repo.preload(:image)
 
     case general_configuration do
       nil ->
         handle_nil_response(conn)
 
       _ ->
-        case GCModel.update_general_configuration(params, general_configuration) do
+        params =
+          params
+          |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+
+        case GCModel.update(general_configuration, params) do
           {:ok, general_configuration} ->
             conn
             |> put_flash(:info, "General configuration updated successfully")
@@ -76,15 +82,15 @@ defmodule AdminAppWeb.GeneralSettingsController do
   end
 
   def delete(conn, %{"id" => id}) do
+    changeset = GCModel.build_general_configuration()
+
     case GCModel.delete_general_configuration(id) do
       {:ok, general_configuration} ->
-        changeset = GCModel.build_general_configuration()
-
         conn
         |> put_flash(:info, "Configuration deleted successfully")
         |> render("new.html", changeset: changeset)
 
-      {:error, changeset} ->
+      {:error, _} ->
         conn
         |> render("new.html", changeset: changeset)
     end
