@@ -44,6 +44,11 @@ defmodule Snitch.Data.Schema.Product do
     field(:weight, :decimal, default: Decimal.new(0))
     field(:is_active, :boolean, default: true)
     field(:state, :string, default: "draft")
+
+    # Following fields are used in context of import
+    field(:store, :string, default: "avia")
+    field(:import_product_id, :string)
+
     timestamps()
 
     has_many(:variations, Variation, foreign_key: :parent_product_id, on_replace: :delete)
