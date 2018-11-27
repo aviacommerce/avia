@@ -24,7 +24,18 @@
             <div class="form-group row ">
                 <%= input f, :currency, nil, is_horizontal: true, description: "Default currency for the store."  %>
             </div>
-            <%= submit "Submit", class: "btn btn-primary"%>
+            <%= if @changeset.data.image != nil do %>
+                <div class="img-wrap col-3 p-1">
+                    <%= img_tag(get_image_url(@changeset.data.image, @changeset.data), class: "img-thumbnail",) %>
+                </div>
+            <% end %>
+            <div class="form-group row col-sm-9">
+                <label class="control-label"><b> Logo </b></label>
+                <%= file_input f, :image, class: "form-control file-upload__input", id: "store-logo" %>
+            </div>
+            <%= button("Cancel", to: page_path(@conn, :index), method: "get", type: "button",
+            class: "btn btn-secondary btn-outline-secondary submit-btn float-left") %>
+            <%= submit "Submit", class: "btn btn-primary float-right"%>
         <% end %>
     </div>
 </div>
