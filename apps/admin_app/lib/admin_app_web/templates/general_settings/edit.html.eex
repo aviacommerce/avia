@@ -1,6 +1,6 @@
 <%= render "_form.html", 
     changeset: @changeset,
-    conn: @conn, 
+    conn: @conn,
     action: general_settings_path(@conn, :update, @general_configuration),
     method: "put" 
 %>
