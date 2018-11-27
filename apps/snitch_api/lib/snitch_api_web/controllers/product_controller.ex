@@ -48,17 +48,17 @@ defmodule SnitchApiWeb.ProductController do
   end
 
   def show(conn, %{"product_slug" => slug} = params) do
-    case Context.list_products(conn, params |> Map.put("filter", %{"slug" => slug})) do
-      {[], _page} ->
+    case Context.product_by_slug(slug) do
+      {:error, :not_found} ->
         conn
         |> put_status(:not_found)
         |> render(SnitchApiWeb.ErrorView, :"404")
 
-      {product, _} ->
+      {:ok, product} ->
         render(
           conn,
           "show.json-api",
-          data: List.first(product),
+          data: product,
           opts: [include: @include]
         )
     end

@@ -7,7 +7,7 @@ defmodule SnitchApi.ProductsContext do
 
   import Ecto.Query, only: [from: 2, order_by: 2]
 
-  @filter_allowables ~w(taxon_id brand_id slug)a
+  @filter_allowables ~w(taxon_id brand_id)a
   @partial_search_allowables ~w(name)a
   @default_filter [state: "active"]
 
@@ -20,11 +20,37 @@ defmodule SnitchApi.ProductsContext do
     child_product_ids = from(c in Variation, select: c.child_product_id) |> Repo.all()
 
     query = define_query(params)
-    query = from(p in query, where: p.state == "active" and p.id not in ^child_product_ids)
+    query = from(p in query, where: p.id not in ^child_product_ids)
 
     page = create_page(query, %{}, conn)
     products = paginate_collection(query, params)
     {products, page}
+  end
+
+  @doc """
+  Gives the product with matched `slug` as {:ok, product} tuple or
+  returns an {:error, :not_found} tuple if product is not found.
+  """
+  @spec product_by_slug(String.t()) :: map
+  def product_by_slug(slug) do
+    case Repo.get_by(Product, slug: slug) do
+      nil ->
+        {:error, :not_found}
+
+      product ->
+        review_query = from(c in Review, limit: 5, preload: [rating_option_vote: :rating_option])
+
+        product =
+          product
+          |> Repo.preload(
+            reviews: review_query,
+            variants: [:images, options: :option_type, theme: [:option_types]],
+            theme: [:option_types],
+            options: :option_type
+          )
+
+        {:ok, product}
+    end
   end
 
   @doc """
