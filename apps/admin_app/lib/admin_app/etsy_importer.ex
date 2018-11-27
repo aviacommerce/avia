@@ -7,24 +7,24 @@ defmodule Avia.Etsy.Importer do
   @access_token "etsy_access_token"
   @access_token_secret "etsy_access_token_secret"
 
+  @start_page_number 1
+  @store "etsy"
+
+  @store_consumer_key "ETSY_CONSUMER_KEY"
+  @store_consumer_secret "ETSY_CONSUMER_SECRET"
+
   alias Snitch.Data.Model.StoreProps
   alias Snitch.Tools.Helper.Taxonomy, as: TaxonomyHelper
   alias Snitch.Repo
   alias Snitch.Data.Schema.{Product, Taxon, Image}
+  alias Snitch.Data.Schema.Taxonomy, as: TaxonomySchema
   alias Snitch.Tools.Helper.ImageUploader
   alias Snitch.Domain.Taxonomy
 
   def import do
     with {:ok, user} <- get_user(),
          {:ok, shop} <- get_user_shops(user["user_id"]) do
-      products_import(1, shop["shop_id"])
-
-      require IEx
-      IEx.pry()
-    else
-      t ->
-        require IEx
-        IEx.pry()
+      products_import(@start_page_number, shop["shop_id"])
     end
   end
 
@@ -33,7 +33,7 @@ defmodule Avia.Etsy.Importer do
       import_products(listings_response, "active")
       next_page = listings_response["pagination"]["next_page"]
 
-      if(next_page != nil and next_page <= 3) do
+      if(next_page != nil) do
         products_import(next_page, shop_id)
       end
     end
@@ -67,16 +67,10 @@ defmodule Avia.Etsy.Importer do
       listing_json["results"]
       |> Enum.filter(fn listing -> listing["has_variations"] == false end)
 
-    t =
+    imported_products =
       listings
       |> Enum.map(fn listing -> listing["listing_id"] end)
       |> Enum.map(fn listing_id -> save_product(listing_id, product_state) end)
-
-    # avia_products = map_listing(listings, product_state)
-
-    # product =
-    #   avia_products
-    #   |> Enum.map(&save_product/1)
   end
 
   defp save_product(listing_id, product_state) do
@@ -87,7 +81,7 @@ defmodule Avia.Etsy.Importer do
     avia_product =
       inventory_json["results"]["products"]
       |> Enum.map(fn x -> map_listing(listing_json["results"], product_state, x) end)
-      |> List.first
+      |> List.first()
 
     {_, product} = Repo.insert_all(Product, [product(avia_product)], returning: [:id])
 
@@ -118,27 +112,12 @@ defmodule Avia.Etsy.Importer do
     }
   end
 
-  defp import_taxonomy(taxonomy_json) do
-    taxons =
-      taxonomy_json["results"]
-      |> Enum.map(&create_taxon_node/1)
-
-    taxonomy = {"All Categories", taxons}
-    TaxonomyHelper.create_taxonomy(taxonomy)
-  end
-
-  def get_taxonomy() do
-    with {:ok, body} <- request_resource("get", "/taxonomy/buyer/get"),
-         {:ok, json} <- Jason.decode(body) do
-      {:ok, json}
-    end
-  end
-
   defp map_listing(listing, product_state, etsy_product) do
-    taxon = Repo.get(Taxon, 1)
+    taxonomy = Repo.all(TaxonomySchema) |> Repo.preload(:root) |> List.first()
+    root_taxon = taxonomy.root
     listing = List.first(listing)
 
-    product_taxon = insert_taxonomy(taxon, listing["taxonomy_path"])
+    product_taxon = insert_taxonomy(root_taxon, listing["taxonomy_path"])
 
     product = %{
       name: listing["title"],
@@ -152,7 +131,7 @@ defmodule Avia.Etsy.Importer do
       import_product_id: "#{etsy_product["product_id"]}",
       has_variants: listing["has_variations"],
       listing_id: listing["listing_id"],
-      store: "etsy"
+      store: @store
     }
   end
 
@@ -164,9 +143,9 @@ defmodule Avia.Etsy.Importer do
       images_json
       |> Enum.map(fn x -> upload_image(x, product) end)
 
-    t = images |> Enum.map(fn x -> create_image(x) end)
+    image = images |> Enum.map(fn x -> create_image(x) end)
 
-    Product.associate_image_changeset(product, t) |> Repo.update!()
+    Product.associate_image_changeset(product, image) |> Repo.update!()
   end
 
   def upload_image(img_json, product) do
@@ -178,8 +157,8 @@ defmodule Avia.Etsy.Importer do
       path: file_path
     }
 
-    t = ImageUploader.store({upload, product})
-    file_name
+    {:ok, filename} = ImageUploader.store({upload, product})
+    filename
   end
 
   defp create_image(image) do
@@ -194,7 +173,7 @@ defmodule Avia.Etsy.Importer do
         File.write(file_path, body)
         {file_path, file_name}
 
-      t ->
+      _ ->
         {:error, :download_failed}
     end
   end
@@ -207,38 +186,21 @@ defmodule Avia.Etsy.Importer do
     "#{listing_id}-#{slug}"
   end
 
-  defp create_variant_mapping(inventory) do
-    inventory["products"]
-    |> Enum.map(fn product ->
-      %{
-        option_values: product["property_values"] |> Enum.map(&map_etsy_property_values/1),
-        selling_price:
-          Money.new(get_product_offering_price(product), get_product_offering_currency(product)),
-        max_retail_price:
-          Money.new(get_product_offering_price(product), get_product_offering_currency(product))
-      }
-    end)
-  end
-
   defp get_product_offering_price(product) do
+    # TODO Use offering where the Avia Store currency matches
     case product["offerings"] |> List.first() do
       nil -> 0
       offering -> offering["price"]["currency_formatted_raw"]
     end
   end
 
+  # TODO Use the same offering price where the offering matches, so that we dont
+  # get_product_offering_price/1 method to sepratel get the price.
   defp get_product_offering_currency(product) do
     case product["offerings"] |> List.first() do
       nil -> :USD
       offering -> offering["price"]["currency_code"]
     end
-  end
-
-  defp map_etsy_property_values(property_value) do
-    %{
-      option_name: property_value["property_name"],
-      option_value: property_value["values"] |> List.first()
-    }
   end
 
   defp get_user() do
@@ -268,9 +230,10 @@ defmodule Avia.Etsy.Importer do
 
   # /listings/active?api_key=
   # /shops/#{shop_id}/listings/active?page=#{page_number}
+  # You can swap the above URL's if you want to test importer with large data
   def get_shop_listing(shop_id, page_number, :active) do
     with {:ok, body} <-
-           request_resource("get", "/listings/active?api_key="),
+           request_resource("get", "/shops/#{shop_id}/listings/active?page=#{page_number}"),
          {:ok, json} <- Jason.decode(body) do
       {:ok, json}
     end
@@ -292,8 +255,8 @@ defmodule Avia.Etsy.Importer do
   end
 
   def get_app_keys do
-    with {:ok, consumer_key} <- get_key("AVIA_CONSUMER_KEY"),
-         {:ok, consumer_secret} <- get_key("AVIA_CONSUMER_SECRET") do
+    with {:ok, consumer_key} <- get_key(@store_consumer_key),
+         {:ok, consumer_secret} <- get_key(@store_consumer_secret) do
       {:ok, consumer_key, consumer_secret}
     else
       {:error, :not_found} -> {:error, :invalid_key}
