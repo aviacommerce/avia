@@ -12,6 +12,7 @@ defmodule Snitch.Domain.Package do
   alias Snitch.Domain.ShippingCalculator
   alias Snitch.Tools.Money, as: MoneyTools
   alias Snitch.Data.Model.StockItem
+  alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
 
   @doc """
   Saves
@@ -23,8 +24,10 @@ defmodule Snitch.Domain.Package do
     # if we can't find the selected shipping method, we must force the
     # Packge.update to fail
     # Eventually replace with some nice API contract/validator.
+    currency = GCModel.fetch_currency()
+
     shipping_method =
-      Enum.find(package.shipping_methods, %{cost: Money.zero(:INR), id: nil}, fn %{id: id} ->
+      Enum.find(package.shipping_methods, %{cost: Money.zero(currency), id: nil}, fn %{id: id} ->
         id == shipping_method_id
       end)
 

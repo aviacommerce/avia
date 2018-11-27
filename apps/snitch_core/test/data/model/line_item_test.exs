@@ -6,6 +6,7 @@ defmodule Snitch.Data.Model.LineItemTest do
   import Snitch.Factory
 
   alias Snitch.Data.Model.{LineItem, Order}
+  alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
 
   describe "with valid params" do
     setup :variants
@@ -42,17 +43,15 @@ defmodule Snitch.Data.Model.LineItemTest do
   describe "compute_total/1 with empty list" do
     setup :verify_on_exit!
 
-    test "when default currency is set" do
-      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :INR} end)
-      assert Money.zero(:INR) == LineItem.compute_total([])
+    test "when default currency is set in the store" do
+      config = insert(:general_config)
+      assert GCModel.fetch_currency() == config.currency
+      assert Money.zero(config.currency) == LineItem.compute_total([])
     end
 
     test "when default currency is not set" do
-      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:error, "whatever"} end)
-
-      assert_raise RuntimeError, "whatever", fn ->
-        LineItem.compute_total([])
-      end
+      assert GCModel.fetch_currency() == "USD"
+      assert Money.zero("USD") == LineItem.compute_total([])
     end
   end
 

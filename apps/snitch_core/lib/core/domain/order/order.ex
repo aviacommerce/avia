@@ -11,7 +11,7 @@ defmodule Snitch.Domain.Order do
   import Ecto.Query
   alias Snitch.Data.Schema.{Order, Package, Payment}
   alias Snitch.Data.Model.Product
-  alias Snitch.Tools.Defaults
+  alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
 
   @spec validate_change(Ecto.Changeset.t()) :: Ecto.Changeset.t()
   def validate_change(%{valid?: false} = changeset), do: changeset
@@ -38,7 +38,7 @@ defmodule Snitch.Domain.Order do
   """
   @spec payments_total(Order.t(), String.t()) :: Money.t()
   def payments_total(order, payment_state) do
-    {:ok, currency} = Defaults.fetch(:currency)
+    currency = GCModel.fetch_currency()
 
     query =
       from(
@@ -76,7 +76,7 @@ defmodule Snitch.Domain.Order do
 
   def total_amount(%Order{} = order) do
     order = Repo.preload(order, [:line_items, packages: :items])
-    {:ok, currency} = Defaults.fetch(:currency)
+    currency = GCModel.fetch_currency()
 
     total =
       Money.add!(
@@ -88,7 +88,7 @@ defmodule Snitch.Domain.Order do
   end
 
   def line_item_total(order) do
-    {:ok, currency} = Defaults.fetch(:currency)
+    currency = GCModel.fetch_currency()
 
     order.line_items
     |> Enum.reduce(Money.new(currency, 0), fn line_item, acc ->
@@ -130,7 +130,7 @@ defmodule Snitch.Domain.Order do
   end
 
   def total_tax(packages) do
-    {:ok, currency} = Defaults.fetch(:currency)
+    currency = GCModel.fetch_currency()
 
     packages
     |> Enum.reduce(Money.new(currency, 0), fn %{
@@ -146,7 +146,7 @@ defmodule Snitch.Domain.Order do
   end
 
   def shipping_total(packages) do
-    {:ok, currency} = Defaults.fetch(:currency)
+    currency = GCModel.fetch_currency()
 
     packages
     |> Enum.reduce(Money.new(currency, 0), fn %{cost: cost}, acc ->

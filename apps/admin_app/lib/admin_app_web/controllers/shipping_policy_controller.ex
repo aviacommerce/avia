@@ -5,6 +5,7 @@ defmodule AdminAppWeb.ShippingPolicyController do
 
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.ShippingCategory
+  alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
   alias Snitch.Data.Model.ShippingCategory, as: ScModel
 
   @defaults Application.get_env(:snitch_core, :defaults_module)
@@ -66,7 +67,7 @@ defmodule AdminAppWeb.ShippingPolicyController do
   end
 
   def set_shipping_amount(rules) do
-    {:ok, currency} = @defaults.fetch(:currency)
+    currency = GCModel.fetch_currency()
 
     Enum.map(rules, fn rule ->
       amount = rule["shipping_cost"] || "0.00"
