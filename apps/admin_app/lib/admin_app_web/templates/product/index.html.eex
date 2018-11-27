@@ -5,6 +5,7 @@
     </div>
     <div class="col-2 p-0 float-right text-right">
       <%= link(raw("<i class='fas fa-plus'></i> Add a Product"), to: "/product/category", class: "btn btn-primary")%>
+      <!-- <%= link(raw("<i class='fas fa-plus'></i> Etsy Import"), to: "/product/import/etsy", class: "btn btn-primary")%> -->
     </div>
   </div>
   <div class="row m-0 list list-extra">

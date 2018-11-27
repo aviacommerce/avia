@@ -165,6 +165,10 @@ defmodule Snitch.Domain.Taxonomy do
     |> Repo.preload([:image, :taxonomy, :variation_themes])
   end
 
+  def get_taxon_by_name(name) do
+    Repo.get_by(Taxon, name: name)
+  end
+
   def create_taxon(parent_taxon, %{image: "undefined"} = taxon_params) do
     taxon_struct = %Taxon{name: taxon_params.name}
     taxon = add_taxon(parent_taxon, taxon_struct, :child)
