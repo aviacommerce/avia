@@ -38,6 +38,14 @@
         <td><b>CURRENCY</b></td> 
         <td><%= @general_configuration.currency %></td>
       </tr>
+      <%= if @general_configuration.image != nil do %>
+        <tr>
+          <td><b>STORE LOGO</b></td> 
+          <td>
+            <%= img_tag(get_image_url(@general_configuration.image, @general_configuration), style: "width: 200px; height: 200px", class: "img-thumbnail") %>
+          </td>
+        </tr>
+      <% end %>
     </tbody>
   <table>
   <div class = "col">
