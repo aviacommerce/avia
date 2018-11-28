@@ -4,6 +4,7 @@ defmodule AdminAppWeb.LayoutView do
   alias Snitch.Data.Schema.{GeneralConfiguration, Taxonomy}
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias AdminAppWeb.Helpers
+  import Ecto.Query
 
   @doc """
   Generates name for the JavaScript view we want to use
@@ -36,7 +37,8 @@ defmodule AdminAppWeb.LayoutView do
   end
 
   def check_general_settings() do
-    Repo.all(GeneralConfiguration) |> List.first()
+    count = Repo.aggregate(from(g in "snitch_general_configurations"), :count, :id)
+    if count == 1, do: true, else: false
   end
 
   def get_default_taxonomy() do

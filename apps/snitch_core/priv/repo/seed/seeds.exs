@@ -13,6 +13,7 @@
 alias Snitch.Core.Tools.MultiTenancy.Repo
 
 alias Snitch.Seed.{
+  GeneralConfiguration,
   CountryState,
   PaymentMethods,
   OptionType,
@@ -32,9 +33,10 @@ alias Snitch.Tools.Helper.Taxonomy, as: TaxonomyHelper
 
 variant_count = 9
 
+# seeds general settings for the store.
+GeneralConfiguration.seed!()
 # seeds the taxonomy
 # Taxonomy.seed()
-
 # seeds countries and states entity
 Repo.transaction(fn ->
   CountryState.seed_countries!()
