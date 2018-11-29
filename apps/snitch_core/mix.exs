@@ -31,7 +31,7 @@ defmodule Snitch.Core.Mixfile do
   def application do
     [
       mod: {Snitch.Application, []},
-      extra_applications: [:logger, :runtime_tools, :sentry, :ecto_enum]
+      extra_applications: [:logger, :runtime_tools, :sentry]
     ]
   end
 
