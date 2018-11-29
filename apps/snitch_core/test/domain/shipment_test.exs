@@ -132,7 +132,6 @@ defmodule Snitch.Domain.ShipmentTest do
       line_items = line_items_with_price(vs, [4])
       order = %Order{id: 42, line_items: line_items, shipping_address: address}
 
-      expect(Snitch.Tools.DefaultsMock, :fetch, fn :currency -> {:ok, :USD} end)
       packages = Shipment.default_packages(order)
 
       assert length(packages) == 1
@@ -204,7 +203,6 @@ defmodule Snitch.Domain.ShipmentTest do
       line_items = line_items_with_price(vs, [0, 0, 6])
       order = %Order{id: 42, line_items: line_items, shipping_address: address}
 
-      expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
       packages = Shipment.default_packages(order)
 
       assert length(packages) == 2
@@ -280,7 +278,6 @@ defmodule Snitch.Domain.ShipmentTest do
       line_items = line_items_with_price(vs, [4, 0, 4])
       order = %Order{id: 42, line_items: line_items, shipping_address: address}
 
-      expect(Snitch.Tools.DefaultsMock, :fetch, 3, fn :currency -> {:ok, :USD} end)
       packages = Shipment.default_packages(order)
 
       Enum.map(packages, fn %{items: items, category: c} ->
@@ -383,7 +380,6 @@ defmodule Snitch.Domain.ShipmentTest do
       line_items = line_items_with_price(vs, [3])
       order = %Order{id: 42, line_items: line_items, shipping_address: address}
 
-      expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
       packages = Shipment.default_packages(order)
 
       assert length(packages) == 2

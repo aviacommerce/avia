@@ -1,30 +1,27 @@
 defmodule Snitch.Tools.MoneyTest do
   use ExUnit.Case, async: true
+  use Snitch.DataCase
 
   import Mox
+  import Snitch.Factory
 
   alias Snitch.Tools.Money, as: MoneyTools
-
-  @msg_no_default "default 'currency' not set"
-  @error_no_default {:error, @msg_no_default}
+  alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
 
   setup :verify_on_exit!
 
   test "when configured all right zero/0, zero!/0" do
-    expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :INR} end)
+    config = insert(:general_config)
 
-    assert Money.zero(:INR) == MoneyTools.zero()
-    assert Money.zero(:INR) == MoneyTools.zero!()
+    assert Money.zero(config.currency) == MoneyTools.zero()
+    assert Money.zero(config.currency) == MoneyTools.zero!()
   end
 
   test "when no default currency zero/0, zero!/0" do
-    expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> @error_no_default end)
+    currency = GCModel.fetch_currency()
 
-    assert @error_no_default = MoneyTools.zero()
-
-    assert_raise RuntimeError, @msg_no_default, fn ->
-      MoneyTools.zero!()
-    end
+    assert Money.zero(currency) == MoneyTools.zero()
+    assert Money.zero(currency) == MoneyTools.zero!()
   end
 
   test "zero/1, and zero!/1" do

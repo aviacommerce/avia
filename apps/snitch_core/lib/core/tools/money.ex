@@ -2,8 +2,7 @@ defmodule Snitch.Tools.Money do
   @moduledoc """
   Some (weak) helpers to work with zeroes and `Money.t`.
   """
-
-  @defaults Application.get_env(:snitch_core, :defaults_module)
+  alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
 
   @doc """
   Returns the zero `Money.t` with `currency`.
@@ -20,10 +19,8 @@ defmodule Snitch.Tools.Money do
   def zero(currency \\ nil)
 
   def zero(nil) do
-    case @defaults.fetch(:currency) do
-      {:ok, default_currency} -> Money.zero(default_currency)
-      error -> error
-    end
+    currency = GCModel.fetch_currency()
+    Money.zero(currency)
   end
 
   def zero(currency) when is_atom(currency) or is_binary(currency) do
@@ -34,8 +31,7 @@ defmodule Snitch.Tools.Money do
   Returns the zero `Money.t` with `currency`.
 
   If `currency` is not passed,
-  * attempts to fetch default currency from application config.
-  * if default currency is not set, raises a `Money.UnkownCurrencyError`
+  * attempts to fetch default currency from the general settings.
 
   ## Note
   Makes use of `Money.new!/2` and this function can `raise`.
@@ -44,10 +40,8 @@ defmodule Snitch.Tools.Money do
   def zero!(currency \\ nil)
 
   def zero!(nil) do
-    case @defaults.fetch(:currency) do
-      {:ok, default_currency} -> Money.new!(0, default_currency)
-      {:error, msg} -> raise(RuntimeError, msg)
-    end
+    currency = GCModel.fetch_currency()
+    Money.zero(currency)
   end
 
   def zero!(currency) when is_atom(currency) or is_binary(currency) do

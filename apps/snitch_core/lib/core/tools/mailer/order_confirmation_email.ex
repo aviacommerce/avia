@@ -30,6 +30,7 @@ defmodule Snitch.Tools.OrderEmail do
     user_email = order.user.email
 
     logo = if general_config.image != nil, do: general_config.image.name, else: nil
+
     mail_template =
       order_email(%{
         order: order,
@@ -40,6 +41,7 @@ defmodule Snitch.Tools.OrderEmail do
       })
 
     store_name = general_config.name
+
     email =
       new_email()
       |> to(user_email)

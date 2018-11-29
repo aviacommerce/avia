@@ -8,9 +8,8 @@ defmodule Snitch.Domain.ShippingCalculator do
 
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Domain.Order, as: OrderDomain
+  alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
   alias Snitch.Data.Schema.{Order, Package}
-
-  @defaults Application.get_env(:snitch_core, :defaults_module)
 
   @doc """
   Returns the `shipping_cost` for a `package`.
@@ -52,7 +51,7 @@ defmodule Snitch.Domain.ShippingCalculator do
 
     active_rules = get_category_active_rules(package.shipping_category)
 
-    {:ok, currency_code} = @defaults.fetch(:currency)
+    currency_code = GCModel.fetch_currency()
     cost = Money.new!(currency_code, 0)
 
     # The piping here is in the order of priority,

@@ -5,11 +5,10 @@ defmodule AdminAppWeb.ProductView do
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Domain.Taxonomy
 
-  alias Snitch.Data.Model.{Product, ProductProperty, Property, StockItem}
+  alias Snitch.Data.Model.{GeneralConfiguration, Product, ProductProperty, Property, StockItem}
   alias Snitch.Data.Schema
   import Ecto.Query
 
-  @currencies ["USD", "INR"]
   @dummy_image_url "/images/empty-img.png"
   @search_keys ["rummage", "search", "state", "search_term"]
   @sort_field_keys ["rummage", "sort", "field"]
@@ -76,17 +75,13 @@ defmodule AdminAppWeb.ProductView do
     conn.params["taxon"]
   end
 
-  def get_currency_value(nil) do
-    @currencies |> List.first()
-  end
-
-  def get_currency_value(money) do
-    money.currency
+  def get_currency_value() do
+    GeneralConfiguration.fetch_currency()
   end
 
   # TODO This needs to fetched from config
   def get_currency() do
-    @currencies
+    [GeneralConfiguration.fetch_currency()]
   end
 
   def get_image_url(image, product) do

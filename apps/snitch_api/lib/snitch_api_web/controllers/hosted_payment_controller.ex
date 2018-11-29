@@ -1,5 +1,6 @@
 defmodule SnitchApiWeb.HostedPaymentController do
   use SnitchApiWeb, :controller
+  alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
   alias SnitchApi.Payment.HostedPayment
   alias SnitchPayments
   alias SnitchPayments.Gateway.{PayuBiz, RazorPay, Stripe}
@@ -39,7 +40,8 @@ defmodule SnitchApiWeb.HostedPaymentController do
 
   def stripe_purchase(conn, params) do
     ## TODO get the currency set for store here and use that.
-    amount = Money.new!(:USD, params["amount"])
+    currency = GCModel.fetch_currency()
+    amount = Money.new!(currency, params["amount"])
     preferences = HostedPayment.get_payment_preferences(params["payment_method_id"])
     secret = preferences[:credentials]["secret_key"]
     request_params = stripe_params_setup(params)
