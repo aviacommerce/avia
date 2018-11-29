@@ -1,7 +1,8 @@
 defmodule AdminAppWeb.LayoutView do
   use AdminAppWeb, :view
   alias AdminAppWeb.Guardian
-  alias Snitch.Data.Schema.{GeneralConfiguration, Taxonomy}
+  alias Snitch.Data.Schema.GeneralConfiguration, as: GC
+  alias Snitch.Data.Schema.Taxonomy
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias AdminAppWeb.Helpers
 
