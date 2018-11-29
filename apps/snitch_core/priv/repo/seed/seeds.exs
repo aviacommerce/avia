@@ -25,6 +25,7 @@ alias Snitch.Seed.{
   Role,
   Shipping,
   Product,
+  StockLocation,
   ProductRating,
   ShippingRules
 }
@@ -61,6 +62,8 @@ Shipping.seed!()
 ShippingRules.seed!()
 
 ShippingRules.seed!()
+
+StockLocation.seed!()
 
 # Repo.transaction(fn ->
 #   Orders.seed_variants!()

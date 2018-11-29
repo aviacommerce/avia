@@ -1,3 +1,4 @@
+<script src="https://cdn.ckeditor.com/ckeditor5/11.1.1/classic/ckeditor.js"></script>
 <%= if  @conn.request_path == product_path(@conn, :new) do %>
   <div style="margin-bottom:1rem">
     <span>Product Category </span>
@@ -38,7 +39,7 @@
       <%= input f, :name, "Title", is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
     </div>
     <div class="form-group row ">
-      <%= textarea_input f, :description, nil, is_horizontal: true, description: "
+      <%= textarea_input f, :description, nil, is_horizontal: true, class: 'invisible', description: "
         Start with a brief overview that describes your item's finest features.List details like dimensions and key features in easy-to-read bullet points.Tell buyers a bit about your process or the story behind this item.", rows: "10" %>
     </div>
     <div class="form-group row ">
@@ -297,3 +298,13 @@
     <%= csrf_meta_tag %>
   </head>
 </html>
+
+<script>
+  ClassicEditor
+    .create( document.querySelector( '#product_description' ), {
+      removePlugins: [ 'ImageUpload', 'MediaEmbed' ]
+    } )
+    .catch( error => {
+        console.error( error );
+    } );
+</script>
