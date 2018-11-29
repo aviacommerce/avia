@@ -301,7 +301,9 @@
 
 <script>
   ClassicEditor
-    .create( document.querySelector( '#product_description' ) )
+    .create( document.querySelector( '#product_description' ), {
+      removePlugins: [ 'ImageUpload', 'MediaEmbed' ]
+    } )
     .catch( error => {
         console.error( error );
     } );
