@@ -114,13 +114,13 @@ defmodule Snitch.Data.Schema.Product do
 
     variant_params =
       product.products
-      |> Enum.map(&%{"is_active" => false, "id" => &1.id})
+      |> Enum.map(&%{"state" => "deleted", "id" => &1.id})
 
-    params = %{"id" => product.id, "is_active" => false, "products" => variant_params}
+    params = %{"id" => product.id, "state" => "deleted", "products" => variant_params}
 
     product
-    |> cast(params, [:is_active])
-    |> cast_assoc(:products, with: &cast(&1, &2, [:is_active]))
+    |> cast(params, [:state])
+    |> cast_assoc(:products, with: &cast(&1, &2, [:state]))
   end
 
   def child_product(model, params \\ %{}) do

@@ -21,7 +21,7 @@ defmodule SnitchApiWeb.ProductControllerTest do
   end
 
   test "shows chosen resource product", %{conn: conn} do
-    product = insert(:product)
+    product = insert(:product, state: "active")
     conn = get(conn, product_path(conn, :show, product.slug))
 
     assert json_response(conn, 200)["data"] |> Map.take(["id", "type"]) == %{
