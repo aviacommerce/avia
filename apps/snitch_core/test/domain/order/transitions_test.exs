@@ -163,7 +163,6 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     setup :embedded_shipping_methods
 
     setup %{embedded_shipping_methods: methods} do
-      Application.put_env(:snitch_core, :defaults, currency: :USD)
       order = insert(:order)
       [order: order, packages: [insert(:package, shipping_methods: methods, order: order)]]
     end
@@ -173,8 +172,6 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       preference = [
         %{package_id: package.id, shipping_method_id: sm.id}
       ]
-
-      expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
 
       result =
         order
@@ -191,8 +188,6 @@ defmodule Snitch.Domain.Order.TransitionsTest do
          %{
            shipping_methods: [sm]
          } = context do
-      expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
-
       set_cost = Money.new!(:USD, 100)
       quantity = 3
 

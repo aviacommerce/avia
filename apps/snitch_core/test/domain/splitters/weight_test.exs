@@ -142,8 +142,6 @@ defmodule Snitch.Domain.Splitter.WeightTest do
       line_items = line_items_with_price(vs, [1])
       order = %Order{id: 42, line_items: line_items, shipping_address: address}
 
-      expect(Snitch.Tools.DefaultsMock, :fetch, 2, fn :currency -> {:ok, :USD} end)
-
       packages =
         order
         |> Shipment.default_packages()
@@ -200,8 +198,6 @@ defmodule Snitch.Domain.Splitter.WeightTest do
     line_items = line_items_with_price(vs, [3, 3])
     order = %Order{id: 42, line_items: line_items, shipping_address: address}
 
-    expect(Snitch.Tools.DefaultsMock, :fetch, 4, fn :currency -> {:ok, :USD} end)
-
     packages =
       order
       |> Shipment.default_packages()
@@ -255,8 +251,6 @@ defmodule Snitch.Domain.Splitter.WeightTest do
     address = %Address{state_id: up.id, country_id: india.id}
     line_items = line_items_with_price(vs, [2, 6])
     order = %Order{id: 42, line_items: line_items, shipping_address: address}
-
-    expect(Snitch.Tools.DefaultsMock, :fetch, 3, fn :currency -> {:ok, :USD} end)
 
     packages =
       order

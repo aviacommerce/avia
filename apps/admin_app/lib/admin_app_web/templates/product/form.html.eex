@@ -52,7 +52,7 @@
       <div class="col-sm-9 input-group">
         <%= text_input :selling_price, :amount, value: get_amount(f.data.selling_price), class: "form-control", name: "product[selling_price][amount]" %>
         <div class="input-group-append">
-          <%= select :selling_price, :currency, get_currency(),value: get_currency_value(f.data.selling_price), class: "form-control", name: "product[selling_price][currency]" %>
+          <%= text_input :selling_price, :currency, value: get_currency_value(), class: "form-control", name: "product[selling_price][currency]", readonly: true %>
         </div>
       </div>
     </div>
@@ -66,7 +66,7 @@
       <div class="col-sm-9 input-group">
         <%= text_input :max_retail_price, :amount, value: get_amount(f.data.max_retail_price), class: "form-control", name: "product[max_retail_price][amount]" %>
         <div class="input-group-append">
-          <%= select :max_retail_price, :currency, get_currency(),value: get_currency_value(f.data.max_retail_price), class: "form-control", name: "product[max_retail_price][currency]" %>
+          <%= text_input :max_retail_price, :currency, value: get_currency_value(), class: "form-control", name: "product[max_retail_price][currency]", readonly: true%>
         </div>
       </div>
     </div>

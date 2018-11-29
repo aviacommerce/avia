@@ -1,7 +1,8 @@
 defmodule AdminAppWeb.LayoutView do
   use AdminAppWeb, :view
   alias AdminAppWeb.Guardian
-  alias Snitch.Data.Schema.{GeneralConfiguration, Taxonomy}
+  alias Snitch.Data.Schema.GeneralConfiguration, as: GC
+  alias Snitch.Data.Schema.Taxonomy
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias AdminAppWeb.Helpers
 
@@ -35,8 +36,11 @@ defmodule AdminAppWeb.LayoutView do
     |> Enum.at(0)
   end
 
-  def check_general_settings() do
-    Repo.all(GeneralConfiguration) |> List.first()
+  def check_general_settings do
+    case Repo.one(GC) do
+      nil -> false
+      _ -> true
+    end
   end
 
   def get_default_taxonomy() do

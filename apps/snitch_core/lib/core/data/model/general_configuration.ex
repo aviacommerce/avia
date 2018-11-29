@@ -10,6 +10,21 @@ defmodule Snitch.Data.Model.GeneralConfiguration do
   alias Snitch.Tools.Helper.ImageUploader
   alias Ecto.Multi
 
+  @currency_list ["USD", "INR", "GDP", "EUR"]
+
+  @spec fetch_currency() :: String.t()
+  def fetch_currency do
+    case Repo.one(GC) do
+      nil -> "USD"
+      gc -> gc.currency
+    end
+  end
+
+  @spec get_currency_list() :: List.t()
+  def get_currency_list do
+    @currency_list
+  end
+
   @spec build_general_configuration(map) :: Ecto.Changeset.t()
   def build_general_configuration(attrs \\ %{}) do
     %GC{} |> GC.create_changeset(attrs)
