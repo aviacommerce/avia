@@ -12,8 +12,15 @@ defmodule Snitch.Data.Model.GeneralConfiguration do
 
   @spec fetch_currency() :: String.t()
   def fetch_currency do
-    general_config = Repo.all(GC) |> List.first()
-    if general_config != nil, do: general_config.currency, else: "USD"
+    case Repo.one(GC) do
+      nil -> "USD"
+      gc -> gc.currency
+    end
+  end
+
+  @spec get_currency_list() :: List.t()
+  def get_currency_list do
+    ["USD", "INR", "GDP", "EUR"]
   end
 
   @spec build_general_configuration(map) :: Ecto.Changeset.t()

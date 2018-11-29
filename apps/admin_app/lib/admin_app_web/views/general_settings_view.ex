@@ -1,14 +1,13 @@
 defmodule AdminAppWeb.GeneralSettingsView do
   use AdminAppWeb, :view
   alias Snitch.Data.Model.ProductBrand
-
-  @currencies ["USD", "INR", "GDP", "EUR"]
+  alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
 
   def get_image_url(image, general_settings) do
     ProductBrand.image_url(image.name, general_settings)
   end
 
   def get_currency() do
-    @currencies
+    GCModel.get_currency_list()
   end
 end
