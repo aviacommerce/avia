@@ -43,7 +43,7 @@ defmodule Snitch.Data.Model.ProductTest do
       assert product_returned.id == va.product_id
       assert {:ok, _} = Product.delete(va.product_id)
       product_deleted = Product.get(va.product_id)
-      assert product_deleted.is_active == false
+      assert product_deleted.state == "deleted"
     end
 
     test "all products" do
@@ -52,7 +52,7 @@ defmodule Snitch.Data.Model.ProductTest do
     end
 
     test "products list" do
-      insert(:product)
+      insert(:product, state: "active")
       product = Product.get_product_list()
       assert Product.get_product_list() != []
     end
@@ -119,7 +119,7 @@ defmodule Snitch.Data.Model.ProductTest do
 
       product_returned = Repo.get(ProductSchema, product.id)
       assert product_returned != nil
-      assert product_returned.is_active == false
+      assert product_returned.state == "deleted"
     end
 
     test "fails product not found" do

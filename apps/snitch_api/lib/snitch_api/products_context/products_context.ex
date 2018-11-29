@@ -7,6 +7,10 @@ defmodule SnitchApi.ProductsContext do
 
   import Ecto.Query, only: [from: 2, order_by: 2]
 
+  @filter_allowables ~w(taxon_id brand_id)a
+  @partial_search_allowables ~w(name)a
+  @default_filter [state: "active"]
+
   @doc """
   List out all the products
   """
@@ -16,7 +20,7 @@ defmodule SnitchApi.ProductsContext do
     child_product_ids = from(c in Variation, select: c.child_product_id) |> Repo.all()
 
     query = define_query(params)
-    query = from(p in query, where: p.state == "active" and p.id not in ^child_product_ids)
+    query = from(p in query, where: p.id not in ^child_product_ids)
 
     page = create_page(query, %{}, conn)
     products = paginate_collection(query, params)
@@ -47,35 +51,6 @@ defmodule SnitchApi.ProductsContext do
 
         {:ok, product}
     end
-  end
-
-  def product_by_brand(brand_id) do
-    query = from(p in Product, where: p.brand_id == ^brand_id and p.is_active == true)
-
-    review_query = from(c in Review, limit: 5, preload: [rating_option_vote: :rating_option])
-
-    product =
-      Repo.all(query)
-      |> Repo.preload(
-        reviews: review_query,
-        variants: [:images, options: :option_type, theme: [:option_types]],
-        theme: [:option_types],
-        options: :option_type
-      )
-  end
-
-  def product_by_taxon(taxon_id) do
-    query = from(p in Product, where: p.taxon_id == ^taxon_id and p.is_active == true)
-
-    review_query = from(c in Review, limit: 5, preload: [rating_option_vote: :rating_option])
-
-    Repo.all(query)
-    |> Repo.preload(
-      reviews: review_query,
-      variants: [:images, options: :option_type, theme: [:option_types]],
-      theme: [:option_types],
-      options: :option_type
-    )
   end
 
   @doc """
@@ -184,13 +159,37 @@ defmodule SnitchApi.ProductsContext do
           order_by(Product, asc: :name)
       end
 
-    query =
-      case params["filter"] do
-        %{"name" => filter} ->
-          from(p in query, where: ilike(p.name, ^"%#{filter}%"))
+    filter_query(query, params["filter"], @filter_allowables)
+    |> like_query(params["filter"], @partial_search_allowables)
+  end
 
-        _ ->
-          query
-      end
+  defp filter_query(query, nil, _allowables), do: query
+
+  defp filter_query(query, filter_params, allowables) do
+    filter_params = @default_filter ++ make_filter_params_list(filter_params, allowables)
+
+    from(q in query, where: ^filter_params)
+  end
+
+  defp like_query(query, nil, _allowables), do: query
+
+  defp like_query(query, filter_params, allowables) do
+    filter_params = make_filter_params_list(filter_params, allowables)
+
+    Enum.reduce(filter_params, query, fn {key, value}, nquery ->
+      from(q in nquery, where: ilike(fragment("CAST(? AS TEXT)", field(q, ^key)), ^"%#{value}%"))
+    end)
+  end
+
+  defp get_value("true"), do: true
+
+  defp get_value("false"), do: false
+
+  defp get_value(value), do: value
+
+  defp make_filter_params_list(filter_params, allowables) do
+    filter_params
+    |> Enum.into([], fn x -> {String.to_atom(elem(x, 0)), get_value(elem(x, 1))} end)
+    |> Enum.reject(fn x -> elem(x, 0) not in allowables end)
   end
 end
