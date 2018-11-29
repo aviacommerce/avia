@@ -44,8 +44,7 @@ defmodule Snitch.Data.Schema.Product do
     field(:weight, :decimal, default: Decimal.new(0))
     field(:is_active, :boolean, default: true)
 
-    # field(:state, :string, default: "draft")
-    field(:state, StateEnum, default: 0)
+    field(:state, ProductStateEnum, default: 0)
 
     # Following fields are used in context of import
     field(:store, :string, default: "avia")
