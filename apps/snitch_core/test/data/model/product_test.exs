@@ -43,7 +43,7 @@ defmodule Snitch.Data.Model.ProductTest do
       assert product_returned.id == va.product_id
       assert {:ok, _} = Product.delete(va.product_id)
       product_deleted = Product.get(va.product_id)
-      assert product_deleted.state == "deleted"
+      assert product_deleted.state == :deleted
     end
 
     test "all products" do
@@ -52,7 +52,7 @@ defmodule Snitch.Data.Model.ProductTest do
     end
 
     test "products list" do
-      insert(:product, state: "active")
+      insert(:product, state: :active)
       product = Product.get_product_list()
       assert Product.get_product_list() != []
     end
@@ -119,7 +119,7 @@ defmodule Snitch.Data.Model.ProductTest do
 
       product_returned = Repo.get(ProductSchema, product.id)
       assert product_returned != nil
-      assert product_returned.state == "deleted"
+      assert product_returned.state == :deleted
     end
 
     test "fails product not found" do
@@ -152,7 +152,7 @@ defmodule Snitch.Data.Model.ProductTest do
     test "count by state" do
       taxon = insert(:taxon)
       product = insert(:product)
-      {:ok, updated_product} = Product.update(product, %{state: "active", taxon_id: taxon.id})
+      {:ok, updated_product} = Product.update(product, %{state: :active, taxon_id: taxon.id})
 
       next_date =
         product.inserted_at
@@ -165,7 +165,7 @@ defmodule Snitch.Data.Model.ProductTest do
         Product.get_product_count_by_state(product.inserted_at, next_date) |> List.first()
 
       assert product_state_count.count == 1
-      assert product_state_count.state == "active"
+      assert product_state_count.state == :active
     end
   end
 

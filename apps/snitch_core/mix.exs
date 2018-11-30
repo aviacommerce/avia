@@ -104,7 +104,10 @@ defmodule Snitch.Core.Mixfile do
       {:mariaex, "~> 0.8.2"},
 
       # xml
-      {:xml_builder, "~> 2.1", override: true}
+      {:xml_builder, "~> 2.1", override: true},
+
+      # ecto_enum
+      {:ecto_enum, "~> 1.0"}
     ]
   end
 
