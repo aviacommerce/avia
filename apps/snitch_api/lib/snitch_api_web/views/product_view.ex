@@ -21,7 +21,8 @@ defmodule SnitchApiWeb.ProductView do
     :max_retail_price,
     :images,
     :rating_summary,
-    :is_orderable
+    :is_orderable,
+    :display_price
   ])
 
   def selling_price(product) do
@@ -30,6 +31,10 @@ defmodule SnitchApiWeb.ProductView do
 
   def max_retail_price(product) do
     Money.round(product.max_retail_price, currency_digits: :cash)
+  end
+
+  def display_price(product) do
+    product.selling_price |> to_string
   end
 
   def images(product, _conn) do
