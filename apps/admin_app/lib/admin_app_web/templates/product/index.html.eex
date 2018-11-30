@@ -83,10 +83,10 @@
                       </a>
                       <div class="dropdown-menu dropdown-menu-right">
                         <%= link("Edit", to: product_path(@conn, :edit, item.id), class: "dropdown-item") %>
-                        <%= if item.state in ["in_active", "draft"] do %>
-                          <%= link("Activate", to: product_path(@conn, :update, item.id, "product": @conn.query_params |> Map.take(["rummage", "id"]) |> Map.merge(%{"state": "active", "id": item.id})), method: :patch, class: "dropdown-item")%>
+                        <%= if item.state in [:in_active, :draft] do %>
+                          <%= link("Activate", to: product_path(@conn, :update, item.id, "product": @conn.query_params |> Map.take(["rummage", "id"]) |> Map.merge(%{"state": :active, "id": item.id})), method: :patch, class: "dropdown-item")%>
                         <% else %>
-                          <%= link("Deactivate", to: product_path(@conn, :update, item.id, "product": @conn.query_params |> Map.take(["rummage", "id"]) |> Map.merge(%{"state": "in_active", "id": item.id})), method: :patch, class: "dropdown-item")%>
+                          <%= link("Deactivate", to: product_path(@conn, :update, item.id, "product": @conn.query_params |> Map.take(["rummage", "id"]) |> Map.merge(%{"state": :in_active, "id": item.id})), method: :patch, class: "dropdown-item")%>
                         <% end %>
                         <%= link("Delete", to: product_path(@conn, :delete, item.id, @conn.query_params), method: :delete, data: [confirm: "Are you sure?"], class: "dropdown-item") %>
                       </div>
