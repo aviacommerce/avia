@@ -9,7 +9,7 @@ defmodule SnitchApi.ProductsContext do
 
   @filter_allowables ~w(taxon_id brand_id)a
   @partial_search_allowables ~w(name)a
-  @default_filter [state: "active"]
+  @default_filter [state: 1]
 
   @doc """
   List out all the products
