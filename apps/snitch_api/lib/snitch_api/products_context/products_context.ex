@@ -163,7 +163,7 @@ defmodule SnitchApi.ProductsContext do
     |> like_query(params["filter"], @partial_search_allowables)
   end
 
-  defp filter_query(query, nil, _allowables), do: query
+  defp filter_query(query, nil, _allowables), do: from(q in query, where: ^@default_filter)
 
   defp filter_query(query, filter_params, allowables) do
     filter_params = @default_filter ++ make_filter_params_list(filter_params, allowables)
