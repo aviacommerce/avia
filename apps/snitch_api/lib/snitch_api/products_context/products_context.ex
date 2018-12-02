@@ -132,6 +132,10 @@ defmodule SnitchApi.ProductsContext do
     end
   end
 
+  def extend_query(query, keyword_list) do
+    from(q in query, where: ^keyword_list)
+  end
+
   @doc """
   Develops the query based on the giver params. At least sorting the
   products in Ascending orders of their names is considered as priority.
@@ -163,12 +167,12 @@ defmodule SnitchApi.ProductsContext do
     |> like_query(params["filter"], @partial_search_allowables)
   end
 
-  defp filter_query(query, nil, _allowables), do: query
+  defp filter_query(query, nil, _allowables), do: extend_query(query, @default_filter)
 
   defp filter_query(query, filter_params, allowables) do
     filter_params = @default_filter ++ make_filter_params_list(filter_params, allowables)
 
-    from(q in query, where: ^filter_params)
+    extend_query(query, filter_params)
   end
 
   defp like_query(query, nil, _allowables), do: query
