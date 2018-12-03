@@ -50,6 +50,7 @@ defmodule Snitch.Tasks.ReleaseTasks do
     IO.puts("Running migrations for #{app}")
     migrations_path = priv_path_for(repo, "migrations")
     Ecto.Migrator.run(repo, migrations_path, :up, all: true)
+    Mix.Tasks.Triplex.Migrate.run([])
   end
 
   defp run_seeds do
