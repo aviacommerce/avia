@@ -74,7 +74,7 @@
       <%= select_input f, :shipping_category_id, get_shipping_category(), nil, is_horizontal: true, description: "Select appropriate shipping method for the product eg. Heavy for Washing Machine, Light for T-shirt." %>
     </div>
     <div class="form-group row ">
-      <%= select_input f, :brand_id, get_brand_options(@brands), nil, is_horizontal: true, description: "Select branch of the product Eg. Levi's." %>
+      <%= select_input f, :brand_id, get_brand_options(@brands), nil, is_horizontal: true, description: "Select branch of the product Eg. Levi's.", prompt: "Choose your brand" %>
     </div>
     <div class="form-group row ">
       <%= input f, :meta_title_, nil, is_horizontal: true, description: "A short title which helps improve the SEO of the product." %>
