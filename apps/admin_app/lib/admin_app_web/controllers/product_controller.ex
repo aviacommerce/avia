@@ -9,6 +9,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Domain.Taxonomy
 
   alias Snitch.Data.Schema.{
+    Image,
     ProductBrand,
     StockLocation,
     VariationTheme,
@@ -88,12 +89,39 @@ defmodule AdminAppWeb.ProductController do
     )
   end
 
+  defp preload_product_images(id) do
+    id
+    |> String.to_integer()
+    |> ProductModel.get()
+    |> Repo.preload(:images)
+  end
+
+  def update_default_image(conn, %{"product_id" => id, "default_image" => default_image}) do
+    product = preload_product_images(id)
+
+    for image <- product.images do
+      if to_string(image.id) == default_image do
+        attrs = %{is_default: true}
+        update_image(conn, attrs, image)
+      else
+        attrs = %{is_default: false}
+        update_image(conn, attrs, image)
+      end
+    end
+
+    conn
+    |> put_status(200)
+    |> json(%{msg: "Update successful"})
+  end
+
+  defp update_image(conn, attrs, image) do
+    image
+    |> Image.update_changeset(attrs)
+    |> Repo.update()
+  end
+
   def add_images(conn, %{"product_images" => product_images, "product_id" => id}) do
-    product =
-      id
-      |> String.to_integer()
-      |> ProductModel.get()
-      |> Repo.preload(:images)
+    product = preload_product_images(id)
 
     images = (product_images["images"] ++ product.images) |> parse_images()
     params = %{"images" => images}

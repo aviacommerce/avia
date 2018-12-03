@@ -6,6 +6,7 @@ export default class View extends MainView {
 
     // Specific logic here
     console.log('ProductEditView mounted');
+    defaultImage();
     imageOnEnter();
     imageOnSubmit();
     handleImageSelect();
@@ -29,6 +30,25 @@ export function imageOnEnter(){
       event.preventDefault();
       handleSubmitImage();
   });
+}
+
+export function defaultImage(){
+  $(document).delegate('input[type="checkbox"]', 'click', function(event) {
+    $(this).parent().siblings().find(':checkbox').prop('checked', false);
+    var default_image = $(this).val();
+    var product_id = $("#product-id").val();
+    var data = { product_id: product_id,  default_image: default_image};
+    var CSRF_TOKEN = $("meta[name='csrf-token']").attr("content");
+    $.ajax({
+      url: `/set-default-image/${product_id}`,
+      type: "POST",
+      cache: false,
+      data: data,
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader("X-CSRF-Token", CSRF_TOKEN);
+      }
+    });
+ });
 }
 
 export function imageOnSubmit(){

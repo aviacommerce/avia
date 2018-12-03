@@ -1,4 +1,5 @@
 <div class="img-wrap col-3 p-1">
+  <input type="checkbox" id="checkimage" class="checkbox" value="<%= @image.id %>" />
   <span class="product-delete">&times;
   <input name="delete-image-id" type="hidden" value="<%= @image.id %>" >
   </span>

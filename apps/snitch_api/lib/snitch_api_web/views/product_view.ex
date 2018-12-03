@@ -22,7 +22,8 @@ defmodule SnitchApiWeb.ProductView do
     :images,
     :rating_summary,
     :is_orderable,
-    :display_price
+    :display_price,
+    :default_image
   ])
 
   def selling_price(product) do
@@ -35,6 +36,14 @@ defmodule SnitchApiWeb.ProductView do
 
   def display_price(product) do
     product.selling_price |> to_string
+  end
+
+  def default_image(product, _conn) do
+    product = product |> Repo.preload(:images)
+
+    product.images
+    |> Enum.filter(fn image -> image.is_default == true end)
+    |> Enum.map(fn image -> %{"default_product_url" => Product.image_url(image.name, product)} end)
   end
 
   def images(product, _conn) do
