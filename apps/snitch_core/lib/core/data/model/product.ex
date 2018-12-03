@@ -11,6 +11,8 @@ defmodule Snitch.Data.Model.Product do
   alias Snitch.Tools.Helper.ImageUploader
   alias Snitch.Data.Schema.Image
 
+  @product_states [:active, :in_active, :draft]
+
   @doc """
   Returns all Products
   """
@@ -297,8 +299,17 @@ defmodule Snitch.Data.Model.Product do
   end
 
   def get_product_count_by_state(start_date, end_date) do
+    child_product_ids =
+      Variation
+      |> select([v], v.child_product_id)
+      |> Repo.all()
+
     Product
-    |> where([p], p.inserted_at >= ^start_date and p.inserted_at <= ^end_date)
+    |> where(
+      [p],
+      p.inserted_at >= ^start_date and p.inserted_at <= ^end_date and p.state in ^@product_states and
+        p.id not in ^child_product_ids
+    )
     |> group_by([p], p.state)
     |> select([p], %{state: p.state, count: count(p.id)})
     |> Repo.all()
