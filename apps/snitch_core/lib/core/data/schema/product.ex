@@ -115,13 +115,20 @@ defmodule Snitch.Data.Schema.Product do
 
     variant_params =
       product.products
-      |> Enum.map(&%{"state" => "deleted", "id" => &1.id})
+      |> Enum.map(
+        &%{"state" => "deleted", "id" => &1.id, "deleted_at" => NaiveDateTime.utc_now()}
+      )
 
-    params = %{"id" => product.id, "state" => "deleted", "products" => variant_params}
+    params = %{
+      "id" => product.id,
+      "state" => "deleted",
+      "products" => variant_params,
+      "deleted_at" => NaiveDateTime.utc_now()
+    }
 
     product
-    |> cast(params, [:state])
-    |> cast_assoc(:products, with: &cast(&1, &2, [:state]))
+    |> cast(params, [:state, :deleted_at])
+    |> cast_assoc(:products, with: &cast(&1, &2, [:state, :deleted_at]))
   end
 
   def child_product(model, params \\ %{}) do
