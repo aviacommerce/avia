@@ -6,9 +6,8 @@ export default class View extends MainView {
 
     // Specific logic here
     console.log('ProductEditView mounted');
-    defaultImage();
     imageOnEnter();
-    imageOnSubmit();
+    setDefaultImage();
     handleImageSelect();
     deleteImage();
     setup_product();
@@ -32,13 +31,14 @@ export function imageOnEnter(){
   });
 }
 
-export function defaultImage(){
-  $(document).delegate('input[type="checkbox"]', 'click', function(event) {
+export function setDefaultImage(){
+  $(document).delegate('input[type="checkbox"]', 'click', function(event) {  
     $(this).parent().siblings().find(':checkbox').prop('checked', false);
     var default_image = $(this).val();
     var product_id = $("#product-id").val();
     var data = { product_id: product_id,  default_image: default_image};
     var CSRF_TOKEN = $("meta[name='csrf-token']").attr("content");
+
     $.ajax({
       url: `/set-default-image/${product_id}`,
       type: "POST",
@@ -49,13 +49,6 @@ export function defaultImage(){
       }
     });
  });
-}
-
-export function imageOnSubmit(){
-  $(document).delegate('#product-image', 'submit', function(event){
-    event.preventDefault();
-    handleSubmitImage();
-  });
 }
 
 function handleSubmitImage(){

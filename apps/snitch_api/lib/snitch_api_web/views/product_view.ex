@@ -1,8 +1,11 @@
 defmodule SnitchApiWeb.ProductView do
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
+  alias Snitch.Data.Schema.Image
+  alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Data.Model.{Product, ProductReview}
   alias Snitch.Core.Tools.MultiTenancy.Repo
+  import Ecto.Query
 
   location("/products/:slug")
 
@@ -39,11 +42,14 @@ defmodule SnitchApiWeb.ProductView do
   end
 
   def default_image(product, _conn) do
-    product = product |> Repo.preload(:images)
+    default_image = from(image in Image, where: image.is_default == true)
 
-    product.images
-    |> Enum.filter(fn image -> image.is_default == true end)
-    |> Enum.map(fn image -> %{"default_product_url" => Product.image_url(image.name, product)} end)
+    query =
+      from(p in ProductSchema, where: p.id == ^product.id, preload: [images: ^default_image])
+
+    product = Repo.one(query)
+    image = product.images |> List.first()
+    %{"default_product_url" => Product.image_url(image.name, product)}
   end
 
   def images(product, _conn) do

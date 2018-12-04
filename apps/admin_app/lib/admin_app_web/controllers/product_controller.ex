@@ -102,10 +102,10 @@ defmodule AdminAppWeb.ProductController do
     for image <- product.images do
       if to_string(image.id) == default_image do
         attrs = %{is_default: true}
-        update_image(conn, attrs, image)
+        update_image(attrs, image)
       else
         attrs = %{is_default: false}
-        update_image(conn, attrs, image)
+        update_image(attrs, image)
       end
     end
 
@@ -114,7 +114,7 @@ defmodule AdminAppWeb.ProductController do
     |> json(%{msg: "Update successful"})
   end
 
-  defp update_image(conn, attrs, image) do
+  defp update_image(attrs, image) do
     image
     |> Image.update_changeset(attrs)
     |> Repo.update()
@@ -122,7 +122,6 @@ defmodule AdminAppWeb.ProductController do
 
   def add_images(conn, %{"product_images" => product_images, "product_id" => id}) do
     product = preload_product_images(id)
-
     images = (product_images["images"] ++ product.images) |> parse_images()
     params = %{"images" => images}
 
@@ -130,7 +129,18 @@ defmodule AdminAppWeb.ProductController do
       {:ok, _} ->
         associated_images = product.images
         product = product |> Repo.preload(:images, force: true)
-        product_images = product.images -- associated_images
+
+        product_images =
+          case Enum.empty?(associated_images) do
+            true ->
+              update_image(%{is_default: true}, product.images |> List.first())
+              product = product |> Repo.preload(:images, force: true)
+              product.images
+
+            false ->
+              product.images -- associated_images
+          end
+
         image_div = Enum.map(product_images, fn image -> get_html_string(product, image) end)
         images = Enum.join(image_div, " ")
         opts = [wrapper_tag: :div, attributes: [class: "alert alert-success"]]
