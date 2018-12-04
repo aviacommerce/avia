@@ -28,7 +28,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col">
+      <div class="col-6">
         <h5>Orders Status</h5>
         <hr />
         <div class="table-contaner orderlist">
@@ -63,15 +63,10 @@
                 </tbody>
               </table>
             </div>
-            <div class="col-12">
-              <div class="card p-2">
-                <canvas id="barChart"></canvas>
-              </div>
-            </div>
           </div>
         </div>
       </div>
-      <div class="col">
+      <div class="col-6">
         <h5>Products Status</h5>
         <hr />
         <div class="table-contaner orderlist">
@@ -106,6 +101,25 @@
                 </tbody>
               </table>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-6">
+        <div class="table-contaner orderlist">
+          <div class="row">
+            <div class="col-12">
+              <div class="card p-2">
+                <canvas id="barChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="table-contaner orderlist">
+          <div class="row">
             <div class="col-12">
               <div class="card p-2">
                 <canvas id="lineChart"></canvas>

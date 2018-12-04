@@ -132,6 +132,7 @@ defmodule Snitch.Data.Model.OrderTest do
   describe "order" do
     test "count by state", %{order_params: params, variants: vs} do
       {:ok, order} = Order.create(params)
+      Order.partial_update(order, %{state: "confirmed"})
 
       next_date =
         order.inserted_at
@@ -144,7 +145,7 @@ defmodule Snitch.Data.Model.OrderTest do
         Order.get_order_count_by_state(order.inserted_at, next_date) |> List.first()
 
       assert order_state_count.count == 1
-      assert order_state_count.state == "cart"
+      assert order_state_count.state == "confirmed"
     end
 
     test "count by date", %{order_params: params, variants: vs} do
