@@ -8,6 +8,7 @@ defmodule Snitch.Data.Model.Order do
   alias Snitch.Data.Schema.Order
   alias Snitch.Data.Model.LineItem, as: LineItemModel
 
+  @order_states ["confirmed", "complete"]
   @doc """
   Creates an order with supplied `params` and `line_items`.
 
@@ -220,7 +221,10 @@ defmodule Snitch.Data.Model.Order do
 
   def get_order_count_by_state(start_date, end_date) do
     Order
-    |> where([o], o.inserted_at >= ^start_date and o.inserted_at <= ^end_date)
+    |> where(
+      [o],
+      o.inserted_at >= ^start_date and o.inserted_at <= ^end_date and o.state in ^@order_states
+    )
     |> group_by([o], o.state)
     |> order_by([o], asc: o.state)
     |> select([o], %{state: o.state, count: count(o.id)})
