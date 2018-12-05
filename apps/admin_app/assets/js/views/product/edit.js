@@ -1,4 +1,5 @@
 import MainView from '../main';
+import { addEventToProductFormButtons } from './publish_helper'
 
 export default class View extends MainView {
   mount() {
@@ -12,6 +13,8 @@ export default class View extends MainView {
     handleImageSelect();
     deleteImage();
     setup_product();
+    addEventToProductFormButtons();
+    
   }
 
   unmount() {

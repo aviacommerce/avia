@@ -7,6 +7,7 @@ import ProductEditView from './product/edit';
 import OrderIndexView from './order/index';
 import ZoneNewView from './zone/new';
 import ProductIndexView from './product/index';
+import ProductNewView from './product/new';
 import DashboardIndexView from './dashboard/index';
 
 
@@ -20,7 +21,8 @@ const views = {
   ProductIndexView,
   OrderIndexView,
   ZoneNewView,
-  DashboardIndexView
+  DashboardIndexView,
+  ProductNewView
 };
 
 export default function loadView(viewName) {
