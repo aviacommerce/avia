@@ -2,7 +2,7 @@ defmodule Core.Repo.Migrations.CreatePaymentTables do
   use Ecto.Migration
 
   @payment_exclusivity_fn ~s"""
-  create or replace function payment_exclusivity(
+  create or replace function #{ prefix() || "public" }.payment_exclusivity(
     in supertype_id bigint,
     in subtype_discriminator char(3)
     )
@@ -48,6 +48,6 @@ defmodule Core.Repo.Migrations.CreatePaymentTables do
     end
     create unique_index("snitch_card_payments", :payment_id)
 
-    execute @payment_exclusivity_fn, "drop function payment_exclusivity;"
+    execute @payment_exclusivity_fn, "drop #{ prefix() || "public" }.function payment_exclusivity;"
   end
 end

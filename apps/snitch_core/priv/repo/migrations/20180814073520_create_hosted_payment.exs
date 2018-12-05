@@ -17,6 +17,6 @@ defmodule Snitch.Repo.Migrations.CreateHostedPayment do
 
     create constraint("snitch_hosted_payments",
       :hosted_payment_exclusivity,
-      check: "payment_exclusivity(payment_id, '#{@code}') = 1")
+      check: "#{ prefix() || "public" }.payment_exclusivity(payment_id, '#{@code}') = 1")
   end
 end
