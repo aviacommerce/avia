@@ -336,12 +336,14 @@ defmodule AdminAppWeb.ProductController do
   end
 
   defp redirect_with_updated_conn(conn, params) do
+    rummage_params = params |> Map.take(["rummage"])
+
     updated_conn =
       conn
-      |> Map.put(:query_params, params)
-      |> Map.put(:query_string, Plug.Conn.Query.encode(params))
+      |> Map.put(:query_params, rummage_params)
+      |> Map.put(:query_string, Plug.Conn.Query.encode(rummage_params))
 
-    redirect(updated_conn, to: product_path(updated_conn, :index, params))
+    redirect(updated_conn, to: product_path(updated_conn, :index, rummage_params))
   end
 
   def index_property(conn, _params) do
