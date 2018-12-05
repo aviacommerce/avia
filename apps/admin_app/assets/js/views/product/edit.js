@@ -12,7 +12,7 @@ export default class View extends MainView {
     setDefaultImage();
     handleImageSelect();
     deleteImage();
-    setup_product();
+    setupProduct();
     addEventToProductFormButtons();
     
   }
@@ -158,7 +158,7 @@ function deleteError(data) {
   console.log('errror data', data)
 }
 
-function setup_product() {
+function setupProduct() {
   let previousOptionValue = ""
 
   // This handle the variation theme selection

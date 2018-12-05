@@ -6,7 +6,6 @@ export default class View extends MainView {
     super.mount();
 
     // Specific logic here
-    console.log('ProductNewView mounted');
 
     addEventToProductFormButtons();
   }
@@ -15,6 +14,5 @@ export default class View extends MainView {
     super.unmount();
 
     // Specific logic here
-    console.log('ProductNewView unmounted');
   }
 }
