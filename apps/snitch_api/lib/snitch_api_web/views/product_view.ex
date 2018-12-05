@@ -44,10 +44,13 @@ defmodule SnitchApiWeb.ProductView do
   def default_image(product, _conn) do
     product = Product.get_product_with_default_image(product)
 
-    case product.images |> List.first() do
-      nil -> %{"default_product_url" => nil}
-      image -> %{"default_product_url" => Product.image_url(image.name, product)}
-    end
+    url =
+      case product.images |> List.first() do
+        nil -> nil
+        image -> Product.image_url(image.name, product)
+      end
+
+    %{"default_product_url" => url}
   end
 
   def images(product, _conn) do
