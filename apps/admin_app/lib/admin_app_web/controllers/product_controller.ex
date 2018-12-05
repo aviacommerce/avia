@@ -75,7 +75,7 @@ defmodule AdminAppWeb.ProductController do
   def update(conn, %{"product" => params}) do
     with %ProductSchema{} = product <- ProductModel.get(params["id"]),
          {:ok, _product} <- ProductModel.update(product, params) do
-      redirect_with_updated_conn(conn, params)
+      redirect_with_updated_conn(conn, @rummage_default)
     end
   end
 
