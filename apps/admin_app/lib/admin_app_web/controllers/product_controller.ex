@@ -18,6 +18,7 @@ defmodule AdminAppWeb.ProductController do
   }
 
   alias Snitch.Tools.Money
+  alias Snitch.Tools.Helper.Query
   alias Snitch.Data.Model.StockItem, as: StockModel
   alias Snitch.Data.Schema.StockItem, as: StockSchema
   alias AdminAppWeb.ProductView
@@ -90,9 +91,8 @@ defmodule AdminAppWeb.ProductController do
   end
 
   defp preload_product_images(id) do
-    id
-    |> String.to_integer()
-    |> ProductModel.get()
+    ProductSchema
+    |> Query.get(id, Repo)
     |> Repo.preload(:images)
   end
 

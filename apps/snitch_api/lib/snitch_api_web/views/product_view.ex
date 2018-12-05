@@ -42,14 +42,12 @@ defmodule SnitchApiWeb.ProductView do
   end
 
   def default_image(product, _conn) do
-    default_image = from(image in Image, where: image.is_default == true)
+    product = Product.get_product_with_default_image(product)
 
-    query =
-      from(p in ProductSchema, where: p.id == ^product.id, preload: [images: ^default_image])
-
-    product = Repo.one(query)
-    image = product.images |> List.first()
-    %{"default_product_url" => Product.image_url(image.name, product)}
+    case product.images |> List.first() do
+      nil -> %{"default_product_url" => nil}
+      image -> %{"default_product_url" => Product.image_url(image.name, product)}
+    end
   end
 
   def images(product, _conn) do
