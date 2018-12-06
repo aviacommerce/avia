@@ -22,6 +22,7 @@ defmodule Snitch.Factory do
     CardPayment,
     GeneralConfiguration,
     HostedPayment,
+    Image,
     LineItem,
     Order,
     Payment,
@@ -246,6 +247,12 @@ defmodule Snitch.Factory do
     }
   end
 
+  def image_factory do
+    %Image{
+      is_default: true,
+      name: "test.png"
+    }
+  end
   # sequence(:first_name, &"Tony-#{&1}")
   def property_factory do
     %Property{
@@ -260,6 +267,12 @@ defmodule Snitch.Factory do
       address: insert(:address),
       user: insert(:user)
     }
+  end
+
+  def product_with_default_image(_context) do
+    attrs = %{images: [build(:image)]}
+
+    [product_with_default_image: insert(:product, attrs)]
   end
 
   def order_with_user(_context) do
