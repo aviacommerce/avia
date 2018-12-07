@@ -55,7 +55,6 @@ export default class View extends MainView {
     $(".taxonform").on("submit", function(event) {
       event.preventDefault();
       var tid = $("#form-taxon-id").val();
-      let target_div = $(`.item[data-taxon_id=${tid}]`);
       var form_data = new FormData();
       var image_file = $(this).find('input[name="taxon[image]"]')[0].files[0];
       var name = $(this)
