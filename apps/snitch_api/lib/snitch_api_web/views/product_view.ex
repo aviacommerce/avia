@@ -74,9 +74,16 @@ defmodule SnitchApiWeb.ProductView do
 
   defp get_parent_images(product) do
     variant = Repo.get_by(Variation, child_product_id: product.id)
-    parent_id = variant.parent_product_id
-    parent_product = Repo.get_by(ProductSchema, id: parent_id) |> Repo.preload([:images])
-    parent_product.images
+
+    case variant do
+      nil ->
+        []
+
+      _ ->
+        parent_id = variant.parent_product_id
+        parent_product = Repo.get_by(ProductSchema, id: parent_id) |> Repo.preload([:images])
+        parent_product.images
+    end
   end
 
   def rating_summary(product, _conn) do
