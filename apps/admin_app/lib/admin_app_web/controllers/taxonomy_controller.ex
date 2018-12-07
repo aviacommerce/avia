@@ -47,10 +47,10 @@ defmodule AdminAppWeb.TaxonomyController do
       |> put_status(200)
       |> json(%{html: html})
     else
-      {:error, changeset} ->
+      {:error, _changeset} ->
         conn
         |> put_status(:bad_request)
-        |> json(%{error: %{message: "request failed"}})
+        |> json(%{"error" => "Failed to create category"})
     end
   end
 

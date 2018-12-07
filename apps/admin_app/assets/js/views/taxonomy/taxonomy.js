@@ -36,6 +36,7 @@ export default class View extends MainView {
     });
 
     $(".taxonomy").on("click", ".add-taxon", function(e) {
+      $("#new-taxon-danger").slideUp("fast");
       $("#taxon-modal").modal({ show: true });
       $(".modal-body select")
         .val("")
@@ -68,6 +69,9 @@ export default class View extends MainView {
       form_data.append("themes", themes);
       form_data.append("_csrf_token", csrf);
       form_data.append("id", tid);
+
+      $("#new-taxon-danger").slideUp("fast");
+
       $.ajax({
         url: "/taxonomy",
         type: "POST",
@@ -75,8 +79,6 @@ export default class View extends MainView {
         processData: false,
         contentType: false,
         success: function(result) {
-
-
           $("#taxon-modal").modal("hide");
           $(result.html)
             .hide()
@@ -84,7 +86,9 @@ export default class View extends MainView {
             .show("normal");
         },
         error: function(result) {
-          console.log("Request failed");
+          let error_json = result.responseJSON;
+          $("#new-taxon-danger").html(error_json.error.message);
+          $("#new-taxon-danger").slideDown("slow");
         }
       });
     });
@@ -183,9 +187,6 @@ export default class View extends MainView {
           console.log("Taxon not found");
         });
     }
-
-    // Specific logic here
-    console.log("TaxonomyTaxonomyView mounted");
   }
 
   get_query_params() {
@@ -201,8 +202,5 @@ export default class View extends MainView {
 
   unmount() {
     super.unmount();
-
-    // Specific logic here
-    console.log("TaxonomyTaxonomyView unmounted");
   }
 }
