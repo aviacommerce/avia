@@ -46,9 +46,6 @@ We are also welcoming to the developers who want to contribute in the developmen
 [pivotal]: https://www.pivotaltracker.com/n/projects/2149807
 [elixir]: http://elixir-lang.org/
 [feedback]: https://github.com/aviabird/snitch/issues/66
-[gitter]: https://gitter.im/avia-commerce/support
+[gitter]: https://gitter.im/avia-commerce/Lobby
 [aviacommerce]: https://aviacommerce.org
 [contribute]: https://www.aviacommerce.org/docs/how-to-contribute.html
-
-
-
