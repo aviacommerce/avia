@@ -44,7 +44,7 @@ defmodule Snitch.Data.Schema.Taxon do
 
   defp handle_slug(%{changes: %{name: name}} = changeset) do
     changeset
-    |> put_change(:slug, Slugger.slugify_downcase(name))
+    |> put_change(:slug, Slugger.slugify_downcase(name, ?_))
     |> unique_constraint(:slug, message: "category with this name alreay exist")
   end
 

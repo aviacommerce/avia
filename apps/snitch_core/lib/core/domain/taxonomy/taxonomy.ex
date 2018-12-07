@@ -189,6 +189,34 @@ defmodule Snitch.Domain.Taxonomy do
     end
   end
 
+  @doc """
+  Updates all category slug based on the name.
+
+  Note: If the slug already exist, then parent slug is prefixed with current
+  category slug
+  """
+  def update_all_categories_slug() do
+    Taxon
+    |> Repo.all()
+    |> Enum.map(&Taxon.changeset(&1, %{}))
+    |> Enum.map(&Repo.update(&1))
+    |> Enum.map(fn update_result ->
+      case update_result do
+        {:ok, taxon} ->
+          {:ok, taxon}
+
+        {:error, changeset} ->
+          current_taxon = Repo.preload(changeset.data, :parent)
+
+          slug =
+            Slugger.slugify_downcase("#{current_taxon.parent.name} #{current_taxon.name}", ?_)
+
+          changeset = Ecto.Changeset.change(current_taxon, slug: slug)
+          Repo.update(changeset)
+      end
+    end)
+  end
+
   def create_taxon(parent_taxon, taxon_params) do
     multi =
       Multi.new()
