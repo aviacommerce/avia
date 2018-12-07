@@ -91,7 +91,8 @@ defmodule Snitch.Tools.Helper.Taxonomy do
       parent_id: taxon.parent_id,
       taxonomy_id: taxon.taxonomy_id,
       image_url: image_url(taxon),
-      taxons: Enum.map(children, &convert_taxon/1)
+      taxons: Enum.map(children, &convert_taxon/1),
+      slug: taxon.slug
     }
   end
 end
