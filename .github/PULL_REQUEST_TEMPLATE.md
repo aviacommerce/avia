@@ -1,21 +1,12 @@
-<!--- Provide a general summary of your changes in the Title above -->
-<!--- in NOT MORE THAN 50 characters. Keep it short, pls. -->
-
-## Motivation and Context
+## Why?
 <!--- Why is this change required? What problem does it solve? -->
 <!--- If it fixes an open issue, please link to the issue here. -->
 <!--- If it delivers a story on the Pivotal tracker, please link to it here. -->
 
-## Describe your changes
+## This change addresses the need by:
 <!--- List and detail all changes made in this PR. -->
 
-## Any further comments?
-
-<!-- If this is a relatively large or complex change, kick off the discussion by -->
-<!-- explaining why you chose the solution you did and what alternatives you -->
-<!-- considered, etc... -->
-
-------
+[delivers #pivotal_story_id]
 
 ## Checklist
 <!--- Go over all the following points, and put an `x` in all the boxes that apply. -->
@@ -30,14 +21,3 @@
 [contributing]: https://github.com/aviabird/snitch/CONTRIBUTING.md
 [credo]: https://github.com/rrrene/credo
 
-<!--- DO NOT REMOVE SECTION BELOW -->
-------
-Dear Gatekeeper,
-
-Please make sure that the commits that will be merged or rebased into the base
-branch are [formatted according to our standards][commit-style].
-
-> The only additional requirement is that the the PR number must appear in the
-> commit title in brackets: `(#XXX)`
-
-[commit-style]: https://github.com/aviabird/snitch/blob/develop/CONTRIBUTING.md#styling
