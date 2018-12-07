@@ -1,7 +1,7 @@
 defmodule SnitchApiWeb.Router do
   use SnitchApiWeb, :router
   use Plug.ErrorHandler
-  use Sentry.Plug
+  # use Sentry.Plug
 
   alias SnitchApiWeb.Guardian
 
@@ -21,6 +21,7 @@ defmodule SnitchApiWeb.Router do
     post("/login", UserController, :login)
     post("/orders/blank", OrderController, :guest_order)
     get("/variants/favorites", VariantController, :favorite_variants)
+    post("/products", ProductController, :index)
     resources("/products", ProductController, except: [:new, :edit], param: "product_slug")
     get("/orders/:order_number", OrderController, :fetch_guest_order)
     post("/hosted-payment/:payment_source/success", HostedPaymentController, :payment_success)

@@ -10,6 +10,7 @@ defmodule Snitch.Data.Model.Product do
   alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Data.Schema.{Image, Product, Variation, Taxon}
   alias Snitch.Tools.Helper.ImageUploader
+  alias Snitch.Tools.ElasticSearch.ProductStore, as: ESProductStore
 
   @product_states [:active, :in_active, :draft]
 
@@ -26,6 +27,11 @@ defmodule Snitch.Data.Model.Product do
     QH.get(Product, query_params, Repo)
   end
 
+  @spec get_product_list() :: [Product.t()]
+  def get_product_list() do
+    Repo.all(admin_display_product_query())
+  end
+
   @doc """
   Get listtable product
   Return following product
@@ -33,11 +39,33 @@ defmodule Snitch.Data.Model.Product do
   - Parent product (Product that has variants)
   In short returns product excluding the variant products
   """
-  @spec get_product_list() :: [Product.t()]
-  def get_product_list() do
-    child_product_ids = from(c in Variation, select: c.child_product_id) |> Repo.all()
-    query = from(p in Product, where: p.state == "active" and p.id not in ^child_product_ids)
-    Repo.all(query)
+  def admin_display_product_query() do
+    child_product_ids =
+      Variation
+      |> select([v], v.child_product_id)
+      |> Repo.all()
+
+    Product
+    |> where([p], p.state == "active" and p.id not in ^child_product_ids)
+  end
+
+  @doc """
+  Get listtable product
+  Return following product
+  - Standalone product.(Product that do not have variants)
+  - Variant product (excluding their parent)
+  In short returns product excluding the parent products
+  """
+  def sellable_products_query() do
+    parent_product_ids =
+      Variation
+      |> distinct([v], v.parent_product_id)
+      |> select([v], v.parent_product_id)
+      |> Repo.all()
+
+    Product
+    |> join(:left, [p], v in Variation, v.child_product_id == p.id)
+    |> where([p, v], p.state != "in_active" and p.id not in ^parent_product_ids)
   end
 
   def get_product_with_default_image(product) do
@@ -92,7 +120,12 @@ defmodule Snitch.Data.Model.Product do
   """
   @spec update(Product.t(), map) :: {:ok, Product.t()} | {:error, Ecto.Changeset.t()}
   def update(product, params) do
-    QH.update(Product, params, product, Repo)
+    with {:ok, product} <- QH.update(Product, params, product, Repo) do
+      ESProductStore.index_product_to_es(product)
+      {:ok, product}
+    else
+      {:error, error} -> {:error, error}
+    end
   end
 
   @doc """

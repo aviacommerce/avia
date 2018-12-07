@@ -5,12 +5,11 @@ defmodule Snitch.Data.Model.ProductReview do
 
   alias Ecto.Multi
   use Snitch.Data.Model
-  alias Snitch.Data.Schema.ProductReview
-  alias Snitch.Data.Schema.RatingOption
-  alias Snitch.Data.Schema.Review
+  alias Snitch.Data.Schema.{ProductReview, RatingOption, Review, Product}
+  alias Snitch.Tools.ElasticSearch.ProductStore, as: ESProductStore
 
   @review_detail %{
-    average_rating: Decimal.new(0),
+    average_rating: 0,
     review_count: 0,
     rating_list: %{}
   }
@@ -45,7 +44,9 @@ defmodule Snitch.Data.Model.ProductReview do
     |> Multi.run(:associate_product, fn %{review: review} ->
       %{product_id: product_id} = params
       params = %{product_id: product_id, review_id: review.id}
-      QH.create(ProductReview, params, Repo)
+      return = QH.create(ProductReview, params, Repo)
+      ESProductStore.index_product_to_es(Repo.get(Product, product_id))
+      return
     end)
     |> persist()
   end
@@ -74,7 +75,7 @@ defmodule Snitch.Data.Model.ProductReview do
   def review_aggregate(product) do
     reviews =
       product
-      |> Repo.preload([reviews: [rating_option_vote: :rating_option]], force: true)
+      |> Repo.preload([reviews: [rating_option_vote: :rating_option]])
       |> Map.get(:reviews)
 
     calculate_aggregate(reviews, length(reviews), @review_detail)
@@ -113,12 +114,13 @@ defmodule Snitch.Data.Model.ProductReview do
                |> Decimal.div(count)
                |> Decimal.mult(100)
                |> Decimal.round(1)
+               |> Decimal.to_float()
          }}
       end
 
     %{
       review_detail
-      | average_rating: sum |> Decimal.div(count) |> Decimal.round(1),
+      | average_rating: sum |> Decimal.div(count) |> Decimal.round(1) |> Decimal.to_float(),
         review_count: count,
         rating_list: rating_summary
     }

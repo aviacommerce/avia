@@ -48,6 +48,10 @@ defmodule Snitch.Data.Schema.Product do
     field(:weight, :decimal, default: Decimal.new(0))
     field(:is_active, :boolean, default: true)
 
+    # Track tenant name during elasticsearch
+    # multitenant query on all schemas at once
+    field(:tenant, :string, virtual: true)
+
     field(:state, ProductStateEnum, default: :draft)
 
     # Following fields are used in context of import
@@ -58,6 +62,8 @@ defmodule Snitch.Data.Schema.Product do
 
     has_many(:variations, Variation, foreign_key: :parent_product_id, on_replace: :delete)
     has_many(:variants, through: [:variations, :child_product])
+
+    has_one(:parent_variation, Variation, foreign_key: :child_product_id)
 
     many_to_many(
       :products,
