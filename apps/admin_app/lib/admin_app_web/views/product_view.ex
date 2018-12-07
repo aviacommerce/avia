@@ -72,7 +72,7 @@ defmodule AdminAppWeb.ProductView do
   end
 
   def get_taxon(conn) do
-    conn.params["taxon"]
+    conn.params["taxon_id"]
   end
 
   def get_currency_value() do

@@ -59,6 +59,7 @@ defmodule AdminAppWeb.ProductController do
     else
       {:error, changeset} ->
         conn = %{conn | request_path: product_path(conn, :new)}
+        conn = %{conn | params: conn.params |> Map.put("taxon_id", Map.get(params, "taxon_id"))}
         render(conn, "new.html", changeset: %{changeset | action: :new})
     end
   end
