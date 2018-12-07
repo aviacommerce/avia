@@ -1,4 +1,7 @@
 <%= form_for @conn, taxonomy_path(@conn, :update_taxon),[as: :taxon, class: "edittaxonform", multipart: true, id: "taxon-form", method: "put"], fn f -> %>
+  <div id="edit-taxon-danger" class="alert alert-danger">
+    Request failed
+  </div>
   <%= hidden_input f, :taxon_id, class: "form-control", id: "editform-taxon-id", value: @taxon.id %>
   <div class="form-group">
     <div class="form-group">

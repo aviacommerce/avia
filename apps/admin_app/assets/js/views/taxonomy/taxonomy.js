@@ -31,12 +31,13 @@ export default class View extends MainView {
           $(`#taxon-edit-loader`)
             .removeClass(`loader`)
             .hide();
+          $("#edit-taxon-danger").hide();
           select2Selector();
         });
     });
 
     $(".taxonomy").on("click", ".add-taxon", function(e) {
-      $("#new-taxon-danger").slideUp("fast");
+      $("#new-taxon-danger").hide();
       $("#taxon-modal").modal({ show: true });
       $(".modal-body select")
         .val("")
@@ -111,6 +112,8 @@ export default class View extends MainView {
       form_data.append("taxon[image]", image_file);
       form_data.append("taxon[themes]", themes);
 
+      $("#edit-taxon-danger").slideUp("fast");
+
       $.ajax({
         url: "/api/taxonomy/update",
         type: "PUT",
@@ -129,9 +132,10 @@ export default class View extends MainView {
             span.removeAttr("style");
           });
         },
-        error: function(xhr) {
-          console.log("Update failed");
-          $("#edittaxon-modal").modal("hide");
+        error: function(result) {
+          let error_json = result.responseJSON;
+          $("#edit-taxon-danger").html(error_json.error.message);
+          $("#edit-taxon-danger").slideDown("slow");
         }
       });
     });
