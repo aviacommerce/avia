@@ -51,7 +51,7 @@ defmodule Snitch.Domain.ShippingCalculatorTest do
       # order rule is set to false so it won't override product rule
 
       # all rules set to true but they are overridden by free shipping for order
-      rule_active_manifest = [true, true, true, true]
+      rule_active_manifest = [false, false, false, true]
       cost_manifest = [Money.new!(:USD, 100), Money.new!(:USD, 100), Money.new!(:USD, 10)]
 
       package = setup_package_with_shipping(context, 3, cost_manifest, rule_active_manifest)

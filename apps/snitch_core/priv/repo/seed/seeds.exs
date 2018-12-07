@@ -61,7 +61,7 @@ Shipping.seed!()
 
 ShippingRules.seed!()
 
-ShippingRules.seed!()
+StockLocation.seed!()
 
 StockLocation.seed!()
 

@@ -21,12 +21,10 @@ defmodule Snitch.Factory.ShippingCategory do
 
       def shipping_rule_factory do
         %ShippingRule{
-          lower_limit: nil,
-          upper_limit: nil,
-          shipping_cost: Money.new!(:USD, 0),
           active?: false,
           shipping_rule_identifier: build(:shipping_identifier),
-          shipping_category: build(:shipping_category)
+          shipping_category: build(:shipping_category),
+          preferences: %{}
         }
       end
     end

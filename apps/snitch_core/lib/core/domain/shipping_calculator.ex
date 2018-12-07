@@ -54,14 +54,17 @@ defmodule Snitch.Domain.ShippingCalculator do
     currency_code = GCModel.fetch_currency()
     cost = Money.new!(currency_code, 0)
 
-    # The piping here is in the order of priority,
-    # the lower the function in pipe the higher the priority.
-    # Here order rules have higher priority than product rules.
-    cost
-    |> product_rules_calculator(active_rules, package, currency_code)
-    |> order_fixed_rate_calculator(active_rules, package, currency_code)
-    |> order_above_limit_price_calculator(active_rules, package, currency_code)
-    |> free_shipping(active_rules, package, currency_code)
+    active_rules
+    |> Enum.reduce_while(cost, fn rule, _acc ->
+      code = rule.shipping_rule_identifier.code
+
+      if code == :fsro do
+        test = cost_for_above_certain_amount(package, currency_code, rule)
+        test
+      else
+        {:cont, calculate_cost(code, package, currency_code, rule)}
+      end
+    end)
     |> Money.round()
   end
 
@@ -72,58 +75,22 @@ defmodule Snitch.Domain.ShippingCalculator do
     end)
   end
 
-  defp product_rules_calculator(cost, rules, package, currency_code) do
-    get_identifiers = get_rule_identifiers(rules)
+  defp cost_for_above_certain_amount(package, currency_code, shipping_rule) do
+    order = Repo.get(Order, package.order_id) |> Repo.preload(:line_items)
+    total_order_cost = OrderDomain.line_item_total(order)
 
-    if :fsrp in get_identifiers do
-      calculate_cost(:fsrp, package, currency_code, cost)
+    min_amount = shipping_rule.shipping_cost
+
+    if Money.cmp!(min_amount, total_order_cost) == :lt do
+      {:halt, Money.new!(currency_code, 0)}
     else
-      cost
+      {:cont, Money.new!(currency_code, 0)}
     end
-  end
-
-  def order_fixed_rate_calculator(cost, rules, package, _currency_code) do
-    get_identifiers = get_rule_identifiers(rules)
-
-    if :fiso in get_identifiers do
-      shipping_rule = get_rule_for_identifier(package, :fiso)
-      shipping_rule.shipping_cost
-    else
-      cost
-    end
-  end
-
-  defp order_above_limit_price_calculator(cost, rules, package, currency_code) do
-    get_identifiers = get_rule_identifiers(rules)
-
-    if :fsro in get_identifiers do
-      calculate_cost(:fsro, package, currency_code, cost)
-    else
-      cost
-    end
-  end
-
-  defp free_shipping(cost, rules, _package, currency_code) do
-    get_identifiers = get_rule_identifiers(rules)
-
-    if :fso in get_identifiers do
-      Money.new!(currency_code, 0)
-    else
-      cost
-    end
-  end
-
-  defp get_rule_identifiers(rules) do
-    Enum.map(rules, fn rule ->
-      rule.shipping_rule_identifier.code
-    end)
   end
 
   ################ functions implementing logic for each identifer ###########
 
-  defp calculate_cost(identifier = :fsrp, package, _currency_code, _prev_cost) do
-    shipping_rule = get_rule_for_identifier(package, identifier)
-
+  defp calculate_cost(_identifier = :fsrp, package, _currency_code, shipping_rule) do
     all_products =
       Enum.reduce(package.items, 0, fn item, acc ->
         acc + item.quantity
@@ -134,26 +101,11 @@ defmodule Snitch.Domain.ShippingCalculator do
     |> Money.round()
   end
 
-  defp calculate_cost(identifier = :fsro, package, currency_code, prev_cost) do
-    shipping_rule = get_rule_for_identifier(package, identifier)
-    order = Repo.get(Order, package.order_id) |> Repo.preload(:line_items)
-    total_order_cost = OrderDomain.line_item_total(order)
-
-    min_amount = shipping_rule.shipping_cost
-
-    if Money.cmp!(min_amount, total_order_cost) == :lt do
-      Money.new!(currency_code, 0)
-    else
-      prev_cost
-    end
+  defp calculate_cost(_identifier = :fso, _package, currency_code, _shipping_rule) do
+    Money.new!(currency_code, 0)
   end
 
-  # Returns the shipping_rule by the supplied `identifier`.
-  def get_rule_for_identifier(package, identifier) do
-    rules = package.shipping_category.shipping_rules
-
-    Enum.find(rules, fn rule ->
-      rule.shipping_rule_identifier.code == identifier
-    end)
+  defp calculate_cost(_identifier = :fiso, _package, _currency_code, shipping_rule) do
+    shipping_rule.shipping_cost
   end
 end
