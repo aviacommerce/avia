@@ -9,6 +9,8 @@ defmodule Snitch.Data.Schema.ShippingRule.OrderConditionalFree do
   order.
   """
   use Snitch.Data.Schema
+  alias Snitch.Data.Schema.Order
+  alias Snitch.Domain.Order, as: OrderDomain
 
   @behaviour Snitch.Data.Schema.ShippingRule
 
@@ -24,8 +26,17 @@ defmodule Snitch.Data.Schema.ShippingRule.OrderConditionalFree do
     |> cast(params, [:amount])
   end
 
-  def calculate(_package, currency_code, _rule) do
-    Money.new!(currency_code, 0)
+  def calculate(package, currency_code, rule, prev_cost) do
+    order = Repo.get(Order, package.order_id) |> Repo.preload(:line_items)
+    total_order_cost = OrderDomain.line_item_total(order)
+
+    min_amount = Money.new!(currency_code, rule.preferences["amount"])
+
+    if Money.cmp!(min_amount, total_order_cost) == :lt do
+      {:halt, Money.new!(currency_code, 0)}
+    else
+      {:cont, prev_cost}
+    end
   end
 
   def identifier() do

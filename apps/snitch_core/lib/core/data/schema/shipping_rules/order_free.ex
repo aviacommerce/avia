@@ -13,12 +13,15 @@ defmodule Snitch.Data.Schema.ShippingRule.OrderFree do
   @identifier :fso
   @description "free shipping for order"
 
-  def changeset(_, _) do
-    %{}
+  embedded_schema do
   end
 
-  def calculate(_package, currency_code, _rule) do
-    Money.new!(currency_code, 0)
+  def changeset(%__MODULE__{} = data, params \\ %{}) do
+    change(data, params)
+  end
+
+  def calculate(_package, currency_code, _rule, _prev_cost) do
+    {:halt, Money.new!(currency_code, 0)}
   end
 
   def identifier() do

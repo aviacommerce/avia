@@ -7,9 +7,8 @@ defmodule Snitch.Domain.ShippingCalculator do
   """
 
   alias Snitch.Core.Tools.MultiTenancy.Repo
-  alias Snitch.Domain.Order, as: OrderDomain
   alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
-  alias Snitch.Data.Schema.{Order, Package}
+  alias Snitch.Data.Schema.{Package, ShippingRuleIdentifier}
 
   @doc """
   Returns the `shipping_cost` for a `package`.
@@ -55,15 +54,11 @@ defmodule Snitch.Domain.ShippingCalculator do
     cost = Money.new!(currency_code, 0)
 
     active_rules
-    |> Enum.reduce_while(cost, fn rule, _acc ->
+    |> Enum.reduce_while(cost, fn rule, acc ->
       code = rule.shipping_rule_identifier.code
-
-      if code == :fsro do
-        test = cost_for_above_certain_amount(package, currency_code, rule)
-        test
-      else
-        {:cont, calculate_cost(code, package, currency_code, rule)}
-      end
+      identifier = ShippingRuleIdentifier.identifier_with_module()
+      module = identifier[code].module
+      module.calculate(package, currency_code, rule, acc)
     end)
     |> Money.round()
   end
@@ -73,39 +68,5 @@ defmodule Snitch.Domain.ShippingCalculator do
     Enum.filter(shipping_category.shipping_rules, fn rule ->
       rule.active?
     end)
-  end
-
-  defp cost_for_above_certain_amount(package, currency_code, shipping_rule) do
-    order = Repo.get(Order, package.order_id) |> Repo.preload(:line_items)
-    total_order_cost = OrderDomain.line_item_total(order)
-
-    min_amount = shipping_rule.shipping_cost
-
-    if Money.cmp!(min_amount, total_order_cost) == :lt do
-      {:halt, Money.new!(currency_code, 0)}
-    else
-      {:cont, Money.new!(currency_code, 0)}
-    end
-  end
-
-  ################ functions implementing logic for each identifer ###########
-
-  defp calculate_cost(_identifier = :fsrp, package, _currency_code, shipping_rule) do
-    all_products =
-      Enum.reduce(package.items, 0, fn item, acc ->
-        acc + item.quantity
-      end)
-
-    shipping_rule.shipping_cost
-    |> Money.mult!(all_products)
-    |> Money.round()
-  end
-
-  defp calculate_cost(_identifier = :fso, _package, currency_code, _shipping_rule) do
-    Money.new!(currency_code, 0)
-  end
-
-  defp calculate_cost(_identifier = :fiso, _package, _currency_code, shipping_rule) do
-    shipping_rule.shipping_cost
   end
 end

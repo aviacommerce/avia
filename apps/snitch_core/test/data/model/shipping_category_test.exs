@@ -39,7 +39,9 @@ defmodule Snitch.Data.Model.ShippingCategoryTest do
 
   defp setup_category_rules(shipping_category) do
     shipping_identifier_1 = insert(:shipping_identifier)
-    shipping_identifier_2 = insert(:shipping_identifier, code: :fsrp)
+
+    shipping_identifier_2 =
+      insert(:shipping_identifier, code: :ofr, description: "fixed shipping rate")
 
     shipping_rule_1 =
       insert(:shipping_rule,

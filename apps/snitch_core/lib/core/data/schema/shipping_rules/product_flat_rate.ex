@@ -22,8 +22,18 @@ defmodule Snitch.Data.Schema.ShippingRule.ProductFlatRate do
     |> cast(params, [:cost_per_item])
   end
 
-  def calculate(_package, currency_code, _rule) do
-    Money.new!(currency_code, 0)
+  def calculate(package, currency_code, rule, _prev_cost) do
+    all_products =
+      Enum.reduce(package.items, 0, fn item, acc ->
+        acc + item.quantity
+      end)
+
+    cost_per_item = Money.new!(currency_code, rule.preferences["cost_per_item"])
+
+    {:cont,
+     cost_per_item
+     |> Money.mult!(all_products)
+     |> Money.round()}
   end
 
   def identifier() do

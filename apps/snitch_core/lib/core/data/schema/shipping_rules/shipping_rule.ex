@@ -10,8 +10,27 @@ defmodule Snitch.Data.Schema.ShippingRule do
 
   @type t :: %__MODULE__{}
 
-  @callback calculate(package :: Package.t(), currency_code :: atom(), rule :: ShippingRule.t()) ::
-              cost :: Money.t()
+  @doc """
+  Returns the shipping cost applied.
+
+  Returns {:halt, Money.t()} if the shipping rule is of highest order
+  and the shipping rule overrides all other in a single run of
+  `Snitch.Domain.ShippingCalculator.calculate/1`.
+
+  Returns {:cont, Money.t()} if further rules can also be applied in a
+  single run of `Snitch.Domain.ShippingCalculator.calculate/1`.
+
+  The `prev_cost` field is overriden by the module adopting the
+  behaviour if the rule applies.
+  """
+  @callback calculate(
+              package :: Package.t(),
+              currency_code :: atom(),
+              rule :: ShippingRule.t(),
+              prev_cost :: Money.t()
+            ) ::
+              {:halt, cost :: Money.t()}
+              | {:cont, cost :: Money.t()}
 
   schema "snitch_shipping_rules" do
     field(:active?, :boolean, default: false)

@@ -22,8 +22,8 @@ defmodule Snitch.Data.Schema.ShippingRule.OrderFlatRate do
     |> cast(params, [:cost])
   end
 
-  def calculate(_package, currency_code, _rule) do
-    Money.new!(currency_code, 0)
+  def calculate(_package, currency_code, rule, _prev_cost) do
+    {:cont, Money.new!(currency_code, rule.preferences["cost"])}
   end
 
   def identifier() do

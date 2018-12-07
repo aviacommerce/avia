@@ -15,7 +15,6 @@ defmodule Snitch.Data.Schema.ShippingRuleIdentifier do
 
   @product_identifiers ~w(fsrp)a
   @order_identifiers ~w(fiso fsro fso)a
-  @codes @product_identifiers ++ @order_identifiers
 
   schema "snitch_shipping_rule_identifiers" do
     field(:code, Ecto.Atom)
@@ -30,12 +29,12 @@ defmodule Snitch.Data.Schema.ShippingRuleIdentifier do
     identifier
     |> cast(params, @required_fields)
     |> validate_required(@required_fields)
-    |> validate_inclusion(:code, @codes)
+    |> validate_inclusion(:code, identifier_codes())
     |> unique_constraint(:code)
   end
 
   def codes() do
-    @codes
+    identifier_codes()
   end
 
   def product_identifier() do
@@ -44,10 +43,6 @@ defmodule Snitch.Data.Schema.ShippingRuleIdentifier do
 
   def order_identifiers() do
     @order_identifiers
-  end
-
-  def free_identifiers() do
-    @free_identifiers
   end
 
   def identifer_description(code) do
@@ -92,5 +87,17 @@ defmodule Snitch.Data.Schema.ShippingRuleIdentifier do
         module: Snitch.Data.Schema.ShippingRule.OrderFlatRate
       }
     }
+  end
+
+  def identifier_codes() do
+    with {:ok, list} <- :application.get_key(:snitch_core, :modules) do
+      list
+      |> Enum.filter(fn module ->
+        ShippingRule in (module.module_info(:attributes)[:behaviour] || [])
+      end)
+      |> Enum.reduce([], fn module, acc ->
+        [module.identifier() | acc]
+      end)
+    end
   end
 end
