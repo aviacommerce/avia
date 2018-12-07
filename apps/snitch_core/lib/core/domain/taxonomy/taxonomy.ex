@@ -21,12 +21,20 @@ defmodule Snitch.Domain.Taxonomy do
   Positon can take follwoing values.
   Position - :left | :right | :child
   """
-  @spec add_taxon(Taxon.t(), Taxon.t(), atom) :: Taxon.t()
+  @spec add_taxon(Taxon.t(), Taxon.t(), atom) :: {:ok, Taxon.t()} | {:error, Ecto.Changeset.t()}
   def add_taxon(%Taxon{} = parent, %Taxon{} = child, position) do
-    %Taxon{child | taxonomy_id: parent.taxonomy.id}
-    |> Repo.preload(:taxonomy)
-    |> create(parent, position)
-    |> AsNestedSet.execute(Repo)
+    try do
+      taxon =
+        %Taxon{child | taxonomy_id: parent.taxonomy.id}
+        |> Repo.preload(:taxonomy)
+        |> create(parent, position)
+        |> AsNestedSet.execute(Repo)
+
+      {:ok, taxon}
+    rescue
+      error in Ecto.InvalidChangesetError ->
+        {:error, error.changeset}
+    end
   end
 
   @doc """
@@ -171,13 +179,14 @@ defmodule Snitch.Domain.Taxonomy do
 
   def create_taxon(parent_taxon, %{image: "undefined"} = taxon_params) do
     taxon_struct = %Taxon{name: taxon_params.name}
-    taxon = add_taxon(parent_taxon, taxon_struct, :child)
 
-    Taxon.update_changeset(
-      taxon,
-      Map.put(taxon_params, :variation_theme_ids, taxon_params.themes)
-    )
-    |> Repo.update()
+    with {:ok, taxon} <- add_taxon(parent_taxon, taxon_struct, :child) do
+      Taxon.update_changeset(
+        taxon,
+        Map.put(taxon_params, :variation_theme_ids, taxon_params.themes)
+      )
+      |> Repo.update()
+    end
   end
 
   def create_taxon(parent_taxon, taxon_params) do
@@ -188,8 +197,7 @@ defmodule Snitch.Domain.Taxonomy do
       end)
       |> Multi.run(:taxon, fn _ ->
         taxon_struct = %Taxon{name: taxon_params.name}
-        taxon = add_taxon(parent_taxon, taxon_struct, :child)
-        {:ok, taxon}
+        add_taxon(parent_taxon, taxon_struct, :child)
       end)
       |> Multi.run(:image_taxon, fn %{image: image, taxon: taxon} ->
         params = Map.put(%{}, :taxon_image, %{image_id: image.id})
@@ -231,16 +239,15 @@ defmodule Snitch.Domain.Taxonomy do
   Create a taxonomy with given name.
   """
   def create_taxonomy(name) do
-    multi =
-      Multi.new()
-      |> Multi.run(:taxonomy, fn _ ->
-        %Taxonomy{name: name} |> Repo.insert()
-      end)
-      |> Multi.run(:root_taxon, fn %{taxonomy: taxonomy} ->
-        taxon = %Taxon{name: name, taxonomy_id: taxonomy.id} |> add_root
-        {:ok, taxon}
-      end)
-      |> Repo.transaction()
+    Multi.new()
+    |> Multi.run(:taxonomy, fn _ ->
+      %Taxonomy{name: name} |> Repo.insert()
+    end)
+    |> Multi.run(:root_taxon, fn %{taxonomy: taxonomy} ->
+      taxon = %Taxon{name: name, taxonomy_id: taxonomy.id} |> add_root
+      {:ok, taxon}
+    end)
+    |> Repo.transaction()
   end
 
   @doc """

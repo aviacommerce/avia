@@ -75,11 +75,16 @@ export default class View extends MainView {
         processData: false,
         contentType: false,
         success: function(result) {
+
+
           $("#taxon-modal").modal("hide");
           $(result.html)
             .hide()
             .appendTo(children_ul)
             .show("normal");
+        },
+        error: function(result) {
+          console.log("Request failed");
         }
       });
     });

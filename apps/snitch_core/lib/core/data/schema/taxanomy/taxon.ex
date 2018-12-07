@@ -13,6 +13,7 @@ defmodule Snitch.Data.Schema.Taxon do
     field(:lft, :integer)
     field(:rgt, :integer)
     field(:variation_theme_ids, {:array, :binary}, virtual: true)
+    field(:slug, :string)
 
     has_one(:taxon_image, TaxonImage, on_replace: :delete)
     has_one(:image, through: [:taxon_image, :image])
@@ -33,10 +34,21 @@ defmodule Snitch.Data.Schema.Taxon do
   @update_fields ~w(name)
 
   def changeset(taxon, params) do
-    cast(taxon, params, @cast_fields)
+    taxon
+    |> cast(params, @cast_fields)
+    |> force_change(:name, taxon.name)
     |> validate_required([:name])
     |> cast_assoc(:taxon_image, with: &TaxonImage.changeset/2)
+    |> handle_slug
   end
+
+  defp handle_slug(%{changes: %{name: name}} = changeset) do
+    changeset
+    |> put_change(:slug, Slugger.slugify_downcase(name))
+    |> unique_constraint(:slug, message: "category with this name alreay exist")
+  end
+
+  defp handle_slug(changeset), do: changeset
 
   defp put_assoc_variation_theme(changeset, theme) when theme in [nil, ""] do
     variation_theme_ids = Enum.map(changeset.data.variation_themes, & &1.id)
@@ -58,6 +70,7 @@ defmodule Snitch.Data.Schema.Taxon do
     taxon
     |> Repo.preload([:variation_themes, :taxon_image])
     |> cast(params, @update_fields)
+    |> handle_slug
     |> validate_required([:name])
     |> cast_assoc(:taxon_image, with: &TaxonImage.changeset/2)
     |> put_assoc_variation_theme(ids)
