@@ -35,7 +35,7 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
       insert(
         :taxon,
         name: "Flooring",
-        slug: get_slug("HFlooring"),
+        slug: get_slug("Flooring"),
         lft: 1,
         rgt: 2,
         parent_id: home_living.id,
