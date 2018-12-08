@@ -2,7 +2,7 @@
 <%= if  @conn.request_path == product_path(@conn, :new) do %>
   <div style="margin-bottom:1rem">
     <span>Product Category </span>
-    <span class="badge badge-secondary"><%= get_product_category(@conn.params["taxon"]) %></span>
+    <span class="badge badge-secondary"><%= get_product_category(@conn.params["taxon_id"]) %></span>
   </div>
 <% end %>
 <ul class="nav nav-tabs">

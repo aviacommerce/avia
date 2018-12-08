@@ -2,6 +2,7 @@ defmodule SnitchApiWeb.ProductView do
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
   alias Snitch.Data.Schema.Image
+  alias Snitch.Data.Schema.Variation
   alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Data.Model.{Product, ProductReview}
   alias Snitch.Core.Tools.MultiTenancy.Repo
@@ -25,8 +26,9 @@ defmodule SnitchApiWeb.ProductView do
     :images,
     :rating_summary,
     :is_orderable,
-    :display_price,
-    :default_image
+    :default_image,
+    :display_selling_price,
+    :display_max_retail_price
   ])
 
   def selling_price(product) do
@@ -37,7 +39,11 @@ defmodule SnitchApiWeb.ProductView do
     Money.round(product.max_retail_price, currency_digits: :cash)
   end
 
-  def display_price(product) do
+  def display_max_retail_price(product) do
+    product.max_retail_price |> to_string
+  end
+
+  def display_selling_price(product) do
     product.selling_price |> to_string
   end
 
@@ -54,10 +60,45 @@ defmodule SnitchApiWeb.ProductView do
   end
 
   def images(product, _conn) do
-    product = product |> Repo.preload(:images)
+    product = product |> Repo.preload([:images, products: :products])
 
-    product.images
-    |> Enum.map(fn image -> %{"product_url" => Product.image_url(image.name, product)} end)
+    product_images =
+      case product.products do
+        [] ->
+          images = product.images
+
+          if images != [] do
+            images
+          else
+            get_parent_images(product)
+          end
+
+        products ->
+          product.images
+      end
+
+    case product_images do
+      [] ->
+        [%{"product_url" => nil}]
+
+      images ->
+        images
+        |> Enum.map(fn image -> %{"product_url" => Product.image_url(image.name, product)} end)
+    end
+  end
+
+  defp get_parent_images(product) do
+    variant = Repo.get_by(Variation, child_product_id: product.id)
+
+    case variant do
+      nil ->
+        []
+
+      _ ->
+        parent_id = variant.parent_product_id
+        parent_product = Repo.get_by(ProductSchema, id: parent_id) |> Repo.preload([:images])
+        parent_product.images
+    end
   end
 
   def rating_summary(product, _conn) do
