@@ -64,6 +64,27 @@ defmodule Snitch.Data.Model.ProductTest do
     end
   end
 
+  describe "test get product with default image" do
+    test "having default image set" do
+      attrs = %{images: [build(:image)]}
+      product = insert(:product, attrs)
+      product_returned = Product.get_product_with_default_image(product)
+      image = product_returned.images |> List.first()
+      assert product_returned.id == product.id
+      assert image.is_default == true
+    end
+
+    test "having default image not set" do
+      attrs = %{is_default: false}
+      image = %{images: [build(:image, attrs)]}
+      product = insert(:product, image)
+      product_returned = Product.get_product_with_default_image(product)
+      image = product_returned.images |> List.first()
+      assert product_returned.id == product.id
+      assert image == nil
+    end
+  end
+
   describe "get by" do
     test "products with name, state, slug" do
       product = insert(:product)

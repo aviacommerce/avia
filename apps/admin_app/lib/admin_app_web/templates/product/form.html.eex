@@ -193,16 +193,24 @@
             <div class="label required">
               Images
             </div>
-            <div class="label-txt">Add image/s for this product.</div>
+            <div class="label-txt">Add image/s for this product.
+            </br> Select the checkbox to set main image for the product.
+            </div>
           </label>
           <div class="col-sm-9">
             <div class="row imgcol">
               <%= if length(@parent_product.images) > 0 do %>
               <%= for image <- @parent_product.images do %>
               <div class="img-wrap col-3 p-1">
+                <%= if image.is_default do %>
+                  <input type="checkbox" id="checkimage" class="checkbox" value="<%= image.id %>" checked="" />
+                <% else %>
+                  <input type="checkbox" id="checkimage" class="checkbox" value="<%= image.id %>" />
+                <% end %>
                 <span class="product-delete">&times;
                 <input name="delete-image-id" type="hidden" value="<%= image.id %>" >
                 </span>
+                <i class="fa fa-info-circle product-info" data-toggle="tooltip" data-placement="top" title="can not delete default image" aria-hidden="true"></i>
                 <%= img_tag(get_image_url(image, @parent_product), class: "img-thumbnail") %>
               </div>
               <% end %>

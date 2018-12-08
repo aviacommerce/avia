@@ -1,6 +1,12 @@
 <div class="img-wrap col-3 p-1">
+  <%= if @image.is_default do %>
+    <input type="checkbox" id="checkimage" class="checkbox" value="<%= @image.id %>" checked="" />
+  <% else %>
+    <input type="checkbox" id="checkimage" class="checkbox" value="<%= @image.id %>" />
+  <% end %>
   <span class="product-delete">&times;
   <input name="delete-image-id" type="hidden" value="<%= @image.id %>" >
   </span>
+  <i class="fa fa-info-circle product-info" data-toggle="tooltip" data-placement="top" title="can not delete default image" aria-hidden="true"></i>
   <%= img_tag(get_image_url(@image, @parent_product), class: "img-thumbnail") %>
 </div>

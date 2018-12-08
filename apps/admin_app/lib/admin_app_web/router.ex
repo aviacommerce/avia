@@ -72,6 +72,7 @@ defmodule AdminAppWeb.Router do
     post("/payment-provider-inputs", PaymentMethodController, :payment_preferences)
     get("/product/category", ProductController, :select_category)
     post("/product-images/:product_id", ProductController, :add_images)
+    post("/set-default-image/:product_id", ProductController, :update_default_image)
     delete("/product-images/", ProductController, :delete_image)
 
     get("/taxonomy", TaxonomyController, :show_default_taxonomy)
