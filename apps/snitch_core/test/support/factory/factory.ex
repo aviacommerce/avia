@@ -22,6 +22,7 @@ defmodule Snitch.Factory do
     CardPayment,
     GeneralConfiguration,
     HostedPayment,
+    Image,
     LineItem,
     Order,
     Payment,
@@ -243,6 +244,13 @@ defmodule Snitch.Factory do
       product: insert(:product),
       property: insert(:property),
       value: sequence("value")
+    }
+  end
+
+  def image_factory do
+    %Image{
+      is_default: true,
+      name: "test.png"
     }
   end
 

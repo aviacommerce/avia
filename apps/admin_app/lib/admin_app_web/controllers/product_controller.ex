@@ -9,6 +9,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Domain.Taxonomy
 
   alias Snitch.Data.Schema.{
+    Image,
     ProductBrand,
     StockLocation,
     VariationTheme,
@@ -17,6 +18,7 @@ defmodule AdminAppWeb.ProductController do
   }
 
   alias Snitch.Tools.Money
+  alias Snitch.Tools.Helper.Query
   alias Snitch.Data.Model.StockItem, as: StockModel
   alias Snitch.Data.Schema.StockItem, as: StockSchema
   alias AdminAppWeb.ProductView
@@ -89,13 +91,38 @@ defmodule AdminAppWeb.ProductController do
     )
   end
 
-  def add_images(conn, %{"product_images" => product_images, "product_id" => id}) do
-    product =
-      id
-      |> String.to_integer()
-      |> ProductModel.get()
-      |> Repo.preload(:images)
+  defp preload_product_images(id) do
+    ProductSchema
+    |> Query.get(id, Repo)
+    |> Repo.preload(:images)
+  end
 
+  def update_default_image(conn, %{"product_id" => id, "default_image" => default_image}) do
+    product = preload_product_images(id)
+
+    for image <- product.images do
+      if to_string(image.id) == default_image do
+        attrs = %{is_default: true}
+        update_image(attrs, image)
+      else
+        attrs = %{is_default: false}
+        update_image(attrs, image)
+      end
+    end
+
+    conn
+    |> put_status(200)
+    |> json(%{msg: "Update successful"})
+  end
+
+  defp update_image(attrs, image) do
+    image
+    |> Image.update_changeset(attrs)
+    |> Repo.update()
+  end
+
+  def add_images(conn, %{"product_images" => product_images, "product_id" => id}) do
+    product = preload_product_images(id)
     images = (product_images["images"] ++ product.images) |> parse_images()
     params = %{"images" => images}
 
@@ -103,7 +130,18 @@ defmodule AdminAppWeb.ProductController do
       {:ok, _} ->
         associated_images = product.images
         product = product |> Repo.preload(:images, force: true)
-        product_images = product.images -- associated_images
+
+        product_images =
+          case Enum.empty?(associated_images) do
+            true ->
+              update_image(%{is_default: true}, product.images |> List.first())
+              product = product |> Repo.preload(:images, force: true)
+              product.images
+
+            false ->
+              product.images -- associated_images
+          end
+
         image_div = Enum.map(product_images, fn image -> get_html_string(product, image) end)
         images = Enum.join(image_div, " ")
         opts = [wrapper_tag: :div, attributes: [class: "alert alert-success"]]

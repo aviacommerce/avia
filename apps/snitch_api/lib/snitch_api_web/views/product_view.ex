@@ -1,10 +1,12 @@
 defmodule SnitchApiWeb.ProductView do
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
+  alias Snitch.Data.Schema.Image
   alias Snitch.Data.Schema.Variation
   alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Data.Model.{Product, ProductReview}
   alias Snitch.Core.Tools.MultiTenancy.Repo
+  import Ecto.Query
 
   location("/products/:slug")
 
@@ -24,6 +26,7 @@ defmodule SnitchApiWeb.ProductView do
     :images,
     :rating_summary,
     :is_orderable,
+    :default_image,
     :display_selling_price,
     :display_max_retail_price
   ])
@@ -42,6 +45,18 @@ defmodule SnitchApiWeb.ProductView do
 
   def display_selling_price(product) do
     product.selling_price |> to_string
+  end
+
+  def default_image(product, _conn) do
+    product = Product.get_product_with_default_image(product)
+
+    url =
+      case product.images |> List.first() do
+        nil -> nil
+        image -> Product.image_url(image.name, product)
+      end
+
+    %{"default_product_url" => url}
   end
 
   def images(product, _conn) do

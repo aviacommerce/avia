@@ -7,9 +7,8 @@ defmodule Snitch.Data.Model.Product do
 
   import Ecto.Query
   alias Ecto.Multi
-  alias Snitch.Data.Schema.{Product, Variation}
+  alias Snitch.Data.Schema.{Image, Product, Variation}
   alias Snitch.Tools.Helper.ImageUploader
-  alias Snitch.Data.Schema.Image
 
   @product_states [:active, :in_active, :draft]
 
@@ -38,6 +37,12 @@ defmodule Snitch.Data.Model.Product do
     child_product_ids = from(c in Variation, select: c.child_product_id) |> Repo.all()
     query = from(p in Product, where: p.state == "active" and p.id not in ^child_product_ids)
     Repo.all(query)
+  end
+
+  def get_product_with_default_image(product) do
+    default_image = from(image in Image, where: image.is_default == true)
+    query = from(p in Product, where: p.id == ^product.id, preload: [images: ^default_image])
+    Repo.one(query)
   end
 
   def get_rummage_product_list(rummage_opts) do
