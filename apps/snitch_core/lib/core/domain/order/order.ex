@@ -3,7 +3,7 @@ defmodule Snitch.Domain.Order do
   Order helpers.
   """
 
-  @editable_states ~w(cart address delivery payment)
+  @editable_states ~w(cart address delivery payment)a
 
   use Snitch.Domain
 
