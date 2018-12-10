@@ -32,9 +32,9 @@ defmodule Snitch.Data.Schema.Zone do
     timestamps()
   end
 
-  @update_fields ~w(name description)a
-  @create_fields [:zone_type | @update_fields]
-
+  @required_fields ~w(name zone_type)a
+  @optional_fields ~w(description)a
+  @create_fields @required_fields ++ @optional_fields
   @doc """
   Returns a `Zone` changeset to create a new `zone`.
   """
@@ -42,7 +42,7 @@ defmodule Snitch.Data.Schema.Zone do
   def create_changeset(zone, params) do
     zone
     |> cast(params, @create_fields)
-    |> validate_required(@create_fields)
+    |> validate_required(@required_fields)
     |> validate_inclusion(:zone_type, @valid_zone_types)
   end
 
@@ -52,7 +52,7 @@ defmodule Snitch.Data.Schema.Zone do
   @spec update_changeset(t, map) :: Ecto.Changeset.t()
   def update_changeset(zone, params) do
     zone
-    |> cast(params, @update_fields)
-    |> validate_required(@create_fields)
+    |> cast(params, @create_fields)
+    |> validate_required(@required_fields)
   end
 end

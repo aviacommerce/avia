@@ -15,7 +15,7 @@ defmodule Snitch.Tools.Helper.Stock do
       %{count_on_hand: 0},
       %{count_on_hand: 6}
     ],
-    "origin" => [ # this is the `admin_name` of the `stock_location`
+    "origin" => [ # this is the `name` of the `stock_location`
       %{count_on_hand: 3},
       %{count_on_hand: 3},
       %{count_on_hand: 3}
@@ -36,7 +36,6 @@ defmodule Snitch.Tools.Helper.Stock do
 
   @stock_location %{
     name: nil,
-    admin_name: nil,
     address_line_1: "",
     state_id: nil,
     country_id: nil,
@@ -50,7 +49,7 @@ defmodule Snitch.Tools.Helper.Stock do
 
   def stock_locations_with_manifest(manifest) do
     Enum.map(manifest, fn {name, params} ->
-      %{Map.merge(@stock_location, params) | admin_name: name}
+      %{Map.merge(@stock_location, params) | name: name}
     end)
   end
 

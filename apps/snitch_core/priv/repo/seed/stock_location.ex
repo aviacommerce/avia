@@ -8,7 +8,6 @@ defmodule Snitch.Seed.StockLocation do
 
     create_stock_location!(
       "default",
-      "default",
       true,
       "Oxford Hallmark",
       "Street 1",
@@ -30,7 +29,6 @@ defmodule Snitch.Seed.StockLocation do
 
   def create_stock_location!(
         name,
-        admin_name,
         default,
         address_line_1,
         address_line_2,
@@ -44,7 +42,6 @@ defmodule Snitch.Seed.StockLocation do
       ) do
     params = %{
       name: name,
-      admin_name: admin_name,
       default: default,
       address_line_1: address_line_1,
       address_line_2: address_line_2,
