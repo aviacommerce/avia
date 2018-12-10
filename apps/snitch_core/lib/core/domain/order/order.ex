@@ -100,16 +100,18 @@ defmodule Snitch.Domain.Order do
   end
 
   defp packages_total_cost(packages, currency) do
+    zero_money = Money.new(currency, 0)
+
     packages
-    |> Enum.reduce(Money.new(currency, 0), fn %{
-                                                items: items,
-                                                shipping_tax: shipping_tax,
-                                                cost: cost
-                                              },
-                                              acc ->
+    |> Enum.reduce(zero_money, fn %{
+                                    items: items,
+                                    shipping_tax: shipping_tax,
+                                    cost: cost
+                                  },
+                                  acc ->
       acc
-      |> Money.add!(shipping_tax)
-      |> Money.add!(cost)
+      |> Money.add!(shipping_tax || zero_money)
+      |> Money.add!(cost || zero_money)
       |> Money.add!(package_items_total_cost(items, currency))
     end)
     |> Money.round(currency_digits: :cash)
