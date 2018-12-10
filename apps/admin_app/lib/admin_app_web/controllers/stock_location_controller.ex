@@ -3,6 +3,9 @@ defmodule AdminAppWeb.StockLocationController do
   alias Snitch.Domain.StockLocation, as: SLDomain
   alias Snitch.Data.Model.StockLocation, as: SLModel
   alias Snitch.Data.Schema.StockLocation, as: SLSchema
+  alias Snitch.Data.Schema.Zone
+  alias Snitch.Data.Model.CountryZone, as: CZone
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def index(conn, _params) do
     data = %{stock_locations: SLDomain.search()}
@@ -28,7 +31,9 @@ defmodule AdminAppWeb.StockLocationController do
   end
 
   def create(conn, %{"stock_location" => stock_location}) do
-    with {:ok, _} <- SLModel.create(stock_location) do
+    with {:ok, location} <- SLModel.create(stock_location) do
+      create_zone_for_location(location)
+
       conn
       |> put_flash(:info, "Stock Location created successfully")
       |> redirect(to: stock_location_path(conn, :index))
@@ -37,6 +42,23 @@ defmodule AdminAppWeb.StockLocationController do
         conn
         |> put_flash(:error, "Error: Some validations failed")
         |> render("new.html", changeset: %{changeset | action: :insert})
+    end
+  end
+
+  defp create_zone_for_location(location) do
+    country_ids = [location.country_id]
+    name = location.name <> "_zone"
+    zones = Repo.all(Zone)
+
+    check_zone_with_country =
+      Enum.find(zones, fn zone -> Enum.member?(CZone.member_ids(zone), location.country_id) end)
+
+    case check_zone_with_country do
+      nil ->
+        CZone.create(name, nil, country_ids)
+
+      zone ->
+        nil
     end
   end
 
