@@ -68,7 +68,7 @@ defmodule Snitch.Domain.Order do
   lineitems as well.
   """
   @spec total_amount(Order.t()) :: Money.t()
-  def total_amount(%Order{state: state} = order) when state in ["cart", "address"] do
+  def total_amount(%Order{state: state} = order) when state in [:cart, :address] do
     order = Repo.preload(order, :line_items)
     total = line_item_total(order)
     total
@@ -112,7 +112,7 @@ defmodule Snitch.Domain.Order do
       acc
       |> Money.add!(shipping_tax || zero_money)
       |> Money.add!(cost || zero_money)
-      |> Money.add!(package_items_total_cost(items, currency))
+      |> Money.add!(package_items_total_cost(items, currency) || zero_money)
     end)
     |> Money.round(currency_digits: :cash)
   end
