@@ -15,7 +15,6 @@ defmodule Snitch.Factory.Stock do
 
         %StockLocation{
           name: sequence("Colosseum"),
-          admin_name: sequence("origin"),
           default: false,
           address_line_1: "Piazza del Colosseo, 1",
           address_line_2: "",
