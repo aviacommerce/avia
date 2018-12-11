@@ -20,8 +20,6 @@ defmodule Snitch.Data.Schema.StockLocation do
 
   schema "snitch_stock_locations" do
     field(:name, :string)
-    # Internal system name
-    field(:admin_name, :string)
     field(:default, :boolean, default: false)
 
     field(:address_line_1, :string)
@@ -45,7 +43,7 @@ defmodule Snitch.Data.Schema.StockLocation do
   end
 
   @required_fields ~w(name address_line_1 state_id country_id)a
-  @cast_fields ~w(admin_name address_line_2 city zip_code phone propagate_all_variants)a ++
+  @cast_fields ~w(address_line_2 city zip_code phone propagate_all_variants)a ++
                  ~w(backorderable_default active)a ++ @required_fields
 
   @spec create_changeset(t, map) :: Ecto.Changeset.t()
@@ -64,5 +62,6 @@ defmodule Snitch.Data.Schema.StockLocation do
     |> validate_format(:phone, ~r/^\d{10}$/)
     |> foreign_key_constraint(:state_id)
     |> foreign_key_constraint(:country_id)
+    |> unique_constraint(:name)
   end
 end
