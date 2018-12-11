@@ -1,4 +1,5 @@
 import MainView from '../main';
+import { addEventToProductFormButtons } from './publish_helper'
 
 export default class View extends MainView {
   mount() {
@@ -11,7 +12,9 @@ export default class View extends MainView {
     setDefaultImage();
     handleImageSelect();
     deleteImage();
-    setup_product();
+    setupProduct();
+    addEventToProductFormButtons();
+    
   }
 
   unmount() {
@@ -155,7 +158,7 @@ function deleteError(data) {
   console.log('errror data', data)
 }
 
-function setup_product() {
+function setupProduct() {
   let previousOptionValue = ""
 
   // This handle the variation theme selection
