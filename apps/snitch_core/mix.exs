@@ -62,6 +62,9 @@ defmodule Snitch.Core.Mixfile do
       # state machine
       {:beepbop, github: "anantanant2015/beepbop", branch: "develop"},
 
+      # time
+      {:timex, "~> 3.1"},
+
       # auth
       {:comeonin, "~> 4.1.1"},
       {:argon2_elixir, "~> 1.2"},
@@ -150,6 +153,7 @@ defmodule Snitch.Core.Mixfile do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
+      "ecto.load.demo": "run priv/repo/demo/demo.exs",
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seed/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       "ecto.rebuild": ["ecto.drop", "ecto.create --quiet", "ecto.migrate"],
