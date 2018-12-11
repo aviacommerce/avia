@@ -60,7 +60,7 @@ defmodule Snitch.Core.Mixfile do
       {:ecto_autoslug_field, "~> 0.5"},
 
       # state machine
-      {:beepbop, github: "oyeb/beepbop", branch: "develop"},
+      {:beepbop, github: "anantanant2015/beepbop", branch: "develop"},
 
       # time
       {:timex, "~> 3.1"},
