@@ -15,17 +15,36 @@ defmodule AdminAppWeb.DashboardController do
     |> render("index.html")
   end
 
-  defp get_naive_date_time(date) do
-    Date.from_iso8601(date)
+  defp get_naive_date_time(date, time, default_date \\ Date.utc_today())
+
+  defp get_naive_date_time(nil, time, default_date) do
+    default_date
+    |> NaiveDateTime.new(time)
     |> elem(1)
-    |> NaiveDateTime.new(~T[23:59:59])
+  end
+
+  defp get_naive_date_time(date, time, default_date) do
+    valid_date =
+      case Date.from_iso8601(date) do
+        {:ok, date} ->
+          date
+
+        {:error, _} ->
+          default_date
+      end
+
+    valid_date
+    |> NaiveDateTime.new(time)
     |> elem(1)
   end
 
   defp get_date_from_params(params) do
-    start_date = params |> Map.get("from", Helpers.date_days_before(30)) |> get_naive_date_time()
+    default_start_date = Helpers.date_days_before(30) |> Date.from_iso8601() |> elem(1)
 
-    end_date = Helpers.get_date_from_params(params, "to") |> get_naive_date_time()
+    start_date =
+      params |> Map.get("from") |> get_naive_date_time(~T[00:00:00], default_start_date)
+
+    end_date = params |> Map.get("to") |> get_naive_date_time(~T[23:59:59])
 
     {start_date, end_date}
   end
