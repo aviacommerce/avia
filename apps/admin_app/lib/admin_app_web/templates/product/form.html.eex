@@ -35,6 +35,8 @@
     <%= if  @conn.request_path == product_path(@conn, :new) do %>
     <%= hidden_input :taxon_id, :taxon_id, value: get_taxon(@conn), name: "product[taxon_id]" %>
     <% end %>
+    <%= hidden_input :publish_redirection, :publish_redirection, value: false, name: "product[publish_redirection]", id: "publish_redirection" %>
+    <%= hidden_input f, :state, class: "form-control", id: "form-state" %>
     <div class="form-group row ">
       <%= input f, :name, "Title", is_horizontal: true, description: "Include keywords that buyers would use to search for your item." %>
     </div>
@@ -101,7 +103,8 @@
       <div class="col-sm-10">
         <%= button("Cancel", to: product_path(@conn, :index), method: "get",  type: "button",
           class: "btn btn-secondary btn-outline-secondary submit-btn float-left") %>
-        <%= submit "Submit", class: "btn  btn-primary submit-btn float-right" %>
+        <%= submit "Save", class: "btn  btn-primary submit-btn float-right", id: "form-save-btn" %>
+        <%= submit "Save & Publish  ", class: "btn  btn-primary submit-btn float-right", id: "form-save-publish-btn" %>
       </div>
     </div>
     <% end %>

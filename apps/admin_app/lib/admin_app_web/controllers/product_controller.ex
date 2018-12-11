@@ -57,7 +57,7 @@ defmodule AdminAppWeb.ProductController do
 
   def create(conn, %{"product" => params}) do
     with {:ok, product} <- ProductModel.create(params) do
-      redirect(conn, to: product_path(conn, :edit, product.id))
+      save_publish_redirect_handler(conn, product, params)
     else
       {:error, changeset} ->
         conn = %{conn | request_path: product_path(conn, :new)}
@@ -77,9 +77,21 @@ defmodule AdminAppWeb.ProductController do
 
   def update(conn, %{"product" => params}) do
     with %ProductSchema{} = product <- ProductModel.get(params["id"]),
-         {:ok, _product} <- ProductModel.update(product, params) do
-      redirect_with_updated_conn(conn, @rummage_default)
+         {:ok, product} <- ProductModel.update(product, params) do
+      save_publish_redirect_handler(conn, product, params)
     end
+  end
+
+  def save_publish_redirect_handler(conn, _product, %{"publish_redirection" => "true"} = params) do
+    redirect_with_updated_conn(conn, params)
+  end
+
+  def save_publish_redirect_handler(conn, product, %{"publish_redirection" => "false"} = _params) do
+    redirect(conn, to: product_path(conn, :edit, product.id))
+  end
+
+  def save_publish_redirect_handler(conn, _product, params) do
+    redirect_with_updated_conn(conn, params)
   end
 
   defp get_html_string(product, image) do
@@ -324,12 +336,14 @@ defmodule AdminAppWeb.ProductController do
   end
 
   defp redirect_with_updated_conn(conn, params) do
+    rummage_params = params |> Map.take(["rummage"])
+
     updated_conn =
       conn
-      |> Map.put(:query_params, params)
-      |> Map.put(:query_string, Plug.Conn.Query.encode(params))
+      |> Map.put(:query_params, rummage_params)
+      |> Map.put(:query_string, Plug.Conn.Query.encode(rummage_params))
 
-    redirect(updated_conn, to: product_path(updated_conn, :index, params))
+    redirect(updated_conn, to: product_path(updated_conn, :index, rummage_params))
   end
 
   def index_property(conn, _params) do
