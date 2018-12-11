@@ -1,0 +1,9 @@
+<%= for {preference, value} <- @preferences do %>
+  <div class="col-lg-12">
+    *Add
+    <%= label(:preferences, preference) %>
+    <%= text_input(:preferences, preference,
+      name: "shipping_policy[#{@shipping_rule.id}][preferences][#{preference}]",
+      value: value, class: "form-control")%>
+  </div>
+<% end %>
