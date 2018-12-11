@@ -207,6 +207,20 @@ body {
     max-width: 150px;
   }
 
+  .product-info {
+    visibility: hidden;
+    font-size:24px;
+    top: 4px;
+    color: grey;
+    right: 8px;
+    position: absolute;
+  }
+
+  #checkimage {
+    zoom: 1.8;
+    position: absolute;
+  }
+
   .img-wrap .product-delete {
     position: absolute;
     top: 4px;

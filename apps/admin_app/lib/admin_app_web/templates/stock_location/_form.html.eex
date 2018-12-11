@@ -3,9 +3,6 @@
   <%= input f, :name, nil, description: "Name to identify your stock location.", is_horizontal: true %>
 </div>
 <div class="form-group row ">
-  <%= input f, :admin_name, nil, description: "Name to identify stock location within your system.", is_horizontal: true %>
-</div>
-<div class="form-group row ">
   <%= textarea_input f, :address_line_1, nil, description: "Eg. 319, Amanora chambers", is_horizontal: true %>
 </div>
 <div class="form-group row ">

@@ -5,7 +5,6 @@
   <hr/>
   <ul class="col">
     <li><strong class="text-danger">Name:</strong> <%= @stock_location.name %></li>
-    <li><strong class="text-danger">Admin Name:</strong> <%= @stock_location.admin_name %></li>
     <li>
       <strong class="text-danger">Address:</strong>
       <ul>

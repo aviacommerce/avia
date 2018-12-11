@@ -9,6 +9,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Domain.Taxonomy
 
   alias Snitch.Data.Schema.{
+    Image,
     ProductBrand,
     StockLocation,
     VariationTheme,
@@ -17,6 +18,7 @@ defmodule AdminAppWeb.ProductController do
   }
 
   alias Snitch.Tools.Money
+  alias Snitch.Tools.Helper.Query
   alias Snitch.Data.Model.StockItem, as: StockModel
   alias Snitch.Data.Schema.StockItem, as: StockSchema
   alias AdminAppWeb.ProductView
@@ -55,10 +57,11 @@ defmodule AdminAppWeb.ProductController do
 
   def create(conn, %{"product" => params}) do
     with {:ok, product} <- ProductModel.create(params) do
-      redirect(conn, to: product_path(conn, :edit, product.id))
+      save_publish_redirect_handler(conn, product, params)
     else
       {:error, changeset} ->
         conn = %{conn | request_path: product_path(conn, :new)}
+        conn = %{conn | params: conn.params |> Map.put("taxon_id", Map.get(params, "taxon_id"))}
         render(conn, "new.html", changeset: %{changeset | action: :new})
     end
   end
@@ -74,9 +77,21 @@ defmodule AdminAppWeb.ProductController do
 
   def update(conn, %{"product" => params}) do
     with %ProductSchema{} = product <- ProductModel.get(params["id"]),
-         {:ok, _product} <- ProductModel.update(product, params) do
-      redirect_with_updated_conn(conn, @rummage_default)
+         {:ok, product} <- ProductModel.update(product, params) do
+      save_publish_redirect_handler(conn, product, params)
     end
+  end
+
+  def save_publish_redirect_handler(conn, _product, %{"publish_redirection" => "true"} = params) do
+    redirect_with_updated_conn(conn, params)
+  end
+
+  def save_publish_redirect_handler(conn, product, %{"publish_redirection" => "false"} = _params) do
+    redirect(conn, to: product_path(conn, :edit, product.id))
+  end
+
+  def save_publish_redirect_handler(conn, _product, params) do
+    redirect_with_updated_conn(conn, params)
   end
 
   defp get_html_string(product, image) do
@@ -88,13 +103,38 @@ defmodule AdminAppWeb.ProductController do
     )
   end
 
-  def add_images(conn, %{"product_images" => product_images, "product_id" => id}) do
-    product =
-      id
-      |> String.to_integer()
-      |> ProductModel.get()
-      |> Repo.preload(:images)
+  defp preload_product_images(id) do
+    ProductSchema
+    |> Query.get(id, Repo)
+    |> Repo.preload(:images)
+  end
 
+  def update_default_image(conn, %{"product_id" => id, "default_image" => default_image}) do
+    product = preload_product_images(id)
+
+    for image <- product.images do
+      if to_string(image.id) == default_image do
+        attrs = %{is_default: true}
+        update_image(attrs, image)
+      else
+        attrs = %{is_default: false}
+        update_image(attrs, image)
+      end
+    end
+
+    conn
+    |> put_status(200)
+    |> json(%{msg: "Update successful"})
+  end
+
+  defp update_image(attrs, image) do
+    image
+    |> Image.update_changeset(attrs)
+    |> Repo.update()
+  end
+
+  def add_images(conn, %{"product_images" => product_images, "product_id" => id}) do
+    product = preload_product_images(id)
     images = (product_images["images"] ++ product.images) |> parse_images()
     params = %{"images" => images}
 
@@ -102,7 +142,18 @@ defmodule AdminAppWeb.ProductController do
       {:ok, _} ->
         associated_images = product.images
         product = product |> Repo.preload(:images, force: true)
-        product_images = product.images -- associated_images
+
+        product_images =
+          case Enum.empty?(associated_images) do
+            true ->
+              update_image(%{is_default: true}, product.images |> List.first())
+              product = product |> Repo.preload(:images, force: true)
+              product.images
+
+            false ->
+              product.images -- associated_images
+          end
+
         image_div = Enum.map(product_images, fn image -> get_html_string(product, image) end)
         images = Enum.join(image_div, " ")
         opts = [wrapper_tag: :div, attributes: [class: "alert alert-success"]]
@@ -285,12 +336,14 @@ defmodule AdminAppWeb.ProductController do
   end
 
   defp redirect_with_updated_conn(conn, params) do
+    rummage_params = params |> Map.take(["rummage"])
+
     updated_conn =
       conn
-      |> Map.put(:query_params, params)
-      |> Map.put(:query_string, Plug.Conn.Query.encode(params))
+      |> Map.put(:query_params, rummage_params)
+      |> Map.put(:query_string, Plug.Conn.Query.encode(rummage_params))
 
-    redirect(updated_conn, to: product_path(updated_conn, :index, params))
+    redirect(updated_conn, to: product_path(updated_conn, :index, rummage_params))
   end
 
   def index_property(conn, _params) do

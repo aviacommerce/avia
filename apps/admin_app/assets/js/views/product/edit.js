@@ -1,4 +1,5 @@
 import MainView from '../main';
+import { addEventToProductFormButtons } from './publish_helper'
 
 export default class View extends MainView {
   mount() {
@@ -7,10 +8,13 @@ export default class View extends MainView {
     // Specific logic here
     console.log('ProductEditView mounted');
     imageOnEnter();
-    imageOnSubmit();
+    disableDeletionforSelected();
+    setDefaultImage();
     handleImageSelect();
     deleteImage();
-    setup_product();
+    setupProduct();
+    addEventToProductFormButtons();
+    
   }
 
   unmount() {
@@ -31,11 +35,33 @@ export function imageOnEnter(){
   });
 }
 
-export function imageOnSubmit(){
-  $(document).delegate('#product-image', 'submit', function(event){
-    event.preventDefault();
-    handleSubmitImage();
-  });
+export function disableDeletionforSelected(){
+  $('.imgcol input:checked').parent().find('.product-delete').hide();
+  $('.imgcol input:checked').parent().find('.product-info').css('visibility','visible');
+}
+
+export function setDefaultImage(){
+  $(document).delegate('input[type="checkbox"]', 'click', function(event) {
+    $(this).parent().find('.product-delete').hide();
+    $(this).parent().find('.product-info').css('visibility','visible');
+    $(this).parent().siblings().find('.product-info').css('visibility','hidden');
+    $(this).parent().siblings().find('.product-delete').show();   
+    $(this).parent().siblings().find(':checkbox').prop('checked', false);
+    var default_image = $(this).val();
+    var product_id = $("#product-id").val();
+    var data = { product_id: product_id,  default_image: default_image};
+    var CSRF_TOKEN = $("meta[name='csrf-token']").attr("content");
+
+    $.ajax({
+      url: `/set-default-image/${product_id}`,
+      type: "POST",
+      cache: false,
+      data: data,
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader("X-CSRF-Token", CSRF_TOKEN);
+      }
+    });
+ });
 }
 
 function handleSubmitImage(){
@@ -132,7 +158,7 @@ function deleteError(data) {
   console.log('errror data', data)
 }
 
-function setup_product() {
+function setupProduct() {
   let previousOptionValue = ""
 
   // This handle the variation theme selection

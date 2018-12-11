@@ -13,13 +13,13 @@ defmodule Snitch.Demo.StockLocation do
         product_path
         |> File.read!
         |> CSV.parse_string
-        |> Enum.each(fn [name, admin_name, default, address_line_1, address_line_2,
+        |> Enum.each(fn [name, default, address_line_1, address_line_2,
         city, zip_code, phone, propagate_all_variants, active] ->
 
             default = String.to_existing_atom(default)
             active = String.to_existing_atom(active)
             propagate_all_variants = String.to_existing_atom(propagate_all_variants)
-            create_stock_location!(name, admin_name, default, address_line_1, address_line_2, city, zip_code, phone, propagate_all_variants, active, state, state.country)
+            create_stock_location!(name, default, address_line_1, address_line_2, city, zip_code, phone, propagate_all_variants, active, state, state.country)
 
         end)
     end
@@ -31,10 +31,9 @@ defmodule Snitch.Demo.StockLocation do
         |> Enum.random()
     end
 
-    def create_stock_location!(name, admin_name, default, address_line_1, address_line_2, city, zip_code, phone, propagate_all_variants, active, state, country) do
+    def create_stock_location!(name, default, address_line_1, address_line_2, city, zip_code, phone, propagate_all_variants, active, state, country) do
         params = %{
             name: name,
-            admin_name: admin_name,
             default: default,
             address_line_1: address_line_1,
             address_line_2: address_line_2,

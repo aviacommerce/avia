@@ -1,3 +1,3 @@
-name,admin_name,default,address_line_1,address_line_2,city,zip_code,phone,propagate_all_variants,active
-Hall of Fame,root,false,Oxford Hallmark,lane 3,abc,232233,8877996675,true,true
-Wall street,John Doe,false,Westin Park,street 4,Worli,234567,4559667665,true,true
+name,default,address_line_1,address_line_2,city,zip_code,phone,propagate_all_variants,active
+Hall of Fame,false,Oxford Hallmark,lane 3,abc,232233,8877996675,true,true
+Wall street,false,Westin Park,street 4,Worli,234567,4559667665,true,true

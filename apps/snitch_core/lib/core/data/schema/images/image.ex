@@ -9,6 +9,7 @@ defmodule Snitch.Data.Schema.Image do
   schema "snitch_images" do
     field(:name, :string)
     field(:image, :any, virtual: true)
+    field(:is_default, :boolean, default: false)
     timestamps()
   end
 
@@ -18,8 +19,14 @@ defmodule Snitch.Data.Schema.Image do
   @spec changeset(t, map) :: Ecto.Changeset.t()
   def changeset(%__MODULE__{} = image, params) do
     image
-    |> cast(params, [:image])
+    |> cast(params, [:image, :is_default])
     |> put_name()
+  end
+
+  def update_changeset(%__MODULE__{} = image, params) do
+    image
+    |> cast(params, [:is_default])
+    |> put_change(:is_default, params.is_default)
   end
 
   @doc """
@@ -28,7 +35,7 @@ defmodule Snitch.Data.Schema.Image do
   @spec changeset(t, map) :: Ecto.Changeset.t()
   def create_changeset(%__MODULE__{} = image, params) do
     image
-    |> cast(params, [:image])
+    |> cast(params, [:image, :is_default])
     |> put_name()
   end
 
