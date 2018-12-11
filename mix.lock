@@ -11,7 +11,7 @@
   "bamboo_smtp": {:hex, :bamboo_smtp, "1.6.0", "0a3607b77f22554af58c547350c1c73ebba6f4fb2c4bd0b11713ab5b4081588f", [:mix], [{:bamboo, "~> 1.0", [hex: :bamboo, repo: "hexpm", optional: false]}, {:gen_smtp, "~> 0.12.0", [hex: :gen_smtp, repo: "hexpm", optional: false]}], "hexpm"},
   "base64url": {:hex, :base64url, "0.0.1", "36a90125f5948e3afd7be97662a1504b934dd5dac78451ca6e9abf85a10286be", [:rebar], [], "hexpm"},
   "bcrypt_elixir": {:hex, :bcrypt_elixir, "1.0.7", "e79d84b666bfad0e461ed217860e1c7de6bc4a1ae919cdb39d473ca784817653", [:make, :mix], [{:elixir_make, "~> 0.4", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm"},
-  "beepbop": {:git, "https://github.com/oyeb/beepbop.git", "221c04e597fda726b3d36c92603096e05787b46d", [branch: "develop"]},
+  "beepbop": {:git, "https://github.com/anantanant2015/beepbop.git", "8dc0cc0598cab600212e600faacb801c5337b495", [branch: "develop"]},
   "blankable": {:hex, :blankable, "0.0.1", "2e0b4667fee684f0614620d31a34bb2731341cccb27ed903e330195819ba3ba0", [:mix], [], "hexpm"},
   "bunt": {:hex, :bunt, "0.2.0", "951c6e801e8b1d2cbe58ebbd3e616a869061ddadcc4863d0a2182541acae9a38", [:mix], [], "hexpm"},
   "certifi": {:hex, :certifi, "2.4.2", "75424ff0f3baaccfd34b1214184b6ef616d89e420b258bb0a5ea7d7bc628f7f0", [:rebar3], [{:parse_trans, "~>3.3", [hex: :parse_trans, repo: "hexpm", optional: false]}], "hexpm"},

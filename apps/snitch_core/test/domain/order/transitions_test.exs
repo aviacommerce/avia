@@ -207,7 +207,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
       assert {:ok, %{packages: _}} = Repo.transaction(result.multi)
 
-      {:ok, order} = OrderModel.partial_update(order, %{state: "delivery"})
+      {:ok, order} = OrderModel.partial_update(order, %{state: :delivery})
 
       order = Repo.preload(order, [:packages, :line_items])
       line_item_total = OrderDomain.line_item_total(order)
@@ -220,7 +220,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       assert final_order_total ==
                Money.add!(
                  order_total,
-                 shipping_rule.shipping_cost
+                 shipping_rule.shipping_cost || Money.new!(:USD, 0)
                )
     end
 
@@ -366,7 +366,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
     # make order and it's packages
     product = stock_item.product
-    order = insert(:order, state: "address")
+    order = insert(:order, state: :address)
     line_item = insert(:line_item, order: order, product: product, quantity: quantity)
 
     package =

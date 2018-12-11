@@ -3,7 +3,7 @@ defmodule Snitch.Domain.Order do
   Order helpers.
   """
 
-  @editable_states ~w(cart address delivery payment)
+  @editable_states ~w(cart address delivery payment)a
 
   use Snitch.Domain
 
@@ -68,7 +68,7 @@ defmodule Snitch.Domain.Order do
   lineitems as well.
   """
   @spec total_amount(Order.t()) :: Money.t()
-  def total_amount(%Order{state: state} = order) when state in ["cart", "address"] do
+  def total_amount(%Order{state: state} = order) when state in [:cart, :address] do
     order = Repo.preload(order, :line_items)
     total = line_item_total(order)
     total
@@ -100,17 +100,19 @@ defmodule Snitch.Domain.Order do
   end
 
   defp packages_total_cost(packages, currency) do
+    zero_money = Money.new(currency, 0)
+
     packages
-    |> Enum.reduce(Money.new(currency, 0), fn %{
-                                                items: items,
-                                                shipping_tax: shipping_tax,
-                                                cost: cost
-                                              },
-                                              acc ->
+    |> Enum.reduce(zero_money, fn %{
+                                    items: items,
+                                    shipping_tax: shipping_tax,
+                                    cost: cost
+                                  },
+                                  acc ->
       acc
-      |> Money.add!(shipping_tax)
-      |> Money.add!(cost)
-      |> Money.add!(package_items_total_cost(items, currency))
+      |> Money.add!(shipping_tax || zero_money)
+      |> Money.add!(cost || zero_money)
+      |> Money.add!(package_items_total_cost(items, currency) || zero_money)
     end)
     |> Money.round(currency_digits: :cash)
   end
