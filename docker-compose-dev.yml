@@ -1,0 +1,17 @@
+version: '3' 
+services:
+  db: 
+    image: postgres
+    container_name: aviacommerce-dev-postgres
+    restart: always
+    ports:
+      - "5432:5432"
+  webapp:
+    build:
+      context: .
+      dockerfile: ./Dockerfile-dev
+    container_name: aviacommerce-dev
+    ports:
+      - "4000:4000"
+    links:
+      - db

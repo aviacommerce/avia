@@ -1,0 +1,56 @@
+FROM ubuntu:18.04
+FROM node:10.14.1-alpine
+FROM surnet/alpine-wkhtmltopdf:3.7-0.12.5-full
+FROM elixir:1.7.3-slim
+
+ENV APP_HOME /avia-backend
+
+RUN mkdir $APP_HOME
+WORKDIR $APP_HOME
+
+# Before running following commands, configure
+# 1. 'env/local.env' file.
+# 2. `/apps/snitch_core/config/dev.exs' file
+
+#Install git
+RUN apt-get update \
+    && apt-get install -y git
+
+# Install essential packages for application build
+RUN apt-get clean \
+  && apt-get update \
+  && apt-get install -y apt-utils apt-transport-https curl git make inotify-tools gnupg g++ \
+  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+  && curl -sL https://deb.nodesource.com/setup_8.x | bash \
+  && apt-get install -y nodejs yarn \
+  && yarn global add elm@0.18.0 \
+  && elm-package install -y
+
+ADD . $APP_HOME
+
+RUN mix local.hex
+
+CMD source env/local.env
+
+RUN mix deps.get
+
+RUN mix compile
+
+# Setting application database
+
+# RUN cd apps/snitch_core
+
+# RUN mix ecto.create
+
+# RUN mix ecto.migrate
+
+# RUN mix run priv/repo/seed/seeds.exs
+
+# Setting up assets
+
+# RUN cd ../../
+
+# RUN cd apps/addmin_app/assets
+
+# RUN npm install
