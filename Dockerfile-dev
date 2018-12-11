@@ -29,28 +29,27 @@ RUN apt-get clean \
 
 ADD . $APP_HOME
 
-RUN mix local.hex
+RUN yes Y | mix local.hex
 
-CMD source env/local.env
-
-RUN mix deps.get
-
-RUN mix compile
+RUN ["/bin/bash", "-c", "source env/local.env"] \
+  && mix deps.get \
+  && mix compile
 
 # Setting application database
 
-# RUN cd apps/snitch_core
-
-# RUN mix ecto.create
-
-# RUN mix ecto.migrate
-
-# RUN mix run priv/repo/seed/seeds.exs
+RUN ["/bin/bash", "-c", "source env/local.env"] \
+  && cd apps/snitch_core \
+  && mix ecto.create \
+  && mix ecto.migrate \
+  && mix run priv/repo/seed/seeds.exs
 
 # Setting up assets
 
-# RUN cd ../../
+RUN ["/bin/bash", "-c", "source env/local.env"] \
+  && cd apps/addmin_app/assets \
+  && npm install
 
-# RUN cd apps/addmin_app/assets
+# Run the server
 
-# RUN npm install
+RUN ["/bin/bash", "-c", "source env/local.env"] \
+  && iex -S mix phx.server
