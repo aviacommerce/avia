@@ -13,7 +13,7 @@ defmodule Snitch.Data.Schema.Order do
 
   schema "snitch_orders" do
     field(:number, Nanoid, autogenerate: true)
-    field(:state, :string, default: "cart")
+    field(:state, OrderStateEnum, default: :cart)
     field(:special_instructions, :string)
 
     embeds_one(:billing_address, OrderAddress, on_replace: :update)

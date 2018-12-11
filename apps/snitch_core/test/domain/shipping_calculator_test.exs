@@ -142,7 +142,7 @@ defmodule Snitch.Domain.ShippingCalculatorTest do
 
     # make order and it's packages
     product = stock_item.product
-    order = insert(:order, state: "delivery")
+    order = insert(:order, state: :delivery)
     line_item = insert(:line_item, order: order, product: product, quantity: quantity)
 
     package =

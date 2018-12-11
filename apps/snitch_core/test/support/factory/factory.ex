@@ -98,7 +98,7 @@ defmodule Snitch.Factory do
   def order_factory do
     %Order{
       number: sequence("order"),
-      state: "cart"
+      state: :cart
     }
   end
 
