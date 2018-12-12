@@ -3,38 +3,51 @@
   
   <div class="table-contaner col-12 p-3 mb-2">
     <%= for shipping_rule <- @shipping_rules do %>
-      <%= if check_identifier(:product, shipping_rule) do %>
-        <%= checkbox f, :for, name: "shipping_policy[#{shipping_rule.id}][active?]", value: "#{shipping_rule.active?}"  %>
-        <input type="hidden" name=<%= "shipping_policy[#{shipping_rule.id}][id]" %> value=<%= "#{shipping_rule.id}" %> >
-            <%= identfier_detail(shipping_rule.shipping_rule_identifier.code) %>
-          <%= text_input f, :for, placeholder: "Shipping Cost", class: "form-control",
-          name: "shipping_policy[#{shipping_rule.id}][shipping_cost]", value: show_amount(shipping_rule.shipping_cost) %>
+      <%= if rule_button_type(shipping_rule) == "check" do %>
+        <div class="shipping-rules-check" style="display: none;">
+          <br>
+          <%= checkbox f, :active?, name: "shipping_policy[#{shipping_rule.id}][active?]",
+            value: "#{shipping_rule.active?}", class: "shipping-rule-checkbox" %>
+          Also add
+          <input type="hidden" name=<%= "shipping_policy[#{shipping_rule.id}][id]" %> value=<%= "#{shipping_rule.id}" %> >
+          <%= shipping_rule.shipping_rule_identifier.description %>
+          <div class="rule-preferences">
+            <%= render "preferences.html", preferences: shipping_rule.preferences,
+              shipping_rule: shipping_rule%>
+          </div>
+        </div>
+      <% else %>
+
+        <div class="shipping-rules">
+          <% radio_button_name = "shipping_policy[#{shipping_rule.id}][active?]" %>
+
+          <%= if active = shipping_rule.active? do %>
+            <input type="radio" name="<%= radio_button_name %>"
+              value="<%= shipping_rule.active? %>" class="shipping-rule-radio"
+              data-code="<%= shipping_rule.shipping_rule_identifier.code %>"
+              checked="<%= active %>">
+              
+            <% else %>
+               <input type="radio" name="<%= radio_button_name %>"
+              value="<%= shipping_rule.active? %>" class="shipping-rule-radio"
+              data-code="<%= shipping_rule.shipping_rule_identifier.code %>">
+          <% end %>
+          
+          <input type="hidden" name=<%= "shipping_policy[#{shipping_rule.id}][id]" %> value=<%= "#{shipping_rule.id}" %> >
+          <%= shipping_rule.shipping_rule_identifier.description %>
+          <div class="rule-preferences" style="display: none;">
+            <%= render "preferences.html", preferences: shipping_rule.preferences,
+              shipping_rule: shipping_rule%>
+            <br>
+            <div class="appended-rules"></div>
+            <br>
+            <button type="submit" class="btn btn-primary submit">Save</button>
+            <%= link("Cancel", to: shipping_policy_path(@conn, :new), class: "btn btn-outline-dark")%>
+            <br>
+            <hr>
+        </div>
+      </div>
       <% end %>
     <% end %>
   </div>
-
-  <div class="table-contaner col-12 p-3 mb-2">
-    <%= for shipping_rule <- @shipping_rules do %>
-      <%= if check_identifier(:order, shipping_rule) do %>
-
-        <%= checkbox f, :for, name: "shipping_policy[#{shipping_rule.id}][active?]", value: "#{shipping_rule.active?}"  %>
-        <input type="hidden" name=<%= "shipping_policy[#{shipping_rule.id}][id]" %> value=<%= "#{shipping_rule.id}" %> >
-            <%= identfier_detail(shipping_rule.shipping_rule_identifier.code) %>
-            <%= text_input f, :for, placeholder: "Shipping Cost", class: "form-control",
-          name: "shipping_policy[#{shipping_rule.id}][shipping_cost]", value: show_amount(shipping_rule.shipping_cost) %>
-        <% end %>
-    <% end %>
-  </div>
-
-  <div class="table-contaner col-12 p-3 mb-2">
-    <%= for shipping_rule <- @shipping_rules do %>
-      <%= if check_identifier(:free, shipping_rule) do %>
-        <%= checkbox f, :for, name: "shipping_policy[#{shipping_rule.id}][active?]", value: "#{shipping_rule.active?}"  %>
-        <input type="hidden" name=<%= "shipping_policy[#{shipping_rule.id}][id]" %> value=<%= "#{shipping_rule.id}" %> >
-            <%= identfier_detail(shipping_rule.shipping_rule_identifier.code) %>
-        <% end %>
-    <% end %>
-  </div>
-
-  <button type="submit" class="btn_submit">Submit</button>
 <% end %>

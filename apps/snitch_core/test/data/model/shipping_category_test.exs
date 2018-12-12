@@ -1,4 +1,6 @@
 defmodule Snitch.Data.Model.ShippingCategoryTest do
+  @moduledoc false
+
   use ExUnit.Case
   use Snitch.DataCase
   import Snitch.Factory
@@ -18,13 +20,10 @@ defmodule Snitch.Data.Model.ShippingCategoryTest do
       assert rule_1.active? == true
       assert rule_2.active? == false
 
-      assert rule_1.shipping_cost == Money.new!(:USD, 100)
-      assert rule_2.shipping_cost == Money.new!(:USD, 20)
-
       params = %{
         shipping_rules: [
-          %{id: rule_1.id, active?: false, shipping_cost: Money.new!(:USD, 10)},
-          %{id: rule_2.id, active?: true, shipping_cost: Money.new!(:USD, 30)}
+          %{id: rule_1.id, active?: false, preferences: %{amount: Decimal.new(10)}},
+          %{id: rule_2.id, active?: true, shipping_cost: %{amount: Decimal.new(10)}}
         ]
       }
 
@@ -33,19 +32,27 @@ defmodule Snitch.Data.Model.ShippingCategoryTest do
 
       rule_1 = Enum.find(sc.shipping_rules, fn rule -> rule.id == rule_1.id end)
       assert rule_1.active? == false
-      assert rule_1.shipping_cost == Money.new!(:USD, 10)
+      assert rule_1.preferences.amount == Decimal.new(10)
     end
   end
 
   defp setup_category_rules(shipping_category) do
-    shipping_identifier_1 = insert(:shipping_identifier)
-    shipping_identifier_2 = insert(:shipping_identifier, code: :fsrp)
+    shipping_identifier_1 =
+      insert(:shipping_identifier,
+        code: :fsoa,
+        description: "free shipping for order above"
+      )
+
+    shipping_identifier_2 =
+      insert(:shipping_identifier,
+        code: :ofr,
+        description: "fixed shipping rate for all orders"
+      )
 
     shipping_rule_1 =
       insert(:shipping_rule,
-        lower_limit: 100,
         active?: true,
-        shipping_cost: Money.new!(:USD, 100),
+        preferences: %{amount: Decimal.new(20)},
         shipping_rule_identifier: shipping_identifier_1,
         shipping_category: shipping_category
       )
@@ -53,7 +60,7 @@ defmodule Snitch.Data.Model.ShippingCategoryTest do
     shipping_rule_2 =
       insert(:shipping_rule,
         active?: false,
-        shipping_cost: Money.new!(:USD, 20),
+        preferences: %{cost: Decimal.new(10)},
         shipping_rule_identifier: shipping_identifier_2,
         shipping_category: shipping_category
       )
