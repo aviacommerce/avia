@@ -4,6 +4,7 @@ defmodule AdminAppWeb.OrderView do
   alias Snitch.Domain.Order, as: OrderDomain
   alias AdminAppWeb.Helpers
   alias SnitchPayments.PaymentMethodCode
+  alias Snitch.Repo
 
   @bootstrap_contextual_class %{
     "slug" => "light",
@@ -271,5 +272,10 @@ defmodule AdminAppWeb.OrderView do
 
   def get_docs_url() do
     Application.get_env(:admin_app, AdminAppWeb.Endpoint)[:docs_url]
+  end
+
+  def get_payment_name(payment) do
+    payment = payment |> Repo.preload(:payment_method)
+    payment.payment_method.name
   end
 end
