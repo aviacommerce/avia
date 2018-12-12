@@ -103,8 +103,10 @@
       <div class="col-sm-10">
         <%= button("Cancel", to: product_path(@conn, :index), method: "get",  type: "button",
           class: "btn btn-secondary btn-outline-secondary submit-btn float-left") %>
-        <%= submit "Save", class: "btn  btn-primary submit-btn float-right", id: "form-save-btn" %>
-        <%= submit "Save & Publish  ", class: "btn  btn-primary submit-btn float-right", id: "form-save-publish-btn" %>
+          <div class="float-right">
+            <%= submit "Save", class: "btn  btn-primary submit-btn", id: "form-save-btn" %>
+            <%= submit "Save & Publish  ", class: "btn  btn-primary submit-btn", id: "form-save-publish-btn" %>
+          </div>
       </div>
     </div>
     <% end %>
