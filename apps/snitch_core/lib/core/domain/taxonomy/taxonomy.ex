@@ -169,7 +169,7 @@ defmodule Snitch.Domain.Taxonomy do
     Repo.get_by(Taxon, name: name)
   end
 
-  def create_taxon(parent_taxon, %{image: "undefined"} = taxon_params) do
+  def create_taxon(parent_taxon, %{image: nil} = taxon_params) do
     taxon_struct = %Taxon{name: taxon_params.name}
     taxon = add_taxon(parent_taxon, taxon_struct, :child)
 
@@ -180,16 +180,17 @@ defmodule Snitch.Domain.Taxonomy do
     |> Repo.update()
   end
 
-  def create_taxon(parent_taxon, taxon_params) do
+  def create_taxon(parent_taxon, %{image: image} = taxon_params) do
     multi =
       Multi.new()
-      |> Multi.run(:image, fn _ ->
-        QH.create(Image, taxon_params, Repo)
-      end)
       |> Multi.run(:taxon, fn _ ->
         taxon_struct = %Taxon{name: taxon_params.name}
         taxon = add_taxon(parent_taxon, taxon_struct, :child)
         {:ok, taxon}
+      end)
+      |> Multi.run(:image, fn %{taxon: taxon} ->
+        params = %{"image" => Map.put(image, :url, image_url(image.filename, taxon))}
+        QH.create(Image, params, Repo)
       end)
       |> Multi.run(:image_taxon, fn %{image: image, taxon: taxon} ->
         params = Map.put(%{}, :taxon_image, %{image_id: image.id})
@@ -216,6 +217,7 @@ defmodule Snitch.Domain.Taxonomy do
 
     Multi.new()
     |> Multi.run(:image, fn _ ->
+      params = %{"image" => Map.put(image, :url, image_url(image.filename, taxon))}
       QH.create(Image, params, Repo)
     end)
     |> Multi.run(:taxon, fn %{image: image} ->
@@ -264,8 +266,10 @@ defmodule Snitch.Domain.Taxonomy do
     ImageUploader.url({name, taxon})
   end
 
-  defp upload_image_multi(multi, %Plug.Upload{} = image) do
+  defp upload_image_multi(multi, %{filename: name, path: path, type: type} = image) do
     Multi.run(multi, :image_upload, fn %{taxon: taxon} ->
+      image = %Plug.Upload{filename: name, path: path, content_type: type}
+
       case ImageUploader.store({image, taxon}) do
         {:ok, _} ->
           {:ok, taxon}

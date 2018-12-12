@@ -135,7 +135,11 @@ defmodule AdminAppWeb.ProductController do
 
   def add_images(conn, %{"product_images" => product_images, "product_id" => id}) do
     product = preload_product_images(id)
-    images = (product_images["images"] ++ product.images) |> parse_images()
+
+    images =
+      product
+      |> parse_images(product_images["images"] ++ product.images)
+
     params = %{"images" => images}
 
     case ProductModel.add_images(product, params) do
@@ -193,9 +197,19 @@ defmodule AdminAppWeb.ProductController do
     end
   end
 
-  defp parse_images(image_list) do
+  defp parse_images(product, image_list) do
     Enum.reduce(image_list, [], fn
       %Plug.Upload{} = image, acc ->
+        extension = Path.extname(image.filename)
+        name = Nanoid.generate() <> extension
+
+        image =
+          %{}
+          |> Map.put(:filename, name)
+          |> Map.put(:path, image.path)
+          |> Map.put(:type, image.content_type)
+          |> Map.put(:url, ProductModel.image_url(name, product))
+
         [%{"image" => image} | acc]
 
       image, acc ->

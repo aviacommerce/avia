@@ -35,6 +35,7 @@ defmodule Snitch.Data.Schema.ProductBrand do
 
   defp common_changeset(model, params) do
     model
+    |> Repo.preload([:brand_image])
     |> cast(params, @required_fields)
     |> validate_required(@required_fields)
     |> cast_assoc(:brand_image, with: &ProductBrandImage.changeset/2)

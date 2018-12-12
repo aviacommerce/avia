@@ -32,7 +32,7 @@ defmodule AdminAppWeb.TaxonomyController do
   end
 
   def create(conn, %{"id" => id, "image" => image, "name" => name, "themes" => themes}) do
-    taxon_params = %{name: name, themes: themes, image: image}
+    taxon_params = %{name: name, themes: themes, image: handle_image_value(image)}
     parent_taxon = Taxonomy.get_taxon(id)
     {:ok, taxon} = Taxonomy.create_taxon(parent_taxon, taxon_params)
 
@@ -75,4 +75,16 @@ defmodule AdminAppWeb.TaxonomyController do
         end
     end
   end
+
+  defp handle_image_value(%Plug.Upload{} = file) do
+    extension = Path.extname(file.filename)
+    name = Nanoid.generate() <> extension
+
+    %{}
+    |> Map.put(:filename, name)
+    |> Map.put(:path, file.path)
+    |> Map.put(:type, file.content_type)
+  end
+
+  defp handle_image_value(_), do: nil
 end

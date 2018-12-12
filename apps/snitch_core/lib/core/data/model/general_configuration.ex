@@ -48,11 +48,12 @@ defmodule Snitch.Data.Model.GeneralConfiguration do
   def create(%{"image" => image} = params) do
     multi =
       Multi.new()
-      |> Multi.run(:image, fn _ ->
-        QH.create(Image, params, Repo)
-      end)
       |> Multi.run(:general_configuration, fn _ ->
         QH.create(GC, params, Repo)
+      end)
+      |> Multi.run(:image, fn %{general_configuration: general_config} ->
+        params = %{"image" => Map.put(image, :url, image_url(image.filename, general_config))}
+        QH.create(Image, params, Repo)
       end)
       |> Multi.run(:image_store, fn %{image: image, general_configuration: general_configuration} ->
         params = Map.put(%{}, :store_image, %{image_id: image.id})
@@ -71,6 +72,7 @@ defmodule Snitch.Data.Model.GeneralConfiguration do
 
     Multi.new()
     |> Multi.run(:image, fn _ ->
+      params = %{"image" => Map.put(image, :url, image_url(image.filename, store))}
       QH.create(Image, params, Repo)
     end)
     |> Multi.run(:general_configuration, fn %{image: image} ->
@@ -106,8 +108,10 @@ defmodule Snitch.Data.Model.GeneralConfiguration do
     end)
   end
 
-  defp upload_image_multi(multi, %Plug.Upload{} = image) do
+  defp upload_image_multi(multi, %{filename: name, path: path, type: type} = image) do
     Multi.run(multi, :image_upload, fn %{general_configuration: general_config} ->
+      image = %Plug.Upload{filename: name, path: path, content_type: type}
+
       case ImageUploader.store({image, general_config}) do
         {:ok, _} ->
           {:ok, general_config}

@@ -39,12 +39,16 @@ defmodule Snitch.Data.Model.ProductBrand do
           {:ok, ProductBrand.t()} | {:error, Ecto.Changeset.t()} | {:error, String.t()}
   def create(%{"image" => image} = params) do
     Multi.new()
-    |> Multi.run(:image, fn _ ->
+    |> Multi.run(:product_brand, fn _ ->
+      QH.create(ProductBrand, params, Repo)
+    end)
+    |> Multi.run(:image, fn %{product_brand: product_brand} ->
+      params = %{"image" => Map.put(image, :url, image_url(image.filename, product_brand))}
       QH.create(Image, params, Repo)
     end)
-    |> Multi.run(:product_brand, fn %{image: image} ->
+    |> Multi.run(:product_brand_image, fn %{image: image, product_brand: product_brand} ->
       params = Map.put(params, "brand_image", %{image_id: image.id})
-      QH.create(ProductBrand, params, Repo)
+      QH.update(ProductBrand, params, product_brand, Repo)
     end)
     |> upload_image_multi(image)
     |> persist()
@@ -71,6 +75,7 @@ defmodule Snitch.Data.Model.ProductBrand do
 
     Multi.new()
     |> Multi.run(:image, fn _ ->
+      params = %{"image" => Map.put(image, :url, image_url(image.filename, model))}
       QH.create(Image, params, Repo)
     end)
     |> Multi.run(:product_brand, fn %{image: image} ->
@@ -138,8 +143,10 @@ defmodule Snitch.Data.Model.ProductBrand do
     end
   end
 
-  defp upload_image_multi(multi, %Plug.Upload{} = image) do
+  defp upload_image_multi(multi, %{filename: name, path: path, type: type} = image) do
     Multi.run(multi, :image_upload, fn %{product_brand: product_brand} ->
+      image = %Plug.Upload{filename: name, path: path, content_type: type}
+
       case ImageUploader.store({image, product_brand}) do
         {:ok, _} ->
           {:ok, "upload success"}
@@ -148,6 +155,10 @@ defmodule Snitch.Data.Model.ProductBrand do
           {:error, "upload error"}
       end
     end)
+  end
+
+  defp delete_image_multi(multi, nil, product_brand) do
+    multi
   end
 
   defp delete_image_multi(multi, image, product_brand) do

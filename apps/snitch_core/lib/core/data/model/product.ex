@@ -210,7 +210,8 @@ defmodule Snitch.Data.Model.Product do
 
     uploads =
       Enum.map(uploads, fn
-        %{"image" => %Plug.Upload{} = upload} ->
+        %{"image" => %{filename: name, path: path, url: url, type: type} = upload} ->
+          upload = %Plug.Upload{filename: name, path: path, content_type: type}
           ImageUploader.store({upload, product})
 
         _ ->

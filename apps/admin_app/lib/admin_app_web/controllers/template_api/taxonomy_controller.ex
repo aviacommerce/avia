@@ -61,6 +61,15 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
     end
   end
 
-  defp handle_image_value(%Plug.Upload{} = file), do: file
+  defp handle_image_value(%Plug.Upload{} = file) do
+    extension = Path.extname(file.filename)
+    name = Nanoid.generate() <> extension
+
+    %{}
+    |> Map.put(:filename, name)
+    |> Map.put(:path, file.path)
+    |> Map.put(:type, file.content_type)
+  end
+
   defp handle_image_value(_), do: nil
 end

@@ -18,6 +18,8 @@ defmodule AdminAppWeb.GeneralSettingsController do
   end
 
   def create(conn, %{"settings" => params}) do
+    params = handle_params(params)
+
     case GCModel.create(params) do
       {:ok, general_configuration} ->
         general_configuration =
@@ -53,6 +55,7 @@ defmodule AdminAppWeb.GeneralSettingsController do
   end
 
   def update(conn, %{"id" => id, "settings" => params}) do
+    params = handle_params(params)
     general_configuration = GCModel.get_general_configuration(id) |> Repo.preload(:image)
 
     case general_configuration do
@@ -79,6 +82,27 @@ defmodule AdminAppWeb.GeneralSettingsController do
             )
         end
     end
+  end
+
+  defp handle_params(%{"image" => image} = params) do
+    %{
+      params
+      | "image" => handle_image_value(image)
+    }
+  end
+
+  defp handle_params(params) do
+    params
+  end
+
+  defp handle_image_value(%Plug.Upload{} = file) do
+    extension = Path.extname(file.filename)
+    name = Nanoid.generate() <> extension
+
+    %{}
+    |> Map.put(:filename, name)
+    |> Map.put(:path, file.path)
+    |> Map.put(:type, file.content_type)
   end
 
   def delete(conn, %{"id" => id}) do

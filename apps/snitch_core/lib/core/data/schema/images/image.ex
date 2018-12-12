@@ -3,11 +3,13 @@ defmodule Snitch.Data.Schema.Image do
   Models an Image.
   """
   use Snitch.Data.Schema
+  alias Ecto.Nanoid
 
   @type t :: %__MODULE__{}
 
   schema "snitch_images" do
-    field(:name, :string)
+    field(:name, Nanoid)
+    field(:image_url, :string)
     field(:image, :any, virtual: true)
     field(:is_default, :boolean, default: false)
     timestamps()
@@ -20,7 +22,7 @@ defmodule Snitch.Data.Schema.Image do
   def changeset(%__MODULE__{} = image, params) do
     image
     |> cast(params, [:image, :is_default])
-    |> put_name()
+    |> put_name_and_url()
   end
 
   def update_changeset(%__MODULE__{} = image, params) do
@@ -36,16 +38,18 @@ defmodule Snitch.Data.Schema.Image do
   def create_changeset(%__MODULE__{} = image, params) do
     image
     |> cast(params, [:image, :is_default])
-    |> put_name()
+    |> put_name_and_url()
   end
 
-  def put_name(changeset) do
+  def put_name_and_url(changeset) do
     case changeset do
       %Ecto.Changeset{
         valid?: true,
-        changes: %{image: %Plug.Upload{content_type: "image/" <> _, filename: name}}
+        changes: %{image: %{filename: name, url: url}}
       } ->
-        put_change(changeset, :name, name)
+        changeset
+        |> put_change(:name, name)
+        |> put_change(:image_url, url)
 
       _ ->
         changeset
