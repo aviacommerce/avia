@@ -8,14 +8,6 @@ defmodule Snitch.Data.Schema.ShippingRuleIdentifier do
 
   @type t :: %__MODULE__{}
 
-  # fso -> free shipping for all orders
-  # fsrp -> flat shipping rate for each product
-  # fiso -> fixed shipping for order
-  # fsro -> free shipping on order above some amount
-
-  @product_identifiers ~w(fsrp)a
-  @order_identifiers ~w(fiso fsro fso)a
-
   schema "snitch_shipping_rule_identifiers" do
     field(:code, Ecto.Atom)
     field(:description, :string)
@@ -31,27 +23,6 @@ defmodule Snitch.Data.Schema.ShippingRuleIdentifier do
     |> validate_required(@required_fields)
     |> validate_inclusion(:code, identifier_codes())
     |> unique_constraint(:code)
-  end
-
-  def codes() do
-    identifier_codes()
-  end
-
-  def product_identifier() do
-    @product_identifiers
-  end
-
-  def order_identifiers() do
-    @order_identifiers
-  end
-
-  def identifer_description(code) do
-    case code do
-      :fso -> "free shipping for order"
-      :fsrp -> "flat shipping rate for each product"
-      :fiso -> "fixed shipping rate for order"
-      :fsro -> "free shipping on order above amount"
-    end
   end
 
   def identifier_with_module() do
