@@ -7,6 +7,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Data.Model.ProductPrototype, as: PrototypeModel
   alias Snitch.Domain.Taxonomy
+  alias Snitch.Tools.Helper.Rummage
 
   alias Snitch.Data.Schema.{
     Image,
@@ -72,12 +73,7 @@ defmodule AdminAppWeb.ProductController do
     with %ProductSchema{} = product <- ProductModel.get(id) |> Repo.preload(preloads) do
       changeset = ProductSchema.create_changeset(product, params)
 
-      query_string =
-        conn.req_headers
-        |> Enum.into(%{})
-        |> Map.get("referer", "")
-        |> URI.parse()
-        |> Map.get(:query) || ""
+      query_string = Rummage.query_string_from_request_referer(conn)
 
       rummage_params = query_string |> URI.decode_query()
 
