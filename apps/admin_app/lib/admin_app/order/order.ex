@@ -16,7 +16,7 @@ defmodule AdminApp.OrderContext do
     |> Repo.preload([
       [line_items: :product],
       [packages: [:items, :shipping_method]],
-      :payments,
+      [payments: :payment_method],
       :user
     ])
   end
