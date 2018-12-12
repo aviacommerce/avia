@@ -163,22 +163,17 @@ function setupProduct() {
 
   // This handle the variation theme selection
   $('#product_theme_id').on('change', function (e) {
-    $('#theme_change_modal').modal(`show`);
+    var product_variants = document.getElementsByClassName("product_has_variants");
+    if (product_variants.length != 0) {
+      $('#theme_change_modal').modal(`show`);
+    }
+    else {
+      create_update_variation_theme();
+    }
   })
 
   $("#theme_change_confirm").click(function (e) {
-    var optionSelected = $('#product_theme_id');
-    var valueSelected = optionSelected.val();
-    const product_id = $(this)
-      .parents()
-      .find('#product_id');
-    const new_variant = $(this)
-      .parents()
-      .find('#new_variant');
-    var link = "/products/" + product_id.val() + "/variant/new?theme_id=" + valueSelected
-    new_variant.attr("href", link)
-
-    get_variation_options(valueSelected, product_id.val())
+    create_update_variation_theme();
   })
 
   $(".option-value")
@@ -228,4 +223,19 @@ function update_option_value(id, value){
         .append(myJson.html)
     });
   $('#theme_change_modal').modal('hide');
+}
+
+function create_update_variation_theme() {
+  var optionSelected = $('#product_theme_id');
+    var valueSelected = optionSelected.val();
+    const product_id = optionSelected
+      .parents()
+      .find('#product_id');
+    const new_variant = optionSelected
+      .parents()
+      .find('#new_variant');
+    var link = "/products/" + product_id.val() + "/variant/new?theme_id=" + valueSelected
+    new_variant.attr("href", link)
+
+    get_variation_options(valueSelected, product_id.val())
 }
