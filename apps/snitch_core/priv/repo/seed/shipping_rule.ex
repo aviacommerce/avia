@@ -11,6 +11,7 @@ defmodule Snitch.Seed.ShippingRules do
 
   @shipping_rule_identifier %{
     code: nil,
+    description: '',
     inserted_at: DateTime.utc_now(),
     updated_at: DateTime.utc_now()
   }
@@ -19,9 +20,9 @@ defmodule Snitch.Seed.ShippingRules do
     active?: false,
     shipping_rule_identifier_id: nil,
     shipping_category_id: nil,
+    preferences: nil,
     inserted_at: DateTime.utc_now(),
-    updated_at: DateTime.utc_now(),
-    shipping_cost: Money.new!(:USD, 0)
+    updated_at: DateTime.utc_now()
   }
 
   def seed!() do
@@ -31,13 +32,13 @@ defmodule Snitch.Seed.ShippingRules do
   end
 
   defp seed_shipping_rule_identifiers() do
-    codes = ShippingRuleIdentifier.codes()
+    codes_with_description = identifier_manifest()
 
     identifiers =
       Enum.map(
-        codes,
-        fn code ->
-          %{@shipping_rule_identifier | code: code}
+        codes_with_description,
+        fn {key, value} ->
+          %{@shipping_rule_identifier | code: key, description: value.description}
         end
       )
 
@@ -56,7 +57,8 @@ defmodule Snitch.Seed.ShippingRules do
               %{
                 @shipping_rule
                 | shipping_rule_identifier_id: identifier.id,
-                  shipping_category_id: category.id
+                  shipping_category_id: category.id,
+                  preferences: get_identifier_preference(identifier)
               }
               | acc
             ]
@@ -66,5 +68,37 @@ defmodule Snitch.Seed.ShippingRules do
       end)
 
     Repo.insert_all(ShippingRule, rules, on_conflict: :nothing, returning: true)
+  end
+
+  defp identifier_manifest() do
+    %{
+      fso: %{
+        description: "free shipping for order",
+        module: Snitch.Data.Schema.ShippingRule.OrderFree,
+        preferences: %{}
+      },
+      fsoa: %{
+        description: "free shipping above specified amount",
+        module: Snitch.Data.Schema.ShippingRule.OrderConditionalFree,
+        preferences: %{amount: Decimal.new(0)}
+      },
+      fsrp: %{
+        description: "fixed shipping rate per product",
+        module: Snitch.Data.Schema.ShippingRule.ProductFlatRate,
+        preferences: %{cost_per_item: Decimal.new(0)}
+      },
+      ofr: %{
+        description: "fixed shipping rate for order",
+        module: Snitch.Data.Schema.ShippingRule.OrderFlatRate,
+        preferences: %{cost: Decimal.new(0)}
+      }
+    }
+  end
+
+  defp get_identifier_preference(identifier) do
+    all_identifiers = identifier_manifest()
+    identifier = all_identifiers[identifier.code]
+
+    identifier.preferences
   end
 end

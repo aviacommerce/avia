@@ -9,8 +9,8 @@ import ZoneNewView from './zone/new';
 import ProductIndexView from './product/index';
 import ProductNewView from './product/new';
 import DashboardIndexView from './dashboard/index';
-
-
+import Shipping_policyIndexView from './shipping_policy/index'
+import Shipping_policyEditView from './shipping_policy/edit'
 // Collection of specific view modules
 const views = {
   TaxonomyIndexView,
@@ -22,7 +22,9 @@ const views = {
   OrderIndexView,
   ZoneNewView,
   DashboardIndexView,
-  ProductNewView
+  ProductNewView,
+  Shipping_policyIndexView,
+  Shipping_policyEditView
 };
 
 export default function loadView(viewName) {

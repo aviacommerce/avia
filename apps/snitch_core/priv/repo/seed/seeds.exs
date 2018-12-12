@@ -61,8 +61,6 @@ Shipping.seed!()
 
 ShippingRules.seed!()
 
-ShippingRules.seed!()
-
 StockLocation.seed!()
 
 # Repo.transaction(fn ->
