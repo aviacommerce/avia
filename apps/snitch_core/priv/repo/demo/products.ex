@@ -62,9 +62,9 @@ defmodule Snitch.Demo.Product do
         end)
     end
 
-    defp create_product!(name, width, height, depth, selling_price, weight, maximum_retail_price, taxon, image) do
+    defp create_product!(name, width, height, depth, selling_price, weight, maximum_retail_price, taxon, image_name) do
         light = Repo.get_by(ShippingCategory, name: "light")
-        image = [create_image(image)]
+        image = [create_image(image_name)]
         params = %{
             "name": name,
 			"width": width,
@@ -78,7 +78,7 @@ defmodule Snitch.Demo.Product do
         }
 
         product = %Product{} |> Product.create_changeset(params) |> Repo.insert!
-        associate_image(product, image)
+        associate_image(product, image, image_name)
     end
 
     def create_product_option_value(variant, product) do
@@ -97,21 +97,23 @@ defmodule Snitch.Demo.Product do
     end
 
     defp create_image(image) do
-      %Image{name: image} |> Repo.insert!
+       extension = Path.extname(image)
+       name = Nanoid.generate() <> extension
+       %Image{name: name, is_default: true} |> Repo.insert!
     end
 
-    defp associate_image(product, image) do
-        uploaded_struct = upload_struct(image, product)
+    defp associate_image(product, image, image_name) do
+        uploaded_struct = upload_struct(image, product, image_name)
         upload_image(uploaded_struct, product)
         Product.associate_image_changeset(product, image) |> Repo.update!
     end
 
-    defp upload_struct([%Image{name: name} = image], product) do
+    defp upload_struct([%Image{name: name} = image], product, image_name) do
         base_path = Application.app_dir(:snitch_core)
         %Plug.Upload{
             content_type: "image/jpeg",
             filename: name,
-            path: "#{base_path}/priv/repo/demo/demo_data/static/product_images/#{name}"
+            path: "#{base_path}/priv/repo/demo/demo_data/static/product_images/#{image_name}"
         }
     end
 
