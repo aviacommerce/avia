@@ -36,9 +36,10 @@ defmodule Snitch.Data.Schema.ShippingRule.OrderFreeTest do
     test "returns {:halt, cost} for free shipping for all orders", context do
       rule_manifest = %{code: :fso, description: "free shipping for order"}
       preference_manifest = %{}
+      item_info = %{unit_price: Money.new!(currency(), 10), quantity: 3}
 
       %{package: package, rule: rule} =
-        package_with_shipping_rule(context, 3, rule_manifest, preference_manifest)
+        package_with_shipping_rule(context, item_info, rule_manifest, preference_manifest)
 
       assert {:halt, cost} =
                OrderFree.calculate(package, currency(), rule, Money.new!(currency(), 0))

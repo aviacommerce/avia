@@ -53,14 +53,17 @@ defmodule Snitch.Data.Schema.ShippingRule.OrderFlatRateTest do
     test "returns {:cont, cost} for rule", context do
       rule_manifest = %{code: :ofr, description: "fixed shipping rate for order"}
       preference_manifest = %{cost: Decimal.new(20.00)}
+      item_info = %{unit_price: Money.new!(currency(), 10), quantity: 3}
 
       %{package: package, rule: rule} =
-        package_with_shipping_rule(context, 3, rule_manifest, preference_manifest)
+        package_with_shipping_rule(context, item_info, rule_manifest, preference_manifest)
 
-      assert {:cont, cost} =
+      assert {:cont, shipping_cost} =
                OrderFlatRate.calculate(package, currency(), rule, Money.new!(currency(), 0))
 
-      assert cost == Money.new!(currency(), Decimal.new(20.00))
+      # since item_info.unit_price * item_info.quantity > preference_manifest.cost
+      # shippping_cost is equal to preference_manifest.cost
+      assert shipping_cost == Money.new!(currency(), preference_manifest.cost)
     end
   end
 

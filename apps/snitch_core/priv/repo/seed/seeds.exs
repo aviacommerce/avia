@@ -63,8 +63,6 @@ ShippingRules.seed!()
 
 StockLocation.seed!()
 
-StockLocation.seed!()
-
 # Repo.transaction(fn ->
 #   Orders.seed_variants!()
 #   Orders.seed_orders!()

@@ -65,10 +65,13 @@ defmodule Snitch.Data.Schema.ShippingRule.OrderConditionalFreeTest do
 
       rule_manifest = %{code: :fsoa, description: "free shipping above amount"}
       preference_manifest = %{amount: 20}
+      item_info = %{unit_price: Money.new!(currency(), 10), quantity: 3}
 
       %{package: package, rule: rule} =
-        package_with_shipping_rule(context, 3, rule_manifest, preference_manifest)
+        package_with_shipping_rule(context, item_info, rule_manifest, preference_manifest)
 
+      # since total cost item_info.quantity * item_info.unit_price > amount
+      # {:halt, cost} is returned
       assert {:halt, cost} =
                OrderConditionalFree.calculate(
                  package,
@@ -84,10 +87,13 @@ defmodule Snitch.Data.Schema.ShippingRule.OrderConditionalFreeTest do
 
       rule_manifest = %{code: :fsoa, description: "free shipping above amount"}
       preference_manifest = %{amount: 20}
+      item_info = %{unit_price: Money.new!(currency(), 10), quantity: 1}
 
       %{package: package, rule: rule} =
-        package_with_shipping_rule(context, 1, rule_manifest, preference_manifest)
+        package_with_shipping_rule(context, item_info, rule_manifest, preference_manifest)
 
+      # since total cost item_info.quantity * item_info.unit_price < amount
+      # {:cont, cost} is returned
       assert {:cont, cost} =
                OrderConditionalFree.calculate(
                  package,

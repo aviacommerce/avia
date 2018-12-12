@@ -31,8 +31,9 @@ defmodule Snitch.Factory.ShippingCategory do
         }
       end
 
-      def package_with_shipping_rule(context, quantity, rule_manifest, preference_manifest) do
+      def package_with_shipping_rule(context, item_info, rule_manifest, preference_manifest) do
         %{embedded_shipping_methods: embedded_shipping_methods} = context
+        %{unit_price: unit_price, quantity: quantity} = item_info
 
         # setup stock for product
         stock_item = insert(:stock_item, count_on_hand: 20)
@@ -57,7 +58,14 @@ defmodule Snitch.Factory.ShippingCategory do
         # make order and it's packages
         product = stock_item.product
         order = insert(:order, state: "delivery")
-        line_item = insert(:line_item, order: order, product: product, quantity: quantity)
+
+        line_item =
+          insert(:line_item,
+            order: order,
+            product: product,
+            quantity: quantity,
+            unit_price: unit_price
+          )
 
         package =
           insert(:package,

@@ -53,9 +53,10 @@ defmodule Snitch.Data.Schema.ShippingRule.ProductFlatRateTest do
     test "returns {:cont, cost} for flat cost per product", context do
       rule_manifest = %{code: :fsrp, description: "fixed shipping rate per product"}
       preference_manifest = %{cost_per_item: Decimal.new(10.00)}
+      item_info = %{unit_price: Money.new!(currency(), 10), quantity: 3}
 
       %{package: package, rule: rule} =
-        package_with_shipping_rule(context, 3, rule_manifest, preference_manifest)
+        package_with_shipping_rule(context, item_info, rule_manifest, preference_manifest)
 
       assert {:cont, cost} =
                ProductFlatRate.calculate(package, currency(), rule, Money.new!(currency(), 0))
@@ -64,8 +65,8 @@ defmodule Snitch.Data.Schema.ShippingRule.ProductFlatRateTest do
 
       assert cost ==
                currency
-               |> Money.new!(Decimal.new(10.00))
-               |> Money.mult!(3)
+               |> Money.new!(preference_manifest.cost_per_item)
+               |> Money.mult!(item_info.quantity)
                |> Money.round()
     end
   end

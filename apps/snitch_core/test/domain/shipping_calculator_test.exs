@@ -26,13 +26,18 @@ defmodule Snitch.Domain.ShippingCalculatorTest do
         fsrp: %{cost_per_item: 5}
       }
 
-      %{package: package, category: category} = setup_package_with_sc(context, _quantity = 5)
+      item_info = %{unit_price: Money.new!(currency(), 10), quantity: 5}
+
+      %{package: package, category: category} = setup_package_with_sc(context, item_info)
 
       setup_shipping_rules(rule_active_manifest, preference_manifest, category)
 
       shipping_cost = ShippingCalculator.calculate(package)
 
-      assert shipping_cost == Money.new!(currency(), 20) |> Money.round()
+      assert shipping_cost ==
+               currency()
+               |> Money.new!(preference_manifest.ofr.cost)
+               |> Money.round()
     end
 
     test "with free for order above amount, returns 0 as :fsoa applies", context do
@@ -45,15 +50,20 @@ defmodule Snitch.Domain.ShippingCalculatorTest do
         fsrp: %{cost_per_item: 5}
       }
 
-      %{package: package, category: category} = setup_package_with_sc(context, _quantity = 7)
+      item_info = %{unit_price: Money.new!(currency(), 10), quantity: 7}
+
+      %{package: package, category: category} = setup_package_with_sc(context, item_info)
 
       setup_shipping_rules(rule_active_manifest, preference_manifest, category)
 
       shipping_cost = ShippingCalculator.calculate(package)
 
       # as order cost is above 50 USD shipping cost is 0
-      # unit_price 9.99 * 7 > 50
-      assert shipping_cost == Money.new!(currency(), 0) |> Money.round()
+      # item_info.unit_price * item_info.quantity > preference_manifest.fsoa.amount
+      assert shipping_cost ==
+               currency()
+               |> Money.new!(0)
+               |> Money.round()
     end
 
     test "with free for order above amount :fsoa does not apply", context do
@@ -66,15 +76,20 @@ defmodule Snitch.Domain.ShippingCalculatorTest do
         fsrp: %{cost_per_item: 5}
       }
 
-      %{package: package, category: category} = setup_package_with_sc(context, _quantity = 1)
+      item_info = %{unit_price: Money.new!(currency(), 10), quantity: 1}
+
+      %{package: package, category: category} = setup_package_with_sc(context, item_info)
 
       setup_shipping_rules(rule_active_manifest, preference_manifest, category)
 
       shipping_cost = ShippingCalculator.calculate(package)
 
       # as free shipping is available over 200, fixed rate cost is applied
-      # unit_price 9.99 * 1 < 200
-      assert shipping_cost == Money.new!(currency(), 20) |> Money.round()
+      # item_info.unit_price * item_info.quantity < preference_manifest.fsoa.amount
+      assert shipping_cost ==
+               currency()
+               |> Money.new!(preference_manifest.ofr.cost)
+               |> Money.round()
     end
   end
 
@@ -89,15 +104,21 @@ defmodule Snitch.Domain.ShippingCalculatorTest do
         fsrp: %{cost_per_item: 5}
       }
 
-      %{package: package, category: category} = setup_package_with_sc(context, _quantity = 5)
+      item_info = %{unit_price: Money.new!(currency(), 10), quantity: 5}
 
-      %{ofr: rule} = setup_shipping_rules(rule_active_manifest, preference_manifest, category)
+      %{package: package, category: category} = setup_package_with_sc(context, item_info)
+
+      setup_shipping_rules(rule_active_manifest, preference_manifest, category)
 
       shipping_cost = ShippingCalculator.calculate(package)
 
       # shipping cost at the rate of 5 per product is applied for 5 products
       # as no other rule is active.
-      assert shipping_cost == Money.new!(:USD, 5) |> Money.mult!(5) |> Money.round()
+      assert shipping_cost ==
+               currency()
+               |> Money.new!(preference_manifest.fsrp.cost_per_item)
+               |> Money.mult!(item_info.quantity)
+               |> Money.round()
     end
 
     test "with free for order above amount, returns 0 as :fsoa applies", context do
@@ -110,14 +131,16 @@ defmodule Snitch.Domain.ShippingCalculatorTest do
         fsrp: %{cost_per_item: 5}
       }
 
-      %{package: package, category: category} = setup_package_with_sc(context, _quantity = 7)
+      item_info = %{unit_price: Money.new!(currency(), 10), quantity: 7}
 
-      %{ofr: rule} = setup_shipping_rules(rule_active_manifest, preference_manifest, category)
+      %{package: package, category: category} = setup_package_with_sc(context, item_info)
+
+      setup_shipping_rules(rule_active_manifest, preference_manifest, category)
 
       shipping_cost = ShippingCalculator.calculate(package)
 
       # as order cost is above 50 USD shipping cost is 0
-      assert shipping_cost == Money.new!(currency(), 0) |> Money.round()
+      assert shipping_cost == currency() |> Money.new!(0) |> Money.round()
     end
 
     test "with free for order above amount :fsoa does not apply", context do
@@ -130,14 +153,20 @@ defmodule Snitch.Domain.ShippingCalculatorTest do
         fsrp: %{cost_per_item: 5}
       }
 
-      %{package: package, category: category} = setup_package_with_sc(context, _quantity = 1)
+      item_info = %{unit_price: Money.new!(currency(), 10), quantity: 1}
 
-      %{ofr: rule} = setup_shipping_rules(rule_active_manifest, preference_manifest, category)
+      %{package: package, category: category} = setup_package_with_sc(context, item_info)
+
+      setup_shipping_rules(rule_active_manifest, preference_manifest, category)
 
       shipping_cost = ShippingCalculator.calculate(package)
 
       # as free shipping is available over 200, fixed rate  per product is applied
-      assert shipping_cost == Money.new!(currency(), 5) |> Money.mult!(1) |> Money.round()
+      assert shipping_cost ==
+               currency()
+               |> Money.new!(preference_manifest.fsrp.cost_per_item)
+               |> Money.mult!(item_info.quantity)
+               |> Money.round()
     end
   end
 
@@ -151,9 +180,11 @@ defmodule Snitch.Domain.ShippingCalculatorTest do
       fsrp: %{cost_per_item: 5}
     }
 
-    %{package: package, category: category} = setup_package_with_sc(context, _quantity = 2)
+    item_info = %{unit_price: Money.new!(currency(), 10), quantity: 1}
 
-    %{ofr: rule} = setup_shipping_rules(rule_active_manifest, preference_manifest, category)
+    %{package: package, category: category} = setup_package_with_sc(context, item_info)
+
+    setup_shipping_rules(rule_active_manifest, preference_manifest, category)
 
     shipping_cost = ShippingCalculator.calculate(package)
 
@@ -162,7 +193,8 @@ defmodule Snitch.Domain.ShippingCalculatorTest do
   end
 
   test "check for no rules set", context do
-    %{package: package, category: category} = setup_package_with_sc(context, _quantity = 1)
+    item_info = %{unit_price: Money.new!(currency(), 10), quantity: 1}
+    %{package: package, category: category} = setup_package_with_sc(context, item_info)
 
     shipping_cost = ShippingCalculator.calculate(package)
 
@@ -215,8 +247,9 @@ defmodule Snitch.Domain.ShippingCalculatorTest do
       )
   end
 
-  defp setup_package_with_sc(context, quantity) do
+  defp setup_package_with_sc(context, item_info) do
     %{embedded_shipping_methods: embedded_shipping_methods} = context
+    %{quantity: quantity, unit_price: unit_price} = item_info
 
     # setup stock for product
     stock_item = insert(:stock_item, count_on_hand: 100)
@@ -224,8 +257,15 @@ defmodule Snitch.Domain.ShippingCalculatorTest do
 
     # make order and it's packages
     product = stock_item.product
-    order = insert(:order, state: :delivery)
-    line_item = insert(:line_item, order: order, product: product, quantity: quantity)
+    order = insert(:order, state: "delivery")
+
+    line_item =
+      insert(:line_item,
+        order: order,
+        product: product,
+        quantity: quantity,
+        unit_price: unit_price
+      )
 
     package =
       insert(:package,
