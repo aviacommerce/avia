@@ -188,7 +188,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
          %{
            shipping_methods: [sm]
          } = context do
-      set_cost = Money.new!(:USD, 100)
+      set_cost = 20
       quantity = 3
 
       %{order: order, package: package, shipping_rule: shipping_rule} =
@@ -207,7 +207,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
       assert {:ok, %{packages: _}} = Repo.transaction(result.multi)
 
-      {:ok, order} = OrderModel.partial_update(order, %{state: "delivery"})
+      {:ok, order} = OrderModel.partial_update(order, %{state: :delivery})
 
       order = Repo.preload(order, [:packages, :line_items])
       line_item_total = OrderDomain.line_item_total(order)
@@ -220,7 +220,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       assert final_order_total ==
                Money.add!(
                  order_total,
-                 shipping_rule.shipping_cost
+                 Money.new!(currency(), shipping_rule.preferences.cost)
                )
     end
 
@@ -352,21 +352,25 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     stock_item = insert(:stock_item, count_on_hand: 10)
 
     # setup shipping category, identifier, rules
-    shipping_identifier = insert(:shipping_identifier, code: :fiso)
+    shipping_identifier =
+      insert(:shipping_identifier,
+        code: :ofr,
+        description: "fixed shipping rate for order"
+      )
 
     shipping_category = insert(:shipping_category)
 
     shipping_rule =
       insert(:shipping_rule,
         active?: true,
-        shipping_cost: shipping_cost,
+        preferences: %{cost: shipping_cost},
         shipping_rule_identifier: shipping_identifier,
         shipping_category: shipping_category
       )
 
     # make order and it's packages
     product = stock_item.product
-    order = insert(:order, state: "address")
+    order = insert(:order, state: :address)
     line_item = insert(:line_item, order: order, product: product, quantity: quantity)
 
     package =

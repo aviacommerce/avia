@@ -5,10 +5,7 @@ defmodule AdminAppWeb.ShippingPolicyController do
 
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.ShippingCategory
-  alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
   alias Snitch.Data.Model.ShippingCategory, as: ScModel
-
-  @defaults Application.get_env(:snitch_core, :defaults_module)
 
   def new(conn, _params) do
     shipping_category =
@@ -58,7 +55,7 @@ defmodule AdminAppWeb.ShippingPolicyController do
   end
 
   def shipping_category_params(id, policy) do
-    rules = Map.values(policy) |> set_shipping_amount()
+    rules = Map.values(policy) |> shipping_rules_manifest()
 
     %{
       id: String.to_integer(id),
@@ -66,13 +63,13 @@ defmodule AdminAppWeb.ShippingPolicyController do
     }
   end
 
-  def set_shipping_amount(rules) do
-    currency = GCModel.fetch_currency()
-
+  def shipping_rules_manifest(rules) do
     Enum.map(rules, fn rule ->
-      amount = rule["shipping_cost"] || "0.00"
-      shipping_cost = Money.new!(currency, amount)
-      Map.put(rule, "shipping_cost", shipping_cost)
+      if Map.has_key?(rule, "active?") do
+        rule
+      else
+        Map.put(rule, "active?", "false")
+      end
     end)
   end
 end
