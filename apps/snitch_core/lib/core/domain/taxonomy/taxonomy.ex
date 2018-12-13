@@ -40,7 +40,7 @@ defmodule Snitch.Domain.Taxonomy do
   @doc """
     Checks if the taxon is a root taxon.
 
-    Note: If taxon is not asscoaited with taxonomy RuntimeError will be raised. 
+    Note: If taxon is not asscoaited with taxonomy RuntimeError will be raised.
   """
   @spec is_root?(Taxon.t()) :: boolean()
   def is_root?(%Taxon{} = taxon) do
@@ -224,13 +224,7 @@ defmodule Snitch.Domain.Taxonomy do
           {:ok, taxon}
 
         {:error, changeset} ->
-          current_taxon = Repo.preload(changeset.data, :parent)
-
-          slug =
-            Slugger.slugify_downcase("#{current_taxon.parent.name} #{current_taxon.name}", ?_)
-
-          changeset = Ecto.Changeset.change(current_taxon, slug: slug)
-          Repo.update(changeset)
+          {:ok, changeset}
       end
     end)
   end

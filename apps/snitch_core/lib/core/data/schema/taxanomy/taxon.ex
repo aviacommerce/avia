@@ -43,6 +43,8 @@ defmodule Snitch.Data.Schema.Taxon do
     |> handle_slug
   end
 
+  defp get_ancestors_slug_text(nil), do: ""
+
   defp get_ancestors_slug_text(taxon_id) do
     with %Taxon{} = taxon <- TaxonomyDomain.get_taxon(taxon_id),
          {:ok, ancestors} <- TaxonomyDomain.get_ancestors(taxon_id) do
@@ -61,7 +63,7 @@ defmodule Snitch.Data.Schema.Taxon do
   end
 
   defp handle_slug(%{changes: %{name: name}} = changeset) do
-    parent_id = changeset.data.parent_id || changeset.changes.parent_id
+    parent_id = changeset.data.parent_id || Map.get(changeset.changes, :parent_id, nil)
 
     ancestors_slug_text = get_ancestors_slug_text(parent_id)
 
