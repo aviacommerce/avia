@@ -26,7 +26,7 @@ defmodule Snitch.Tools.Helpers.TaxonomyTest do
 
       taxonomy = dump_taxonomy(taxonomy.root)
 
-      assert {%{name: "Brands"},
+      assert {%{name: "Brands", slug: "brands"},
               [
                 {%{name: "Bags", slug: "bags"}, []},
                 {%{name: "Mugs", slug: "mugs"}, []},
@@ -45,7 +45,7 @@ defmodule Snitch.Tools.Helpers.TaxonomyTest do
         |> Repo.preload(:root)
 
       taxonomy = dump_taxonomy(taxonomy.root)
-      assert {%{name: "Root"}, []} = taxonomy
+      assert {%{name: "Root", slug: "root"}, []} = taxonomy
     end
   end
 

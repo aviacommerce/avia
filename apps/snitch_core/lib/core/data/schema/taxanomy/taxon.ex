@@ -70,9 +70,11 @@ defmodule Snitch.Data.Schema.Taxon do
     slug_text = "#{ancestors_slug_text} #{name}"
 
     changeset
-    |> put_change(:slug, Slugger.slugify_downcase(slug_text, ?_))
+    |> put_change(:slug, generate_slug(slug_text))
     |> unique_constraint(:slug, message: "category with this name alreay exist")
   end
+
+  def generate_slug(text), do: Slugger.slugify_downcase(text, ?_)
 
   defp handle_slug(changeset), do: changeset
 

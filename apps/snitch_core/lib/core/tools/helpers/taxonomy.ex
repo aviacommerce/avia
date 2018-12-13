@@ -29,7 +29,11 @@ defmodule Snitch.Tools.Helper.Taxonomy do
       |> Taxonomy.changeset()
       |> Repo.insert!()
 
-    taxon = Repo.preload(%Taxon{name: parent, taxonomy_id: taxonomy.id}, :taxonomy)
+    taxon =
+      Repo.preload(
+        %Taxon{name: parent, taxonomy_id: taxonomy.id, slug: Taxon.generate_slug(parent)},
+        :taxonomy
+      )
 
     root = TaxonomyDomain.add_root(taxon)
 
