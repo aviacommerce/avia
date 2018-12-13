@@ -48,7 +48,11 @@ defmodule Snitch.Data.Schema.Taxon do
          {:ok, ancestors} <- TaxonomyDomain.get_ancestors(taxon_id) do
       {_, ancestors_till_level_1} = List.pop_at(ancestors, 0)
 
-      taxons = ancestors_till_level_1 ++ [taxon]
+      taxons =
+        case TaxonomyDomain.is_root?(taxon) do
+          true -> ancestors_till_level_1
+          false -> ancestors_till_level_1 ++ [taxon]
+        end
 
       slug_text =
         taxons

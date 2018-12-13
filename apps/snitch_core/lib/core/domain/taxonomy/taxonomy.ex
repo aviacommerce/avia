@@ -37,6 +37,19 @@ defmodule Snitch.Domain.Taxonomy do
     end
   end
 
+  @spec is_root?(Taxon.t()) :: bool
+  def is_root?(%Taxon{} = taxon) do
+    taxon = Repo.preload(taxon, :taxonomy)
+
+    case taxon.taxonomy do
+      nil ->
+        :error
+
+      _ ->
+        taxon.id == taxon.taxonomy.root_id
+    end
+  end
+
   @doc """
   Adds taxon as root to the taxonomy
   """
