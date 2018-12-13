@@ -49,7 +49,7 @@ defmodule Snitch.Tools.Helper.Taxonomy do
         :parent
       ])
 
-    root = TaxonomyDomain.add_taxon(root, child, :child)
+    {:ok, root} = TaxonomyDomain.add_taxon(root, child, :child)
 
     for taxon <- children do
       create_taxon(taxon, root)
