@@ -5,6 +5,7 @@ defmodule Snitch.Data.Model.ProductBrand do
   use Snitch.Data.Model
   alias Ecto.Multi
   alias Snitch.Data.Schema.{Image, ProductBrand}
+  alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Tools.Helper.ImageUploader
 
   @doc """
@@ -38,20 +39,7 @@ defmodule Snitch.Data.Model.ProductBrand do
   @spec create(map) ::
           {:ok, ProductBrand.t()} | {:error, Ecto.Changeset.t()} | {:error, String.t()}
   def create(%{"image" => image} = params) do
-    Multi.new()
-    |> Multi.run(:product_brand, fn _ ->
-      QH.create(ProductBrand, params, Repo)
-    end)
-    |> Multi.run(:image, fn %{product_brand: product_brand} ->
-      params = %{"image" => Map.put(image, :url, image_url(image.filename, product_brand))}
-      QH.create(Image, params, Repo)
-    end)
-    |> Multi.run(:product_brand_image, fn %{image: image, product_brand: product_brand} ->
-      params = Map.put(params, "brand_image", %{image_id: image.id})
-      QH.update(ProductBrand, params, product_brand, Repo)
-    end)
-    |> upload_image_multi(image)
-    |> persist()
+    ImageModel.create(ProductBrand, params, "brand_image")
   end
 
   def create(params) do
@@ -71,20 +59,7 @@ defmodule Snitch.Data.Model.ProductBrand do
   """
   @spec update(ProductBrand.t(), map) :: {:ok, ProductBrand.t()} | {:error, Ecto.Changeset.t()}
   def update(model, %{"image" => image} = params) do
-    old_image = model.image
-
-    Multi.new()
-    |> Multi.run(:image, fn _ ->
-      params = %{"image" => Map.put(image, :url, image_url(image.filename, model))}
-      QH.create(Image, params, Repo)
-    end)
-    |> Multi.run(:product_brand, fn %{image: image} ->
-      params = Map.put(params, "brand_image", %{image_id: image.id})
-      QH.update(ProductBrand, params, model, Repo)
-    end)
-    |> delete_image_multi(old_image, model)
-    |> upload_image_multi(image)
-    |> persist()
+    ImageModel.update(ProductBrand, model, params, "brand_image")
   end
 
   def update(model, params) do
@@ -120,73 +95,11 @@ defmodule Snitch.Data.Model.ProductBrand do
     end
   end
 
-  @doc """
-  Returns the url of the location where image is stored.
-
-  Takes as input `name` of the `image` and the `ProductBrand.t()`
-  struct.
-  """
-  @spec image_url(String.t(), ProductBrand.t()) :: String.t()
-  def image_url(name, product_brand) do
-    ImageUploader.url({name, product_brand})
-  end
-
-  ########################### private functions #####################
-
-  defp persist(multi) do
-    case Repo.transaction(multi) do
-      {:ok, _} ->
-        {:ok, "success"}
-
-      {:error, _, failed_value, _} ->
-        {:error, failed_value}
-    end
-  end
-
-  defp upload_image_multi(multi, %{filename: name, path: path, type: type} = image) do
-    Multi.run(multi, :image_upload, fn %{product_brand: product_brand} ->
-      image = %Plug.Upload{filename: name, path: path, content_type: type}
-
-      case ImageUploader.store({image, product_brand}) do
-        {:ok, _} ->
-          {:ok, "upload success"}
-
-        _ ->
-          {:error, "upload error"}
-      end
-    end)
-  end
-
-  defp delete_image_multi(multi, nil, product_brand) do
-    multi
-  end
-
-  defp delete_image_multi(multi, image, product_brand) do
-    multi
-    |> Multi.run(:remove_from_upload, fn _ ->
-      case ImageUploader.delete({image.name, product_brand}) do
-        :ok ->
-          {:ok, "success"}
-
-        _ ->
-          {:error, "not_found"}
-      end
-    end)
-    |> Multi.run(:delete_image, fn _ ->
-      QH.delete(Image, image.id, Repo)
-    end)
-  end
-
   defp delete_product_brand(_brand, nil, changeset) do
     Repo.delete(changeset)
   end
 
   defp delete_product_brand(brand, image, changeset) do
-    Multi.new()
-    |> Multi.run(:delete_product_brand, fn _ ->
-      Repo.delete(changeset)
-    end)
-    |> delete_image_multi(image, brand)
-    |> persist()
+    ImageModel.delete(brand, image, changeset)
   end
 end

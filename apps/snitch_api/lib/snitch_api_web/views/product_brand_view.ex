@@ -1,7 +1,7 @@
 defmodule SnitchApiWeb.ProductBrandView do
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
-  alias Snitch.Data.Model.ProductBrand
+  alias Snitch.Data.Model.Image
 
   attributes([
     :name,
@@ -14,7 +14,7 @@ defmodule SnitchApiWeb.ProductBrandView do
         nil
 
       _ ->
-        ProductBrand.image_url(brand.image.name, brand)
+        Image.image_url(brand.image.name, brand)
     end
   end
 end

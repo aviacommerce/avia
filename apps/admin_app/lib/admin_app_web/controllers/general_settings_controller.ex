@@ -63,9 +63,7 @@ defmodule AdminAppWeb.GeneralSettingsController do
         handle_nil_response(conn)
 
       _ ->
-        params =
-          params
-          |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+        params
 
         case GCModel.update(general_configuration, params) do
           {:ok, general_configuration} ->

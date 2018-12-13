@@ -7,6 +7,7 @@ defmodule Snitch.Data.Model.Product do
 
   import Ecto.Query
   alias Ecto.Multi
+  alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Data.Schema.{Image, Product, Variation}
   alias Snitch.Tools.Helper.ImageUploader
 
@@ -154,18 +155,18 @@ defmodule Snitch.Data.Model.Product do
     |> Multi.run(:store_image, fn %{product: product} ->
       store_images(product, params)
     end)
-    |> persist()
+    |> ImageModel.persist()
   end
 
-  @doc """
-  Returns the url of the location where image is stored.
-  Takes as input `name` of the image and the `Product.t()`
-  struct.
-  """
-  @spec image_url(String.t(), Product.t()) :: String.t()
-  def image_url(name, product) do
-    ImageUploader.url({name, product})
-  end
+  # @doc """
+  # Returns the url of the location where image is stored.
+  # Takes as input `name` of the image and the `Product.t()`
+  # struct.
+  # """
+  # @spec image_url(String.t(), Product.t()) :: String.t()
+  # def image_url(name, product) do
+  #   ImageUploader.url({name, product})
+  # end
 
   @doc """
   Delete an image associated with a product.
@@ -190,20 +191,10 @@ defmodule Snitch.Data.Model.Product do
     end)
     |> Multi.delete_all(:delete, query)
     |> remove_image_from_store()
-    |> persist()
+    |> ImageModel.persist()
   end
 
   ####################### Private Functions ########################
-
-  defp persist(multi) do
-    case Repo.transaction(multi) do
-      {:ok, _} ->
-        {:ok, "success"}
-
-      {:error, _, failed_value, _} ->
-        {:error, failed_value}
-    end
-  end
 
   defp store_images(product, params) do
     uploads = params["images"]
@@ -264,10 +255,6 @@ defmodule Snitch.Data.Model.Product do
           {:error, "not found"}
       end
     end)
-  end
-
-  def image_url(name, product) do
-    ImageUploader.url({name, product})
   end
 
   def get_selling_prices(product_ids) do

@@ -21,6 +21,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Tools.Helper.Query
   alias Snitch.Data.Model.StockItem, as: StockModel
   alias Snitch.Data.Schema.StockItem, as: StockSchema
+  alias Snitch.Data.Model.Image, as: ImageModel
   alias AdminAppWeb.ProductView
 
   import Phoenix.View, only: [render_to_string: 3]
@@ -208,7 +209,7 @@ defmodule AdminAppWeb.ProductController do
           |> Map.put(:filename, name)
           |> Map.put(:path, image.path)
           |> Map.put(:type, image.content_type)
-          |> Map.put(:url, ProductModel.image_url(name, product))
+          |> Map.put(:url, ImageModel.image_url(name, product))
 
         [%{"image" => image} | acc]
 

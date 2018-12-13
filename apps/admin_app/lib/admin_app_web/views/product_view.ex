@@ -7,6 +7,7 @@ defmodule AdminAppWeb.ProductView do
   alias Snitch.Domain.Taxonomy
 
   alias Snitch.Data.Model.{GeneralConfiguration, Product, ProductProperty, Property, StockItem}
+  alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Data.Schema
   import Ecto.Query
 
@@ -86,7 +87,7 @@ defmodule AdminAppWeb.ProductView do
   end
 
   def get_image_url(image, product) do
-    Product.image_url(image.name, product)
+    ImageModel.image_url(image.name, product)
   end
 
   def get_product_display_image(product) do

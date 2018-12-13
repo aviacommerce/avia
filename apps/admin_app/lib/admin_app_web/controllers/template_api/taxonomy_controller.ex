@@ -45,9 +45,9 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
     taxon = taxon_id |> Taxonomy.get_taxon()
 
     params = %{
-      name: taxon_name,
-      variation_theme_ids: params["themes"],
-      image: handle_image_value(params["image"])
+      "name" => taxon_name,
+      "variation_theme_ids" => params["themes"],
+      "image" => handle_image_value(params["image"])
     }
 
     case Taxonomy.update_taxon(taxon, params) do
