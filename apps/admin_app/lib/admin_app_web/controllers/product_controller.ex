@@ -73,9 +73,7 @@ defmodule AdminAppWeb.ProductController do
     with %ProductSchema{} = product <- ProductModel.get(id) |> Repo.preload(preloads) do
       changeset = ProductSchema.create_changeset(product, params)
 
-      query_string = Rummage.query_string_from_request_referer(conn)
-
-      rummage_params = query_string |> URI.decode_query()
+      rummage_params = Rummage.get_rummage_params(conn)
 
       render(conn, "edit.html",
         changeset: changeset,
