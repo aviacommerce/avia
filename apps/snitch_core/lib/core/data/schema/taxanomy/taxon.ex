@@ -5,6 +5,7 @@ defmodule Snitch.Data.Schema.Taxon do
 
   import Ecto.Query
   alias Snitch.Data.Schema.{Image, Taxon, Taxonomy, VariationTheme, TaxonImage}
+  alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
 
   @type t :: %__MODULE__{}
 
@@ -42,9 +43,30 @@ defmodule Snitch.Data.Schema.Taxon do
     |> handle_slug
   end
 
+  defp get_ancestors_slug(taxon_id) do
+    with %Taxon{} = taxon <- TaxonomyDomain.get_taxon(taxon_id),
+         {:ok, ancestors} <- TaxonomyDomain.get_ancestors(taxon_id) do
+      {_, ancestors_till_level_1} = List.pop_at(ancestors, 0)
+
+      taxons = ancestors_till_level_1 ++ [taxon]
+
+      slug_text =
+        taxons
+        |> Enum.reduce("", fn taxon, acc ->
+          "#{acc} #{String.trim(taxon.name)}"
+        end)
+    end
+  end
+
   defp handle_slug(%{changes: %{name: name}} = changeset) do
+    parent_id = changeset.data.parent_id || changeset.changes.parent_id
+
+    ancestors_slug_text = get_ancestors_slug(parent_id)
+
+    slug_text = "#{ancestors_slug_text} #{name}"
+
     changeset
-    |> put_change(:slug, Slugger.slugify_downcase(name, ?_))
+    |> put_change(:slug, Slugger.slugify_downcase(slug_text, ?_))
     |> unique_constraint(:slug, message: "category with this name alreay exist")
   end
 
