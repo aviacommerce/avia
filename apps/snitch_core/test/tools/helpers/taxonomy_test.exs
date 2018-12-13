@@ -28,12 +28,12 @@ defmodule Snitch.Tools.Helpers.TaxonomyTest do
 
       assert {%{name: "Brands"},
               [
-                {%{name: "Bags"}, []},
-                {%{name: "Mugs"}, []},
-                {%{name: "Clothing"},
+                {%{name: "Bags", slug: "bags"}, []},
+                {%{name: "Mugs", slug: "mugs"}, []},
+                {%{name: "Clothing", slug: "clothing"},
                  [
-                   {%{name: "Shirts"}, []},
-                   {%{name: "T-Shirts"}, []}
+                   {%{name: "Shirts", slug: "clothing_shirts"}, []},
+                   {%{name: "T-Shirts", slug: "clothing_t_shirts"}, []}
                  ]}
               ]} = taxonomy
     end

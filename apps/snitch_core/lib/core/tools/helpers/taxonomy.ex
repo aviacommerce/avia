@@ -33,13 +33,16 @@ defmodule Snitch.Tools.Helper.Taxonomy do
 
     root = TaxonomyDomain.add_root(taxon)
 
+    taxonomy =
+      taxonomy
+      |> Taxonomy.changeset(%{root_id: root.id})
+      |> Repo.update!()
+
     for taxon <- children do
       create_taxon(taxon, root)
     end
 
     taxonomy
-    |> Taxonomy.changeset(%{root_id: root.id})
-    |> Repo.update!()
   end
 
   defp create_taxon({parent, children}, root) do
