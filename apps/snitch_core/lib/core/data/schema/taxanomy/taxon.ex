@@ -54,10 +54,9 @@ defmodule Snitch.Data.Schema.Taxon do
           false -> ancestors_till_level_1 ++ [taxon]
         end
 
-        taxons
-        |> Enum.reduce("", fn taxon, acc ->
-          "#{acc} #{String.trim(taxon.name)}"
-        end)
+      Enum.reduce(taxons, "", fn taxon, acc ->
+        "#{acc} #{String.trim(taxon.name)}"
+      end)
     end
   end
 
