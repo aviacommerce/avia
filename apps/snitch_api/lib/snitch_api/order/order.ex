@@ -156,19 +156,19 @@ defmodule SnitchApi.Order do
     {:error, %{message: message}}
   end
 
-  defp transition_to_address("cart", context) do
+  defp transition_to_address(:cart, context) do
     DefaultMachine.add_addresses(context)
   end
 
-  defp transition_to_address("address", context) do
+  defp transition_to_address(:address, context) do
     DefaultMachine.delivery_to_address(context)
   end
 
-  defp transition_to_address("delivery", context) do
+  defp transition_to_address(:delivery, context) do
     DefaultMachine.delivery_to_address(context)
   end
 
-  defp transition_to_address("payment", context) do
+  defp transition_to_address(:payment, context) do
     DefaultMachine.payment_to_address(context)
   end
 

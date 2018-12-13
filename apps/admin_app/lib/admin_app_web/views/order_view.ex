@@ -272,4 +272,8 @@ defmodule AdminAppWeb.OrderView do
   def get_docs_url() do
     Application.get_env(:admin_app, AdminAppWeb.Endpoint)[:docs_url]
   end
+
+  def get_payment_name(payment) do
+    payment.payment_method.name
+  end
 end

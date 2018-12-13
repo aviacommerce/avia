@@ -14,7 +14,7 @@ export default class View extends MainView {
     deleteImage();
     setupProduct();
     addEventToProductFormButtons();
-    
+
   }
 
   unmount() {
@@ -28,28 +28,28 @@ export default class View extends MainView {
 var selDiv
 var storedFile = []
 
-export function imageOnEnter(){
-  $(document).delegate('#product-images', 'change', function(event){
-      event.preventDefault();
-      handleSubmitImage();
+export function imageOnEnter() {
+  $(document).delegate('#product-images', 'change', function (event) {
+    event.preventDefault();
+    handleSubmitImage();
   });
 }
 
-export function disableDeletionforSelected(){
+export function disableDeletionforSelected() {
   $('.imgcol input:checked').parent().find('.product-delete').hide();
-  $('.imgcol input:checked').parent().find('.product-info').css('visibility','visible');
+  $('.imgcol input:checked').parent().find('.product-info').css('visibility', 'visible');
 }
 
-export function setDefaultImage(){
-  $(document).delegate('input[type="checkbox"]', 'click', function(event) {
+export function setDefaultImage() {
+  $(document).delegate('input[type="checkbox"]', 'click', function (event) {
     $(this).parent().find('.product-delete').hide();
-    $(this).parent().find('.product-info').css('visibility','visible');
-    $(this).parent().siblings().find('.product-info').css('visibility','hidden');
-    $(this).parent().siblings().find('.product-delete').show();   
+    $(this).parent().find('.product-info').css('visibility', 'visible');
+    $(this).parent().siblings().find('.product-info').css('visibility', 'hidden');
+    $(this).parent().siblings().find('.product-delete').show();
     $(this).parent().siblings().find(':checkbox').prop('checked', false);
     var default_image = $(this).val();
     var product_id = $("#product-id").val();
-    var data = { product_id: product_id,  default_image: default_image};
+    var data = { product_id: product_id, default_image: default_image };
     var CSRF_TOKEN = $("meta[name='csrf-token']").attr("content");
 
     $.ajax({
@@ -61,14 +61,14 @@ export function setDefaultImage(){
         xhr.setRequestHeader("X-CSRF-Token", CSRF_TOKEN);
       }
     });
- });
+  });
 }
 
-function handleSubmitImage(){
+function handleSubmitImage() {
   var product_id = $("#product-id").val();
   var form_data = new FormData();
   var image_files = $("#product-image").find('#product-images.file-upload__input')[0].files;
-  $.each(image_files, function(i, file) {
+  $.each(image_files, function (i, file) {
     form_data.append('product_images[images][]', file);
   });
   var csrf = $("meta[name='csrf-token']").attr("content");
@@ -80,19 +80,19 @@ function handleSubmitImage(){
     data: form_data,
     processData: false,
     contentType: false,
-    success: function(json) {
+    success: function (json) {
       $(`.file-upload`).parent()
-      .prepend(json.images);
+        .prepend(json.images);
       $(`#show-upload-response`)
-      .empty()
-      .append(json.html);
+        .empty()
+        .append(json.html);
       $("#img-selected-container").empty();
     },
-    error: function(json) {
+    error: function (json) {
       $(`#show-upload-response`)
-      .empty()
-      .append(json.responseJSON.html)
-    } 
+        .empty()
+        .append(json.responseJSON.html)
+    }
   });
 }
 
@@ -123,7 +123,7 @@ function selectedFile(e) {
 }
 
 export function deleteImage() {
-  $(document).delegate('.product-delete', 'click', function(){
+  $(document).delegate('.product-delete', 'click', function () {
     let product_id = $("#product-id").val();
     let image_id = $(this).find("input").val()
     delete_product_image(product_id, image_id, this)
@@ -163,22 +163,18 @@ function setupProduct() {
 
   // This handle the variation theme selection
   $('#product_theme_id').on('change', function (e) {
-    $('#theme_change_modal').modal(`show`);
+    var product_variants = document.getElementsByClassName("product_has_variants");
+
+    if (product_variants.length != 0) {
+      $('#theme_change_modal').modal(`show`);
+    }
+    else {
+      create_update_variation_theme();
+    }
   })
 
   $("#theme_change_confirm").click(function (e) {
-    var optionSelected = $('#product_theme_id');
-    var valueSelected = optionSelected.val();
-    const product_id = $(this)
-      .parents()
-      .find('#product_id');
-    const new_variant = $(this)
-      .parents()
-      .find('#new_variant');
-    var link = "/products/" + product_id.val() + "/variant/new?theme_id=" + valueSelected
-    new_variant.attr("href", link)
-
-    get_variation_options(valueSelected, product_id.val())
+    create_update_variation_theme();
   })
 
   $(".option-value")
@@ -205,21 +201,20 @@ function setupProduct() {
     get_variation_options(theme_id, product_id)
 }
 
-function update_option_value(id, value){
-    $.ajax({
-      type: "POST",
-      url: '/api/product_option_values/' + id,
-      crossDomain: true,
-      data: {value: value},
-      success: function(response){
-      }
-    })
-  }
+function update_option_value(id, value) {
+  $.ajax({
+    type: "POST",
+    url: '/api/product_option_values/' + id,
+    crossDomain: true,
+    data: { value: value },
+    success: function (response) {
+    }
+  })
+}
 
-  function get_variation_options(theme_id, product_id)
-  {
-    fetch('/api/option_types?theme_id=' + theme_id + "&product_id=" + product_id)
-    .then(function(response) {
+function get_variation_options(theme_id, product_id) {
+  fetch('/api/option_types?theme_id=' + theme_id + "&product_id=" + product_id)
+    .then(function (response) {
       return response.json();
     })
     .then(function (myJson) {
@@ -228,4 +223,22 @@ function update_option_value(id, value){
         .append(myJson.html)
     });
   $('#theme_change_modal').modal('hide');
+}
+
+function create_update_variation_theme() {
+  var optionSelected = $('#product_theme_id');
+  var valueSelected = optionSelected.val();
+
+  const product_id = optionSelected
+    .parents()
+    .find('#product_id');
+
+  const new_variant = optionSelected
+    .parents()
+    .find('#new_variant');
+
+  var link = "/products/" + product_id.val() + "/variant/new?theme_id=" + valueSelected
+  new_variant.attr("href", link)
+
+  get_variation_options(valueSelected, product_id.val())
 }
