@@ -209,9 +209,6 @@ defmodule Snitch.Domain.Taxonomy do
 
   @doc """
   Updates all category slug based on the name.
-
-  Note: If the slug already exist, then parent slug is prefixed with current
-  category slug
   """
   def update_all_categories_slug() do
     Taxon
