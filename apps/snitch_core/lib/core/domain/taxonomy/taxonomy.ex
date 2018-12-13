@@ -37,13 +37,18 @@ defmodule Snitch.Domain.Taxonomy do
     end
   end
 
-  @spec is_root?(Taxon.t()) :: bool
+  @doc """
+    Checks if the taxon is a root taxon.
+
+    Note: If taxon is not asscoaited with taxonomy RuntimeError will be raised. 
+  """
+  @spec is_root?(Taxon.t()) :: boolean()
   def is_root?(%Taxon{} = taxon) do
     taxon = Repo.preload(taxon, :taxonomy)
 
     case taxon.taxonomy do
       nil ->
-        :error
+        raise "No taxonomy is associated with taxon"
 
       _ ->
         taxon.id == taxon.taxonomy.root_id
