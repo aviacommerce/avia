@@ -21,7 +21,7 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
     home_living =
       insert(:taxon,
         name: "Home & Living",
-        slug: Taxon.generate_slug("Flooring"),
+        slug: Taxon.generate_slug("Home & Living"),
         lft: 0,
         rgt: 11,
         taxonomy: taxonomy
