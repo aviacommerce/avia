@@ -31,6 +31,10 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
         taxonomy: taxonomy
       )
 
+    taxonomy
+    |> Ecto.Changeset.change(root_id: home_living.id)
+    |> Repo.update()
+
     flooring =
       insert(
         :taxon,
@@ -251,6 +255,22 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
     test "dump invalid taxonomy" do
       dump = Taxonomy.dump_taxonomy(-1)
       assert [] == dump
+    end
+  end
+
+  describe "is_root?/1" do
+    test "test all cases" do
+      {root_taxon, [{random_taxon, _} | _]} = create_taxonomy()
+      root_taxon = Repo.preload(root_taxon, :taxonomy, force: true)
+
+      assert Taxonomy.is_root?(root_taxon)
+      refute Taxonomy.is_root?(random_taxon)
+
+      taxon_without_taxonomy = insert(:taxon, name: "Shirts", slug: get_slug("Shirts"))
+
+      assert_raise RuntimeError, "No taxonomy is associated with taxon", fn ->
+        Taxonomy.is_root?(taxon_without_taxonomy)
+      end
     end
   end
 
