@@ -4,6 +4,7 @@ defmodule AdminAppWeb.ProductBrandController do
   alias Snitch.Data.Model.ProductBrand, as: ProductBrandModel
   alias Snitch.Data.Schema.ProductBrand, as: ProductBrandSchema
   alias Snitch.Core.Tools.MultiTenancy.Repo
+  alias Snitch.Data.Model.Image
 
   def index(conn, _params) do
     product_brands = ProductBrandModel.get_all()
@@ -65,22 +66,12 @@ defmodule AdminAppWeb.ProductBrandController do
   defp handle_params(%{"image" => image} = params) do
     %{
       params
-      | "image" => handle_image_value(image)
+      | "image" => Image.handle_image_value(image)
     }
   end
 
   defp handle_params(params) do
     params
-  end
-
-  defp handle_image_value(%Plug.Upload{} = file) do
-    extension = Path.extname(file.filename)
-    name = Nanoid.generate() <> extension
-
-    %{}
-    |> Map.put(:filename, name)
-    |> Map.put(:path, file.path)
-    |> Map.put(:type, file.content_type)
   end
 
   def delete(conn, %{"id" => id}) do

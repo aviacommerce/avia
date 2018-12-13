@@ -4,6 +4,7 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
   alias Snitch.Domain.Taxonomy
   alias AdminAppWeb.TemplateApi.TaxonomyView
   alias Snitch.Data.Schema.Taxon
+  alias Snitch.Data.Model.Image
   alias Snitch.Core.Tools.MultiTenancy.Repo
   import Phoenix.View, only: [render_to_string: 3]
 
@@ -47,7 +48,7 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
     params = %{
       "name" => taxon_name,
       "variation_theme_ids" => params["themes"],
-      "image" => handle_image_value(params["image"])
+      "image" => Image.handle_image_value(params["image"])
     }
 
     case Taxonomy.update_taxon(taxon, params) do
@@ -60,16 +61,4 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
         |> json(%{})
     end
   end
-
-  defp handle_image_value(%Plug.Upload{} = file) do
-    extension = Path.extname(file.filename)
-    name = Nanoid.generate() <> extension
-
-    %{}
-    |> Map.put(:filename, name)
-    |> Map.put(:path, file.path)
-    |> Map.put(:type, file.content_type)
-  end
-
-  defp handle_image_value(_), do: nil
 end

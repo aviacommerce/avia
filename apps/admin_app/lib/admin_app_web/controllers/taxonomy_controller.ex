@@ -5,8 +5,9 @@ defmodule AdminAppWeb.TaxonomyController do
   alias Snitch.Data.Schema.Taxon
   alias Snitch.Data.Schema.Taxonomy, as: TaxonomySchema
   alias AdminAppWeb.TaxonomyView
-  import Ecto.Query
+  alias Snitch.Data.Model.Image
   alias Snitch.Core.Tools.MultiTenancy.Repo
+  import Ecto.Query
   import Phoenix.View, only: [render_to_string: 3]
 
   def show_default_taxonomy(conn, _params) do
@@ -32,7 +33,7 @@ defmodule AdminAppWeb.TaxonomyController do
   end
 
   def create(conn, %{"id" => id, "image" => image, "name" => name, "themes" => themes}) do
-    taxon_params = %{name: name, themes: themes, image: handle_image_value(image)}
+    taxon_params = %{name: name, themes: themes, image: Image.handle_image_value(image)}
     parent_taxon = Taxonomy.get_taxon(id)
     {:ok, taxon} = Taxonomy.create_taxon(parent_taxon, taxon_params)
 
@@ -75,16 +76,4 @@ defmodule AdminAppWeb.TaxonomyController do
         end
     end
   end
-
-  defp handle_image_value(%Plug.Upload{} = file) do
-    extension = Path.extname(file.filename)
-    name = Nanoid.generate() <> extension
-
-    %{}
-    |> Map.put(:filename, name)
-    |> Map.put(:path, file.path)
-    |> Map.put(:type, file.content_type)
-  end
-
-  defp handle_image_value(_), do: nil
 end

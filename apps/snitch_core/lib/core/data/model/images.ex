@@ -109,4 +109,16 @@ defmodule Snitch.Data.Model.Image do
   def image_url(name, struct) do
     ImageUploader.url({name, struct})
   end
+
+  def handle_image_value(%Plug.Upload{} = file) do
+    extension = Path.extname(file.filename)
+    name = Nanoid.generate() <> extension
+
+    %{}
+    |> Map.put(:filename, name)
+    |> Map.put(:path, file.path)
+    |> Map.put(:type, file.content_type)
+  end
+
+  def handle_image_value(_), do: nil
 end

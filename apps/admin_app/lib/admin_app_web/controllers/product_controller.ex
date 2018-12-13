@@ -201,15 +201,9 @@ defmodule AdminAppWeb.ProductController do
   defp parse_images(product, image_list) do
     Enum.reduce(image_list, [], fn
       %Plug.Upload{} = image, acc ->
-        extension = Path.extname(image.filename)
-        name = Nanoid.generate() <> extension
+        image = ImageModel.handle_image_value(image)
 
-        image =
-          %{}
-          |> Map.put(:filename, name)
-          |> Map.put(:path, image.path)
-          |> Map.put(:type, image.content_type)
-          |> Map.put(:url, ImageModel.image_url(name, product))
+        image = image |> Map.put(:url, ImageModel.image_url(image.filename, product))
 
         [%{"image" => image} | acc]
 
