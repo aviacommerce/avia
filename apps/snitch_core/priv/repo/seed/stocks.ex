@@ -23,8 +23,8 @@ defmodule Snitch.Seed.Stocks do
 
     Repo.transaction(fn ->
       locations =
-        Enum.reduce(seed_stock_locations!(), %{}, fn %{id: id, admin_name: nickname}, acc ->
-          Map.put(acc, nickname, id)
+        Enum.reduce(seed_stock_locations!(), %{}, fn %{id: id, name: name}, acc ->
+          Map.put(acc, name, id)
         end)
 
       seed_stock_items!(variants, locations)
@@ -36,7 +36,6 @@ defmodule Snitch.Seed.Stocks do
       [
         %{
           name: "Statue of Liberty",
-          admin_name: "default",
           default: true,
           address_line_1: "Liberty Island",
           address_line_2: "Manhattan",
@@ -50,7 +49,6 @@ defmodule Snitch.Seed.Stocks do
         },
         %{
           name: "Taj Mahal",
-          admin_name: "warehouse",
           address_line_1: "Dharmapuri, Forest Colony",
           address_line_2: "Tajganj",
           city: "Agra",
@@ -63,7 +61,6 @@ defmodule Snitch.Seed.Stocks do
         },
         %{
           name: "Colosseum",
-          admin_name: "backup",
           address_line_1: "Piazza del Colosseo, 1",
           address_line_2: "",
           city: "",
@@ -76,7 +73,6 @@ defmodule Snitch.Seed.Stocks do
         },
         %{
           name: "Sinhagadh Fort",
-          admin_name: "origin",
           address_line_1: "Sinhagad Ghat Road",
           address_line_2: "Thoptewadi",
           city: "Pune",

@@ -1,7 +1,8 @@
 defmodule AdminAppWeb.ProductView do
   use AdminAppWeb, :view
 
-  alias Snitch.Data.Schema.{ShippingCategory, Variation, Taxon}
+  alias Snitch.Data.Schema.{Image, ShippingCategory, Variation, Taxon}
+  alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Domain.Taxonomy
 
@@ -72,7 +73,7 @@ defmodule AdminAppWeb.ProductView do
   end
 
   def get_taxon(conn) do
-    conn.params["taxon"]
+    conn.params["taxon_id"]
   end
 
   def get_currency_value() do
@@ -89,13 +90,13 @@ defmodule AdminAppWeb.ProductView do
   end
 
   def get_product_display_image(product) do
-    image = product.images |> List.first()
+    product = Product.get_product_with_default_image(product)
 
-    case image do
+    case product.images |> List.first() do
       nil ->
         @dummy_image_url
 
-      _ ->
+      image ->
         get_image_url(image, product)
     end
   end

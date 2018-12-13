@@ -309,7 +309,7 @@ defmodule Snitch.Domain.Splitter.WeightTest do
     {_, stock_locations} = Repo.insert_all(StockLocation, locations, returning: true)
 
     Enum.reduce(stock_locations, %{}, fn sl, acc ->
-      Map.put(acc, sl.admin_name, sl)
+      Map.put(acc, sl.name, sl)
     end)
   end
 

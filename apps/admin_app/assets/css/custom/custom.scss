@@ -12,7 +12,7 @@ body {
   .stickformbutton {
     position: fixed;
     bottom: -16px;
-    width: 97%;
+    width: 95%;
     background-color: $white;
     margin-left: -31px;
     padding: 8px 10px 4px;
@@ -205,6 +205,20 @@ body {
 
   .imgcol .col-3 {
     max-width: 150px;
+  }
+
+  .product-info {
+    visibility: hidden;
+    font-size:24px;
+    top: 4px;
+    color: grey;
+    right: 8px;
+    position: absolute;
+  }
+
+  #checkimage {
+    zoom: 1.8;
+    position: absolute;
   }
 
   .img-wrap .product-delete {

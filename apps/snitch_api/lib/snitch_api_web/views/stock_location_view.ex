@@ -4,7 +4,6 @@ defmodule SnitchApiWeb.StockLocationView do
 
   attributes([
     :name,
-    :admin_name,
     :default,
     :address_line_1,
     :address_line_2,

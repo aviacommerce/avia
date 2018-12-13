@@ -123,16 +123,16 @@ defmodule Snitch.Data.Model.OrderTest do
     test "params only", %{order_params: order_params} do
       {:ok, order} = Order.create(order_params)
 
-      {:ok, new_order} = Order.partial_update(order, %{state: "foo"})
+      {:ok, new_order} = Order.partial_update(order, %{state: :address})
       assert extract_ids(order.line_items) == extract_ids(new_order.line_items)
-      assert new_order.state == "foo"
+      assert new_order.state == :address
     end
   end
 
   describe "order" do
     test "count by state", %{order_params: params, variants: vs} do
       {:ok, order} = Order.create(params)
-      Order.partial_update(order, %{state: "confirmed"})
+      Order.partial_update(order, %{state: :confirmed})
 
       next_date =
         order.inserted_at
@@ -145,7 +145,7 @@ defmodule Snitch.Data.Model.OrderTest do
         Order.get_order_count_by_state(order.inserted_at, next_date) |> List.first()
 
       assert order_state_count.count == 1
-      assert order_state_count.state == "confirmed"
+      assert order_state_count.state == :confirmed
     end
 
     test "count by date", %{order_params: params, variants: vs} do

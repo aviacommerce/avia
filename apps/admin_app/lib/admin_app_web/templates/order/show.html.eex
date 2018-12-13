@@ -175,7 +175,7 @@
                      <div class="paid-via mt-4">
                       <%= for payment <- @order.payments do %>
                         <div class="">
-                            Paid via <b> <%= payment.payment_type %></b>
+                            Paid via <b> <%= get_payment_name(payment) %></b>
                         </div>
                         <div class="n-paid">
                            Status <%= payment.state %>

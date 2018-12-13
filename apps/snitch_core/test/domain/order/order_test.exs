@@ -12,7 +12,7 @@ defmodule Snitch.Domain.OrderTest do
     test "with order in frozen state" do
       {:error, cs} =
         :line_item
-        |> insert(order: build(:order, state: "foo"))
+        |> insert(order: build(:order, state: :cancelled))
         |> change(%{quantity: 3})
         |> OrderDomain.validate_change()
         |> Repo.update()

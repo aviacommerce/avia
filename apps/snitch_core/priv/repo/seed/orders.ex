@@ -29,7 +29,7 @@ defmodule Snitch.Seed.Orders do
   #   }
   # }
 
-  defp build_orders do
+  defp build_orders() do
     variants = Repo.all(Product)
     [user | _] = Repo.all(User)
 
@@ -42,8 +42,7 @@ defmodule Snitch.Seed.Orders do
     make_orders(digest, variants)
   end
 
-  def seed_orders! do
-    Repo.delete_all(Order)
+  def seed_orders!() do
     {orders, line_items} = build_orders()
 
     {count, order_structs} =

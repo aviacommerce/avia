@@ -10,7 +10,7 @@ defmodule Snitch.Data.Model.GeneralConfiguration do
   alias Snitch.Tools.Helper.ImageUploader
   alias Ecto.Multi
 
-  @currency_list ["USD", "INR", "GDP", "EUR"]
+  @currency_list ["USD", "INR", "GBP", "EUR"]
 
   @spec fetch_currency() :: String.t()
   def fetch_currency do
