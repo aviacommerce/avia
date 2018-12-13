@@ -187,7 +187,7 @@ export default class View extends MainView {
           select2Selector();
         })
         .catch(function(error) {
-          console.log("Taxon not found");
+          // Show error message in the UI
         });
     }
   }

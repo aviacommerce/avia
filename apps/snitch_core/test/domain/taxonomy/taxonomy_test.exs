@@ -15,10 +15,6 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
   #   ├── Mats & Napkin
   #   ├── Home decor
 
-  defp get_slug(text) do
-    Slugger.slugify_downcase(text)
-  end
-
   defp create_taxonomy do
     taxonomy = insert(:taxonomy, name: "Home & Living")
 
@@ -39,7 +35,7 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
       insert(
         :taxon,
         name: "Flooring",
-        slug: get_slug("Flooring"),
+        slug: Taxon.generate_slug("Flooring"),
         lft: 1,
         rgt: 2,
         parent_id: home_living.id,
@@ -50,7 +46,7 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
       insert(
         :taxon,
         name: "Kitchen & Tables",
-        slug: get_slug("Kitchen & Tables"),
+        slug: Taxon.generate_slug("Kitchen & Tables"),
         lft: 3,
         rgt: 8,
         parent_id: home_living.id,
@@ -61,7 +57,7 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
       insert(
         :taxon,
         name: "Home Decor",
-        slug: get_slug("Home Decor"),
+        slug: Taxon.generate_slug("Home Decor"),
         lft: 9,
         rgt: 10,
         parent_id: home_living.id,
@@ -72,7 +68,7 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
       insert(
         :taxon,
         name: "Table Covers",
-        slug: get_slug("Table Covers"),
+        slug: Taxon.generate_slug("Table Covers"),
         lft: 4,
         rgt: 5,
         parent_id: kitchen_table.id,
@@ -83,7 +79,7 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
       insert(
         :taxon,
         name: "Mat & Napkins",
-        slug: get_slug("Mat & Napkins"),
+        slug: Taxon.generate_slug("Mat & Napkins"),
         lft: 6,
         rgt: 7,
         parent_id: kitchen_table.id,
@@ -266,7 +262,7 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
       assert Taxonomy.is_root?(root_taxon)
       refute Taxonomy.is_root?(random_taxon)
 
-      taxon_without_taxonomy = insert(:taxon, name: "Shirts", slug: get_slug("Shirts"))
+      taxon_without_taxonomy = insert(:taxon, name: "Shirts", slug: Taxon.generate_slug("Shirts"))
 
       assert_raise RuntimeError, "No taxonomy is associated with taxon", fn ->
         Taxonomy.is_root?(taxon_without_taxonomy)

@@ -218,15 +218,6 @@ defmodule Snitch.Domain.Taxonomy do
     |> Repo.all()
     |> Enum.map(&Taxon.changeset(&1, %{}))
     |> Enum.map(&Repo.update(&1))
-    |> Enum.map(fn update_result ->
-      case update_result do
-        {:ok, taxon} ->
-          {:ok, taxon}
-
-        {:error, changeset} ->
-          {:ok, changeset}
-      end
-    end)
   end
 
   def create_taxon(parent_taxon, taxon_params) do
