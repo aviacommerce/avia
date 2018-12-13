@@ -188,7 +188,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
          %{
            shipping_methods: [sm]
          } = context do
-      set_cost = Money.new!(:USD, 100)
+      set_cost = 20
       quantity = 3
 
       %{order: order, package: package, shipping_rule: shipping_rule} =
@@ -220,7 +220,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       assert final_order_total ==
                Money.add!(
                  order_total,
-                 shipping_rule.shipping_cost || Money.new!(:USD, 0)
+                 Money.new!(currency(), shipping_rule.preferences.cost)
                )
     end
 
@@ -352,14 +352,18 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     stock_item = insert(:stock_item, count_on_hand: 10)
 
     # setup shipping category, identifier, rules
-    shipping_identifier = insert(:shipping_identifier, code: :fiso)
+    shipping_identifier =
+      insert(:shipping_identifier,
+        code: :ofr,
+        description: "fixed shipping rate for order"
+      )
 
     shipping_category = insert(:shipping_category)
 
     shipping_rule =
       insert(:shipping_rule,
         active?: true,
-        shipping_cost: shipping_cost,
+        preferences: %{cost: shipping_cost},
         shipping_rule_identifier: shipping_identifier,
         shipping_category: shipping_category
       )
