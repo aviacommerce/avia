@@ -43,7 +43,7 @@ defmodule Snitch.Data.Schema.Taxon do
     |> handle_slug
   end
 
-  defp get_ancestors_slug(taxon_id) do
+  defp get_ancestors_slug_text(taxon_id) do
     with %Taxon{} = taxon <- TaxonomyDomain.get_taxon(taxon_id),
          {:ok, ancestors} <- TaxonomyDomain.get_ancestors(taxon_id) do
       {_, ancestors_till_level_1} = List.pop_at(ancestors, 0)
@@ -54,7 +54,6 @@ defmodule Snitch.Data.Schema.Taxon do
           false -> ancestors_till_level_1 ++ [taxon]
         end
 
-      slug_text =
         taxons
         |> Enum.reduce("", fn taxon, acc ->
           "#{acc} #{String.trim(taxon.name)}"
@@ -65,7 +64,7 @@ defmodule Snitch.Data.Schema.Taxon do
   defp handle_slug(%{changes: %{name: name}} = changeset) do
     parent_id = changeset.data.parent_id || changeset.changes.parent_id
 
-    ancestors_slug_text = get_ancestors_slug(parent_id)
+    ancestors_slug_text = get_ancestors_slug_text(parent_id)
 
     slug_text = "#{ancestors_slug_text} #{name}"
 
