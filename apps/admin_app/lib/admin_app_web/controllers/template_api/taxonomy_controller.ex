@@ -4,6 +4,7 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
   alias Snitch.Domain.Taxonomy
   alias AdminAppWeb.TemplateApi.TaxonomyView
   alias Snitch.Data.Schema.Taxon
+  alias Snitch.Data.Model.Image
   alias Snitch.Core.Tools.MultiTenancy.Repo
   import Phoenix.View, only: [render_to_string: 3]
 
@@ -45,9 +46,9 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
     taxon = taxon_id |> Taxonomy.get_taxon()
 
     params = %{
-      name: taxon_name,
-      variation_theme_ids: params["themes"],
-      image: handle_image_value(params["image"])
+      "name" => taxon_name,
+      "variation_theme_ids" => params["themes"],
+      "image" => Image.handle_image_value(params["image"])
     }
 
     case Taxonomy.update_taxon(taxon, params) do
@@ -60,7 +61,4 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
         |> json(%{error: %{message: "Failed to update category"}})
     end
   end
-
-  defp handle_image_value(%Plug.Upload{} = file), do: file
-  defp handle_image_value(_), do: nil
 end

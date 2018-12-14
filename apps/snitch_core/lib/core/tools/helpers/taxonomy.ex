@@ -5,6 +5,7 @@ defmodule Snitch.Tools.Helper.Taxonomy do
 
   alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
   alias Snitch.Data.Schema.{Taxon, Taxonomy}
+  alias Snitch.Data.Model.Image
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
   @doc """
@@ -81,7 +82,7 @@ defmodule Snitch.Tools.Helper.Taxonomy do
         nil
 
       _ ->
-        TaxonomyDomain.image_url(taxon.taxon_image.image.name, taxon)
+        Image.image_url(taxon.taxon_image.image.name, taxon)
     end
   end
 

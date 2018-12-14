@@ -112,7 +112,7 @@ defmodule Snitch.Data.Schema.Taxon do
   end
 
   def update_changeset(taxon, params) do
-    ids = get_variation_theme(params.variation_theme_ids)
+    ids = get_variation_theme(params["variation_theme_ids"])
 
     taxon
     |> Repo.preload([:variation_themes, :taxon_image])

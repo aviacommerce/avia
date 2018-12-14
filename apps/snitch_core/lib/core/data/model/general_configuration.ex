@@ -8,6 +8,7 @@ defmodule Snitch.Data.Model.GeneralConfiguration do
   alias Snitch.Data.Schema.Image
   alias Snitch.Data.Schema.GeneralConfiguration, as: GC
   alias Snitch.Tools.Helper.ImageUploader
+  alias Snitch.Data.Model.Image, as: ImageModel
   alias Ecto.Multi
 
   @currency_list ["USD", "INR", "GBP", "EUR"]
@@ -46,89 +47,18 @@ defmodule Snitch.Data.Model.GeneralConfiguration do
   end
 
   def create(%{"image" => image} = params) do
-    multi =
-      Multi.new()
-      |> Multi.run(:image, fn _ ->
-        QH.create(Image, params, Repo)
-      end)
-      |> Multi.run(:general_configuration, fn _ ->
-        QH.create(GC, params, Repo)
-      end)
-      |> Multi.run(:image_store, fn %{image: image, general_configuration: general_configuration} ->
-        params = Map.put(%{}, :store_image, %{image_id: image.id})
-        QH.update(GC, params, general_configuration, Repo)
-      end)
-      |> upload_image_multi(image)
-      |> persist()
+    ImageModel.create(GC, params, "store_image")
   end
 
   def create(params) do
     QH.create(GC, params, Repo)
   end
 
-  def update(store, %{image: image} = params) do
-    old_image = store.image
-
-    Multi.new()
-    |> Multi.run(:image, fn _ ->
-      QH.create(Image, params, Repo)
-    end)
-    |> Multi.run(:general_configuration, fn %{image: image} ->
-      params = Map.put(params, :store_image, %{image_id: image.id})
-      QH.update(GC, params, store, Repo)
-    end)
-    |> delete_image_multi(old_image, store)
-    |> upload_image_multi(params.image)
-    |> persist()
+  def update(store, %{"image" => image} = params) do
+    ImageModel.update(GC, store, params, "store_image")
   end
 
   def update(store, params) do
     QH.update(GC, params, store, Repo)
-  end
-
-  defp delete_image_multi(multi, nil, store) do
-    multi
-  end
-
-  defp delete_image_multi(multi, image, store) do
-    multi
-    |> Multi.run(:remove_from_upload, fn _ ->
-      case ImageUploader.delete({image.name, store}) do
-        :ok ->
-          {:ok, "success"}
-
-        _ ->
-          {:error, "not_found"}
-      end
-    end)
-    |> Multi.run(:delete_image, fn _ ->
-      QH.delete(Image, image.id, Repo)
-    end)
-  end
-
-  defp upload_image_multi(multi, %Plug.Upload{} = image) do
-    Multi.run(multi, :image_upload, fn %{general_configuration: general_config} ->
-      case ImageUploader.store({image, general_config}) do
-        {:ok, _} ->
-          {:ok, general_config}
-
-        _ ->
-          {:error, "upload error"}
-      end
-    end)
-  end
-
-  defp persist(multi) do
-    case Repo.transaction(multi) do
-      {:ok, multi_result} ->
-        {:ok, multi_result.general_configuration}
-
-      {:error, _, failed_value, _} ->
-        {:error, failed_value}
-    end
-  end
-
-  def image_url(name, general_config) do
-    ImageUploader.url({name, general_config})
   end
 end

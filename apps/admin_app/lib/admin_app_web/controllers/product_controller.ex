@@ -22,6 +22,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Tools.Helper.Query
   alias Snitch.Data.Model.StockItem, as: StockModel
   alias Snitch.Data.Schema.StockItem, as: StockSchema
+  alias Snitch.Data.Model.Image, as: ImageModel
   alias AdminAppWeb.ProductView
 
   import Phoenix.View, only: [render_to_string: 3]
@@ -152,7 +153,11 @@ defmodule AdminAppWeb.ProductController do
 
   def add_images(conn, %{"product_images" => product_images, "product_id" => id}) do
     product = preload_product_images(id)
-    images = (product_images["images"] ++ product.images) |> parse_images()
+
+    images =
+      product
+      |> parse_images(product_images["images"] ++ product.images)
+
     params = %{"images" => images}
 
     case ProductModel.add_images(product, params) do
@@ -210,9 +215,13 @@ defmodule AdminAppWeb.ProductController do
     end
   end
 
-  defp parse_images(image_list) do
+  defp parse_images(product, image_list) do
     Enum.reduce(image_list, [], fn
       %Plug.Upload{} = image, acc ->
+        image = ImageModel.handle_image_value(image)
+
+        image = image |> Map.put(:url, ImageModel.image_url(image.filename, product))
+
         [%{"image" => image} | acc]
 
       image, acc ->

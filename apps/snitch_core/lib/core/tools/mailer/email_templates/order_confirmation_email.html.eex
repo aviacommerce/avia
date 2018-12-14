@@ -66,7 +66,7 @@
                             <td class="es-m-p0r" width="180" valign="top" align="center" style="padding:0;Margin:0;">
                               <table width="100%" cellspacing="0" cellpadding="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;">
                                 <tr style="border-collapse:collapse;">
-                                  <td class="es-m-p0l es-m-txt-c" align="left" style="padding:0;Margin:0;padding-left:15px;"> <a href=<%= "#{@frontend_base_url}" %> target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:14px;text-decoration:underline;color:#999999;"><img src=<%= Snitch.Data.Model.GeneralConfiguration.image_url(@logo, @general_config) %>       
+                                  <td class="es-m-p0l es-m-txt-c" align="left" style="padding:0;Margin:0;padding-left:15px;"> <a href=<%= "#{@frontend_base_url}" %> target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:14px;text-decoration:underline;color:#999999;"><img src=<%= Snitch.Data.Model.Image.image_url(@logo, @general_config) %>       
                                   alt="Aviacommerce logo" title="Aviacommerce logo" width="90" heigth="50" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;"></a> </td>
                                 </tr>
                               </table>
@@ -372,7 +372,7 @@
                             <td class="es-m-p0r es-m-p20b" width="178" valign="top" align="center" style="padding:0;Margin:0;">
                               <table width="100%" cellspacing="0" cellpadding="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;">
                                 <tr style="border-collapse:collapse;">
-                                  <td class="es-m-p0l es-m-txt-c" align="left" style="padding:0;Margin:0;"> <img src=<%= Snitch.Data.Model.GeneralConfiguration.image_url(@logo, @general_config) %>  alt="Aviacommerce logo" title="Aviacommerce logo" width="90" heigth="50" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;"></td>
+                                  <td class="es-m-p0l es-m-txt-c" align="left" style="padding:0;Margin:0;"> <img src=<%= Snitch.Data.Model.Image.image_url(@logo, @general_config) %>  alt="Aviacommerce logo" title="Aviacommerce logo" width="90" heigth="50" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;"></td>
                                 </tr>
                               </table>
                             </td>
