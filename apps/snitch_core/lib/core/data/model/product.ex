@@ -158,16 +158,6 @@ defmodule Snitch.Data.Model.Product do
     |> ImageModel.persist()
   end
 
-  # @doc """
-  # Returns the url of the location where image is stored.
-  # Takes as input `name` of the image and the `Product.t()`
-  # struct.
-  # """
-  # @spec image_url(String.t(), Product.t()) :: String.t()
-  # def image_url(name, product) do
-  #   ImageUploader.url({name, product})
-  # end
-
   @doc """
   Delete an image associated with a product.
   Takes as input id of the `image` to be deleted and the `product` id.
