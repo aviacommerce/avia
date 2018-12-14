@@ -35,6 +35,9 @@ defmodule Snitch.Data.Model.Promotion.Elibility do
   defp valid_coupon_check(coupon) do
   end
 
+  defp promotion_active?() do
+  end
+
   defp promotion_action_exists?(promotion) do
   end
 
