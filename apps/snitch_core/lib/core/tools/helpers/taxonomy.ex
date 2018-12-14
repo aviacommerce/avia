@@ -29,17 +29,24 @@ defmodule Snitch.Tools.Helper.Taxonomy do
       |> Taxonomy.changeset()
       |> Repo.insert!()
 
-    taxon = Repo.preload(%Taxon{name: parent, taxonomy_id: taxonomy.id}, :taxonomy)
+    taxon =
+      Repo.preload(
+        %Taxon{name: parent, taxonomy_id: taxonomy.id, slug: Taxon.generate_slug(parent)},
+        :taxonomy
+      )
 
     root = TaxonomyDomain.add_root(taxon)
+
+    taxonomy =
+      taxonomy
+      |> Taxonomy.changeset(%{root_id: root.id})
+      |> Repo.update!()
 
     for taxon <- children do
       create_taxon(taxon, root)
     end
 
     taxonomy
-    |> Taxonomy.changeset(%{root_id: root.id})
-    |> Repo.update!()
   end
 
   defp create_taxon({parent, children}, root) do
@@ -49,7 +56,7 @@ defmodule Snitch.Tools.Helper.Taxonomy do
         :parent
       ])
 
-    root = TaxonomyDomain.add_taxon(root, child, :child)
+    {:ok, root} = TaxonomyDomain.add_taxon(root, child, :child)
 
     for taxon <- children do
       create_taxon(taxon, root)
@@ -91,7 +98,8 @@ defmodule Snitch.Tools.Helper.Taxonomy do
       parent_id: taxon.parent_id,
       taxonomy_id: taxon.taxonomy_id,
       image_url: image_url(taxon),
-      taxons: Enum.map(children, &convert_taxon/1)
+      taxons: Enum.map(children, &convert_taxon/1),
+      slug: taxon.slug
     }
   end
 end

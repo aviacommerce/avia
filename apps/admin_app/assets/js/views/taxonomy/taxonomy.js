@@ -31,11 +31,13 @@ export default class View extends MainView {
           $(`#taxon-edit-loader`)
             .removeClass(`loader`)
             .hide();
+          $("#edit-taxon-danger").hide();
           select2Selector();
         });
     });
 
     $(".taxonomy").on("click", ".add-taxon", function(e) {
+      $("#new-taxon-danger").hide();
       $("#taxon-modal").modal({ show: true });
       $(".modal-body select")
         .val("")
@@ -53,7 +55,6 @@ export default class View extends MainView {
     $(".taxonform").on("submit", function(event) {
       event.preventDefault();
       var tid = $("#form-taxon-id").val();
-      let target_div = $(`.item[data-taxon_id=${tid}]`);
       var form_data = new FormData();
       var image_file = $(this).find('input[name="taxon[image]"]')[0].files[0];
       var name = $(this)
@@ -68,6 +69,9 @@ export default class View extends MainView {
       form_data.append("themes", themes);
       form_data.append("_csrf_token", csrf);
       form_data.append("id", tid);
+
+      $("#new-taxon-danger").slideUp("fast");
+
       $.ajax({
         url: "/taxonomy",
         type: "POST",
@@ -80,6 +84,11 @@ export default class View extends MainView {
             .hide()
             .appendTo(children_ul)
             .show("normal");
+        },
+        error: function(result) {
+          let error_json = result.responseJSON;
+          $("#new-taxon-danger").html(error_json.error.message);
+          $("#new-taxon-danger").slideDown("slow");
         }
       });
     });
@@ -102,6 +111,8 @@ export default class View extends MainView {
       form_data.append("taxon[image]", image_file);
       form_data.append("taxon[themes]", themes);
 
+      $("#edit-taxon-danger").slideUp("fast");
+
       $.ajax({
         url: "/api/taxonomy/update",
         type: "PUT",
@@ -120,9 +131,10 @@ export default class View extends MainView {
             span.removeAttr("style");
           });
         },
-        error: function(xhr) {
-          console.log("Update failed");
-          $("#edittaxon-modal").modal("hide");
+        error: function(result) {
+          let error_json = result.responseJSON;
+          $("#edit-taxon-danger").html(error_json.error.message);
+          $("#edit-taxon-danger").slideDown("slow");
         }
       });
     });
@@ -175,12 +187,9 @@ export default class View extends MainView {
           select2Selector();
         })
         .catch(function(error) {
-          console.log("Taxon not found");
+          // Show error message in the UI
         });
     }
-
-    // Specific logic here
-    console.log("TaxonomyTaxonomyView mounted");
   }
 
   get_query_params() {
@@ -196,8 +205,5 @@ export default class View extends MainView {
 
   unmount() {
     super.unmount();
-
-    // Specific logic here
-    console.log("TaxonomyTaxonomyView unmounted");
   }
 }

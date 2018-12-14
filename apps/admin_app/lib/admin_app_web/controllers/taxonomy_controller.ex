@@ -34,18 +34,24 @@ defmodule AdminAppWeb.TaxonomyController do
   def create(conn, %{"id" => id, "image" => image, "name" => name, "themes" => themes}) do
     taxon_params = %{name: name, themes: themes, image: image}
     parent_taxon = Taxonomy.get_taxon(id)
-    {:ok, taxon} = Taxonomy.create_taxon(parent_taxon, taxon_params)
 
-    html =
-      render_to_string(
-        TaxonomyView,
-        "taxon.html",
-        taxon: taxon
-      )
+    with {:ok, taxon} <- Taxonomy.create_taxon(parent_taxon, taxon_params) do
+      html =
+        render_to_string(
+          TaxonomyView,
+          "taxon.html",
+          taxon: taxon
+        )
 
-    conn
-    |> put_status(200)
-    |> json(%{html: html})
+      conn
+      |> put_status(200)
+      |> json(%{html: html})
+    else
+      {:error, _changeset} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(%{"error" => "Failed to create category"})
+    end
   end
 
   def delete(conn, %{"id" => id}) do

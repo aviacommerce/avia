@@ -5,6 +5,7 @@ defmodule Snitch.Data.Schema.Taxon do
 
   import Ecto.Query
   alias Snitch.Data.Schema.{Image, Taxon, Taxonomy, VariationTheme, TaxonImage}
+  alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
 
   @type t :: %__MODULE__{}
 
@@ -13,6 +14,7 @@ defmodule Snitch.Data.Schema.Taxon do
     field(:lft, :integer)
     field(:rgt, :integer)
     field(:variation_theme_ids, {:array, :binary}, virtual: true)
+    field(:slug, :string)
 
     has_one(:taxon_image, TaxonImage, on_replace: :delete)
     has_one(:image, through: [:taxon_image, :image])
@@ -33,10 +35,67 @@ defmodule Snitch.Data.Schema.Taxon do
   @update_fields ~w(name)
 
   def changeset(taxon, params) do
-    cast(taxon, params, @cast_fields)
+    taxon
+    |> cast(params, @cast_fields)
+    |> force_change(:name, taxon.name)
     |> validate_required([:name])
     |> cast_assoc(:taxon_image, with: &TaxonImage.changeset/2)
+    |> handle_slug
   end
+
+  defp get_ancestors_slug_text(nil), do: ""
+
+  @doc """
+  This method returns the comma separated name of all the taxon above it till
+  level 1
+
+  Consider following taxonomy
+
+  Category
+  |-- Men
+  |   |-- Shirt
+  |   |   |-- Full Sleeve
+  |   |   |-- Half Sleeve
+  |   |-- T-Shirt
+  |-- Women
+      |-- Shirt
+      |-- T-Shirt
+
+  `Full Sleeve` Category under women it would return `Men Shirt`
+  """
+  defp get_ancestors_slug_text(taxon_id) do
+    with %Taxon{} = taxon <- TaxonomyDomain.get_taxon(taxon_id),
+         {:ok, ancestors} <- TaxonomyDomain.get_ancestors(taxon_id) do
+      {_, ancestors_till_level_1} = List.pop_at(ancestors, 0)
+
+      # Here we exclude the root taxon as we don't include it in slug
+      taxons =
+        case TaxonomyDomain.is_root?(taxon) do
+          true -> ancestors_till_level_1
+          false -> ancestors_till_level_1 ++ [taxon]
+        end
+
+      Enum.reduce(taxons, "", fn taxon, acc ->
+        "#{acc} #{String.trim(taxon.name)}"
+      end)
+    end
+  end
+
+  defp handle_slug(%{changes: %{name: name}} = changeset) do
+    parent_id = changeset.data.parent_id || Map.get(changeset.changes, :parent_id, nil)
+
+    ancestors_slug_text = get_ancestors_slug_text(parent_id)
+
+    slug_text = "#{ancestors_slug_text} #{name}"
+
+    changeset
+    |> put_change(:slug, generate_slug(slug_text))
+    |> unique_constraint(:slug, message: "category with this name alreay exist")
+  end
+
+  def generate_slug(text), do: Slugger.slugify_downcase(text, ?_)
+
+  defp handle_slug(changeset), do: changeset
 
   defp put_assoc_variation_theme(changeset, theme) when theme in [nil, ""] do
     variation_theme_ids = Enum.map(changeset.data.variation_themes, & &1.id)
@@ -58,6 +117,7 @@ defmodule Snitch.Data.Schema.Taxon do
     taxon
     |> Repo.preload([:variation_themes, :taxon_image])
     |> cast(params, @update_fields)
+    |> handle_slug
     |> validate_required([:name])
     |> cast_assoc(:taxon_image, with: &TaxonImage.changeset/2)
     |> put_assoc_variation_theme(ids)
