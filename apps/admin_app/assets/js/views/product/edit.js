@@ -74,6 +74,7 @@ function handleSubmitImage() {
   var csrf = $("meta[name='csrf-token']").attr("content");
   form_data.append('product_id', product_id);
   form_data.append('_csrf_token', csrf);
+  $('#loadingmessage').addClass("loader"); 
   $.ajax({
     url: `/product-images/${product_id}`,
     type: "POST",
@@ -87,6 +88,7 @@ function handleSubmitImage() {
         .empty()
         .append(json.html);
       $("#img-selected-container").empty();
+      $('#loadingmessage').removeClass("loader");  
     },
     error: function (json) {
       $(`#show-upload-response`)
