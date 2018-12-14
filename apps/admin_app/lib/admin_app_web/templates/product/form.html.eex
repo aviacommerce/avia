@@ -204,6 +204,8 @@
       <input id="product-id" name="product-id" type="hidden" value="<%= @parent_product.id %>" >
       <form id="product-image" accept-charset="UTF-8" enctype="multipart/form-data" method="post" >
         <input type="hidden" value="<%= @token %>" name="_csrf_token"/>
+        <div id='loadingmessage'>
+        </div>
         <div id="show-upload-response">
         </div>
         <div class="form-group row ">
