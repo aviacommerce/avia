@@ -62,7 +62,7 @@
     <div data-toggle="collapse" data-target="#advanced_section" style="margin-bottom:1rem;padding:0.5rem;border:1px solid #ddd;cursor:pointer" >
       <span>Advanced Section</span>
     </div>
-    <div id="advanced_section" >
+    <div id="advanced_section" class="collapse">
       <div class="form-group row ">
       <label  class="col-sm-3 col-form-label">
         <div class="label">
