@@ -109,8 +109,10 @@
       <div class="col-sm-10">
         <%= button("Cancel", to: product_path(@conn, :index), method: "get",  type: "button",
           class: "btn btn-secondary btn-outline-secondary submit-btn float-left") %>
-        <%= submit "Save", class: "btn  btn-primary submit-btn float-right", id: "form-save-btn" %>
-        <%= submit "Save & Publish  ", class: "btn  btn-primary submit-btn float-right", id: "form-save-publish-btn" %>
+          <div class="float-right">
+            <%= submit "Save", class: "btn  btn-primary submit-btn", id: "form-save-btn" %>
+            <%= submit "Save & Publish  ", class: "btn  btn-primary submit-btn", id: "form-save-publish-btn" %>
+          </div>
       </div>
     </div>
     <% end %>
@@ -136,12 +138,12 @@
               </div>
               <div class="modal-body">
                 <div class="alert alert-danger" role="alert">
-                  Changing theme will remove all the associated variants.
-                  Are you sure you want to do this?
+                  Changing the variation theme would remove all the existing variants, 
+                  are you sure you want to proceed?
                 </div>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
                 <button id="theme_change_confirm" type="button" class="btn btn-primary">Yes</button>
               </div>
             </div>
@@ -149,7 +151,7 @@
         </div>
       </div>
       <%= if has_variants(@parent_product) do %>
-      <div>
+      <div class="product_has_variants">
         <h3>Product Variants</h3>
         <table class="table">
           <thead>
