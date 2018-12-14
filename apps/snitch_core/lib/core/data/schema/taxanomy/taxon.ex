@@ -45,11 +45,30 @@ defmodule Snitch.Data.Schema.Taxon do
 
   defp get_ancestors_slug_text(nil), do: ""
 
+  @doc """
+  This method returns the comma separated name of all the taxon above it till
+  level 1
+
+  Consider following taxonomy
+
+  Category
+  |-- Men
+  |   |-- Shirt
+  |   |   |-- Full Sleeve
+  |   |   |-- Half Sleeve
+  |   |-- T-Shirt
+  |-- Women
+      |-- Shirt
+      |-- T-Shirt
+
+  `Full Sleeve` Category under women it would return `Men Shirt`
+  """
   defp get_ancestors_slug_text(taxon_id) do
     with %Taxon{} = taxon <- TaxonomyDomain.get_taxon(taxon_id),
          {:ok, ancestors} <- TaxonomyDomain.get_ancestors(taxon_id) do
       {_, ancestors_till_level_1} = List.pop_at(ancestors, 0)
 
+      # Here we exclude the root taxon as we don't include it in slug
       taxons =
         case TaxonomyDomain.is_root?(taxon) do
           true -> ancestors_till_level_1

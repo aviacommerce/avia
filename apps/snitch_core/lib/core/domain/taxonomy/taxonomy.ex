@@ -38,9 +38,9 @@ defmodule Snitch.Domain.Taxonomy do
   end
 
   @doc """
-    Checks if the taxon is a root taxon.
+  Checks if the taxon is a root taxon.
 
-    Note: If taxon is not asscoaited with taxonomy RuntimeError will be raised.
+  Note: If taxon is not asscoaited with taxonomy RuntimeError will be raised.
   """
   @spec is_root?(Taxon.t()) :: boolean()
   def is_root?(%Taxon{} = taxon) do
@@ -209,6 +209,10 @@ defmodule Snitch.Domain.Taxonomy do
 
   @doc """
   Updates all category slug based on the name.
+
+  Warning: This methods should be used only when the slug are not present.
+  Running this method might change the existing slug if the tree of above a
+  category is modified.
   """
   def update_all_categories_slug() do
     Taxon
