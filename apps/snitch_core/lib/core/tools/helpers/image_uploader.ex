@@ -36,7 +36,12 @@ defmodule Snitch.Tools.Helper.ImageUploader do
   """
   def storage_dir(_version, {_file, scope}) do
     scope_dir = get_scope_name(scope)
-    "uploads/images/#{scope_dir}/#{scope.id}/images/"
+
+    if Mix.env() == :test do
+      "uploads/test/images/#{scope_dir}/#{scope.id}/images/"
+    else
+      "uploads/images/#{scope_dir}/#{scope.id}/images/"
+    end
   end
 
   defp get_scope_name(scope) do

@@ -34,6 +34,7 @@ defmodule Snitch.Factory do
     User,
     Variant,
     Product,
+    ProductBrand,
     ShippingCategory,
     ProductProperty,
     Property,
@@ -221,6 +222,12 @@ defmodule Snitch.Factory do
     %Role{
       name: sequence("nobody"),
       description: "is like everybody"
+    }
+  end
+
+  def product_brand_factory do
+    %ProductBrand{
+      name: sequence("testbrand")
     }
   end
 

@@ -1,11 +1,11 @@
-defmodule Snitch.Data.Model.GeneralConfigurationTest do
+defmodule Snitch.Data.Model.ProductBrandTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
   import Snitch.Factory
 
-  alias Snitch.Data.Schema.{Image, GeneralConfiguration}
-  alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
+  alias Snitch.Data.Schema.{Image, ProductBrand}
+  alias Snitch.Data.Model.ProductBrand, as: PBModel
   alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
@@ -14,16 +14,10 @@ defmodule Snitch.Data.Model.GeneralConfigurationTest do
 
   setup do
     valid_params = %{
-      "name" => "store",
-      "sender_mail" => "hello@aviabird.com",
-      "frontend_url" => "https://abc.com",
-      "backend_url" => "https://abc.com",
-      "seo_title" => "store",
-      "currency" => "USD",
-      "hosted_payment_url" => "https://abc.com"
+      "name" => "yolo"
     }
 
-    general_config = insert(:general_config)
+    product_brand = insert(:product_brand)
 
     image_params = %{
       type: "image/png",
@@ -32,57 +26,69 @@ defmodule Snitch.Data.Model.GeneralConfigurationTest do
     }
 
     invalid_params = %{
-      "seo_title" => "store"
+      "name" => nil
     }
 
     [
       valid_params: valid_params,
       invalid_params: invalid_params,
       image_params: image_params,
-      general_config: general_config
+      product_brand: product_brand
     ]
   end
 
-  describe "create general configuration" do
+  describe "create product brand" do
     test "successfully along with image", %{image_params: ip, valid_params: vp} do
       vp = vp |> Map.put("image", ip)
-      assert {:ok, general_config} = GCModel.create(vp)
+      assert {:ok, product_brand} = PBModel.create(vp)
       path = Path.wildcard("uploads/test/images/") |> List.first()
       cleanup(path)
     end
 
     test "successfully without image", %{valid_params: vp} do
-      assert {:ok, general_config} = GCModel.create(vp)
+      assert {:ok, product_brand} = PBModel.create(vp)
     end
 
     test "with invalid params", %{invalid_params: ip} do
-      assert {:error, _} = GCModel.create(ip)
+      assert {:error, _} = PBModel.create(ip)
     end
   end
 
-  describe "update general configuration" do
-    test "successfully along with image", %{image_params: ip, general_config: gc} do
+  describe "update product brand" do
+    test "successfully along with image", %{image_params: ip, product_brand: pb} do
       new_image = %{
         type: "image/png",
         filename: "3Lu6PTMFSHz8eQfoGCCCC.png",
         path: @img_new
       }
 
-      gc = gc |> Repo.preload(:image)
+      pb = pb |> Repo.preload(:image)
       params = %{} |> Map.put("image", new_image)
-      assert {:ok, general_config} = GCModel.update(gc, params)
+      assert {:ok, product_brand} = PBModel.update(pb, params)
       path = Path.wildcard("uploads/test/images/") |> List.first()
       cleanup(path)
     end
 
-    test "successfully without image", %{general_config: gc} do
+    test "successfully without image", %{product_brand: pb} do
       params = %{"name" => "new_store"}
-      assert {:ok, general_config} = GCModel.update(gc, params)
+      assert {:ok, product_brand} = PBModel.update(pb, params)
     end
 
-    test "with invalid params", %{general_config: gc} do
+    test "with invalid params", %{product_brand: pb} do
       params = %{"name" => nil}
-      assert {:error, _} = GCModel.update(gc, params)
+      assert {:error, _} = PBModel.update(pb, params)
+    end
+  end
+
+  describe "delete product brand" do
+    test "with image", %{image_params: ip, valid_params: vp} do
+      vp = vp |> Map.put("image", ip)
+      {:ok, product_brand} = PBModel.create(vp)
+      assert {:ok, "success"} = PBModel.delete(product_brand.id)
+    end
+
+    test "without image", %{product_brand: pb} do
+      assert {:ok, product_brand} = PBModel.delete(pb.id)
     end
   end
 
