@@ -4,7 +4,9 @@ defmodule SnitchApiWeb.ProductView do
   alias Snitch.Data.Schema.Image
   alias Snitch.Data.Schema.Variation
   alias Snitch.Data.Schema.Product, as: ProductSchema
-  alias Snitch.Data.Model.{Product, ProductReview}
+  alias Snitch.Data.Model.ProductReview
+  alias Snitch.Data.Model.Product
+  alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Core.Tools.MultiTenancy.Repo
   import Ecto.Query
 
@@ -53,7 +55,7 @@ defmodule SnitchApiWeb.ProductView do
     url =
       case product.images |> List.first() do
         nil -> nil
-        image -> Product.image_url(image.name, product)
+        image -> ImageModel.image_url(image.name, product)
       end
 
     %{"default_product_url" => url}
@@ -83,7 +85,7 @@ defmodule SnitchApiWeb.ProductView do
 
       images ->
         images
-        |> Enum.map(fn image -> %{"product_url" => Product.image_url(image.name, product)} end)
+        |> Enum.map(fn image -> %{"product_url" => ImageModel.image_url(image.name, product)} end)
     end
   end
 

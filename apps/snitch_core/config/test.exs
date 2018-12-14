@@ -11,6 +11,7 @@ config :snitch_core, Snitch.Repo,
 
 config :snitch_core, :defaults_module, Snitch.Tools.DefaultsMock
 config :snitch_core, :user_config_module, Snitch.Tools.UserConfigMock
+config :arc, storage: Arc.Storage.Local
 
 config :snitch_core, Snitch.Tools.Mailer, adapter: Bamboo.TestAdapter
 

@@ -11,6 +11,7 @@ defmodule Snitch.Domain.Taxonomy do
   import Ecto.Query
 
   alias Ecto.Multi
+  alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Data.Schema.{Taxon, Taxonomy, Image}
   alias Snitch.Tools.Helper.Taxonomy, as: Helper
   alias Snitch.Tools.Helper.ImageUploader
@@ -195,7 +196,7 @@ defmodule Snitch.Domain.Taxonomy do
     Repo.get_by(Taxon, name: name)
   end
 
-  def create_taxon(parent_taxon, %{image: "undefined"} = taxon_params) do
+  def create_taxon(parent_taxon, %{image: nil} = taxon_params) do
     taxon_struct = %Taxon{name: taxon_params.name}
 
     with {:ok, taxon} <- add_taxon(parent_taxon, taxon_struct, :child) do
@@ -221,50 +222,39 @@ defmodule Snitch.Domain.Taxonomy do
     |> Enum.map(&Repo.update(&1))
   end
 
-  def create_taxon(parent_taxon, taxon_params) do
+  def create_taxon(parent_taxon, %{image: image} = taxon_params) do
     multi =
       Multi.new()
-      |> Multi.run(:image, fn _ ->
-        QH.create(Image, taxon_params, Repo)
-      end)
-      |> Multi.run(:taxon, fn _ ->
+      |> Multi.run(:struct, fn _ ->
         taxon_struct = %Taxon{name: taxon_params.name}
         add_taxon(parent_taxon, taxon_struct, :child)
       end)
-      |> Multi.run(:image_taxon, fn %{image: image, taxon: taxon} ->
+      |> Multi.run(:image, fn %{struct: struct} ->
+        params = %{"image" => Map.put(image, :url, ImageModel.image_url(image.filename, struct))}
+        QH.create(Image, params, Repo)
+      end)
+      |> Multi.run(:association, fn %{image: image, struct: struct} ->
         params = Map.put(%{}, :taxon_image, %{image_id: image.id})
 
         Taxon.update_changeset(
-          taxon,
+          struct,
           Map.put(params, :variation_theme_ids, taxon_params.themes)
         )
         |> Repo.update()
       end)
-      |> upload_image_multi(taxon_params.image)
-      |> persist()
+      |> ImageModel.upload_image_multi(taxon_params.image)
+      |> ImageModel.persist()
   end
 
   @doc """
   Update the given taxon.
   """
-  def update_taxon(taxon, %{image: nil} = params) do
+  def update_taxon(taxon, %{"image" => nil} = params) do
     taxon |> Taxon.update_changeset(params) |> Repo.update()
   end
 
-  def update_taxon(taxon, %{image: image} = params) do
-    old_image = taxon.image
-
-    Multi.new()
-    |> Multi.run(:image, fn _ ->
-      QH.create(Image, params, Repo)
-    end)
-    |> Multi.run(:taxon, fn %{image: image} ->
-      params = Map.put(params, :taxon_image, %{image_id: image.id})
-      taxon |> Taxon.update_changeset(params) |> Repo.update()
-    end)
-    |> delete_image_multi(old_image, taxon)
-    |> upload_image_multi(params.image)
-    |> persist()
+  def update_taxon(taxon, %{"image" => image} = params) do
+    ImageModel.update(Taxon, taxon, params, "taxon_image")
   end
 
   @doc """
@@ -287,51 +277,5 @@ defmodule Snitch.Domain.Taxonomy do
   """
   def delete_taxon(taxon) do
     taxon |> AsNestedSet.delete() |> AsNestedSet.execute(Repo)
-  end
-
-  defp persist(multi) do
-    case Repo.transaction(multi) do
-      {:ok, multi_result} ->
-        {:ok, multi_result.taxon}
-
-      {:error, _, failed_value, _} ->
-        {:error, failed_value}
-    end
-  end
-
-  def image_url(name, taxon) do
-    ImageUploader.url({name, taxon})
-  end
-
-  defp upload_image_multi(multi, %Plug.Upload{} = image) do
-    Multi.run(multi, :image_upload, fn %{taxon: taxon} ->
-      case ImageUploader.store({image, taxon}) do
-        {:ok, _} ->
-          {:ok, taxon}
-
-        _ ->
-          {:error, "upload error"}
-      end
-    end)
-  end
-
-  defp delete_image_multi(multi, nil, taxon) do
-    multi
-  end
-
-  defp delete_image_multi(multi, image, taxon) do
-    multi
-    |> Multi.run(:remove_from_upload, fn _ ->
-      case ImageUploader.delete({image.name, taxon}) do
-        :ok ->
-          {:ok, "success"}
-
-        _ ->
-          {:error, "not_found"}
-      end
-    end)
-    |> Multi.run(:delete_image, fn _ ->
-      QH.delete(Image, image.id, Repo)
-    end)
   end
 end

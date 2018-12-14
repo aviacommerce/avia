@@ -4,6 +4,7 @@ defmodule AdminAppWeb.GeneralSettingsController do
   alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
   alias Snitch.Data.Schema.GeneralConfiguration, as: GCSchema
   alias Snitch.Core.Tools.MultiTenancy.Repo
+  alias Snitch.Data.Model.Image
 
   def index(conn, _params) do
     general_configuration =
@@ -18,6 +19,8 @@ defmodule AdminAppWeb.GeneralSettingsController do
   end
 
   def create(conn, %{"settings" => params}) do
+    params = handle_params(params)
+
     case GCModel.create(params) do
       {:ok, general_configuration} ->
         general_configuration =
@@ -53,6 +56,7 @@ defmodule AdminAppWeb.GeneralSettingsController do
   end
 
   def update(conn, %{"id" => id, "settings" => params}) do
+    params = handle_params(params)
     general_configuration = GCModel.get_general_configuration(id) |> Repo.preload(:image)
 
     case general_configuration do
@@ -60,9 +64,7 @@ defmodule AdminAppWeb.GeneralSettingsController do
         handle_nil_response(conn)
 
       _ ->
-        params =
-          params
-          |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+        params
 
         case GCModel.update(general_configuration, params) do
           {:ok, general_configuration} ->
@@ -79,6 +81,17 @@ defmodule AdminAppWeb.GeneralSettingsController do
             )
         end
     end
+  end
+
+  defp handle_params(%{"image" => image} = params) do
+    %{
+      params
+      | "image" => Image.handle_image_value(image)
+    }
+  end
+
+  defp handle_params(params) do
+    params
   end
 
   def delete(conn, %{"id" => id}) do

@@ -3,7 +3,7 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyView do
 
   alias Snitch.Data.Schema.VariationTheme
   alias Snitch.Core.Tools.MultiTenancy.Repo
-  alias Snitch.Domain.Taxonomy
+  alias Snitch.Data.Model.Image
 
   def get_themes() do
     Repo.all(VariationTheme)
@@ -16,7 +16,7 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyView do
   end
 
   def get_image_url(image, taxon) do
-    Taxonomy.image_url(image.name, taxon)
+    Image.image_url(image.name, taxon)
   end
 
   def render("taxon.json", %{taxon: taxon}) do

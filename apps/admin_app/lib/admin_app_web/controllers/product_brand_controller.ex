@@ -4,6 +4,7 @@ defmodule AdminAppWeb.ProductBrandController do
   alias Snitch.Data.Model.ProductBrand, as: ProductBrandModel
   alias Snitch.Data.Schema.ProductBrand, as: ProductBrandSchema
   alias Snitch.Core.Tools.MultiTenancy.Repo
+  alias Snitch.Data.Model.Image
 
   def index(conn, _params) do
     product_brands = ProductBrandModel.get_all()
@@ -16,6 +17,8 @@ defmodule AdminAppWeb.ProductBrandController do
   end
 
   def create(conn, %{"product_brand" => params}) do
+    params = handle_params(params)
+
     with {:ok, _} <- ProductBrandModel.create(params) do
       redirect(conn, to: product_brand_path(conn, :index))
     else
@@ -42,6 +45,8 @@ defmodule AdminAppWeb.ProductBrandController do
   end
 
   def update(conn, %{"id" => id, "product_brand" => params}) do
+    params = handle_params(params)
+
     with %ProductBrandSchema{} = brand <- id |> ProductBrandModel.get() |> Repo.preload(:image),
          {:ok, _} <- ProductBrandModel.update(brand, params) do
       conn
@@ -56,6 +61,17 @@ defmodule AdminAppWeb.ProductBrandController do
         |> put_flash(:info, "Product Brand not found")
         |> redirect(to: product_brand_path(conn, :index))
     end
+  end
+
+  defp handle_params(%{"image" => image} = params) do
+    %{
+      params
+      | "image" => Image.handle_image_value(image)
+    }
+  end
+
+  defp handle_params(params) do
+    params
   end
 
   def delete(conn, %{"id" => id}) do

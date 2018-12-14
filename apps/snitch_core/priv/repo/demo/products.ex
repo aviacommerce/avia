@@ -34,7 +34,6 @@ defmodule Snitch.Demo.Product do
                       selling_price,
                       weight,
                       maximum_retail_price,
-                      state,
                       taxon,
                       image
                     ] ->
@@ -46,7 +45,7 @@ defmodule Snitch.Demo.Product do
       theme_id = [to_string(variation_theme.id)]
 
       {:ok, updated_taxon} =
-        Taxonomy.update_taxon(taxon, %{variation_theme_ids: theme_id, image: nil})
+        Taxonomy.update_taxon(taxon, %{"variation_theme_ids" => theme_id, "image" => nil})
 
       selling_price = Money.new(selling_price, :USD)
       maximum_retail_price = Money.new(maximum_retail_price, :USD)
@@ -60,7 +59,6 @@ defmodule Snitch.Demo.Product do
           selling_price,
           weight,
           maximum_retail_price,
-          state,
           updated_taxon,
           image
         )
@@ -114,7 +112,6 @@ defmodule Snitch.Demo.Product do
       height = Decimal.new(height)
       depth = Decimal.new(depth)
       taxon = Repo.get_by(Taxon, name: taxon)
-      state = product.state
       selling_price = Money.new(selling_price, :USD)
       maximum_retail_price = Money.new(maximum_retail_price, :USD)
 
@@ -127,7 +124,6 @@ defmodule Snitch.Demo.Product do
           selling_price,
           weight,
           maximum_retail_price,
-          state,
           taxon,
           image
         )
@@ -145,19 +141,17 @@ defmodule Snitch.Demo.Product do
          selling_price,
          weight,
          maximum_retail_price,
-         state,
          taxon,
-         image
+         image_name
        ) do
     light = Repo.get_by(ShippingCategory, name: "light")
-    image = [create_image(image)]
+    image = [create_image(image_name)]
 
     params = %{
       name: name,
       width: width,
       height: height,
       depth: depth,
-      state: state,
       selling_price: selling_price,
       weight: weight,
       shipping_category_id: light.id,
@@ -166,7 +160,7 @@ defmodule Snitch.Demo.Product do
     }
 
     product = %Product{} |> Product.create_changeset(params) |> Repo.insert!()
-    associate_image(product, image)
+    associate_image(product, image, image_name)
   end
 
   def create_product_option_value(variant, product) do
@@ -187,22 +181,24 @@ defmodule Snitch.Demo.Product do
   end
 
   defp create_image(image) do
-    %Image{name: image} |> Repo.insert!()
+    extension = Path.extname(image)
+    name = Nanoid.generate() <> extension
+    %Image{name: name, is_default: true} |> Repo.insert!()
   end
 
-  defp associate_image(product, image) do
-    uploaded_struct = upload_struct(image, product)
+  defp associate_image(product, image, image_name) do
+    uploaded_struct = upload_struct(image, product, image_name)
     upload_image(uploaded_struct, product)
     Product.associate_image_changeset(product, image) |> Repo.update!()
   end
 
-  defp upload_struct([%Image{name: name} = image], product) do
+  defp upload_struct([%Image{name: name} = image], product, image_name) do
     base_path = Application.app_dir(:snitch_core)
 
     %Plug.Upload{
       content_type: "image/jpeg",
       filename: name,
-      path: "#{base_path}/priv/repo/demo/demo_data/static/product_images/#{name}"
+      path: "#{base_path}/priv/repo/demo/demo_data/static/product_images/#{image_name}"
     }
   end
 
