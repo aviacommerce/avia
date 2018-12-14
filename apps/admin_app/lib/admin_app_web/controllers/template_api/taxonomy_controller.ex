@@ -61,4 +61,14 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
         |> json(%{error: %{message: "Failed to update category"}})
     end
   end
+
+  def taxon_delete(conn, params) do
+    Honeydew.async({:delete_cateory, [params]}, :category_delete_queue)
+    conn
+    |> put_status(:ok)
+    |> json(%{message: "Category delete has started in background"})
+  end
+
+  defp handle_image_value(%Plug.Upload{} = file), do: file
+  defp handle_image_value(_), do: nil
 end
