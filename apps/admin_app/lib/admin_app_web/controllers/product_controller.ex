@@ -7,7 +7,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Data.Model.ProductPrototype, as: PrototypeModel
   alias Snitch.Domain.Taxonomy
-  alias Snitch.Tools.Helper.Rummage
+  alias Snitch.Tools.Helper.Rummage, as: RummageHelper
 
   alias Snitch.Data.Schema.{
     Image,
@@ -73,7 +73,7 @@ defmodule AdminAppWeb.ProductController do
     with %ProductSchema{} = product <- ProductModel.get(id) |> Repo.preload(preloads) do
       changeset = ProductSchema.create_changeset(product, params)
 
-      rummage_params = Rummage.get_rummage_params(conn)
+      rummage_params = RummageHelper.get_rummage_params(conn)
 
       render(conn, "edit.html",
         changeset: changeset,
