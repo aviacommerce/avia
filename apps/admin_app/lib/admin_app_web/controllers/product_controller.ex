@@ -53,7 +53,11 @@ defmodule AdminAppWeb.ProductController do
 
   def new(conn, _params) do
     changeset = ProductSchema.create_changeset(%ProductSchema{}, %{})
-    render(conn, "new.html", changeset: changeset)
+
+    render(conn, "new.html",
+      changeset: changeset,
+      rummage_params: RummageHelper.get_rummage_params(conn)
+    )
   end
 
   def create(conn, %{"product" => params}) do
@@ -63,7 +67,11 @@ defmodule AdminAppWeb.ProductController do
       {:error, changeset} ->
         conn = %{conn | request_path: product_path(conn, :new)}
         conn = %{conn | params: conn.params |> Map.put("taxon_id", Map.get(params, "taxon_id"))}
-        render(conn, "new.html", changeset: %{changeset | action: :new})
+
+        render(conn, "new.html",
+          changeset: %{changeset | action: :new},
+          rummage_params: RummageHelper.get_rummage_params(conn)
+        )
     end
   end
 
