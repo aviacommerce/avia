@@ -10,7 +10,8 @@
         changeset: @changeset,
         conn: @conn,
         action: product_path(@conn, :create),
-        brands: @brands
+        brands: @brands,
+        rummage_params: @rummage_params
         %>
     </div>
   </div>

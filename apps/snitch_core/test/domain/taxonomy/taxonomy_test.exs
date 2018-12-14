@@ -14,14 +14,28 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
   #   │   └── Table Cover
   #   ├── Mats & Napkin
   #   ├── Home decor
+
   defp create_taxonomy do
     taxonomy = insert(:taxonomy, name: "Home & Living")
-    home_living = insert(:taxon, name: "Home & Living", lft: 0, rgt: 11, taxonomy: taxonomy)
+
+    home_living =
+      insert(:taxon,
+        name: "Home & Living",
+        slug: Taxon.generate_slug("Home & Living"),
+        lft: 0,
+        rgt: 11,
+        taxonomy: taxonomy
+      )
+
+    taxonomy
+    |> Ecto.Changeset.change(root_id: home_living.id)
+    |> Repo.update()
 
     flooring =
       insert(
         :taxon,
         name: "Flooring",
+        slug: Taxon.generate_slug("Flooring"),
         lft: 1,
         rgt: 2,
         parent_id: home_living.id,
@@ -32,6 +46,7 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
       insert(
         :taxon,
         name: "Kitchen & Tables",
+        slug: Taxon.generate_slug("Kitchen & Tables"),
         lft: 3,
         rgt: 8,
         parent_id: home_living.id,
@@ -42,6 +57,7 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
       insert(
         :taxon,
         name: "Home Decor",
+        slug: Taxon.generate_slug("Home Decor"),
         lft: 9,
         rgt: 10,
         parent_id: home_living.id,
@@ -52,6 +68,7 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
       insert(
         :taxon,
         name: "Table Covers",
+        slug: Taxon.generate_slug("Table Covers"),
         lft: 4,
         rgt: 5,
         parent_id: kitchen_table.id,
@@ -62,6 +79,7 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
       insert(
         :taxon,
         name: "Mat & Napkins",
+        slug: Taxon.generate_slug("Mat & Napkins"),
         lft: 6,
         rgt: 7,
         parent_id: kitchen_table.id,
@@ -85,13 +103,13 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
       {_, [{flooring, _} | _]} = create_taxonomy()
 
       carpet = %Taxon{name: "Carpet"}
-      taxon = Taxonomy.add_taxon(flooring, carpet, :child)
-
-      taxonomy = dump_taxonomy(flooring)
+      {:ok, taxon} = Taxonomy.add_taxon(flooring, carpet, :child)
 
       assert taxon.name == "Carpet"
       assert taxon.taxonomy_id == flooring.taxonomy_id
       assert taxon.parent_id == flooring.id
+
+      taxonomy = dump_taxonomy(flooring)
 
       assert {%{name: "Home & Living"},
               [
@@ -108,7 +126,7 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
               ]} = taxonomy
 
       lamp_light = %Taxon{name: "Lamp and Lights"}
-      taxon = Taxonomy.add_taxon(flooring, lamp_light, :left)
+      {:ok, taxon} = Taxonomy.add_taxon(flooring, lamp_light, :left)
 
       taxonomy = dump_taxonomy(flooring)
 
@@ -132,7 +150,7 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
               ]} = taxonomy
 
       storage = %Taxon{name: "Storage"}
-      taxon = Taxonomy.add_taxon(flooring, storage, :right)
+      {:ok, taxon} = Taxonomy.add_taxon(flooring, storage, :right)
 
       taxonomy = dump_taxonomy(flooring)
 
@@ -157,7 +175,7 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
               ]} = taxonomy
 
       home_decoration = %Taxon{name: "Home Decoration"}
-      taxon = Taxonomy.add_taxon(flooring, home_decoration, :parent)
+      {:ok, taxon} = Taxonomy.add_taxon(flooring, home_decoration, :parent)
 
       taxonomy = dump_taxonomy(flooring)
 
@@ -182,6 +200,18 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
                  ]},
                 {%{name: "Home Decor"}, []}
               ]} = taxonomy
+    end
+
+    test "add taxon with same name fails" do
+      {:ok, %{root_taxon: root}} = Taxonomy.create_taxonomy("Categories")
+      root = root |> Repo.preload(:taxonomy)
+
+      taxon = %Taxon{name: "Shirt"}
+
+      {:ok, _} = Taxonomy.add_taxon(root, taxon, :child)
+
+      {:error, changeset} = Taxonomy.add_taxon(root, taxon, :child)
+      assert changeset.errors[:slug] == {"category with this name alreay exist", []}
     end
   end
 
@@ -221,6 +251,22 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
     test "dump invalid taxonomy" do
       dump = Taxonomy.dump_taxonomy(-1)
       assert [] == dump
+    end
+  end
+
+  describe "is_root?/1" do
+    test "test all cases" do
+      {root_taxon, [{random_taxon, _} | _]} = create_taxonomy()
+      root_taxon = Repo.preload(root_taxon, :taxonomy, force: true)
+
+      assert Taxonomy.is_root?(root_taxon)
+      refute Taxonomy.is_root?(random_taxon)
+
+      taxon_without_taxonomy = insert(:taxon, name: "Shirts", slug: Taxon.generate_slug("Shirts"))
+
+      assert_raise RuntimeError, "No taxonomy is associated with taxon", fn ->
+        Taxonomy.is_root?(taxon_without_taxonomy)
+      end
     end
   end
 

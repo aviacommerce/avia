@@ -82,7 +82,7 @@
                       <i class="fa fa-cog"></i>
                       </a>
                       <div class="dropdown-menu dropdown-menu-right">
-                        <%= link("Edit", to: product_path(@conn, :edit, item.id), class: "dropdown-item") %>
+                        <%= link("Edit", to: product_path(@conn, :edit, item.id, "product": @conn.query_params |> Map.take(["rummage"])), class: "dropdown-item") %>
                         <%= if item.state in [:in_active, :draft] do %>
                           <%= link("Activate", to: product_path(@conn, :update, item.id, "product": @conn.query_params |> Map.take(["rummage"]) |> Map.merge(%{"state": :active, "id": item.id})), method: :patch, class: "dropdown-item")%>
                         <% else %>
