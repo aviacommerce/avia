@@ -17,5 +17,7 @@ defmodule Snitch.Tools.Helper.Rummage do
 
   defp decode_query(nil), do: Map.new()
 
+  defp decode_query(%{query: nil}), do: Map.new()
+
   defp decode_query(%{query: query}), do: URI.decode_query(query)
 end
