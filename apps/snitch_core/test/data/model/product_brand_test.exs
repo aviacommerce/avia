@@ -7,7 +7,7 @@ defmodule Snitch.Data.Model.ProductBrandTest do
   alias Snitch.Data.Schema.{Image, ProductBrand}
   alias Snitch.Data.Model.ProductBrand, as: PBModel
   alias Snitch.Data.Model.Image, as: ImageModel
-  alias Snitch.Core.Tools.MultiTenancy.Repo
+  alias Snitch.Repo
 
   @img "test/support/image.png"
   @img_new "test/support/image_new.png"
@@ -41,7 +41,7 @@ defmodule Snitch.Data.Model.ProductBrandTest do
     test "successfully along with image", %{image_params: ip, valid_params: vp} do
       vp = vp |> Map.put("image", ip)
       assert {:ok, product_brand} = PBModel.create(vp)
-      path = Path.wildcard("uploads/test/images/") |> List.first()
+      path = Path.wildcard("uploads/images/**/#{product_brand.id}") |> List.first()
       cleanup(path)
     end
 
@@ -65,7 +65,7 @@ defmodule Snitch.Data.Model.ProductBrandTest do
       pb = pb |> Repo.preload(:image)
       params = %{} |> Map.put("image", new_image)
       assert {:ok, product_brand} = PBModel.update(pb, params)
-      path = Path.wildcard("uploads/test/images/") |> List.first()
+      path = Path.wildcard("uploads/images/**/#{product_brand.id}") |> List.first()
       cleanup(path)
     end
 
@@ -85,6 +85,8 @@ defmodule Snitch.Data.Model.ProductBrandTest do
       vp = vp |> Map.put("image", ip)
       {:ok, product_brand} = PBModel.create(vp)
       assert {:ok, "success"} = PBModel.delete(product_brand.id)
+      path = Path.wildcard("uploads/images/**/#{product_brand.id}") |> List.first()
+      cleanup(path)
     end
 
     test "without image", %{product_brand: pb} do

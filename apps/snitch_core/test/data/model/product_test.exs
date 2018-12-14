@@ -15,6 +15,8 @@ defmodule Snitch.Data.Model.ProductTest do
     }
   }
 
+  @img "test/support/image.png"
+
   setup do
     product = insert(:product)
     shipping_category = insert(:shipping_category)
@@ -22,6 +24,19 @@ defmodule Snitch.Data.Model.ProductTest do
 
     valid_attrs = %{
       product_id: product.id
+    }
+
+    image_params = %{
+      "images" => [
+        %{
+          "image" => %{
+            filename: "fDwvoPbZGc4WuAVLYwwyo.png",
+            path: @img,
+            type: "image/png",
+            url: "/abc"
+          }
+        }
+      ]
     }
 
     valid_params = %{
@@ -34,7 +49,7 @@ defmodule Snitch.Data.Model.ProductTest do
       taxon_id: taxon.id
     }
 
-    [valid_attrs: valid_attrs, valid_params: valid_params]
+    [valid_attrs: valid_attrs, valid_params: valid_params, image_params: image_params]
   end
 
   describe "get" do
@@ -108,6 +123,33 @@ defmodule Snitch.Data.Model.ProductTest do
     test "creation fails for duplicate product", %{valid_params: vp} do
       Product.create(vp)
       assert {:error, _} = Product.create(vp)
+    end
+  end
+
+  describe "image handling - " do
+    setup do
+      product = insert(:product)
+      taxon = insert(:taxon)
+      {:ok, updated_product} = Product.update(product, %{state: :active, taxon_id: taxon.id})
+      product = updated_product |> Repo.preload(:images)
+      [product: product]
+    end
+
+    test "add images with valid params", %{image_params: ip, product: product} do
+      assert {:ok, "success"} = Product.add_images(product, ip)
+    end
+
+    test "delete image for a product", %{product: product, image_params: ip} do
+      Product.add_images(product, ip)
+      new_product = product |> Repo.preload(:images, force: true)
+      image = new_product.images |> List.first()
+      assert {:ok, "success"} = Product.delete_image(new_product.id, image.id)
+    end
+
+    test "pass empty list of images to a product" do
+      product = insert(:product) |> Repo.preload(:images)
+      ip = %{"images" => []}
+      assert {:error, _} = Product.add_images(product, ip)
     end
   end
 
