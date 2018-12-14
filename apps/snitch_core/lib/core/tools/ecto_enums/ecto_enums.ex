@@ -10,3 +10,5 @@ defenum(OrderStateEnum,
   complete: 5,
   cancelled: 6
 )
+
+defenum(PackageStateEnum, processing: 0, ready: 1, shipped: 2, delivered: 3)
