@@ -14,7 +14,7 @@ defmodule Snitch.Factory.Taxonomy do
         }
       end
 
-      def taxon_factory do
+      def taxon_factory() do
         %Taxon{
           name: sequence("Taxon")
         }

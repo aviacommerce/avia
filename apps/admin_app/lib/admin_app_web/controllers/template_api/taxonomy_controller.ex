@@ -57,7 +57,7 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
       {:error, changeset} ->
         conn
         |> put_status(:bad_request)
-        |> json(%{})
+        |> json(%{error: %{message: "Failed to update category"}})
     end
   end
 
