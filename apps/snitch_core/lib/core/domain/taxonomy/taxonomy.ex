@@ -327,6 +327,7 @@ defmodule Snitch.Domain.Taxonomy do
     taxon
     |> AsNestedSet.delete()
     |> AsNestedSet.execute(Snitch.Core.Tools.MultiTenancy.Repo)
+
     {:ok, taxon}
   end
 end
