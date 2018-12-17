@@ -247,12 +247,12 @@ defmodule AdminAppWeb.ProductController do
              "theme_id" => params["theme_id"]
            }) do
       {:ok, _product} = Repo.update(changeset)
-      redirect(conn, to: product_path(conn, :index))
+      redirect(conn, to: product_path(conn, :edit, params["product_id"]))
     else
       _ ->
         conn
         |> put_flash(:error, "Failed to create variant")
-        |> redirect(to: product_path(conn, :index))
+        |> redirect(to: product_path(conn, :edit, params["product_id"]))
     end
   end
 
