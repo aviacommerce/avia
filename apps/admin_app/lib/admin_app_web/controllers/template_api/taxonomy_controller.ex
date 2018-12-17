@@ -87,7 +87,7 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
 
   def taxon_delete(conn, params) do
     params = Map.put(params, "tenant", Repo.get_prefix())
-    t = Honeydew.async({:delete_cateory, [params]}, :category_delete_queue)
+    Honeydew.async({:delete_cateory, [params]}, :category_delete_queue)
 
     conn
     |> put_status(:ok)
