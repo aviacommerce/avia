@@ -45,7 +45,25 @@ defmodule Snitch.Data.Schema.Promotion do
   end
 
   @doc """
-  Returns an updatecreate changeset for `Promotion.t()`.
+  Returns a changeset to update the rules for a promotion.
+
+  ### Note
+  - The function uses `cast_assoc` for managing associations so
+    rules specified by `cast_assoc` applies.
+    __See__
+    `Ecto.Changeset.cast_assoc(changeset, name, opts \\ [])`
+  - The `:rules` association needs to be preloaded before calling
+    update `action`.
+  """
+  def rule_update_changeset(%__MODULE__{} = promotion, params) do
+    promotion
+    |> cast(params, @create_fields)
+    |> common_changeset()
+    |> cast_assoc(:rules, with: &PromotionRule.changeset/2)
+  end
+
+  @doc """
+  Returns an update changeset for `Promotion.t()`.
   """
   def update_changeset(%__MODULE__{} = promotion, params) do
     promotion
