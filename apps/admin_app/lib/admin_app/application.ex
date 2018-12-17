@@ -22,11 +22,13 @@ defmodule AdminApp.Application do
     :ok = Honeydew.start_workers(:etsy_import_queue, Avia.Etsy.ImportWorker)
 
     :ok =
-      Honeydew.start_queue(:category_delete_queue,
-        failure_mode: {Honeydew.FailureMode.Retry, [times: 1]}
+      Honeydew.start_queue(
+        :category_delete_queue
+        # failure_mode: {Honeydew.FailureMode.Retry, [times: 1]},
+        # success_mode: {Honeydew.SuccessMode.Log, []}
       )
 
-    :ok = Honeydew.start_workers(:category_delete_queue, Avia.CategoryWorker)
+    :ok = Honeydew.start_workers(:category_delete_queue, Avia.CategoryWorker, num: 3)
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

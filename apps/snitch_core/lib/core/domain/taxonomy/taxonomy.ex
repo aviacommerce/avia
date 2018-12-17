@@ -12,7 +12,7 @@ defmodule Snitch.Domain.Taxonomy do
 
   alias Ecto.Multi
   alias Snitch.Data.Model.Image, as: ImageModel
-  alias Snitch.Data.Schema.{Taxon, Taxonomy, Image}
+  alias Snitch.Data.Schema.{Taxon, Taxonomy, Image, Product}
   alias Snitch.Tools.Helper.Taxonomy, as: Helper
   alias Snitch.Tools.Helper.ImageUploader
 
@@ -169,6 +169,18 @@ defmodule Snitch.Domain.Taxonomy do
     Repo.all(from(taxon in Taxon, where: taxon.parent_id == ^taxon_id))
   end
 
+  def get_all_children_and_self(taxon_id) do
+    case get_taxon(taxon_id) do
+      %Taxon{} = taxon ->
+        taxon
+        |> AsNestedSet.self_and_descendants()
+        |> AsNestedSet.execute(Repo)
+
+      _ ->
+        {:error, :not_found}
+    end
+  end
+
   def get_ancestors(taxon_id) do
     case Repo.get(Taxon, taxon_id) do
       nil ->
@@ -275,7 +287,46 @@ defmodule Snitch.Domain.Taxonomy do
   @doc """
   Delete a taxon
   """
-  def delete_taxon(taxon) do
-    taxon |> AsNestedSet.delete() |> AsNestedSet.execute(Repo)
+  def delete_taxon(taxon_id) do
+    case get_taxon(taxon_id) do
+      %Taxon{} = taxon ->
+        Multi.new()
+        |> Multi.run(:delete_products, fn _ -> do_delete_products(taxon_id) end)
+        |> Multi.run(:category, fn _ -> do_delete_taxon(taxon) end)
+        |> Repo.transaction()
+
+      nil ->
+        {:error, :not_found}
+    end
+  end
+
+  defp do_delete_products(taxon_id) do
+    categories =
+      get_all_children_and_self(taxon_id)
+      |> Enum.map(& &1.id)
+
+    product_delete_query =
+      from(p in Product,
+        where: p.taxon_id in ^categories
+      )
+
+    total_products = from(p in product_delete_query, select: count(p.id)) |> Repo.one()
+
+    {update_products_count, t} =
+      Repo.update_all(product_delete_query,
+        set: [state: "deleted", deleted_at: NaiveDateTime.utc_now(), taxon_id: nil]
+      )
+
+    case update_products_count == total_products do
+      true -> {:ok, t}
+      false -> {:error, :update_failed}
+    end
+  end
+
+  defp do_delete_taxon(%Taxon{} = taxon) do
+    taxon
+    |> AsNestedSet.delete()
+    |> AsNestedSet.execute(Snitch.Core.Tools.MultiTenancy.Repo)
+    {:ok, taxon}
   end
 end

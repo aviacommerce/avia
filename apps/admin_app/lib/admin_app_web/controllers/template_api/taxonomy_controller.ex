@@ -63,7 +63,9 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
   end
 
   def taxon_delete(conn, params) do
-    Honeydew.async({:delete_cateory, [params]}, :category_delete_queue)
+    params = Map.put(params, "tenant", Repo.get_prefix())
+    t = Honeydew.async({:delete_cateory, [params]}, :category_delete_queue)
+
     conn
     |> put_status(:ok)
     |> json(%{message: "Category delete has started in background"})
