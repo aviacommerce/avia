@@ -8,7 +8,7 @@ defmodule Snitch.Data.Model.Product do
   import Ecto.Query
   alias Ecto.Multi
   alias Snitch.Data.Model.Image, as: ImageModel
-  alias Snitch.Data.Schema.{Image, Product, Variation}
+  alias Snitch.Data.Schema.{Image, Product, Variation, Taxon}
   alias Snitch.Tools.Helper.ImageUploader
 
   @product_states [:active, :in_active, :draft]
@@ -113,6 +113,23 @@ defmodule Snitch.Data.Model.Product do
     with %Product{} = product <- get(id),
          changeset <- Product.delete_changeset(product) do
       Repo.update(changeset)
+    end
+  end
+
+  def delete_by_category(%Taxon{} = taxon) do
+    with product_by_category_query <- Product.product_by_category_query(taxon.id),
+         product_delete_query <- Product.set_delete_fields(product_by_category_query) do
+      total_products =
+        from(p in product_by_category_query, select: count(p.id))
+        |> Repo.one()
+
+      {delete_product_count, products} = Repo.update_all(product_delete_query, [])
+
+      if(total_products == delete_product_count) do
+        {:ok, products}
+      else
+        {:error, :bulk_delete_failed}
+      end
     end
   end
 

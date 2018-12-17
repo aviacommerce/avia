@@ -15,6 +15,7 @@ defmodule Snitch.Domain.Taxonomy do
   alias Snitch.Data.Schema.{Taxon, Taxonomy, Image, Product}
   alias Snitch.Tools.Helper.Taxonomy, as: Helper
   alias Snitch.Tools.Helper.ImageUploader
+  alias Snitch.Data.Model.Product, as: ProductModel
 
   @doc """
   Adds child taxon to left, right or child of parent taxon.
@@ -291,35 +292,12 @@ defmodule Snitch.Domain.Taxonomy do
     case get_taxon(taxon_id) do
       %Taxon{} = taxon ->
         Multi.new()
-        |> Multi.run(:delete_products, fn _ -> do_delete_products(taxon_id) end)
+        |> Multi.run(:delete_products, fn _ -> ProductModel.delete_by_category(taxon) end)
         |> Multi.run(:category, fn _ -> do_delete_taxon(taxon) end)
         |> Repo.transaction()
 
       nil ->
         {:error, :not_found}
-    end
-  end
-
-  defp do_delete_products(taxon_id) do
-    categories =
-      get_all_children_and_self(taxon_id)
-      |> Enum.map(& &1.id)
-
-    product_delete_query =
-      from(p in Product,
-        where: p.taxon_id in ^categories
-      )
-
-    total_products = from(p in product_delete_query, select: count(p.id)) |> Repo.one()
-
-    {update_products_count, t} =
-      Repo.update_all(product_delete_query,
-        set: [state: "deleted", deleted_at: NaiveDateTime.utc_now(), taxon_id: nil]
-      )
-
-    case update_products_count == total_products do
-      true -> {:ok, t}
-      false -> {:error, :update_failed}
     end
   end
 
