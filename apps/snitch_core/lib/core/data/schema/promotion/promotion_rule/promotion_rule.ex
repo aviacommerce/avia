@@ -33,20 +33,42 @@ defmodule Snitch.Data.Schema.PromotionRule do
     timestamps()
   end
 
-  @required_params ~w(name module promotion_id)a
-  @optional_params ~w(preferences)a
+  @required_params ~w(name module)a
+  @optional_params ~w(preferences promotion_id)a
   @create_params @required_params ++ @optional_params
 
+  @doc """
+  Returns a changeset for `PromotionRule.t()`.
+
+  This function has been explicitly created to be used with while creating
+  `promotion rule` with a promotion via the `cast_assoc` function.
+  ### See
+  `Promotion.rule_update_changeset/2`
+
+  To create rule explicitly without `cast_assoc` use `create_changeset/2`.
+  """
   def changeset(%__MODULE__{} = rule, params) do
     rule
     |> cast(params, @create_params)
     |> validate_required(@required_params)
+    |> common_changeset()
+  end
+
+  def create_changeset(%__MODULE__{} = rule, params) do
+    rule
+    |> cast(params, @create_params)
+    |> validate_required([:promotion_id | @required_params])
+    |> common_changeset()
+  end
+
+  ############################ private functions ######################
+
+  defp common_changeset(changeset) do
+    changeset
     |> unique_constraint(:name)
     |> foreign_key_constraint(:promotion_id)
     |> validate_preference_with_target()
   end
-
-  ############################ private functions ######################
 
   defp validate_preference_with_target(%Ecto.Changeset{valid?: true} = changeset) do
     with {:ok, preferences} <- fetch_change(changeset, :preferences),

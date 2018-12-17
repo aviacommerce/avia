@@ -13,8 +13,7 @@ defmodule Snitch.Data.Schema.PromotionRuleTest do
 
     assert %{
              module: ["can't be blank"],
-             name: ["can't be blank"],
-             promotion_id: ["can't be blank"]
+             name: ["can't be blank"]
            } == errors_on(changeset)
   end
 
@@ -87,7 +86,7 @@ defmodule Snitch.Data.Schema.PromotionRuleTest do
       promotion = insert(:promotion)
 
       params = %{
-        name: "Order Item Total",
+        name: "Product Rule",
         module: "Elixir.Snitch.Data.Schema.PromotionRule.Product",
         preferences: %{product_list: [1, 2, 3, 4], match_policy: "all"},
         promotion_id: promotion.id
@@ -102,7 +101,7 @@ defmodule Snitch.Data.Schema.PromotionRuleTest do
       promotion = insert(:promotion)
 
       params = %{
-        name: "Order Item Total",
+        name: "Product Rule",
         module: "Elixir.Snitch.Data.Schema.PromotionRule.Product",
         preferences: %{product_list: [1, 2, 3, 4], match_policy: "abc"},
         promotion_id: promotion.id
@@ -119,7 +118,7 @@ defmodule Snitch.Data.Schema.PromotionRuleTest do
       promotion = insert(:promotion)
 
       params = %{
-        name: "Order Item Total",
+        name: "Product Rule",
         module: "Elixir.Snitch.Data.Schema.PromotionRule.Product",
         preferences: %{product_list: [], match_policy: "all"},
         promotion_id: promotion.id
