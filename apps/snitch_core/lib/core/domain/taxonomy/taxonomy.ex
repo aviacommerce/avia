@@ -173,9 +173,12 @@ defmodule Snitch.Domain.Taxonomy do
   def get_all_children_and_self(taxon_id) do
     case get_taxon(taxon_id) do
       %Taxon{} = taxon ->
-        taxon
-        |> AsNestedSet.self_and_descendants()
-        |> AsNestedSet.execute(Repo)
+        taxons =
+          taxon
+          |> AsNestedSet.self_and_descendants()
+          |> AsNestedSet.execute(Repo)
+
+        {:ok, taxons}
 
       _ ->
         {:error, :not_found}

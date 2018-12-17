@@ -151,11 +151,11 @@ defmodule Snitch.Data.Schema.Product do
   end
 
   def product_by_category_query(taxon_id) do
-    categories =
-      Taxonomy.get_all_children_and_self(taxon_id)
-      |> Enum.map(& &1.id)
+    {:ok, categories} = Taxonomy.get_all_children_and_self(taxon_id)
 
-    from(p in __MODULE__, where: p.taxon_id in ^categories)
+    categories_ids = Enum.map(categories, & &1.id)
+
+    from(p in __MODULE__, where: p.taxon_id in ^categories_ids)
   end
 
   def set_delete_fields(%Ecto.Query{} = product_query) do

@@ -133,6 +133,12 @@ defmodule Snitch.Data.Model.Product do
     end
   end
 
+  def get_products_by_category(taxon_id) do
+    taxon_id
+    |> Product.product_by_category_query()
+    |> Repo.all()
+  end
+
   @doc """
   Handles creating new images and associating them with the product.
   The function stores the name of the image in the `snitch_images` table

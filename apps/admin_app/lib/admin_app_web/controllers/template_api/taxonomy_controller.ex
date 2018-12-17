@@ -4,7 +4,7 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
   alias Snitch.Domain.Taxonomy
   alias AdminAppWeb.TemplateApi.TaxonomyView
   alias Snitch.Data.Schema.Taxon
-  alias Snitch.Data.Model.Image
+  alias Snitch.Data.Model.{Image, Product}
   alias Snitch.Core.Tools.MultiTenancy.Repo
   import Phoenix.View, only: [render_to_string: 3]
 
@@ -59,6 +59,29 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
         conn
         |> put_status(:bad_request)
         |> json(%{error: %{message: "Failed to update category"}})
+    end
+  end
+
+  def taxon_delete_aggregate(conn, %{"taxon_id" => taxon_id}) do
+    with {:ok, categories} <- Taxonomy.get_all_children_and_self(taxon_id) do
+      category_count = length(categories)
+      product_count = Product.get_products_by_category(taxon_id) |> length
+
+      html =
+        render_to_string(TaxonomyView, "category_aggregate.html", %{
+          conn: conn,
+          category_count: category_count,
+          product_count: product_count
+        })
+
+      conn
+      |> put_status(200)
+      |> json(%{html: html})
+    else
+      {:error, :not_found} ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: %{message: "Category not found"}})
     end
   end
 
