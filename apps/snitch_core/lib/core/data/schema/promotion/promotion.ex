@@ -7,6 +7,7 @@ defmodule Snitch.Data.Schema.Promotion do
   """
 
   use Snitch.Data.Schema
+  alias Snitch.Data.Schema.PromotionRule
 
   @type t :: %__MODULE__{}
   @match_policy ~w(all any)s
@@ -21,6 +22,10 @@ defmodule Snitch.Data.Schema.Promotion do
     field(:current_usage_count, :integer, default: 0)
     field(:match_policy, :string, default: "all")
     field(:active?, :boolean, default: false)
+
+    # associations
+    has_many(:rules, PromotionRule, on_delete: :delete_all)
+
     timestamps()
   end
 
