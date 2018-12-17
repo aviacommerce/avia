@@ -12,6 +12,7 @@ defmodule AdminAppWeb.OrderController do
   alias AdminAppWeb.OrderView
   alias AdminApp.OrderContext
   alias AdminApp.PackageContext
+  alias AdminAppWeb.Helpers
 
   @root_path [File.cwd!(), "invoices"] |> Path.join()
 
@@ -264,6 +265,30 @@ defmodule AdminAppWeb.OrderController do
         conn = put_flash(conn, :error, Atom.to_string(title) <> " - " <> error_value)
         redirect(conn, to: "/orders/#{order.number}/address/add")
     end
+  end
+
+  def export(conn, _params) do
+    current_user = Guardian.Plug.current_resource(conn)
+  
+    {:ok, conn} =
+    Repo.transaction(fn ->
+      abc = Helpers.build_export_query(current_user)
+      require IEx
+      IEx.pry
+      |> Enum.reduce_while(conn, fn (data, conn) ->
+      case chunk(conn, data) do
+        {:ok, conn} ->
+          {:cont, conn}
+        {:error, :closed} ->
+          {:halt, conn}
+      end
+    end)
+    end)
+    conn =
+      conn
+      |> put_resp_header("content-disposition", "attachment; filename=payments.csv")
+      |> put_resp_content_type("text/csv")
+      |> send_chunked(200)
   end
 
   defp remove_line_item(edit_item, line_items) do

@@ -62,4 +62,24 @@ defmodule AdminAppWeb.Helpers do
     |> Date.add(-1 * days)
     |> Date.to_string()
   end
+
+  def build_export_query(user, batch_size \\ 500) do
+    columns = ~w(id number special_instructions inserted_at updated_at user_id billing_address shipping_address state)
+
+    query = """
+      COPY (
+        SELECT #{Enum.join(columns, ",")}
+        FROM snitch_orders
+        WHERE archived = false
+        AND user_id = #{user.id}
+      ) to STDOUT WITH CSV DELIMITER ',';
+    """
+
+    csv_header = [Enum.join(columns, ","), "\n"]
+
+    Ecto.Adapters.SQL.stream(Repo, query, [], max_rows: batch_size)
+    |> Stream.map(&(&1.rows))
+    |> (fn stream -> Stream.concat(csv_header, stream) end).()
+  end
+
 end
