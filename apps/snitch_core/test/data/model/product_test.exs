@@ -4,6 +4,8 @@ defmodule Snitch.Data.Model.ProductTest do
   import Snitch.Factory
   alias Snitch.Data.Model.Product
   alias Snitch.Data.Schema.Product, as: ProductSchema
+  alias Snitch.Tools.Helper.Taxonomy
+  alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
   alias Snitch.Repo
 
   @rummage_default %{
@@ -232,10 +234,69 @@ defmodule Snitch.Data.Model.ProductTest do
     end
   end
 
+  describe "get_products_by_category/1" do
+    test "get product from different category levels" do
+      create_taxonomy()
+
+      casual_shirt = TaxonomyDomain.get_taxon_by_name("Casual Shirt")
+      insert_list(3, :product, taxon: casual_shirt, state: "active")
+
+      assert Product.get_products_by_category(casual_shirt.id) |> length == 3
+
+      formal_shirt = TaxonomyDomain.get_taxon_by_name("Formal Shirt")
+      insert_list(5, :product, taxon: formal_shirt, state: "draft")
+
+      assert Product.get_products_by_category(formal_shirt.id) |> length == 5
+
+      formal_shirt = TaxonomyDomain.get_taxon_by_name("Shrugs")
+      assert Product.get_products_by_category(formal_shirt.id) |> length == 0
+
+      formal_shirt = TaxonomyDomain.get_taxon_by_name("TopWear")
+      assert Product.get_products_by_category(formal_shirt.id) |> length == 8
+    end
+  end
+
   defp get_naive_date_time(date) do
     Date.from_iso8601(date)
     |> elem(1)
     |> NaiveDateTime.new(~T[00:00:00])
     |> elem(1)
+  end
+
+  defp create_taxonomy() do
+    Taxonomy.create_taxonomy({
+      "Category",
+      [
+        {"Men",
+         [
+           {"TopWear",
+            [
+              {"TShirt", []},
+              {"Casual Shirt", []},
+              {"Formal Shirt", []}
+            ]},
+           {"BottomWear",
+            [
+              {"Jeans", []},
+              {"Shorts", []}
+            ]}
+         ]},
+        {"Women",
+         [
+           {"Western Wear",
+            [
+              {"Dresses & JumpSuit", []},
+              {"Tops, Tshirts & Shirts", []},
+              {"Shrugs", []}
+            ]},
+           {"Indian & Fusion Wear",
+            [
+              {"Kurta's & Suits", []},
+              {"Skirts and Palazzos", []},
+              {"Jackets and WaistCoats", []}
+            ]}
+         ]}
+      ]
+    })
   end
 end

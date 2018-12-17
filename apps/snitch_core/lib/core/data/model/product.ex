@@ -133,6 +133,12 @@ defmodule Snitch.Data.Model.Product do
     end
   end
 
+  @doc """
+  Gets all product under a particular product category.
+
+  All category tree is considered under the category the search is done.
+  """
+  @spec get_products_by_category(integer) :: [Product.t()]
   def get_products_by_category(taxon_id) do
     taxon_id
     |> Product.product_by_category_query()
