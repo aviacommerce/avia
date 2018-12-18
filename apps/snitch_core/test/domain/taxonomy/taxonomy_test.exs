@@ -10,11 +10,11 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
   # Will create a better code for this to create taxonomy from list or map
   # Creates following taxonomy
   #   ├── Home & Living
-  #   │   └── Kitchen & Table
-  #   │   └── Table Cover
-  #   ├── Mats & Napkin
-  #   ├── Home decor
-
+  #       └── Kitchen & Tables
+  #       │   └── Table Covers
+  #       │   └── Mat & Napkins
+  #       └── Home Decor
+  #       └── Flooring
   defp create_taxonomy do
     taxonomy = insert(:taxonomy, name: "Home & Living")
 
@@ -288,6 +288,28 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
 
     test "invalid taxon" do
       {:error, :not_found} = Taxonomy.get_child_taxons(-1)
+    end
+  end
+
+  describe "delete_taxon/1" do
+    test "successfully delete taxon" do
+      create_taxonomy()
+
+      product_category = Taxonomy.get_taxon_by_name("Table Covers")
+      products = insert_list(3, :product, taxon: product_category)
+
+      delete_category = Taxonomy.get_taxon_by_name("Kitchen & Tables")
+
+      {:ok, result} = Taxonomy.delete_taxon(delete_category.id)
+
+      assert result.delete_products |> length == 3
+      assert Taxonomy.get_taxon_by_name("Kitchen & Tables") == nil
+      assert Taxonomy.get_taxon_by_name("Table Covers") == nil
+      assert Taxonomy.get_taxon_by_name("Mat & Napkins") == nil
+    end
+
+    test "invalid taxon" do
+      assert Taxonomy.delete_taxon(-1) == {:error, :not_found}
     end
   end
 
