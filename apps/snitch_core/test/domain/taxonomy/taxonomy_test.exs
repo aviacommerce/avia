@@ -10,11 +10,11 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
   # Will create a better code for this to create taxonomy from list or map
   # Creates following taxonomy
   #   ├── Home & Living
-  #   │   └── Kitchen & Table
-  #   │   └── Table Cover
-  #   ├── Mats & Napkin
-  #   ├── Home decor
-
+  #       └── Kitchen & Tables
+  #       │   └── Table Covers
+  #       │   └── Mat & Napkins
+  #       └── Home Decor
+  #       └── Flooring
   defp create_taxonomy do
     taxonomy = insert(:taxonomy, name: "Home & Living")
 
@@ -267,6 +267,91 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
       assert_raise RuntimeError, "No taxonomy is associated with taxon", fn ->
         Taxonomy.is_root?(taxon_without_taxonomy)
       end
+    end
+  end
+
+  describe "get_child_taxons/1" do
+    test "return all categories" do
+      create_taxonomy()
+
+      home_and_living = Taxonomy.get_taxon_by_name("Home & Living")
+
+      {:ok, child_taxons} = Taxonomy.get_child_taxons(home_and_living.id)
+
+      assert length(child_taxons) == 3
+
+      child_taxons
+      |> Enum.map(fn taxon ->
+        assert Enum.member?(["Home Decor", "Kitchen & Tables", "Flooring"], taxon.name)
+      end)
+    end
+
+    test "invalid taxon" do
+      {:error, :not_found} = Taxonomy.get_child_taxons(-1)
+    end
+  end
+
+  describe "delete_taxon/1" do
+    test "successfully delete taxon" do
+      create_taxonomy()
+
+      product_category = Taxonomy.get_taxon_by_name("Table Covers")
+      products = insert_list(3, :product, taxon: product_category)
+
+      delete_category = Taxonomy.get_taxon_by_name("Kitchen & Tables")
+
+      {:ok, result} = Taxonomy.delete_taxon(delete_category.id)
+
+      assert result.delete_products |> length == 3
+      assert Taxonomy.get_taxon_by_name("Kitchen & Tables") == nil
+      assert Taxonomy.get_taxon_by_name("Table Covers") == nil
+      assert Taxonomy.get_taxon_by_name("Mat & Napkins") == nil
+    end
+
+    test "invalid taxon" do
+      assert Taxonomy.delete_taxon(-1) == {:error, :not_found}
+    end
+  end
+
+  describe "get_ancestors/1" do
+    test "successfully get ancestors" do
+      create_taxonomy()
+
+      product_category = Taxonomy.get_taxon_by_name("Table Covers")
+
+      {:ok, ancestors} = Taxonomy.get_ancestors(product_category.id)
+
+      assert [
+               "Home & Living",
+               "Kitchen & Tables"
+             ] == Enum.map(ancestors, & &1.name)
+    end
+
+    test "invalid taxon" do
+      assert Taxonomy.get_ancestors(-1) == {:error, :not_found}
+    end
+  end
+
+  describe "get_all_children_and_self/1" do
+    test "successfully get all children" do
+      create_taxonomy()
+
+      product_category = Taxonomy.get_taxon_by_name("Home & Living")
+
+      {:ok, children} = Taxonomy.get_all_children_and_self(product_category.id)
+
+      assert [
+               "Home & Living",
+               "Flooring",
+               "Kitchen & Tables",
+               "Table Covers",
+               "Mat & Napkins",
+               "Home Decor"
+             ] == Enum.map(children, & &1.name)
+    end
+
+    test "invalid taxon" do
+      assert Taxonomy.get_all_children_and_self(-1) == {:error, :not_found}
     end
   end
 
