@@ -7,7 +7,7 @@ defmodule Snitch.Data.Schema.Promotion do
   """
 
   use Snitch.Data.Schema
-  alias Snitch.Data.Schema.PromotionRule
+  alias Snitch.Data.Schema.{PromotionRule, PromotionAction}
 
   @type t :: %__MODULE__{}
   @match_policy ~w(all any)s
@@ -25,6 +25,10 @@ defmodule Snitch.Data.Schema.Promotion do
 
     # associations
     has_many(:rules, PromotionRule, on_delete: :delete_all)
+
+    # shouldn't delete actions they are being used for tracking
+    # adjustments later on.
+    has_many(:actions, PromotionAction, on_delete: :nilify_all)
 
     timestamps()
   end
@@ -60,6 +64,27 @@ defmodule Snitch.Data.Schema.Promotion do
     |> cast(params, @create_fields)
     |> common_changeset()
     |> cast_assoc(:rules, with: &PromotionRule.changeset/2)
+  end
+
+  @doc """
+  Returns a changeset to update the actions for a promotion.
+
+  ### Note
+  - The function uses `cast_assoc` for managing associations so
+    rules specified by `cast_assoc` applies.
+    __See__
+    `Ecto.Changeset.cast_assoc(changeset, name, opts \\ [])`
+  - The `:actions` association needs to be preloaded before calling
+    update `action`.
+  - `on_replace: :nilify_all` is being used for `actions` because
+    in case a promotion is updated and the action is removed then it should
+    not be removed as it keeps track of adjustments against the order.
+  """
+  def action_update_changeset(%__MODULE__{} = promotion, params) do
+    promotion
+    |> cast(params, @create_fields)
+    |> common_changeset()
+    |> cast_assoc(:actions, with: &PromotionAction.changeset/2)
   end
 
   @doc """

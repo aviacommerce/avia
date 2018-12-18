@@ -76,7 +76,7 @@ defmodule Snitch.Data.Schema.PromotionTest do
   end
 
   describe "rule_update_changeset/2" do
-    test "successfully adds new rules for promotion" do
+    test "can successfully add new rules for promotion" do
       promotion = insert(:promotion)
 
       params = %{
@@ -133,6 +133,76 @@ defmodule Snitch.Data.Schema.PromotionTest do
                  %{preferences: [%{match_policy: ["is invalid"]}]}
                ]
              } = get_changeset_error(changeset)
+    end
+  end
+
+  describe "action_update_changeset/2" do
+    test "can successfully add new actions for promotion" do
+      promotion = insert(:promotion)
+
+      params = %{
+        actions: [
+          %{
+            name: "Order Action",
+            module: "Elixir.Snitch.Data.Schema.PromotionAction.OrderAction",
+            preferences: %{
+              calculator_module: "Elixir.Snitch.Domain.Calculator.FlatRate",
+              calculator_preferences: %{amount: 10}
+            }
+          },
+          %{
+            name: "LineItem Action",
+            module: "Elixir.Snitch.Data.Schema.PromotionAction.LineItemAction",
+            preferences: %{
+              calculator_module: "Elixir.Snitch.Domain.Calculator.FlatRate",
+              calculator_preferences: %{amount: 5}
+            }
+          }
+        ]
+      }
+
+      promotion = Repo.preload(promotion, :actions)
+      assert length(promotion.actions) == 0
+
+      assert %{valid?: true} = cs = Promotion.action_update_changeset(promotion, params)
+      assert {:ok, promo} = Repo.update(cs)
+      assert length(promo.actions) == 2
+    end
+
+    test "fails for errors in params" do
+      promotion = insert(:promotion)
+
+      params = %{
+        actions: [
+          %{
+            name: "Order Action",
+            module: "Elixir.Snitch.Data.Schema.PromotionAction.OrderAction",
+            preferences: %{
+              calculator_module: "Elixir.Snitch.Domain.Calculator.FlatRate",
+              calculator_preferences: %{amount: "abc"}
+            }
+          },
+          %{
+            name: "LineItem Action",
+            module: "Elixir.Snitch.Data.Schema.PromotionAction.LineItem",
+            preferences: %{
+              calculator_module: "Elixir.Snitch.Domain.Calculator.FlatRate",
+              calculator_preferences: %{amount: 5}
+            }
+          }
+        ]
+      }
+
+      promotion = Repo.preload(promotion, :actions)
+
+      assert %{valid?: false} = cs = Promotion.action_update_changeset(promotion, params)
+
+      assert %{
+               actions: [
+                 %{preferences: [%{calculator_preferences: [%{amount: ["is invalid"]}]}]},
+                 %{module: [%{type: PromotionActionEnum, validation: :cast}]}
+               ]
+             } = get_changeset_error(cs)
     end
   end
 
