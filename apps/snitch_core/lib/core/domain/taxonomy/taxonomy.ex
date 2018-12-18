@@ -166,8 +166,23 @@ defmodule Snitch.Domain.Taxonomy do
     |> Enum.map(&Helper.convert_to_map/1)
   end
 
+  @doc """
+  Gets all immediate children for a particular category
+  """
+  @spec get_child_taxons(integer()) :: [Taxon.t()]
   def get_child_taxons(taxon_id) do
-    Repo.all(from(taxon in Taxon, where: taxon.parent_id == ^taxon_id))
+    case get_taxon(taxon_id) do
+      %Taxon{} = taxon ->
+        taxons =
+          taxon
+          |> AsNestedSet.children()
+          |> AsNestedSet.execute(Repo)
+
+        {:ok, taxons}
+
+      _ ->
+        {:error, :not_found}
+    end
   end
 
   def get_all_children_and_self(taxon_id) do

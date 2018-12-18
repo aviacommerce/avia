@@ -270,6 +270,27 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
     end
   end
 
+  describe "get_child_taxons/1" do
+    test "return all categories" do
+      create_taxonomy()
+
+      home_and_living = Taxonomy.get_taxon_by_name("Home & Living")
+
+      {:ok, child_taxons} = Taxonomy.get_child_taxons(home_and_living.id)
+
+      assert length(child_taxons) == 3
+
+      child_taxons
+      |> Enum.map(fn taxon ->
+        assert Enum.member?(["Home Decor", "Kitchen & Tables", "Flooring"], taxon.name)
+      end)
+    end
+
+    test "invalid taxon" do
+      {:error, :not_found} = Taxonomy.get_child_taxons(-1)
+    end
+  end
+
   defp dump_taxonomy(taxon) do
     taxon
     |> Taxonomy.get_root()
