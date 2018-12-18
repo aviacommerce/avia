@@ -200,6 +200,10 @@ defmodule Snitch.Domain.Taxonomy do
     end
   end
 
+  @doc """
+  Gets all the ancestor taxons till the root level
+  """
+  @spec get_ancestors(integer()) :: {:ok, [Taxon.t()]} | {:error, :not_found}
   def get_ancestors(taxon_id) do
     case Repo.get(Taxon, taxon_id) do
       nil ->

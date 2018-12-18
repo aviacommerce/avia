@@ -313,6 +313,25 @@ defmodule Snitch.Core.Domain.TaxonomyTest do
     end
   end
 
+  describe "get_ancestors/1" do
+    test "successfully get ancestors" do
+      create_taxonomy()
+
+      product_category = Taxonomy.get_taxon_by_name("Table Covers")
+
+      {:ok, ancestors} = Taxonomy.get_ancestors(product_category.id)
+
+      assert [
+               "Home & Living",
+               "Kitchen & Tables"
+             ] == Enum.map(ancestors, & &1.name)
+    end
+
+    test "invalid taxon" do
+      assert Taxonomy.get_ancestors(-1) == {:error, :not_found}
+    end
+  end
+
   defp dump_taxonomy(taxon) do
     taxon
     |> Taxonomy.get_root()
