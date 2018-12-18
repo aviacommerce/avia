@@ -259,7 +259,7 @@ defmodule AdminAppWeb.ProductController do
   def select_category(conn, _params) do
     with {:ok, taxonomy} <- Taxonomy.get_default_taxonomy(),
          taxonomy <- Repo.preload(taxonomy, :root),
-         taxons <- Taxonomy.get_child_taxons(taxonomy.root.id) do
+         {:ok, taxons} <- Taxonomy.get_child_taxons(taxonomy.root.id) do
       render(conn, "product_category.html", taxons: taxons)
     else
       {:error, :not_found} ->

@@ -12,9 +12,10 @@ defmodule Snitch.Domain.Taxonomy do
 
   alias Ecto.Multi
   alias Snitch.Data.Model.Image, as: ImageModel
-  alias Snitch.Data.Schema.{Taxon, Taxonomy, Image}
+  alias Snitch.Data.Schema.{Taxon, Taxonomy, Image, Product}
   alias Snitch.Tools.Helper.Taxonomy, as: Helper
   alias Snitch.Tools.Helper.ImageUploader
+  alias Snitch.Data.Model.Product, as: ProductModel
 
   @doc """
   Adds child taxon to left, right or child of parent taxon.
@@ -165,10 +166,48 @@ defmodule Snitch.Domain.Taxonomy do
     |> Enum.map(&Helper.convert_to_map/1)
   end
 
+  @doc """
+  Gets all immediate children for a particular category
+  """
+  @spec get_child_taxons(integer()) :: [Taxon.t()]
   def get_child_taxons(taxon_id) do
-    Repo.all(from(taxon in Taxon, where: taxon.parent_id == ^taxon_id))
+    case get_taxon(taxon_id) do
+      %Taxon{} = taxon ->
+        taxons =
+          taxon
+          |> AsNestedSet.children()
+          |> AsNestedSet.execute(Repo)
+
+        {:ok, taxons}
+
+      _ ->
+        {:error, :not_found}
+    end
   end
 
+  @doc """
+  Gets all the taxons under a taxon tree
+  """
+  @spec get_all_children_and_self(integer()) :: {:ok, [Taxon.t()]} | {:error, :not_found}
+  def get_all_children_and_self(taxon_id) do
+    case get_taxon(taxon_id) do
+      %Taxon{} = taxon ->
+        taxons =
+          taxon
+          |> AsNestedSet.self_and_descendants()
+          |> AsNestedSet.execute(Repo)
+
+        {:ok, taxons}
+
+      _ ->
+        {:error, :not_found}
+    end
+  end
+
+  @doc """
+  Gets all the ancestor taxons till the root level
+  """
+  @spec get_ancestors(integer()) :: {:ok, [Taxon.t()]} | {:error, :not_found}
   def get_ancestors(taxon_id) do
     case Repo.get(Taxon, taxon_id) do
       nil ->
@@ -273,9 +312,26 @@ defmodule Snitch.Domain.Taxonomy do
   end
 
   @doc """
-  Delete a taxon
+  Delete a taxon along with all the products associated with that taxon tree.
   """
-  def delete_taxon(taxon) do
-    taxon |> AsNestedSet.delete() |> AsNestedSet.execute(Repo)
+  def delete_taxon(taxon_id) do
+    case get_taxon(taxon_id) do
+      %Taxon{} = taxon ->
+        Multi.new()
+        |> Multi.run(:delete_products, fn _ -> ProductModel.delete_by_category(taxon) end)
+        |> Multi.run(:category, fn _ -> do_delete_taxon(taxon) end)
+        |> Repo.transaction()
+
+      nil ->
+        {:error, :not_found}
+    end
+  end
+
+  defp do_delete_taxon(%Taxon{} = taxon) do
+    taxon
+    |> AsNestedSet.delete()
+    |> AsNestedSet.execute(Snitch.Core.Tools.MultiTenancy.Repo)
+
+    {:ok, taxon}
   end
 end

@@ -2,9 +2,9 @@
   <span>
     <i class="icon-minus-sign fa"><%= @taxon.name %></i>
     <div class="taxon-actions float-right">
-      <i class="add-taxon fa fa-plus-square fa-4" aria-hidden="true"></i>
-      <i class="edit-taxon fa fa-pencil-square fa-4" aria-hidden="true"></i>
-      <!-- <i class="fa fa-trash fa-4" aria-hidden="true"></i> -->
+      <i class="add-taxon fa fa-plus-square fa-4"></i>
+      <i class="edit-taxon fa fa-pencil-square fa-4"></i>
+      <i class="delete-taxon fa fa-trash fa-4"></i>
     </div>
   </span>
   <ul data-parent_id="<%= @taxon.id %>">

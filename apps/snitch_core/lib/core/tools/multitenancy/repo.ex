@@ -17,9 +17,7 @@ defmodule Snitch.Core.Tools.MultiTenancy.Repo do
   defrepo(:insert!, [:arg1], :append)
   defrepo(:update, [:arg1], :append)
   defrepo(:update!, [:arg1], :append)
-  defrepo(:update_all, [:arg1, :arg2], :append)
   defrepo(:delete, [:arg1], :append)
-  defrepo(:delete_all, [:arg1], :append)
   defrepo(:aggregate, [:arg1, :arg2, :arg3], :append)
 
   defrepo(:load, [:arg1, :arg2], :pass)
@@ -34,6 +32,10 @@ defmodule Snitch.Core.Tools.MultiTenancy.Repo do
   def preload(arg1, arg2, arg3 \\ []), do: Repo.preload(arg1, arg2, get_opts() ++ arg3)
 
   def transaction(arg1, arg2 \\ []), do: Repo.transaction(arg1, get_opts() ++ arg2)
+
+  def delete_all(arg1, arg2 \\ []), do: Repo.delete_all(arg1, get_opts() ++ arg2)
+
+  def update_all(arg1, arg2, arg3 \\ []), do: Repo.update_all(arg1, arg2, get_opts() ++ arg3)
 
   def set_tenant(tenant) do
     Process.put({__MODULE__, :prefix}, tenant)
