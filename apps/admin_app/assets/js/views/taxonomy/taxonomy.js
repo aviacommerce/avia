@@ -6,6 +6,7 @@ export default class View extends MainView {
     super.mount();
 
     let children_ul = null;
+    let delete_taxon_id = null;
 
     $(".taxonomy").on("click", ".edit-taxon", function(e) {
       $("#edittaxon-modal").modal({ show: true });
@@ -50,6 +51,51 @@ export default class View extends MainView {
       children_ul = $(chidren_selector);
       $("#form-taxon-id").val(id);
       e.stopPropagation();
+    });
+
+    $(".taxonomy").on("click", ".delete-taxon", function(e) {
+      e.stopPropagation();
+      $(`#deletetaxon-modal`).modal({ show: true });
+      $(`#taxon-delete-loader`)
+        .addClass(`loader`)
+        .show();
+      $("#delete-taxon-danger").hide();
+      let taxon_id = $(this)
+        .closest("li")
+        .data("taxon_id");
+      delete_taxon_id = taxon_id;
+      fetch("/api/taxon/" + taxon_id + "/aggregate")
+        .then(function(response) {
+          if (response.ok) return response.json();
+          else {
+            throw Error("Category request failed");
+          }
+        })
+        .then(function(json) {
+          $(`#taxon-delete-body`)
+            .show()
+            .empty()
+            .append(json.html);
+          $(`#taxon-delete-loader`)
+            .removeClass(`loader`)
+            .hide();
+        })
+        .catch(function(error_message) {
+          $(`#taxon-delete-body`).hide();
+          $(`#taxon-delete-loader`)
+            .removeClass(`loader`)
+            .hide();
+          $("#delete-taxon-danger").html(error_message);
+          $("#delete-taxon-danger").show();
+        });
+    });
+
+    $("#taxon_delete").click(function() {
+      fetch("/api/taxon/" + delete_taxon_id, {
+        method: "DELETE"
+      }).then(response => {
+        $(`#deletetaxon-modal`).modal("hide");
+      });
     });
 
     $(".taxonform").on("submit", function(event) {

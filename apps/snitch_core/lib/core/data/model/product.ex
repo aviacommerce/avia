@@ -8,7 +8,7 @@ defmodule Snitch.Data.Model.Product do
   import Ecto.Query
   alias Ecto.Multi
   alias Snitch.Data.Model.Image, as: ImageModel
-  alias Snitch.Data.Schema.{Image, Product, Variation}
+  alias Snitch.Data.Schema.{Image, Product, Variation, Taxon}
   alias Snitch.Tools.Helper.ImageUploader
 
   @product_states [:active, :in_active, :draft]
@@ -114,6 +114,41 @@ defmodule Snitch.Data.Model.Product do
          changeset <- Product.delete_changeset(product) do
       Repo.update(changeset)
     end
+  end
+
+  @doc """
+  Deletes all product that fall under a particular category and all its children
+  category
+  """
+  @spec delete_by_category(Taxon.t()) :: {:ok, [Products.t()]} | {:error, :delete_failed}
+  def delete_by_category(%Taxon{} = taxon) do
+    with product_by_category_query <- Product.product_by_category_query(taxon.id),
+         product_delete_query <- Product.set_delete_fields(product_by_category_query) do
+      total_products =
+        from(p in product_by_category_query, select: count(p.id))
+        |> Repo.one()
+
+      {delete_product_count, products_ids} =
+        Repo.update_all(product_delete_query, [], returning: [:id])
+
+      if(total_products == delete_product_count) do
+        {:ok, products_ids}
+      else
+        {:error, :delete_failed}
+      end
+    end
+  end
+
+  @doc """
+  Gets all product under a particular product category.
+
+  All category tree is considered under the category the search is done.
+  """
+  @spec get_products_by_category(integer) :: [Product.t()]
+  def get_products_by_category(taxon_id) do
+    taxon_id
+    |> Product.product_by_category_query()
+    |> Repo.all()
   end
 
   @doc """
