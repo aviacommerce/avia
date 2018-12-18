@@ -304,7 +304,7 @@ defmodule Snitch.Domain.Taxonomy do
   end
 
   @doc """
-  Delete a taxon
+  Delete a taxon along with all the products associated with that taxon tree.
   """
   def delete_taxon(taxon_id) do
     case get_taxon(taxon_id) do
