@@ -248,11 +248,34 @@ defmodule Snitch.Data.Model.ProductTest do
 
       assert Product.get_products_by_category(formal_shirt.id) |> length == 5
 
-      formal_shirt = TaxonomyDomain.get_taxon_by_name("Shrugs")
-      assert Product.get_products_by_category(formal_shirt.id) |> length == 0
+      shrug = TaxonomyDomain.get_taxon_by_name("Shrugs")
+      assert Product.get_products_by_category(shrug.id) |> length == 0
 
-      formal_shirt = TaxonomyDomain.get_taxon_by_name("TopWear")
-      assert Product.get_products_by_category(formal_shirt.id) |> length == 8
+      top_wear = TaxonomyDomain.get_taxon_by_name("TopWear")
+      assert Product.get_products_by_category(top_wear.id) |> length == 8
+    end
+  end
+
+  describe "delete_by_category/1" do
+    test "delete product category" do
+      create_taxonomy()
+
+      casual_shirt = TaxonomyDomain.get_taxon_by_name("Casual Shirt")
+      products = insert_list(3, :product, taxon: casual_shirt, state: "active")
+      products_ids = Enum.map(products, & &1.id)
+
+      {:ok, _} = Product.delete_by_category(casual_shirt)
+
+      products_by_category = Product.get_products_by_category(casual_shirt.id)
+      deleted_products = products_ids |> Enum.map(&Product.get/1)
+
+      assert length(products_by_category) == 0
+
+      deleted_products
+      |> Enum.map(fn product ->
+        assert product.state == :deleted
+        assert product.taxon_id == nil
+      end)
     end
   end
 

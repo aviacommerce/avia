@@ -116,6 +116,11 @@ defmodule Snitch.Data.Model.Product do
     end
   end
 
+  @doc """
+  Deletes all product that fall under a particular category and all its children
+  category
+  """
+  @spec delete_by_category(Taxon.t()) :: {:ok, [Products.t()]} | {:error, :delete_failed}
   def delete_by_category(%Taxon{} = taxon) do
     with product_by_category_query <- Product.product_by_category_query(taxon.id),
          product_delete_query <- Product.set_delete_fields(product_by_category_query) do
@@ -123,12 +128,13 @@ defmodule Snitch.Data.Model.Product do
         from(p in product_by_category_query, select: count(p.id))
         |> Repo.one()
 
-      {delete_product_count, products} = Repo.update_all(product_delete_query, [])
+      {delete_product_count, products_ids} =
+        Repo.update_all(product_delete_query, [], returning: [:id])
 
       if(total_products == delete_product_count) do
-        {:ok, products}
+        {:ok, products_ids}
       else
-        {:error, :bulk_delete_failed}
+        {:error, :delete_failed}
       end
     end
   end
