@@ -97,7 +97,7 @@ defmodule SnitchApiWeb.ProductView do
 
     case variant do
       nil ->
-        []
+        %{images: [], parent_product: nil}
 
       _ ->
         parent_id = variant.parent_product_id
