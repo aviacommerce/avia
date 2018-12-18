@@ -4,12 +4,12 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
   alias Snitch.Domain.Taxonomy
   alias AdminAppWeb.TemplateApi.TaxonomyView
   alias Snitch.Data.Schema.Taxon
-  alias Snitch.Data.Model.Image
+  alias Snitch.Data.Model.{Image, Product}
   alias Snitch.Core.Tools.MultiTenancy.Repo
   import Phoenix.View, only: [render_to_string: 3]
 
   def index(conn, %{"taxon_id" => taxon_id}) do
-    categories = Taxonomy.get_child_taxons(taxon_id)
+    {:ok, categories} = Taxonomy.get_child_taxons(taxon_id)
 
     if(length(categories) > 0) do
       html = render_to_string(TaxonomyView, "taxons.html", taxons: categories)
@@ -61,4 +61,39 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
         |> json(%{error: %{message: "Failed to update category"}})
     end
   end
+
+  def taxon_delete_aggregate(conn, %{"taxon_id" => taxon_id}) do
+    with {:ok, categories} <- Taxonomy.get_all_children_and_self(taxon_id) do
+      category_count = length(categories)
+      product_count = Product.get_products_by_category(taxon_id) |> length
+
+      html =
+        render_to_string(TaxonomyView, "category_aggregate.html", %{
+          conn: conn,
+          category_count: category_count,
+          product_count: product_count
+        })
+
+      conn
+      |> put_status(200)
+      |> json(%{html: html})
+    else
+      {:error, :not_found} ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: %{message: "Category not found"}})
+    end
+  end
+
+  def taxon_delete(conn, params) do
+    params = Map.put(params, "tenant", Repo.get_prefix())
+    Honeydew.async({:delete_cateory, [params]}, :category_delete_queue)
+
+    conn
+    |> put_status(:ok)
+    |> json(%{message: "Category delete has started in background"})
+  end
+
+  defp handle_image_value(%Plug.Upload{} = file), do: file
+  defp handle_image_value(_), do: nil
 end

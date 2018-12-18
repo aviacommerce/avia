@@ -1,0 +1,12 @@
+<div class="alert alert-danger">
+  <span>
+    Deleting category will delete
+    <strong><%= "#{@category_count} #{ngettext("category", "categories", @category_count)}" %></strong>
+    <%= if @product_count > 0 do %>
+      and <strong><%= "#{@product_count} #{ngettext("product", "products", @product_count)}" %>
+      </strong>
+    <% end %>
+  . Are you sure you want to proceed?
+  </span>
+</div>
+<p style="font-size: .75rem;">* category deletion might take a few minutes.</p>

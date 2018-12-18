@@ -1,5 +1,6 @@
 defmodule AdminAppWeb.TemplateApi.TaxonomyView do
   use AdminAppWeb, :view
+  import AdminAppWeb.Gettext
 
   alias Snitch.Data.Schema.VariationTheme
   alias Snitch.Core.Tools.MultiTenancy.Repo
