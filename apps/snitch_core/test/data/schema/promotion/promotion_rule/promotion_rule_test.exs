@@ -45,7 +45,7 @@ defmodule Snitch.Data.Schema.PromotionRuleTest do
   end
 
   describe "changeset/2 with 'item total rule'" do
-    test "create successfuly" do
+    test "create successfully" do
       promotion = insert(:promotion)
 
       params = %{
@@ -82,7 +82,7 @@ defmodule Snitch.Data.Schema.PromotionRuleTest do
   end
 
   describe "changeset/2 with 'products rule'" do
-    test "create successfuly" do
+    test "create successfully" do
       promotion = insert(:promotion)
 
       params = %{

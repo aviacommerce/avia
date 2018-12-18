@@ -17,3 +17,8 @@ defenum(PromotionActionEnum,
   "Elixir.Snitch.Data.Schema.PromotionAction.OrderAction": 0,
   "Elixir.Snitch.Data.Schema.PromotionAction.LineItemAction": 1
 )
+
+defenum(ActionCalculators,
+  "Elixir.Snitch.Domain.Calculator.FlatRate": 0,
+  "Elixir.Snitch.Domain.Calculator.FlatPercent": 1
+)
