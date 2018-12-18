@@ -185,6 +185,10 @@ defmodule Snitch.Domain.Taxonomy do
     end
   end
 
+  @doc """
+  Gets all the taxons under a taxon tree
+  """
+  @spec get_all_children_and_self(integer()) :: {:ok, [Taxon.t()]} | {:error, :not_found}
   def get_all_children_and_self(taxon_id) do
     case get_taxon(taxon_id) do
       %Taxon{} = taxon ->
