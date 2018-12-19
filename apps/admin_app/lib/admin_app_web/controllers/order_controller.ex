@@ -13,7 +13,7 @@ defmodule AdminAppWeb.OrderController do
   alias AdminApp.OrderContext
   alias AdminApp.PackageContext
   alias AdminAppWeb.Helpers
-  alias AdminAppWeb.OrderCsvMail
+  alias AdminAppWeb.OrderExportMail
 
   @root_path [File.cwd!(), "invoices"] |> Path.join()
 
@@ -269,36 +269,19 @@ defmodule AdminAppWeb.OrderController do
   end
 
   def export_csv(conn, _params) do
-  
-    {:ok, file} = Helpers.order_csv_exporter
-    require IEx
-    IEx.pry
-    csv_attachment = %Plug.Upload{
-      path: file.path,
-      content_type: "text/csv",
-      filename: "order.csv"
-    }
-    case OrderCsvMail.order_csv_mail(csv_attachment) do
-      {:ok, _} ->
-        conn
-          |> put_flash(:info, "You'll receive an email with orders csv shortly.")
-          |> redirect(to: page_path(conn, :index))
-      {:error, _} ->
-        conn
-        |> put_flash(:error, "Error sending mail.")
-        |> redirect(to: page_path(conn, :index))
-    end
+    params = Map.put(%{"type" => "csv"}, "tenant", Repo.get_prefix())
+    Honeydew.async({:export_order, [params]}, :export_order_queue)
+    conn
+    |> put_flash(:info, "Orders csv export started in background.")
+    |> redirect(to: page_path(conn, :index))
   end
 
   def export_xls(conn, _params) do
-  
-    abc = Helpers.order_xlsx_exporter
-    IO.inspect abc
-    require IEx
-    IEx.pry
+    params = Map.put(%{"type" => "xlsx"}, "tenant", Repo.get_prefix())
+    Honeydew.async({:export_order, [params]}, :export_order_queue)
     conn
-      |> put_flash(:info, "You'll receive an email with orders xlsx shortly.")
-      |> redirect(to: page_path(conn, :index))
+    |> put_flash(:info, "Orders xlsx export started in background.")
+    |> redirect(to: page_path(conn, :index))
   end
 
   defp remove_line_item(edit_item, line_items) do

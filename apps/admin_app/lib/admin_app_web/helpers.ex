@@ -5,6 +5,7 @@ defmodule AdminAppWeb.Helpers do
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.Order
   alias Elixlsx.{Workbook, Sheet}
+  alias AdminAppWeb.OrderExportMail
 
   @months ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"]
 
@@ -72,13 +73,19 @@ defmodule AdminAppWeb.Helpers do
 
     path = "/tmp/orders.csv"
     query = from u in Order
-    Repo.transaction fn ->
+    {:ok, file} = Repo.transaction fn ->
       query
       |> Repo.stream
       |> Stream.map(&parse_line/1)
       |> CSV.encode
       |> Enum.into(File.stream!(path, [:write, :utf8]))
     end
+    attachment = %Plug.Upload{
+      path: file.path,
+      content_type: "text/csv",
+      filename: "orders.csv"
+    }
+    OrderExportMail.order_export_mail(attachment, "csv")
   end
 
    defp parse_line(order) do
@@ -89,12 +96,16 @@ defmodule AdminAppWeb.Helpers do
 
   def order_xlsx_exporter() do
     orders = Repo.all(Order)
-    abc = xlsx_generator(orders)
+    xlsx_generator(orders)
     |> Elixlsx.write_to_memory("/tmp/orders.xlsx") 
-    require IEx
-    IEx.pry
     |> elem(1) 
     |> elem(1)
+    attachment = %Plug.Upload{
+      path: "/tmp/orders.xlsx",
+      content_type: "text/xlsx",
+      filename: "orders.xlsx"
+    }
+    OrderExportMail.order_export_mail(attachment, "xlsx")
   end
 
   def xlsx_generator(orders) do

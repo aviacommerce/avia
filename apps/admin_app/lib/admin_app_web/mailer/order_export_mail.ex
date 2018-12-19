@@ -1,20 +1,20 @@
-defmodule AdminAppWeb.OrderCsvMail do
+defmodule AdminAppWeb.OrderExportMail do
     @moduledoc """
-    Composing email to send order csv export.
+    Composing email to send order export.
     """
 
     import Swoosh.Email
     alias AdminAppWeb.Mailer
   
-    def order_csv_mail(csv_attachment) do
+    def order_export_mail(attachment, type) do
       sender_email = Application.get_env(:admin_app, AdminAppWeb.Endpoint)[:sendgrid_sender_mail]
 
       new()
       |> to("jyotigautam108@gmail.com")
       |> from({"Aviacommerce", sender_email})
       |> subject("Your orders")
-      |> text_body("Here is the csv export of your orders.")
-      |> attachment(csv_attachment)
+      |> text_body("Here is the #{type} export of your orders.")
+      |> attachment(attachment)
       |> Mailer.deliver()
     end
   end
