@@ -12,6 +12,7 @@ defmodule Snitch.Data.Model.Promotion.Eligibility do
   along with `promotion rules` to be eligible for the promotion.
   """
   alias Snitch.Data.Model.Promotion.Applicability
+  alias Snitch.Data.Model.Promotion.OrderEligiblity
 
   @success_message "coupon eligible"
 
@@ -25,8 +26,8 @@ defmodule Snitch.Data.Model.Promotion.Eligibility do
   on the basis of `match_policy` to give the final result.
   """
   @spec eligible(order :: Order.t(), coupon :: String.t()) ::
-          {true, String.t()}
-          | {false, String.t()}
+          {:ok, String.t()}
+          | {:error, String.t()}
   def eligible(order, coupon) do
     with {:ok, promotion} <- Applicability.valid_coupon_check(coupon),
          true <- promotion_level_check(promotion),
@@ -58,5 +59,15 @@ defmodule Snitch.Data.Model.Promotion.Eligibility do
   ############## order level checks ###############
 
   def order_level_check(order, promotion) do
+    # TODO add check for promotion_applied once it is done
+
+    with true <- OrderEligiblity.valid_order_state(order),
+         true <- OrderEligiblity.order_promotionable(order),
+         true <- OrderEligiblity.rules_check(order, promotion) do
+      true
+    else
+      {false, _message} = reason ->
+        reason
+    end
   end
 end
