@@ -1,7 +1,7 @@
 defmodule Snitch.Factory.Promotion do
   defmacro __using__(_opts) do
     quote do
-      alias Snitch.Data.Schema.Promotion
+      alias Snitch.Data.Schema.{Promotion, PromotionAction}
 
       def promotion_factory() do
         %Promotion{
@@ -13,6 +13,18 @@ defmodule Snitch.Factory.Promotion do
           current_usage_count: 0,
           match_policy: "all",
           active?: true
+        }
+      end
+
+      def promotion_order_action_factory() do
+        %PromotionAction{
+          name: "Order Action",
+          module: "Elixir.Snitch.Data.Schema.PromotionAction.OrderAction",
+          preferences: %{
+            calculator_module: "Elixir.Snitch.Domain.Calculator.FlatRate",
+            calculator_preferences: %{amount: 5}
+          },
+          promotion: build(:promotion)
         }
       end
     end
