@@ -13,7 +13,6 @@ defmodule AdminAppWeb.OrderController do
   alias AdminApp.OrderContext
   alias AdminApp.PackageContext
   alias AdminAppWeb.Helpers
-  alias AdminAppWeb.OrderExportMail
 
   @root_path [File.cwd!(), "invoices"] |> Path.join()
 
@@ -269,18 +268,22 @@ defmodule AdminAppWeb.OrderController do
   end
 
   def export_csv(conn, _params) do
-    params = Map.put(%{"type" => "csv"}, "tenant", Repo.get_prefix())
+    current_user = Guardian.Plug.current_resource(conn)
+    params = Map.put(%{"type" => "csv", "user" => current_user}, "tenant", Repo.get_prefix())
     Honeydew.async({:export_order, [params]}, :export_order_queue)
+
     conn
-    |> put_flash(:info, "Orders csv export started in background.")
+    |> put_flash(:info, "Your request is accepted. Data will be emailed shortly")
     |> redirect(to: page_path(conn, :index))
   end
 
   def export_xls(conn, _params) do
-    params = Map.put(%{"type" => "xlsx"}, "tenant", Repo.get_prefix())
+    current_user = Guardian.Plug.current_resource(conn)
+    params = Map.put(%{"type" => "xlsx", "user" => current_user}, "tenant", Repo.get_prefix())
     Honeydew.async({:export_order, [params]}, :export_order_queue)
+
     conn
-    |> put_flash(:info, "Orders xlsx export started in background.")
+    |> put_flash(:info, "Your request is accepted. Data will be emailed shortly")
     |> redirect(to: page_path(conn, :index))
   end
 

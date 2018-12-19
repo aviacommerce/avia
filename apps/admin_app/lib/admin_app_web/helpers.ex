@@ -69,54 +69,59 @@ defmodule AdminAppWeb.Helpers do
     |> Date.to_string()
   end
 
-  def order_csv_exporter() do
-
+  def order_csv_exporter(user) do
     path = "/tmp/orders.csv"
-    query = from u in Order
-    {:ok, file} = Repo.transaction fn ->
-      query
-      |> Repo.stream
-      |> Stream.map(&parse_line/1)
-      |> CSV.encode
-      |> Enum.into(File.stream!(path, [:write, :utf8]))
-    end
+    query = from(u in Order)
+
+    {:ok, file} =
+      Repo.transaction(fn ->
+        query
+        |> Repo.stream()
+        |> Stream.map(&parse_line/1)
+        |> CSV.encode()
+        |> Enum.into(File.stream!(path, [:write, :utf8]))
+      end)
+
     attachment = %Plug.Upload{
       path: file.path,
       content_type: "text/csv",
       filename: "orders.csv"
     }
-    OrderExportMail.order_export_mail(attachment, "csv")
+
+    OrderExportMail.order_export_mail(attachment, user, "csv")
   end
 
-   defp parse_line(order) do
+  defp parse_line(order) do
     # order our data to match our column order
     columns = ~w(id number special_instructions inserted_at updated_at user_id state)
     Enum.map(columns, &Map.get(order, :"#{&1}"))
   end
 
-  def order_xlsx_exporter() do
+  def order_xlsx_exporter(user) do
     orders = Repo.all(Order)
+
     xlsx_generator(orders)
-    |> Elixlsx.write_to_memory("/tmp/orders.xlsx") 
-    |> elem(1) 
+    |> Elixlsx.write_to_memory("/tmp/orders.xlsx")
     |> elem(1)
+    |> elem(1)
+
     attachment = %Plug.Upload{
       path: "/tmp/orders.xlsx",
       content_type: "text/xlsx",
       filename: "orders.xlsx"
     }
-    OrderExportMail.order_export_mail(attachment, "xlsx")
+
+    OrderExportMail.order_export_mail(attachment, user, "xlsx")
   end
 
   def xlsx_generator(orders) do
     columns = ~w(id number special_instructions inserted_at updated_at user_id state)
-    rows = orders |> Enum.map(&(row(&1)))
+    rows = orders |> Enum.map(&row(&1))
     %Workbook{sheets: [%Sheet{name: "Orders", rows: [columns] ++ rows}]}
   end
 
   def row(order) do
     columns = ~w(id number special_instructions inserted_at updated_at user_id state)
-    Enum.map(columns, &Map.get(order, :"#{&1}") |> to_string)
+    Enum.map(columns, &(Map.get(order, :"#{&1}") |> to_string))
   end
-
 end
