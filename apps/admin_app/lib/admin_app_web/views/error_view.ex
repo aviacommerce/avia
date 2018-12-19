@@ -1,6 +1,5 @@
 defmodule AdminAppWeb.ErrorView do
   use AdminAppWeb, :view
-  alias Phoenix.Controller
 
   def render("500.html", _assigns) do
     "Internal server error"

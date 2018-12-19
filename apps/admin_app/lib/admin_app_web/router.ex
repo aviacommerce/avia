@@ -143,6 +143,6 @@ defmodule AdminAppWeb.Router do
   end
 
   scope "/", AdminAppWeb do
-    get "/*path", ErrorController, :index
+    get("/*path", ErrorController, :index)
   end
 end
