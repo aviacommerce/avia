@@ -1,7 +1,7 @@
 defmodule Snitch.Factory.Promotion do
   defmacro __using__(_opts) do
     quote do
-      alias Snitch.Data.Schema.{Promotion, PromotionAction}
+      alias Snitch.Data.Schema.{Promotion, PromotionAction, PromotionRule}
 
       def promotion_factory() do
         %Promotion{
@@ -13,6 +13,24 @@ defmodule Snitch.Factory.Promotion do
           current_usage_count: 0,
           match_policy: "all",
           active?: true
+        }
+      end
+
+      def item_total_rule_factory() do
+        %PromotionRule{
+          name: "Order Item Total",
+          module: "Elixir.Snitch.Data.Schema.PromotionRule.ItemTotal",
+          preferences: %{lower_range: 10, upper_range: 100},
+          promotion: build(:promotion)
+        }
+      end
+
+      def product_rule_factory() do
+        %PromotionRule{
+          name: "Product Rule",
+          module: "Elixir.Snitch.Data.Schema.PromotionRule.Product",
+          preferences: %{match_polciy: "any", product_list: []},
+          promotion: build(:promotion)
         }
       end
 
