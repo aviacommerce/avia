@@ -141,4 +141,8 @@ defmodule AdminAppWeb.Router do
     put("/taxonomy/update", TaxonomyController, :update_taxon)
     post("/product_option_values/:id", OptionTypeController, :update)
   end
+
+  scope "/", AdminAppWeb do
+    get "/*path", ErrorController, :index
+  end
 end
