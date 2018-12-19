@@ -40,6 +40,16 @@ config :admin_app, AdminAppWeb.Mailer,
 
 config :pdf_generator, wkhtml_path: System.get_env("WKHTML_PATH")
 
+config :sentry,
+  dsn: "https://dd946671f2c840b6b51740249efbbb34@sentry.io/1293293",
+  included_environments: [:prod],
+  environment_name: Mix.env(),
+  enable_source_code_context: true,
+  root_source_code_path: File.cwd!(),
+  tags: %{
+    env: "production"
+  }
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
