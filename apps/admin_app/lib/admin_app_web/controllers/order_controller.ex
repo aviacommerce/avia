@@ -13,6 +13,7 @@ defmodule AdminAppWeb.OrderController do
   alias AdminApp.OrderContext
   alias AdminApp.PackageContext
   alias AdminAppWeb.Helpers
+  alias AdminAppWeb.OrderCsvMail
 
   @root_path [File.cwd!(), "invoices"] |> Path.join()
 
@@ -267,28 +268,37 @@ defmodule AdminAppWeb.OrderController do
     end
   end
 
-  def export(conn, _params) do
-    current_user = Guardian.Plug.current_resource(conn)
+  def export_csv(conn, _params) do
   
-    {:ok, conn} =
-    Repo.transaction(fn ->
-      abc = Helpers.build_export_query(current_user)
-      require IEx
-      IEx.pry
-      |> Enum.reduce_while(conn, fn (data, conn) ->
-      case chunk(conn, data) do
-        {:ok, conn} ->
-          {:cont, conn}
-        {:error, :closed} ->
-          {:halt, conn}
-      end
-    end)
-    end)
-    conn =
-      conn
-      |> put_resp_header("content-disposition", "attachment; filename=payments.csv")
-      |> put_resp_content_type("text/csv")
-      |> send_chunked(200)
+    {:ok, file} = Helpers.order_csv_exporter
+    require IEx
+    IEx.pry
+    csv_attachment = %Plug.Upload{
+      path: file.path,
+      content_type: "text/csv",
+      filename: "order.csv"
+    }
+    case OrderCsvMail.order_csv_mail(csv_attachment) do
+      {:ok, _} ->
+        conn
+          |> put_flash(:info, "You'll receive an email with orders csv shortly.")
+          |> redirect(to: page_path(conn, :index))
+      {:error, _} ->
+        conn
+        |> put_flash(:error, "Error sending mail.")
+        |> redirect(to: page_path(conn, :index))
+    end
+  end
+
+  def export_xls(conn, _params) do
+  
+    abc = Helpers.order_xlsx_exporter
+    IO.inspect abc
+    require IEx
+    IEx.pry
+    conn
+      |> put_flash(:info, "You'll receive an email with orders xlsx shortly.")
+      |> redirect(to: page_path(conn, :index))
   end
 
   defp remove_line_item(edit_item, line_items) do

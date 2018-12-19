@@ -1,5 +1,10 @@
 defmodule AdminAppWeb.Helpers do
   import Ecto.Changeset
+  import Ecto.Query
+  alias Ecto.Adapters.SQL
+  alias Snitch.Core.Tools.MultiTenancy.Repo
+  alias Snitch.Data.Schema.Order
+  alias Elixlsx.{Workbook, Sheet}
 
   @months ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"]
 
@@ -63,23 +68,44 @@ defmodule AdminAppWeb.Helpers do
     |> Date.to_string()
   end
 
-  def build_export_query(user, batch_size \\ 500) do
-    columns = ~w(id number special_instructions inserted_at updated_at user_id billing_address shipping_address state)
+  def order_csv_exporter() do
 
-    query = """
-      COPY (
-        SELECT #{Enum.join(columns, ",")}
-        FROM snitch_orders
-        WHERE archived = false
-        AND user_id = #{user.id}
-      ) to STDOUT WITH CSV DELIMITER ',';
-    """
+    path = "/tmp/orders.csv"
+    query = from u in Order
+    Repo.transaction fn ->
+      query
+      |> Repo.stream
+      |> Stream.map(&parse_line/1)
+      |> CSV.encode
+      |> Enum.into(File.stream!(path, [:write, :utf8]))
+    end
+  end
 
-    csv_header = [Enum.join(columns, ","), "\n"]
+   defp parse_line(order) do
+    # order our data to match our column order
+    columns = ~w(id number special_instructions inserted_at updated_at user_id state)
+    Enum.map(columns, &Map.get(order, :"#{&1}"))
+  end
 
-    Ecto.Adapters.SQL.stream(Repo, query, [], max_rows: batch_size)
-    |> Stream.map(&(&1.rows))
-    |> (fn stream -> Stream.concat(csv_header, stream) end).()
+  def order_xlsx_exporter() do
+    orders = Repo.all(Order)
+    abc = xlsx_generator(orders)
+    |> Elixlsx.write_to_memory("/tmp/orders.xlsx") 
+    require IEx
+    IEx.pry
+    |> elem(1) 
+    |> elem(1)
+  end
+
+  def xlsx_generator(orders) do
+    columns = ~w(id number special_instructions inserted_at updated_at user_id state)
+    rows = orders |> Enum.map(&(row(&1)))
+    %Workbook{sheets: [%Sheet{name: "Orders", rows: [columns] ++ rows}]}
+  end
+
+  def row(order) do
+    columns = ~w(id number special_instructions inserted_at updated_at user_id state)
+    Enum.map(columns, &Map.get(order, :"#{&1}") |> to_string)
   end
 
 end

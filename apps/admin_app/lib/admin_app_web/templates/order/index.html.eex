@@ -50,9 +50,14 @@
                   Option2
                   </label>
                </div>
-               <div>
-                  <%= button("Export Orders as CSV", to: order_path(@conn, :export), method: "get", type: "button",
-                  class: "btn btn-secondary btn-outline-secondary ") %>
+               <div class="dropdown col-4 p-0">
+                  <a class="p-2 btn btn-secondary btn-outline-secondary dropdown-toggle options" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                   Export Orders
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-right">
+                    <%= link("CSV", to: order_path(@conn, :export_csv), class: "dropdown-item")%>
+                    <%= link("XLS", to: order_path(@conn, :export_xls),class: "dropdown-item")%>
+                  </div>
                </div>
             </div>
          </form>
