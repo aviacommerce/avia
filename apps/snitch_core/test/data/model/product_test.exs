@@ -4,6 +4,8 @@ defmodule Snitch.Data.Model.ProductTest do
   import Snitch.Factory
   alias Snitch.Data.Model.Product
   alias Snitch.Data.Schema.Product, as: ProductSchema
+  alias Snitch.Tools.Helper.Taxonomy
+  alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
   alias Snitch.Repo
 
   @rummage_default %{
@@ -232,10 +234,92 @@ defmodule Snitch.Data.Model.ProductTest do
     end
   end
 
+  describe "get_products_by_category/1" do
+    test "get product from different category levels" do
+      create_taxonomy()
+
+      casual_shirt = TaxonomyDomain.get_taxon_by_name("Casual Shirt")
+      insert_list(3, :product, taxon: casual_shirt, state: "active")
+
+      assert Product.get_products_by_category(casual_shirt.id) |> length == 3
+
+      formal_shirt = TaxonomyDomain.get_taxon_by_name("Formal Shirt")
+      insert_list(5, :product, taxon: formal_shirt, state: "draft")
+
+      assert Product.get_products_by_category(formal_shirt.id) |> length == 5
+
+      shrug = TaxonomyDomain.get_taxon_by_name("Shrugs")
+      assert Product.get_products_by_category(shrug.id) |> length == 0
+
+      top_wear = TaxonomyDomain.get_taxon_by_name("TopWear")
+      assert Product.get_products_by_category(top_wear.id) |> length == 8
+    end
+  end
+
+  describe "delete_by_category/1" do
+    test "delete product category" do
+      create_taxonomy()
+
+      casual_shirt = TaxonomyDomain.get_taxon_by_name("Casual Shirt")
+      products = insert_list(3, :product, taxon: casual_shirt, state: "active")
+      products_ids = Enum.map(products, & &1.id)
+
+      {:ok, _} = Product.delete_by_category(casual_shirt)
+
+      products_by_category = Product.get_products_by_category(casual_shirt.id)
+      deleted_products = products_ids |> Enum.map(&Product.get/1)
+
+      assert length(products_by_category) == 0
+
+      deleted_products
+      |> Enum.map(fn product ->
+        assert product.state == :deleted
+        assert product.taxon_id == nil
+      end)
+    end
+  end
+
   defp get_naive_date_time(date) do
     Date.from_iso8601(date)
     |> elem(1)
     |> NaiveDateTime.new(~T[00:00:00])
     |> elem(1)
+  end
+
+  defp create_taxonomy() do
+    Taxonomy.create_taxonomy({
+      "Category",
+      [
+        {"Men",
+         [
+           {"TopWear",
+            [
+              {"TShirt", []},
+              {"Casual Shirt", []},
+              {"Formal Shirt", []}
+            ]},
+           {"BottomWear",
+            [
+              {"Jeans", []},
+              {"Shorts", []}
+            ]}
+         ]},
+        {"Women",
+         [
+           {"Western Wear",
+            [
+              {"Dresses & JumpSuit", []},
+              {"Tops, Tshirts & Shirts", []},
+              {"Shrugs", []}
+            ]},
+           {"Indian & Fusion Wear",
+            [
+              {"Kurta's & Suits", []},
+              {"Skirts and Palazzos", []},
+              {"Jackets and WaistCoats", []}
+            ]}
+         ]}
+      ]
+    })
   end
 end

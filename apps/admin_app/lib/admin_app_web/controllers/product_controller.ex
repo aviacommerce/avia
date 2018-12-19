@@ -230,11 +230,11 @@ defmodule AdminAppWeb.ProductController do
     end)
   end
 
-  def delete(conn, %{"id" => id}) do
+  def delete(conn, %{"id" => id} = params) do
     with {:ok, _product} <- ProductModel.delete(id) do
       conn
       |> put_flash(:info, "Product deleted successfully")
-      |> redirect(to: product_path(conn, :index))
+      |> redirect_with_updated_conn(params)
     end
   end
 
@@ -247,19 +247,19 @@ defmodule AdminAppWeb.ProductController do
              "theme_id" => params["theme_id"]
            }) do
       {:ok, _product} = Repo.update(changeset)
-      redirect(conn, to: product_path(conn, :index))
+      redirect(conn, to: product_path(conn, :edit, params["product_id"]))
     else
       _ ->
         conn
         |> put_flash(:error, "Failed to create variant")
-        |> redirect(to: product_path(conn, :index))
+        |> redirect(to: product_path(conn, :edit, params["product_id"]))
     end
   end
 
   def select_category(conn, _params) do
     with {:ok, taxonomy} <- Taxonomy.get_default_taxonomy(),
          taxonomy <- Repo.preload(taxonomy, :root),
-         taxons <- Taxonomy.get_child_taxons(taxonomy.root.id) do
+         {:ok, taxons} <- Taxonomy.get_child_taxons(taxonomy.root.id) do
       render(conn, "product_category.html", taxons: taxons)
     else
       {:error, :not_found} ->
