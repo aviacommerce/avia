@@ -267,19 +267,9 @@ defmodule AdminAppWeb.OrderController do
     end
   end
 
-  def export_csv(conn, _params) do
+  def export_order(conn, %{"type" => type}) do
     current_user = Guardian.Plug.current_resource(conn)
-    params = Map.put(%{"type" => "csv", "user" => current_user}, "tenant", Repo.get_prefix())
-    Honeydew.async({:export_order, [params]}, :export_order_queue)
-
-    conn
-    |> put_flash(:info, "Your request is accepted. Data will be emailed shortly")
-    |> redirect(to: page_path(conn, :index))
-  end
-
-  def export_xls(conn, _params) do
-    current_user = Guardian.Plug.current_resource(conn)
-    params = Map.put(%{"type" => "xlsx", "user" => current_user}, "tenant", Repo.get_prefix())
+    params = Map.put(%{"type" => type, "user" => current_user}, "tenant", Repo.get_prefix())
     Honeydew.async({:export_order, [params]}, :export_order_queue)
 
     conn
