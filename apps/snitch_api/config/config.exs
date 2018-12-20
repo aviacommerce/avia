@@ -41,16 +41,6 @@ config :snitch_api, SnitchApi.Guardian,
 config :snitch_api, frontend_checkout_url: System.get_env("FRONTEND_CHECKOUT_URL")
 config :snitch_api, hosted_payment_url: System.get_env("HOSTED_PAYMENT_URL")
 
-config :sentry,
-  dsn: "https://dd946671f2c840b6b51740249efbbb34@sentry.io/1293293",
-  included_environments: [:prod],
-  environment_name: Mix.env(),
-  enable_source_code_context: true,
-  root_source_code_path: File.cwd!(),
-  tags: %{
-    env: "production"
-  }
-
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
