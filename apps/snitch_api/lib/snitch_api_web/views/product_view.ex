@@ -70,16 +70,19 @@ defmodule SnitchApiWeb.ProductView do
           images = product.images
 
           if images != [] do
-            images
+            get_images(images, product)
           else
-            get_parent_images(product)
+            %{images: images, parent_product: parent_product} = get_parent_images(product)
+            get_images(images, parent_product)
           end
 
         products ->
-          product.images
+          get_images(product.images, product)
       end
+  end
 
-    case product_images do
+  defp get_images(images, product) do
+    case images do
       [] ->
         [%{"product_url" => nil}]
 
@@ -94,12 +97,12 @@ defmodule SnitchApiWeb.ProductView do
 
     case variant do
       nil ->
-        []
+        %{images: [], parent_product: nil}
 
       _ ->
         parent_id = variant.parent_product_id
         parent_product = Repo.get_by(ProductSchema, id: parent_id) |> Repo.preload([:images])
-        parent_product.images
+        %{images: parent_product.images, parent_product: parent_product}
     end
   end
 
