@@ -11,7 +11,7 @@
 //
 // If you no longer want to use a dependency, remember
 // to also remove its path from "config.paths.watched".
-import "phoenix_html"
+import "phoenix_html";
 
 // Import local files
 //
@@ -20,14 +20,13 @@ import "phoenix_html"
 
 // import socket from "./socket"
 
-import css from '../css/app.css';
 import "bootstrap";
-import select2Selector from './form-helpers/select2-selector';
-import loadView from './views/loader';
+import select2Selector from "./form-helpers/select2-selector";
+import loadView from "./views/loader";
 
 function handleDOMContentLoaded() {
   // Get the current view name
-  const viewName = document.getElementsByTagName('body')[0].dataset.jsViewName;
+  const viewName = document.getElementsByTagName("body")[0].dataset.jsViewName;
 
   // Load view class and mount it
   const ViewClass = loadView(viewName);
@@ -41,12 +40,14 @@ function handleDocumentUnload() {
   window.currentView.unmount();
 }
 
-window.addEventListener('DOMContentLoaded', handleDOMContentLoaded, false);
-window.addEventListener('unload', handleDocumentUnload, false);
+window.addEventListener("DOMContentLoaded", handleDOMContentLoaded, false);
+window.addEventListener("unload", handleDocumentUnload, false);
 
 $(document).ready(() => {
   select2Selector();
-})
+});
 
 const elmDiv = document.getElementById("elm-main");
-if (elmDiv) { Elm.Main.embed(elmDiv) }
+if (elmDiv) {
+  Elm.Main.embed(elmDiv);
+}
