@@ -100,16 +100,14 @@ defmodule AdminAppWeb.Helpers do
   def order_xlsx_exporter(user) do
     orders = Repo.all(Order)
 
-    xlsx_generator(orders)
-    |> Elixlsx.write_to_memory("/tmp/orders.xlsx")
-    |> elem(1)
-    |> elem(1)
+    order_binary =
+      xlsx_generator(orders)
+      |> Elixlsx.write_to_memory("/tmp/orders.xlsx")
+      |> elem(1)
+      |> elem(1)
 
-    attachment = %Plug.Upload{
-      path: "/tmp/orders.xlsx",
-      content_type: "text/xlsx",
-      filename: "orders.xlsx"
-    }
+    File.write("/tmp/order.xlsx", order_binary)
+    attachment = "/tmp/order.xlsx"
 
     OrderExportMail.order_export_mail(attachment, user, "xlsx")
   end
