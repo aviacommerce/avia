@@ -5,7 +5,7 @@ defmodule AdminAppWeb.Helpers do
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.Order
   alias Elixlsx.{Workbook, Sheet}
-  alias AdminAppWeb.OrderExportMail
+  alias AdminAppWeb.DataExportMail
 
   @months ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"]
 
@@ -91,7 +91,7 @@ defmodule AdminAppWeb.Helpers do
       filename: "orders.csv"
     }
 
-    OrderExportMail.order_export_mail(attachment, user, "csv")
+    DataExportMail.data_export_mail(attachment, user, "csv")
   end
 
   defp parse_line(order) do
@@ -120,16 +120,12 @@ defmodule AdminAppWeb.Helpers do
   def order_xlsx_exporter(user) do
     orders = Repo.all(Order)
 
-    order_binary =
-      xlsx_generator(orders)
-      |> Elixlsx.write_to_memory("/tmp/orders.xlsx")
-      |> elem(1)
-      |> elem(1)
+    xlsx_generator(orders)
+    |> Elixlsx.write_to("/tmp/order.xlsx")
 
-    File.write("/tmp/order.xlsx", order_binary)
     attachment = "/tmp/order.xlsx"
 
-    OrderExportMail.order_export_mail(attachment, user, "xlsx")
+    DataExportMail.data_export_mail(attachment, user, "xlsx")
   end
 
   def xlsx_generator(orders) do
