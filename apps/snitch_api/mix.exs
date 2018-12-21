@@ -57,7 +57,6 @@ defmodule SnitchApi.Mixfile do
 
       # html parser
       {:floki, "~> 0.20.0"},
-      {:sentry, "~> 7.0"},
       {:jason, "~> 1.1"}
     ]
   end
