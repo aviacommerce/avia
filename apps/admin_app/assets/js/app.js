@@ -24,6 +24,12 @@ import "bootstrap";
 import select2Selector from "./form-helpers/select2-selector";
 import loadView from "./views/loader";
 
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./components/App";
+
+ReactDOM.render(<App />, document.getElementById("react-app"));
+
 function handleDOMContentLoaded() {
   // Get the current view name
   const viewName = document.getElementsByTagName("body")[0].dataset.jsViewName;

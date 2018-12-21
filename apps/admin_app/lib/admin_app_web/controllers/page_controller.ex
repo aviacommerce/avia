@@ -4,7 +4,6 @@ defmodule AdminAppWeb.PageController do
   alias AdminAppWeb.Helpers
 
   def index(conn, _params) do
-    conn
-    |> redirect(to: dashboard_path(conn, :index))
+    render(conn, "index.html")
   end
 end
