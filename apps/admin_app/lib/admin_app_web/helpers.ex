@@ -3,9 +3,9 @@ defmodule AdminAppWeb.Helpers do
   import Ecto.Query
   alias Ecto.Adapters.SQL
   alias Snitch.Core.Tools.MultiTenancy.Repo
-  alias Snitch.Data.Schema.Order
+  alias Snitch.Data.Schema.{Order, Product}
   alias Elixlsx.{Workbook, Sheet}
-  alias AdminAppWeb.OrderExportMail
+  alias AdminAppWeb.DataExportMail
 
   @months ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"]
 
@@ -69,33 +69,52 @@ defmodule AdminAppWeb.Helpers do
     |> Date.to_string()
   end
 
-  def order_csv_exporter(user) do
-    path = "/tmp/orders.csv"
-    query = from(u in Order)
+  defp get_columns(type) do
+    case type do
+      "order" ->
+        ~w(id number special_instructions billing_address shipping_address inserted_at updated_at user_id state)a
 
-    columns =
-      ~w(id number special_instructions billing_address shipping_address inserted_at updated_at user_id state)a
+      "product" ->
+        ~w(id name slug state max_retail_price selling_price taxon_id weight height store theme_id is_active)a
+    end
+  end
+
+  def csv_exporter(user, type) do
+    path = "/tmp/#{type}s.csv"
+
+    query =
+      case type do
+        "order" ->
+          from(u in Order)
+
+        "product" ->
+          from(u in Product)
+      end
 
     {:ok, file} =
       Repo.transaction(fn ->
         query
         |> Repo.stream()
         |> Stream.map(&parse_line/1)
-        |> CSV.encode(headers: columns, separator: ?\t, delimiter: "\n")
+        |> CSV.encode(headers: get_columns(type), separator: ?\t, delimiter: "\n")
         |> Enum.into(File.stream!(path, [:write, :utf8]))
       end)
 
     attachment = %Plug.Upload{
       path: file.path,
       content_type: "text/csv",
-      filename: "orders.csv"
+      filename: "#{type}s.csv"
     }
 
-    OrderExportMail.order_export_mail(attachment, user, "csv")
+    DataExportMail.data_export_mail(attachment, user, "csv", type)
   end
 
-  defp parse_line(order) do
+  defp parse_line(%Order{} = order) do
     order |> Map.from_struct() |> parse_address()
+  end
+
+  defp parse_line(%Product{} = product) do
+    product |> Map.from_struct()
   end
 
   defp parse_address(order) do
@@ -117,34 +136,37 @@ defmodule AdminAppWeb.Helpers do
     end
   end
 
-  def order_xlsx_exporter(user) do
-    orders = Repo.all(Order)
+  def xlsx_exporter(user, type) do
+    data_list =
+      case type do
+        "order" ->
+          Repo.all(Order)
 
-    order_binary =
-      xlsx_generator(orders)
-      |> Elixlsx.write_to_memory("/tmp/orders.xlsx")
+        "product" ->
+          Repo.all(Product)
+      end
+
+    binary_data =
+      xlsx_generator(data_list, type)
+      |> Elixlsx.write_to_memory("/tmp/#{type}s.xlsx")
       |> elem(1)
       |> elem(1)
 
-    File.write("/tmp/order.xlsx", order_binary)
-    attachment = "/tmp/order.xlsx"
+    File.write("/tmp/#{type}.xlsx", binary_data)
+    attachment = "/tmp/#{type}.xlsx"
 
-    OrderExportMail.order_export_mail(attachment, user, "xlsx")
+    DataExportMail.data_export_mail(attachment, user, "xlsx", type)
   end
 
-  def xlsx_generator(orders) do
-    columns =
-      ~w(id number special_instructions billing_address shipping_address inserted_at updated_at user_id state)
+  def xlsx_generator(data_list, type) do
+    columns = get_columns(type) |> Enum.map(&Atom.to_string(&1))
 
-    orders = orders |> Enum.map(&parse_line(&1))
-    rows = orders |> Enum.map(&row(&1))
-    %Workbook{sheets: [%Sheet{name: "Orders", rows: [columns] ++ rows}]}
+    data_list = data_list |> Enum.map(&parse_line(&1))
+    rows = data_list |> Enum.map(&row(&1, columns))
+    %Workbook{sheets: [%Sheet{name: "Data for #{type}s", rows: [columns] ++ rows}]}
   end
 
-  def row(order) do
-    columns =
-      ~w(id number special_instructions billing_address shipping_address inserted_at updated_at user_id state)
-
-    Enum.map(columns, &(Map.get(order, :"#{&1}") |> to_string))
+  def row(data, columns) do
+    Enum.map(columns, &(Map.get(data, :"#{&1}") |> to_string))
   end
 end

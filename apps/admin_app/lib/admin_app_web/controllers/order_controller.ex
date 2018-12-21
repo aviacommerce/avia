@@ -267,10 +267,17 @@ defmodule AdminAppWeb.OrderController do
     end
   end
 
-  def export_order(conn, %{"type" => type}) do
+  def export_order(conn, %{"format" => format}) do
     current_user = Guardian.Plug.current_resource(conn)
-    params = Map.put(%{"type" => type, "user" => current_user}, "tenant", Repo.get_prefix())
-    Honeydew.async({:export_order, [params]}, :export_order_queue)
+
+    params =
+      Map.put(
+        %{"type" => "order", "format" => format, "user" => current_user},
+        "tenant",
+        Repo.get_prefix()
+      )
+
+    Honeydew.async({:export_data, [params]}, :export_data_queue)
 
     conn
     |> put_flash(:info, "Your request is accepted. Data will be emailed shortly")

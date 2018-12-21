@@ -34,6 +34,7 @@ defmodule AdminAppWeb.Router do
 
     get("/", PageController, :index)
 
+    get("/products/export_products", ProductController, :export_product)
     get("/orders/export_orders", OrderController, :export_order)
     get("/orders/:category", OrderController, :index)
     get("/orders", OrderController, :index)
