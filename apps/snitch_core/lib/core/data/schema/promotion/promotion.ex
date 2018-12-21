@@ -7,7 +7,8 @@ defmodule Snitch.Data.Schema.Promotion do
   """
 
   use Snitch.Data.Schema
-  alias Snitch.Data.Schema.{PromotionRule, PromotionAction}
+  alias Snitch.Data.Schema.{PromotionAction, PromotionRule}
+  alias Snitch.Tools.EctoType.UnixTimestamp
 
   @type t :: %__MODULE__{}
   @match_policy ~w(all any)s
@@ -22,20 +23,18 @@ defmodule Snitch.Data.Schema.Promotion do
     field(:current_usage_count, :integer, default: 0)
     field(:match_policy, :string, default: "all")
     field(:active?, :boolean, default: false)
+    field(:archived_at, UnixTimestamp, default: 0)
 
     # associations
-    has_many(:rules, PromotionRule, on_delete: :delete_all)
-
-    # shouldn't delete actions they are being used for tracking
-    # adjustments later on.
-    has_many(:actions, PromotionAction, on_delete: :nilify_all)
+    has_many(:rules, PromotionRule, on_replace: :delete, on_delete: :delete_all)
+    has_many(:actions, PromotionAction, on_replace: :delete, on_delete: :delete_all)
 
     timestamps()
   end
 
   @required_fields ~w(code name)a
   @optional_fields ~w(description starts_at expires_at usage_limit match_policy
-    active? code)a
+    active? code archived_at)a
 
   @create_fields @optional_fields ++ @required_fields
 
@@ -102,7 +101,10 @@ defmodule Snitch.Data.Schema.Promotion do
     |> validate_future_date(:expires_at)
     |> validate_inclusion(:match_policy, @match_policy)
     |> validate_starts_at_with_expiry()
-    |> unique_constraint(:code)
+    |> unique_constraint(:code,
+      name: :unique_promotion_code,
+      message: "has already been taken"
+    )
   end
 
   # checks if `expires_at` is after `starts_at`

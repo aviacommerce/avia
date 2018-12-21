@@ -24,7 +24,7 @@ defmodule Snitch.Data.Schema.PromotionAction do
     field(:preferences, :map)
 
     # associations
-    belongs_to(:promotion, Promotion, on_replace: :nilify)
+    belongs_to(:promotion, Promotion)
 
     timestamps()
   end

@@ -207,7 +207,7 @@ defmodule Snitch.Data.Schema.PromotionTest do
   end
 
   def get_changeset_error(changeset) do
-    traverse_errors(changeset, fn {msg, opts} ->
+    traverse_errors(changeset, fn {_msg, opts} ->
       Enum.reduce(opts, %{}, fn {key, value}, acc ->
         Map.put(acc, key, value)
       end)

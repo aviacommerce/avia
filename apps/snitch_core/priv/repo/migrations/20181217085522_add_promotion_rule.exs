@@ -7,12 +7,12 @@ defmodule Snitch.Repo.Migrations.AddPromotionRule do
       add(:name, :citext, null: false)
       add(:module, PromotionRuleEnum.type(), null: false)
       add(:preferences, :map)
-      add(:promotion_id, references("snitch_promotions", on_delete: :delete_all),
+      add(:promotion_id, references("snitch_promotions"),
         null: false)
 
       timestamps()
     end
 
-    create unique_index("snitch_promotion_rules", [:name])
+    create unique_index("snitch_promotion_rules", [:name, :promotion_id])
   end
 end

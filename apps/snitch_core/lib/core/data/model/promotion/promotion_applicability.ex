@@ -3,9 +3,6 @@ defmodule Snitch.Data.Model.Promotion.Applicability do
   Exposes functions related to
   """
 
-  @doc """
-  Checks if a coupon with the supplied code exists.
-  """
   use Snitch.Data.Model
   alias Snitch.Data.Schema.Promotion
 
@@ -15,9 +12,15 @@ defmodule Snitch.Data.Model.Promotion.Applicability do
     expired: "promotion has expired"
   }
 
+  @doc """
+  Checks if a valid coupon exists for the supplied coupon_code.
+
+  The function along with valid `code` name also checks if coupon is not
+  `archived`.
+  """
   @spec valid_coupon_check(String.t()) :: {:ok, Promotion.t()} | {:error, String.t()}
   def valid_coupon_check(coupon_code) do
-    case Repo.get_by(Promotion, code: coupon_code) do
+    case Repo.get_by(Promotion, code: coupon_code, archived_at: 0) do
       nil ->
         {:error, @errors.not_found}
 
