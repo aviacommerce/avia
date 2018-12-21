@@ -23,6 +23,21 @@ defmodule AdminAppWeb do
       import Plug.Conn
       import AdminAppWeb.Router.Helpers
       import AdminAppWeb.Gettext
+
+      def action(conn, _) do
+        args = [conn, conn.params]
+        controller = conn.private.phoenix_controller
+        action = conn.private.phoenix_action
+        actions = controller.module_info(:exports) |> Keyword.keys()
+
+        case Enum.member?(actions, action) do
+          true ->
+            apply(__MODULE__, action_name(conn), args)
+
+          false ->
+            conn |> render(AdminAppWeb.ErrorView, "404.html") |> halt
+        end
+      end
     end
   end
 
