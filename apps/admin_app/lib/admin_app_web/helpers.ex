@@ -73,12 +73,15 @@ defmodule AdminAppWeb.Helpers do
     path = "/tmp/orders.csv"
     query = from(u in Order)
 
+    columns =
+      ~w(id number special_instructions billing_address shipping_address inserted_at updated_at user_id state)a
+
     {:ok, file} =
       Repo.transaction(fn ->
         query
         |> Repo.stream()
         |> Stream.map(&parse_line/1)
-        |> CSV.encode()
+        |> CSV.encode(headers: columns, separator: ?\t, delimiter: "\n")
         |> Enum.into(File.stream!(path, [:write, :utf8]))
       end)
 
@@ -92,9 +95,26 @@ defmodule AdminAppWeb.Helpers do
   end
 
   defp parse_line(order) do
-    # order our data to match our column order
-    columns = ~w(id number special_instructions inserted_at updated_at user_id state)
-    Enum.map(columns, &Map.get(order, :"#{&1}"))
+    order |> Map.from_struct() |> parse_address()
+  end
+
+  defp parse_address(order) do
+    shipping_address = order.shipping_address |> format_address
+    billing_address = order.billing_address |> format_address
+    %{order | shipping_address: shipping_address, billing_address: billing_address}
+  end
+
+  defp format_address(address) do
+    case address do
+      nil ->
+        nil
+
+      address ->
+        address
+        |> Map.from_struct()
+        |> Enum.map(fn {key, value} -> value end)
+        |> Enum.join(" ")
+    end
   end
 
   def order_xlsx_exporter(user) do
@@ -113,13 +133,18 @@ defmodule AdminAppWeb.Helpers do
   end
 
   def xlsx_generator(orders) do
-    columns = ~w(id number special_instructions inserted_at updated_at user_id state)
+    columns =
+      ~w(id number special_instructions billing_address shipping_address inserted_at updated_at user_id state)
+
+    orders = orders |> Enum.map(&parse_line(&1))
     rows = orders |> Enum.map(&row(&1))
     %Workbook{sheets: [%Sheet{name: "Orders", rows: [columns] ++ rows}]}
   end
 
   def row(order) do
-    columns = ~w(id number special_instructions inserted_at updated_at user_id state)
+    columns =
+      ~w(id number special_instructions billing_address shipping_address inserted_at updated_at user_id state)
+
     Enum.map(columns, &(Map.get(order, :"#{&1}") |> to_string))
   end
 end
