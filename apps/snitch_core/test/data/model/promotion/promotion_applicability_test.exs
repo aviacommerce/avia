@@ -26,10 +26,19 @@ defmodule Snitch.Data.Model.Promotion.ApplicabilityTest do
       assert message = "promotion not found"
     end
 
-    test "returns promotion if code found" do
+    test "returns error if promotion archived" do
+      current_unix_time = DateTime.utc_now() |> DateTime.to_unix()
       promotion = insert(:promotion)
 
+      # does not return error if promotion not archived
       assert {:ok, %Promotion{} = promo} = Applicability.valid_coupon_check(promotion.code)
+
+      cs = Promotion.update_changeset(promotion, %{archived_at: current_unix_time})
+      {:ok, promotion} = Repo.update(cs)
+
+      # returns error as promotion archived now
+      assert {:error, message} = Applicability.valid_coupon_check(promotion.code)
+      assert message = "promotion not found"
     end
   end
 

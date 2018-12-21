@@ -12,10 +12,12 @@ defmodule Snitch.Repo.Migrations.AddPromotionsTable do
       add(:current_usage_count, :integer, default: 0)
       add(:match_policy, :string, default: "all")
       add(:active?, :boolean, default: false)
+      add(:archived_at, :utc_datetime)
 
       timestamps()
     end
 
-    create unique_index("snitch_promotions", :code)
+    create unique_index("snitch_promotions", [:code, :archived_at],
+      name: :unique_promotion_code)
   end
 end
