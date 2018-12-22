@@ -30,7 +30,7 @@ import App from "./components/App";
 
 const reactAppContainer = document.getElementById("react-app");
 if (reactAppContainer) {
-  ReactDOM.render(<App />, document.getElementById("react-app"));
+  ReactDOM.render(<App />, reactAppContainer);
 }
 
 function handleDOMContentLoaded() {
