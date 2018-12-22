@@ -40,7 +40,7 @@ defmodule AdminAppWeb.AuthorizePlug do
     else
       conn
       |> put_flash(:error, "you are unauthorized to access this!")
-      |> redirect(to: page_path(conn, :index))
+      |> redirect(to: session_path(conn, :new))
       |> halt()
     end
   end

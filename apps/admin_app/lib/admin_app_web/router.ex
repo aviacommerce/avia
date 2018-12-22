@@ -32,8 +32,6 @@ defmodule AdminAppWeb.Router do
     # Use the default browser stack
     pipe_through([:browser, :authentication])
 
-    get("/", PageController, :index)
-
     get("/orders/:category", OrderController, :index)
     get("/orders", OrderController, :index)
     get("/orders/:number/detail", OrderController, :show)
@@ -103,6 +101,8 @@ defmodule AdminAppWeb.Router do
     get("/product/import/etsy", ProductImportController, :import_etsy)
     get("/product/import/etsy/callback", ProductImportController, :oauth_callback)
     get("/product/import/etsy/progress", ProductImportController, :import_progress)
+
+    get("/*path", PageController, :index)
   end
 
   scope "/", AdminAppWeb do
