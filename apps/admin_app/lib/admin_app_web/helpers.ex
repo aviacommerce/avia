@@ -4,6 +4,7 @@ defmodule AdminAppWeb.Helpers do
   alias Ecto.Adapters.SQL
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.Order
+  alias Snitch.Domain.Order, as: Domain
   alias Elixlsx.{Workbook, Sheet}
   alias AdminAppWeb.DataExportMail
 
@@ -71,10 +72,10 @@ defmodule AdminAppWeb.Helpers do
 
   def order_csv_exporter(user) do
     path = "/tmp/orders.csv"
-    query = from(u in Order)
+    query = from(u in Order, preload: [:line_items])
 
     columns =
-      ~w(id number special_instructions billing_address shipping_address inserted_at updated_at user_id state)a
+      ~w(id number line_items_count order_total billing_address shipping_address inserted_at updated_at user_id state)a
 
     {:ok, file} =
       Repo.transaction(fn ->
@@ -95,7 +96,11 @@ defmodule AdminAppWeb.Helpers do
   end
 
   defp parse_line(order) do
-    order |> Map.from_struct() |> parse_address()
+    order
+    |> Map.from_struct()
+    |> parse_address()
+    |> Map.put(:line_items_count, Domain.line_items_count(order))
+    |> Map.put(:order_total, Domain.total_amount(order))
   end
 
   defp parse_address(order) do
@@ -118,7 +123,7 @@ defmodule AdminAppWeb.Helpers do
   end
 
   def order_xlsx_exporter(user) do
-    orders = Repo.all(Order)
+    orders = Repo.all(Order) |> Repo.preload([:line_items])
 
     xlsx_generator(orders)
     |> Elixlsx.write_to("/tmp/order.xlsx")
@@ -130,7 +135,7 @@ defmodule AdminAppWeb.Helpers do
 
   def xlsx_generator(orders) do
     columns =
-      ~w(id number special_instructions billing_address shipping_address inserted_at updated_at user_id state)
+      ~w(id number line_items_count order_total billing_address shipping_address inserted_at updated_at user_id state)
 
     orders = orders |> Enum.map(&parse_line(&1))
     rows = orders |> Enum.map(&row(&1))
@@ -139,7 +144,7 @@ defmodule AdminAppWeb.Helpers do
 
   def row(order) do
     columns =
-      ~w(id number special_instructions billing_address shipping_address inserted_at updated_at user_id state)
+      ~w(id number line_items_count order_total billing_address shipping_address inserted_at updated_at user_id state)
 
     Enum.map(columns, &(Map.get(order, :"#{&1}") |> to_string))
   end
