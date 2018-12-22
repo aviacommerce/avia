@@ -102,6 +102,8 @@ defmodule AdminAppWeb.Router do
     get("/product/import/etsy/callback", ProductImportController, :oauth_callback)
     get("/product/import/etsy/progress", ProductImportController, :import_progress)
 
+    # Add all pheonix routes above this route. Routes that does not match any
+    # of the above routes will go to react app
     get("/*path", PageController, :index)
   end
 
