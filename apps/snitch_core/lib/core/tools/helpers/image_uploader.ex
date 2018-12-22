@@ -17,7 +17,8 @@ defmodule Snitch.Tools.Helper.ImageUploader do
   Validates image file type.
   """
   def validate({file, _}) do
-    ~w(.jpg .jpeg .gif .png) |> Enum.member?(Path.extname(file.file_name))
+    file_extension = file.file_name |> Path.extname() |> String.downcase()
+    ~w(.jpg .jpeg .gif .png) |> Enum.member?(file_extension)
   end
 
   @doc """

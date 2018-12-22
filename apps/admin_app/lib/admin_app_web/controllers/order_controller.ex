@@ -12,6 +12,7 @@ defmodule AdminAppWeb.OrderController do
   alias AdminAppWeb.OrderView
   alias AdminApp.OrderContext
   alias AdminApp.PackageContext
+  alias AdminAppWeb.Helpers
 
   @root_path [File.cwd!(), "invoices"] |> Path.join()
 
@@ -264,6 +265,16 @@ defmodule AdminAppWeb.OrderController do
         conn = put_flash(conn, :error, Atom.to_string(title) <> " - " <> error_value)
         redirect(conn, to: "/orders/#{order.number}/address/add")
     end
+  end
+
+  def export_order(conn, %{"type" => type}) do
+    current_user = Guardian.Plug.current_resource(conn)
+    params = Map.put(%{"type" => type, "user" => current_user}, "tenant", Repo.get_prefix())
+    Honeydew.async({:export_order, [params]}, :export_order_queue)
+
+    conn
+    |> put_flash(:info, "Your request is accepted. Data will be emailed shortly")
+    |> redirect(to: page_path(conn, :index))
   end
 
   defp remove_line_item(edit_item, line_items) do

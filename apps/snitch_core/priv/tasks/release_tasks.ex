@@ -16,7 +16,7 @@ defmodule Snitch.Tasks.ReleaseTasks do
     stop_services()
   end
 
-  def seed()do
+  def seed() do
     start_services()
 
     run_migrations()
@@ -50,7 +50,16 @@ defmodule Snitch.Tasks.ReleaseTasks do
     IO.puts("Running migrations for #{app}")
     migrations_path = priv_path_for(repo, "migrations")
     Ecto.Migrator.run(repo, migrations_path, :up, all: true)
-    Mix.Tasks.Triplex.Migrate.run([])
+
+    Enum.each(Triplex.all(repo), fn tenant ->
+      Ecto.Migrator.run(
+        repo,
+        migrations_path,
+        :up,
+        all: true,
+        prefix: tenant
+      )
+    end)
   end
 
   defp run_seeds do

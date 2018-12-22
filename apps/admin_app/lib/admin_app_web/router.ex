@@ -1,6 +1,5 @@
 defmodule AdminAppWeb.Router do
   use AdminAppWeb, :router
-  use Plug.ErrorHandler
   use Sentry.Plug
 
   pipeline :browser do
@@ -34,6 +33,7 @@ defmodule AdminAppWeb.Router do
 
     get("/", PageController, :index)
 
+    get("/orders/export_orders", OrderController, :export_order)
     get("/orders/:category", OrderController, :index)
     get("/orders", OrderController, :index)
     get("/orders/:number/detail", OrderController, :show)
@@ -140,5 +140,9 @@ defmodule AdminAppWeb.Router do
     get("/taxon/:taxon_id/aggregate", TaxonomyController, :taxon_delete_aggregate)
     put("/taxonomy/update", TaxonomyController, :update_taxon)
     post("/product_option_values/:id", OptionTypeController, :update)
+  end
+
+  scope "/", AdminAppWeb do
+    get("/*path", ErrorController, :index)
   end
 end
