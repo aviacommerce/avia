@@ -9,6 +9,16 @@ use Mix.Config
 # back to each application for organization purposes.
 import_config "../apps/*/config/config.exs"
 
+config :sentry,
+  dsn: "https://dd946671f2c840b6b51740249efbbb34@sentry.io/1293293",
+  included_environments: [:prod],
+  environment_name: Mix.env(),
+  enable_source_code_context: true,
+  root_source_code_path: File.cwd!(),
+  tags: %{
+    env: "production"
+  }
+
 # Sample configuration (overrides the imported configuration above):
 #
 #     config :logger, :console,

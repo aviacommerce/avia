@@ -4,6 +4,7 @@ defmodule AdminAppWeb.Helpers do
   alias Ecto.Adapters.SQL
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.{Order, Product}
+  alias Snitch.Domain.Order, as: Domain
   alias Elixlsx.{Workbook, Sheet}
   alias AdminAppWeb.DataExportMail
 
@@ -72,10 +73,10 @@ defmodule AdminAppWeb.Helpers do
   defp get_columns(type) do
     case type do
       "order" ->
-        ~w(id number special_instructions billing_address shipping_address inserted_at updated_at user_id state)a
+        ~w(id number line_items_count order_total billing_address shipping_address inserted_at updated_at user_id state)a
 
       "product" ->
-        ~w(id name slug state max_retail_price selling_price taxon_id weight height store theme_id is_active)a
+        ~w(id name slug state max_retail_price selling_price variant_count taxon_name weight height depth store theme_id is_active)a
     end
   end
 
@@ -85,10 +86,12 @@ defmodule AdminAppWeb.Helpers do
     query =
       case type do
         "order" ->
-          from(u in Order)
+          from(u in Order, preload: [:line_items])
 
         "product" ->
-          from(u in Product)
+          from(u in Product,
+            preload: [:variants, :taxon, :shipping_category, :options, :brand, :theme]
+          )
       end
 
     {:ok, file} =
@@ -110,11 +113,18 @@ defmodule AdminAppWeb.Helpers do
   end
 
   defp parse_line(%Order{} = order) do
-    order |> Map.from_struct() |> parse_address()
+    order
+    |> Map.from_struct()
+    |> parse_address()
+    |> Map.put(:line_items_count, Domain.line_items_count(order))
+    |> Map.put(:order_total, Domain.total_amount(order))
   end
 
   defp parse_line(%Product{} = product) do
-    product |> Map.from_struct()
+    product
+    |> Map.from_struct()
+    |> Map.put(:taxon_name, product.taxon.name)
+    |> Map.put(:variant_count, length(product.variants))
   end
 
   defp parse_address(order) do
@@ -140,20 +150,18 @@ defmodule AdminAppWeb.Helpers do
     data_list =
       case type do
         "order" ->
-          Repo.all(Order)
+          Repo.all(Order) |> Repo.preload([:line_items])
 
         "product" ->
           Repo.all(Product)
+          |> Repo.preload([:variants, :taxon, :shipping_category, :options, :brand, :theme])
       end
 
     binary_data =
       xlsx_generator(data_list, type)
-      |> Elixlsx.write_to_memory("/tmp/#{type}s.xlsx")
-      |> elem(1)
-      |> elem(1)
+      |> Elixlsx.write_to("/tmp/#{type}s.xlsx")
 
-    File.write("/tmp/#{type}.xlsx", binary_data)
-    attachment = "/tmp/#{type}.xlsx"
+    attachment = "/tmp/#{type}s.xlsx"
 
     DataExportMail.data_export_mail(attachment, user, "xlsx", type)
   end
