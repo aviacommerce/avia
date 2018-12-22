@@ -21,13 +21,20 @@ module.exports = (env, options) => ({
     path: path.resolve(__dirname, "../priv/static/js")
   },
   resolve: {
-    extensions: [".js"],
+    extensions: [".ts", ".tsx", ".js"],
     alias: {
       jquery: path.resolve(__dirname + "/node_modules/jquery/src/jquery.js")
     }
   },
   module: {
     rules: [
+      {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "awesome-typescript-loader"
+        }
+      },
       {
         test: /\.js$/,
         exclude: /node_modules/,
