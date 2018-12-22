@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "moduleResolution": "node",
+    "target": "es5",
+    "jsx": "react",
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "allowJs": true,
+    "skipDefaultLibCheck": true,
+    "lib": ["es2015", "dom"]
+  },
+  "include": ["js/**/*"]
+}

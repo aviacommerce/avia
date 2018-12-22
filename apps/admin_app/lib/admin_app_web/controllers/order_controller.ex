@@ -274,7 +274,7 @@ defmodule AdminAppWeb.OrderController do
 
     conn
     |> put_flash(:info, "Your request is accepted. Data will be emailed shortly")
-    |> redirect(to: page_path(conn, :index))
+    |> redirect(to: dashboard_path(conn, :index))
   end
 
   defp remove_line_item(edit_item, line_items) do

@@ -1,7 +1,7 @@
 <div class = "list-container" >
     <h4 class="p-3 m-0">GENERAL SETTINGS</h4>
     <div class = "card col-12" >
-        <%= form_for @changeset, @action, [as: :settings, id: "settings-form", method: @method, multipart: true], fn f -> %>          
+        <%= form_for @changeset, @action, [as: :settings, id: "settings-form", method: @method, multipart: true], fn f -> %>
             <div class="form-group row ">
                 <%= input f, :name, nil, is_horizontal: true, description: "Name for the store."  %>
             </div>
@@ -40,10 +40,9 @@
                 <label class="control-label"><b> Logo </b></label>
                 <%= file_input f, :image, class: "form-control file-upload__input", id: "store-logo" %>
             </div>
-            <%= button("Cancel", to: page_path(@conn, :index), method: "get", type: "button",
+            <%= button("Cancel", to: general_settings_path(@conn, :index), method: "get", type: "button",
             class: "btn btn-secondary btn-outline-secondary submit-btn float-left") %>
             <%= submit "Submit", class: "btn btn-primary float-right"%>
         <% end %>
     </div>
 </div>
-

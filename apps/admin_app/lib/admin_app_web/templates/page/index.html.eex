@@ -1,4 +1,1 @@
-<div class="jumbotron">
-  <h2>Welcome to <a href=<%=  get_docs_url() %> > Aviacommerce</a></h2>
-  <p class="lead">A productive web ecommerce solution that<br />does not compromise speed and maintainability.</p>
-</div>
+<div id="react-app"></div>
