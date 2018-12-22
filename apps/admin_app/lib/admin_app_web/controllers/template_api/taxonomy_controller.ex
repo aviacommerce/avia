@@ -93,7 +93,4 @@ defmodule AdminAppWeb.TemplateApi.TaxonomyController do
     |> put_status(:ok)
     |> json(%{message: "Category delete has started in background"})
   end
-
-  defp handle_image_value(%Plug.Upload{} = file), do: file
-  defp handle_image_value(_), do: nil
 end

@@ -190,6 +190,11 @@ body {
     }
   }
 
+  .not_found {
+    text-align: center;
+    border: 1px solid red
+  }
+
   .loader {
     background-image: url("/images/loader.svg");
     height: 30px;
