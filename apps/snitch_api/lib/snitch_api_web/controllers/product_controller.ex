@@ -4,6 +4,7 @@ defmodule SnitchApiWeb.ProductController do
   alias Snitch.Data.Model.{Product, ProductReview}
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias SnitchApi.ProductsContext, as: Context
+  alias SnitchApiWeb.Elasticsearch.ProductView, as: ESPView
 
   plug(SnitchApiWeb.Plug.DataToAttributes)
   action_fallback(SnitchApiWeb.FallbackController)
@@ -37,13 +38,14 @@ defmodule SnitchApiWeb.ProductController do
   variants.options,variants.options.option_type,options,options.option_type,
   theme,theme.option_types,reviews.rating_option_vote.rating_option)
   def index(conn, params) do
-    {products, page} = Context.list_products(conn, params)
+    {products, page, aggregations, total} = Context.list_products(conn, params)
 
-    render(
+    json(
       conn,
-      "index.json-api",
-      data: products,
-      opts: [page: page]
+      JaSerializer.format(ESPView, products, conn,
+        page: page,
+        meta: %{aggregations: aggregations, total: total}
+      )
     )
   end
 

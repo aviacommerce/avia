@@ -19,6 +19,8 @@ defmodule Snitch.Core.Tools.MultiTenancy.Repo do
   defrepo(:update!, [:arg1], :append)
   defrepo(:delete, [:arg1], :append)
   defrepo(:aggregate, [:arg1, :arg2, :arg3], :append)
+  defrepo(:stream, [:arg1], :append)
+  defrepo(:stream, [:arg1, :arg2], :append)
 
   defrepo(:load, [:arg1, :arg2], :pass)
   defrepo(:rollback, [:arg1], :pass)
@@ -49,6 +51,6 @@ defmodule Snitch.Core.Tools.MultiTenancy.Repo do
   end
 
   def get_prefix() do
-    Process.get({__MODULE__, :prefix})
+    Process.get({__MODULE__, :prefix}) || "public"
   end
 end
