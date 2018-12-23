@@ -22,6 +22,7 @@ ARG SENDGRID_API_KEY
 ARG SENDGRID_SENDER_EMAIL
 ARG FRONTEND_URL
 ARG BACKEND_URL
+ARG ELASTIC_HOST
 
 # Install essential packages for application build
 RUN apt-get clean \
@@ -49,7 +50,8 @@ ENV MIX_ENV=prod \
     SENDGRID_API_KEY=$SENDGRID_API_KEY \
     SENDGRID_SENDER_EMAIL=$SENDGRID_SENDER_EMAIL \
     FRONTEND_URL=$FRONTEND_URL \
-    BACKEND_URL=$BACKEND_URL
+    BACKEND_URL=$BACKEND_URL \
+    ELASTIC_HOST=$ELASTIC_HOST
 
 WORKDIR /snitch
 
@@ -69,7 +71,7 @@ RUN cd apps/admin_app/assets \
 
 # Create assets build for admin app
 RUN cd apps/admin_app/assets \
-  && node node_modules/brunch/bin/brunch build --production \
+  && yarn deploy \
   && cd .. \
   && mix phx.digest
 

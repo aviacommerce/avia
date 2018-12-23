@@ -12,7 +12,9 @@ defmodule Snitch.Application do
     {:ok, pid} =
       Supervisor.start_link(
         [
-          supervisor(Snitch.Repo, [])
+          supervisor(Snitch.Repo, []),
+          supervisor(Snitch.Tools.ElasticsearchCluster, []),
+          worker(Cachex, [:snitch_cache, []])
         ],
         strategy: :one_for_one,
         name: Snitch.Supervisor
