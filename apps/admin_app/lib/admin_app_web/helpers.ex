@@ -2,6 +2,7 @@ defmodule AdminAppWeb.Helpers do
   import Ecto.Changeset
   import Ecto.Query
   alias Ecto.Adapters.SQL
+  alias AdminAppWeb.ProductView
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.{Order, Product}
   alias Snitch.Domain.Order, as: Domain
@@ -76,7 +77,7 @@ defmodule AdminAppWeb.Helpers do
         ~w(id number line_items_count order_total billing_address shipping_address inserted_at updated_at user_id state)a
 
       "product" ->
-        ~w(id name slug state max_retail_price selling_price variant_count taxon_name weight height depth store theme_id is_active)a
+        ~w(id name product_type slug state max_retail_price selling_price variant_count taxon_name weight height depth store theme_id is_active)a
     end
   end
 
@@ -120,9 +121,20 @@ defmodule AdminAppWeb.Helpers do
     |> Map.put(:order_total, Domain.total_amount(order))
   end
 
+  defp get_product_type(product) do
+    case ProductView.is_parent_product(to_string(product.id)) do
+      true ->
+        "variable"
+
+      false ->
+        if ProductView.is_child_product(product), do: "variant", else: "simple"
+    end
+  end
+
   defp parse_line(%Product{} = product) do
     product
     |> Map.from_struct()
+    |> Map.put(:product_type, get_product_type(product))
     |> Map.put(:taxon_name, product.taxon.name)
     |> Map.put(:variant_count, length(product.variants))
   end
