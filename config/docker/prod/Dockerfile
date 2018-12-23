@@ -71,7 +71,7 @@ RUN cd apps/admin_app/assets \
 
 # Create assets build for admin app
 RUN cd apps/admin_app/assets \
-  && node node_modules/brunch/bin/brunch build --production \
+  && yarn deploy \
   && cd .. \
   && mix phx.digest
 
