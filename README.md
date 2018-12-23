@@ -14,15 +14,23 @@
   <a href="https://www.pivotaltracker.com/n/projects/2149807">
     <img src="http://res.cloudinary.com/zeus999/image/upload/c_limit,h_1041,w_1487/v1486457388/Yatrum%20Logo/pt-badge_ss3dyt.svg" alt="pivotal" title="project-tracker"/>
   </a>
+   <a href="">
+    <img src="https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat" alt="license" title="Software License"/>
+  </a>
 </p>
 
 # Avia
-**E-commerce re-invented :zap: in [Elixir][elixir]!**
-> Inspired from [magento][magento], [spree][spree] and [nectar-commerce][nectar]
 
-[magento]: https://github.com/magento/magento2
-[spree]: https://github.com/spree/spree
-[nectar]: https://github.com/vinsol/nectarcommerce
+**E-commerce re-invented :zap: in [Elixir][elixir]!**
+
+* 🌍 [https://aviacommerce.org/][aviacommerce] - Learn more about Aviacommerce
+* 📖 [Documentation](https://aviacommerce.org/docs/)
+* 📚 [API Documentation](https://www.aviacommerce.org/docs/apis-getting-started.html)
+* 👍 Like us on [Facebook](https://www.facebook.com/aviacommerce)
+* 🕊 Twitter: [@aviacommerce](https://twitter.com/aviacommerce) - Get the latest news
+* 🐞 Issue Tracker: - [Issues](https://github.com/aviacommerce/avia/issues) - Report bugs here
+* 🗨 [Forums](https://forum.aviacommerce.org/) - Discussions -> Coming soon... 
+* 👪 [Community Chat][gitter] - Gitter 
 
 ## Goals
 
@@ -45,7 +53,6 @@ We are also welcoming to the developers who want to contribute in the developmen
 
 [pivotal]: https://www.pivotaltracker.com/n/projects/2149807
 [elixir]: http://elixir-lang.org/
-[feedback]: https://github.com/aviabird/snitch/issues/66
 [gitter]: https://gitter.im/avia-commerce/Lobby
 [aviacommerce]: https://aviacommerce.org
 [contribute]: https://www.aviacommerce.org/docs/how-to-contribute.html
