@@ -4,12 +4,10 @@ defmodule AdminAppWeb.PageController do
   alias AdminAppWeb.Helpers
 
   def index(conn, _params) do
-    case conn.request_path do
-      "/" ->
-        redirect(conn, to: dashboard_path(conn, :index))
+    redirect(conn, to: dashboard_path(conn, :index))
+  end
 
-      _ ->
-        render(conn, "index.html")
-    end
+  def react_app(conn, _params) do
+    render(conn, "index.html")
   end
 end

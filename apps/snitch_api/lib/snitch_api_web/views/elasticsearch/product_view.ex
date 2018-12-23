@@ -18,7 +18,6 @@ defmodule SnitchApiWeb.Elasticsearch.ProductView do
 
   defp source(product), do: product["_source"]
 
-
   defp id(product) do
     [_, id] = String.split(product["_id"], "_")
     String.to_integer(id)

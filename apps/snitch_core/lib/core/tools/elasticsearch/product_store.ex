@@ -29,7 +29,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductStore do
   along with a tenant(virtual field) to track teanant in Elasticsearch
   """
   def stream(_schema) do
-    ["public" | Triplex.all]
+    ["public" | Triplex.all()]
     |> Stream.flat_map(fn tenant ->
       IO.puts("\n\t Streaming data for #{tenant} database \n")
       Repo.set_tenant(tenant)
