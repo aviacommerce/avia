@@ -81,7 +81,10 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
 
   # If variant does not have images, then use parent images
   defp product_images(
-         %{parent_variation: %{parent_product: %{images: parent_images, id: parent_id}}, images: []} = product
+         %{
+           parent_variation: %{parent_product: %{images: parent_images, id: parent_id}},
+           images: []
+         } = product
        ) do
     product_images(%{product | parent_variation: nil, images: parent_images, id: parent_id})
   end
