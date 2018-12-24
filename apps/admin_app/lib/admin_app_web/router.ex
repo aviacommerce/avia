@@ -103,10 +103,6 @@ defmodule AdminAppWeb.Router do
     get("/product/import/etsy", ProductImportController, :import_etsy)
     get("/product/import/etsy/callback", ProductImportController, :oauth_callback)
     get("/product/import/etsy/progress", ProductImportController, :import_progress)
-
-    # Add all pheonix routes above this route. Routes that does not match any
-    # of the above routes will go to react app
-    get("/*path", PageController, :react_app)
   end
 
   scope "/", AdminAppWeb do
@@ -144,5 +140,13 @@ defmodule AdminAppWeb.Router do
     get("/taxon/:taxon_id/aggregate", TaxonomyController, :taxon_delete_aggregate)
     put("/taxonomy/update", TaxonomyController, :update_taxon)
     post("/product_option_values/:id", OptionTypeController, :update)
+  end
+
+  scope "/", AdminAppWeb do
+    pipe_through([:browser, :authentication])
+
+    # Don't add phoenix routes after this route as, all routes that does not match
+    # Phoenix routes goes to react app. 
+    get("/*path", ReactController, :index)
   end
 end
