@@ -1,4 +1,4 @@
-# We are using wkhtmltopdf to generate PDF files. Unfortunately according to 
+# We are using wkhtmltopdf to generate PDF files. Unfortunately according to
 # madnight, compiling wkhtmltopdf from scratch will take hours even with the
 # largest ec2 instance. So here we take the precompiled binary from the other
 # image available on Dockerfile - we will get to this in final stage.
@@ -22,6 +22,7 @@ ARG SENDGRID_API_KEY
 ARG SENDGRID_SENDER_EMAIL
 ARG FRONTEND_URL
 ARG BACKEND_URL
+ARG ELASTIC_HOST
 
 # Install essential packages for application build
 RUN apt-get clean \
@@ -30,9 +31,7 @@ RUN apt-get clean \
   && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
   && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
   && curl -sL https://deb.nodesource.com/setup_8.x | bash \
-  && apt-get install -y nodejs yarn \
-  && yarn global add elm@0.18.0 \
-  && elm-package install -y
+  && apt-get install -y nodejs yarn
 
 ENV MIX_ENV=prod \
     PHOENIX_SECRET_KEY_BASE=$PHOENIX_SECRET_KEY_BASE \
@@ -49,7 +48,8 @@ ENV MIX_ENV=prod \
     SENDGRID_API_KEY=$SENDGRID_API_KEY \
     SENDGRID_SENDER_EMAIL=$SENDGRID_SENDER_EMAIL \
     FRONTEND_URL=$FRONTEND_URL \
-    BACKEND_URL=$BACKEND_URL
+    BACKEND_URL=$BACKEND_URL \
+    ELASTIC_HOST=$ELASTIC_HOST
 
 WORKDIR /snitch
 
@@ -62,14 +62,10 @@ COPY apps apps
 RUN mix do local.hex --force, local.rebar --force
 RUN mix do deps.get, deps.compile
 
-# Install npm/elm pacakges
-RUN cd apps/admin_app/assets \
-  && yarn install \
-  && cd elm && elm-package install --yes
-
 # Create assets build for admin app
 RUN cd apps/admin_app/assets \
-  && node node_modules/brunch/bin/brunch build --production \
+  && yarn install \
+  && yarn deploy \
   && cd .. \
   && mix phx.digest
 

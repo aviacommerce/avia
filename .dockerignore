@@ -1,0 +1,11 @@
+.git
+.scripts
+_build
+cover
+erl_crash.dump
+uploads
+.elixir_ls
+.github
+deps
+vendor
+dist

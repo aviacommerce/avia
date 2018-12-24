@@ -21,6 +21,11 @@ defmodule Snitch.Tools.Helper.ImageUploader do
     ~w(.jpg .jpeg .gif .png) |> Enum.member?(file_extension)
   end
 
+  def transform(:original, _) do
+    {:convert,
+     "-strip -quality 75 -thumbnail 600x800^ -gravity center -extent 600x800 -format jpg"}
+  end
+
   @doc """
   Overrides the storage directory where images would be stored.
   """

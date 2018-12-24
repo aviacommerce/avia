@@ -33,6 +33,19 @@ defmodule SnitchApiWeb.ProductView do
     :display_max_retail_price
   ])
 
+  def name(product), do: append_option_value_in_name(product)
+
+  defp append_option_value_in_name(%{options: [], name: name}), do: name
+
+  defp append_option_value_in_name(%{options: options, name: name}) do
+    postfix =
+      options
+      |> Enum.map(&String.capitalize(&1.value))
+      |> Enum.join(",")
+
+    name <> " (" <> postfix <> ")"
+  end
+
   def selling_price(product) do
     Money.round(product.selling_price, currency_digits: :cash)
   end
