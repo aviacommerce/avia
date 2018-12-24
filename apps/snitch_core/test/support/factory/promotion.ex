@@ -12,7 +12,8 @@ defmodule Snitch.Factory.Promotion do
           usage_limit: 20,
           current_usage_count: 0,
           match_policy: "all",
-          active?: true
+          active?: true,
+          archived_at: 0
         }
       end
 
@@ -38,6 +39,18 @@ defmodule Snitch.Factory.Promotion do
         %PromotionAction{
           name: "Order Action",
           module: "Elixir.Snitch.Data.Schema.PromotionAction.OrderAction",
+          preferences: %{
+            calculator_module: "Elixir.Snitch.Domain.Calculator.FlatRate",
+            calculator_preferences: %{amount: 5}
+          },
+          promotion: build(:promotion)
+        }
+      end
+
+      def promotion_line_item_action_factory() do
+        %PromotionAction{
+          name: "LineItem Action",
+          module: "Elixir.Snitch.Data.Schema.PromotionAction.LineItemAction",
           preferences: %{
             calculator_module: "Elixir.Snitch.Domain.Calculator.FlatRate",
             calculator_preferences: %{amount: 5}

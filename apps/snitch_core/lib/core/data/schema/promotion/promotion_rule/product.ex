@@ -10,7 +10,7 @@ defmodule Snitch.Data.Schema.PromotionRule.Product do
   """
 
   use Snitch.Data.Schema
-  @behaviour Snitch.Data.Schema.PromotionRule
+  use Snitch.Data.Schema.PromotionRule
 
   @type t :: %__MODULE__{}
   @name "Product Rule"
@@ -44,14 +44,27 @@ defmodule Snitch.Data.Schema.PromotionRule.Product do
   satisfied.
   """
   def eligible(order, rule_data) do
-    # TODO add logic here.
     order_product_set = get_order_products_set(order)
     rule_product_set = MapSet.new(rule_data["product_list"])
 
     check_order_against_rule(rule_data["match_policy"], order_product_set, rule_product_set)
   end
 
-  def check_order_against_rule("all", order_products, rule_products) do
+  def line_item_actionable?(line_item, rule) do
+    line_item = Repo.preload(line_item, :product)
+
+    case rule.preferences["match_policy"] do
+      "none" ->
+        line_item.product.id not in rule.preferences["product_list"]
+
+      _ ->
+        line_item.product.id in rule.preferences["product_list"]
+    end
+  end
+
+  ################### private functions ####################
+
+  defp check_order_against_rule("all", order_products, rule_products) do
     case MapSet.subset?(rule_products, order_products) do
       true ->
         {true, @success_message}
@@ -61,7 +74,7 @@ defmodule Snitch.Data.Schema.PromotionRule.Product do
     end
   end
 
-  def check_order_against_rule("any", order_products, rule_products) do
+  defp check_order_against_rule("any", order_products, rule_products) do
     if MapSet.disjoint?(order_products, rule_products) do
       {false, @failure_messsage}
     else
@@ -69,7 +82,7 @@ defmodule Snitch.Data.Schema.PromotionRule.Product do
     end
   end
 
-  def check_order_against_rule("none", order_products, rule_products) do
+  defp check_order_against_rule("none", order_products, rule_products) do
     if MapSet.disjoint?(order_products, rule_products) do
       {true, @success_message}
     else

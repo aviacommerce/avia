@@ -18,6 +18,22 @@ defmodule Snitch.Data.Schema.PromotionAction do
 
   @type t :: %__MODULE__{}
 
+  @doc """
+  Performs the action for the promotion.
+
+  The function should be implemented by individual action types.
+
+  ### Note
+  The function usually has side effects such as writing to the database.
+
+  Returns a boolean depending on whether the action was applied or not.
+  """
+  @callback perform?(
+              order :: Order.t(),
+              promtoion :: Promotion.t(),
+              action :: PromotionAction.t()
+            ) :: boolean()
+
   schema "snitch_promotion_actions" do
     field(:name, :string)
     field(:module, PromotionActionEnum)

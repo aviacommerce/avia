@@ -4,9 +4,9 @@ defmodule Snitch.Data.Schema.PromotionRule.ItemTotal do
   """
 
   use Snitch.Data.Schema
+  use Snitch.Data.Schema.PromotionRule
   alias Snitch.Domain.Order, as: OrderDomain
 
-  @behaviour Snitch.Data.Schema.PromotionRule
   @type t :: %__MODULE__{}
 
   @name "Order Item Total"

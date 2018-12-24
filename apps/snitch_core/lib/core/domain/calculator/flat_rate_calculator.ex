@@ -4,6 +4,8 @@ defmodule Snitch.Domain.Calculator.FlatRate do
   it.
   """
   use Snitch.Data.Schema
+  alias Snitch.Data.Schema.{LineItem, Order}
+  alias Snitch.Domain.Order, as: OrderDomain
 
   @behaviour Snitch.Domain.Calculator
 
@@ -19,7 +21,12 @@ defmodule Snitch.Domain.Calculator.FlatRate do
     |> validate_required([:amount])
   end
 
-  # TODO implement the function
-  def compute(item, amount) do
+  def compute(%Order{} = order, params) do
+    order_total = OrderDomain.total_amount(order)
+    min(order_total.amount, params.amount)
+  end
+
+  def compute(%LineItem{} = item, params) do
+    min(item.unit_price.amount * item.quantity, params.amount)
   end
 end

@@ -4,9 +4,17 @@ defmodule Snitch.Data.Schema.PromotionAction.OrderAction do
   """
 
   use Snitch.Data.Schema
+  alias Snitch.Data.Model.PromotionAdjustment
+
+  @behaviour Snitch.Data.Schema.PromotionAction
+
   @type t :: %__MODULE__{}
 
   embedded_schema do
+    # The field is using ActionCalculators enum but it has no
+    # effect because it is being handled manually at present and the
+    # dump and load is not being used since the data is being stored
+    # as embedded schema which is also dynamic
     field(:calculator_module, ActionCalculators)
     field(:calculator_preferences, :map)
   end
@@ -18,6 +26,40 @@ defmodule Snitch.Data.Schema.PromotionAction.OrderAction do
     |> cast(params, @params)
     |> validate_required(@params)
     |> validate_calculator_preferences()
+  end
+
+  def perform?(order, promotion, action) do
+    action_data = action.preferences
+    calculator = String.to_existing_atom(action_data["calculator_module"])
+
+    params =
+      for {key, value} <- action_data["calculator_preferences"], into: %{} do
+        {String.to_existing_atom(key), value}
+      end
+
+    amount = calculator.compute(order, params) * -1
+    params = set_adjustment_params(order, promotion, action, amount)
+
+    case PromotionAdjustment.create(params) do
+      {:ok, _data} ->
+        true
+
+      {:error, _data} ->
+        false
+    end
+  end
+
+  ####################### Private Functions #####################
+
+  defp set_adjustment_params(order, promotion, action, amount) do
+    %{
+      order: order,
+      promotion: promotion,
+      promotion_action: action,
+      amount: amount,
+      adjustable_type: :order,
+      adjustable_id: order.id
+    }
   end
 
   defp validate_calculator_preferences(%Ecto.Changeset{valid?: true} = changeset) do

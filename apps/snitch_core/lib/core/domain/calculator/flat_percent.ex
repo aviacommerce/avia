@@ -21,10 +21,10 @@ defmodule Snitch.Domain.Calculator.FlatPercent do
   end
 
   # TODO implement the function
-  def compute(%Order{} = order, params, currency) do
+  def compute(%Order{} = order, params) do
   end
 
   # TODO implement the function
-  def compute(%Order{} = order, params) do
+  def compute(%LineItem{} = order, params) do
   end
 end
