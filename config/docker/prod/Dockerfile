@@ -1,4 +1,4 @@
-# We are using wkhtmltopdf to generate PDF files. Unfortunately according to 
+# We are using wkhtmltopdf to generate PDF files. Unfortunately according to
 # madnight, compiling wkhtmltopdf from scratch will take hours even with the
 # largest ec2 instance. So here we take the precompiled binary from the other
 # image available on Dockerfile - we will get to this in final stage.
@@ -32,8 +32,6 @@ RUN apt-get clean \
   && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
   && curl -sL https://deb.nodesource.com/setup_8.x | bash \
   && apt-get install -y nodejs yarn \
-  && yarn global add elm@0.18.0 \
-  && elm-package install -y
 
 ENV MIX_ENV=prod \
     PHOENIX_SECRET_KEY_BASE=$PHOENIX_SECRET_KEY_BASE \
@@ -64,13 +62,9 @@ COPY apps apps
 RUN mix do local.hex --force, local.rebar --force
 RUN mix do deps.get, deps.compile
 
-# Install npm/elm pacakges
-RUN cd apps/admin_app/assets \
-  && yarn install \
-  && cd elm && elm-package install --yes
-
 # Create assets build for admin app
 RUN cd apps/admin_app/assets \
+  && yarn install \
   && yarn deploy \
   && cd .. \
   && mix phx.digest
