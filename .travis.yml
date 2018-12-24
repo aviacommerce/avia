@@ -9,6 +9,10 @@ before_install:
   - wget https://downloads.wkhtmltopdf.org/0.12/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz
   - tar xf wkhtmltox-0.12.4_linux-generic-amd64.tar.xz
   - sudo mv wkhtmltox/bin/wkhtmltopdf /usr/bin
+  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.5.4.deb
+  - sudo dpkg -i --force-confnew elasticsearch-6.5.4.deb
+  - sudo /etc/init.d/elasticsearch start
+  - until curl --silent -XGET --fail http://localhost:9200; do printf '.'; sleep 1; done
 script:
   - set -e
   - MIX_ENV=test mix format --check-formatted
@@ -31,6 +35,7 @@ env:
   global:
     - FRONTEND_CHECKOUT_URL=http://localhost:4200/checkout/
     - HOSTED_PAYMENT_URL=http://localhost:3000/api/v1/hosted-payment/
+    - ELASTIC_HOST=http://localhost:9200/
 
 notifications:
   email:
