@@ -47,7 +47,8 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
       "query" => %{
         "bool" => %{
           "must" =>
-            (tenant_query() ++ match_keywords(params)) ++ taxon_query(params) ++ brand_query(params)
+            (tenant_query() ++ match_keywords(params)) ++
+              taxon_query(params) ++ brand_query(params)
         }
       },
       "aggs" => aggregate_query(params)

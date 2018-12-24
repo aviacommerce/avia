@@ -116,7 +116,7 @@ defmodule Snitch.Core.Mixfile do
       {:elasticsearch, "~> 0.6.0"},
 
       # Caching
-      {:cachex, "~> 3.1"},
+      {:cachex, "~> 3.1"}
     ]
   end
 

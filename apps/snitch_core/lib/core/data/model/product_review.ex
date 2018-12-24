@@ -75,7 +75,7 @@ defmodule Snitch.Data.Model.ProductReview do
   def review_aggregate(product) do
     reviews =
       product
-      |> Repo.preload([reviews: [rating_option_vote: :rating_option]])
+      |> Repo.preload(reviews: [rating_option_vote: :rating_option])
       |> Map.get(:reviews)
 
     calculate_aggregate(reviews, length(reviews), @review_detail)

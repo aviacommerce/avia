@@ -2,7 +2,7 @@ use Mix.Config
 
 config :snitch_core, Snitch.Tools.ElasticsearchCluster,
   # The URL where Elasticsearch is hosted on your system
-  url:  System.get_env("ELASTIC_HOST"),
+  url: System.get_env("ELASTIC_HOST"),
 
   # If your Elasticsearch cluster uses HTTP basic authentication,
   # specify the username and password here:
