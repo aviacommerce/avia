@@ -10,7 +10,7 @@ defmodule Snitch.Domain.Order do
   import Ecto.Changeset
   import Ecto.Query
   alias Snitch.Data.Schema.{Order, Package, Payment}
-  alias Snitch.Data.Model.Product
+  alias Snitch.Data.Model.{Product, Image}
   alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
 
   @spec validate_change(Ecto.Changeset.t()) :: Ecto.Changeset.t()
@@ -159,7 +159,7 @@ defmodule Snitch.Domain.Order do
 
   def fetch_image_url(line_item) do
     image = line_item.product.images |> List.first()
-    Product.image_url(image.name, line_item.product)
+    Image.image_url(image.name, line_item.product)
   end
 
   def format_date(date) do

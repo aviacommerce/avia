@@ -4,6 +4,8 @@ defmodule Snitch.Data.Model.ProductTest do
   import Snitch.Factory
   alias Snitch.Data.Model.Product
   alias Snitch.Data.Schema.Product, as: ProductSchema
+  alias Snitch.Tools.Helper.Taxonomy
+  alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
   alias Snitch.Repo
 
   @rummage_default %{
@@ -15,6 +17,8 @@ defmodule Snitch.Data.Model.ProductTest do
     }
   }
 
+  @img "test/support/image.png"
+
   setup do
     product = insert(:product)
     shipping_category = insert(:shipping_category)
@@ -22,6 +26,19 @@ defmodule Snitch.Data.Model.ProductTest do
 
     valid_attrs = %{
       product_id: product.id
+    }
+
+    image_params = %{
+      "images" => [
+        %{
+          "image" => %{
+            filename: "fDwvoPbZGc4WuAVLYwwyo.png",
+            path: @img,
+            type: "image/png",
+            url: "/abc"
+          }
+        }
+      ]
     }
 
     valid_params = %{
@@ -34,7 +51,7 @@ defmodule Snitch.Data.Model.ProductTest do
       taxon_id: taxon.id
     }
 
-    [valid_attrs: valid_attrs, valid_params: valid_params]
+    [valid_attrs: valid_attrs, valid_params: valid_params, image_params: image_params]
   end
 
   describe "get" do
@@ -108,6 +125,33 @@ defmodule Snitch.Data.Model.ProductTest do
     test "creation fails for duplicate product", %{valid_params: vp} do
       Product.create(vp)
       assert {:error, _} = Product.create(vp)
+    end
+  end
+
+  describe "image handling - " do
+    setup do
+      product = insert(:product)
+      taxon = insert(:taxon)
+      {:ok, updated_product} = Product.update(product, %{state: :active, taxon_id: taxon.id})
+      product = updated_product |> Repo.preload(:images)
+      [product: product]
+    end
+
+    test "add images with valid params", %{image_params: ip, product: product} do
+      assert {:ok, "success"} = Product.add_images(product, ip)
+    end
+
+    test "delete image for a product", %{product: product, image_params: ip} do
+      Product.add_images(product, ip)
+      new_product = product |> Repo.preload(:images, force: true)
+      image = new_product.images |> List.first()
+      assert {:ok, "success"} = Product.delete_image(new_product.id, image.id)
+    end
+
+    test "pass empty list of images to a product" do
+      product = insert(:product) |> Repo.preload(:images)
+      ip = %{"images" => []}
+      assert {:error, _} = Product.add_images(product, ip)
     end
   end
 
@@ -190,10 +234,92 @@ defmodule Snitch.Data.Model.ProductTest do
     end
   end
 
+  describe "get_products_by_category/1" do
+    test "get product from different category levels" do
+      create_taxonomy()
+
+      casual_shirt = TaxonomyDomain.get_taxon_by_name("Casual Shirt")
+      insert_list(3, :product, taxon: casual_shirt, state: "active")
+
+      assert Product.get_products_by_category(casual_shirt.id) |> length == 3
+
+      formal_shirt = TaxonomyDomain.get_taxon_by_name("Formal Shirt")
+      insert_list(5, :product, taxon: formal_shirt, state: "draft")
+
+      assert Product.get_products_by_category(formal_shirt.id) |> length == 5
+
+      shrug = TaxonomyDomain.get_taxon_by_name("Shrugs")
+      assert Product.get_products_by_category(shrug.id) |> length == 0
+
+      top_wear = TaxonomyDomain.get_taxon_by_name("TopWear")
+      assert Product.get_products_by_category(top_wear.id) |> length == 8
+    end
+  end
+
+  describe "delete_by_category/1" do
+    test "delete product category" do
+      create_taxonomy()
+
+      casual_shirt = TaxonomyDomain.get_taxon_by_name("Casual Shirt")
+      products = insert_list(3, :product, taxon: casual_shirt, state: "active")
+      products_ids = Enum.map(products, & &1.id)
+
+      {:ok, _} = Product.delete_by_category(casual_shirt)
+
+      products_by_category = Product.get_products_by_category(casual_shirt.id)
+      deleted_products = products_ids |> Enum.map(&Product.get/1)
+
+      assert length(products_by_category) == 0
+
+      deleted_products
+      |> Enum.map(fn product ->
+        assert product.state == :deleted
+        assert product.taxon_id == nil
+      end)
+    end
+  end
+
   defp get_naive_date_time(date) do
     Date.from_iso8601(date)
     |> elem(1)
     |> NaiveDateTime.new(~T[00:00:00])
     |> elem(1)
+  end
+
+  defp create_taxonomy() do
+    Taxonomy.create_taxonomy({
+      "Category",
+      [
+        {"Men",
+         [
+           {"TopWear",
+            [
+              {"TShirt", []},
+              {"Casual Shirt", []},
+              {"Formal Shirt", []}
+            ]},
+           {"BottomWear",
+            [
+              {"Jeans", []},
+              {"Shorts", []}
+            ]}
+         ]},
+        {"Women",
+         [
+           {"Western Wear",
+            [
+              {"Dresses & JumpSuit", []},
+              {"Tops, Tshirts & Shirts", []},
+              {"Shrugs", []}
+            ]},
+           {"Indian & Fusion Wear",
+            [
+              {"Kurta's & Suits", []},
+              {"Skirts and Palazzos", []},
+              {"Jackets and WaistCoats", []}
+            ]}
+         ]}
+      ]
+    })
   end
 end

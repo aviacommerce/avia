@@ -6,7 +6,7 @@ defmodule Snitch.Tools.Helper.ImageUploader do
   """
   use Arc.Definition
 
-  @versions [:original, :thumb]
+  @versions [:original]
 
   # function override to store images locally.
   def __storage do
@@ -17,18 +17,13 @@ defmodule Snitch.Tools.Helper.ImageUploader do
   Validates image file type.
   """
   def validate({file, _}) do
-    ~w(.jpg .jpeg .gif .png) |> Enum.member?(Path.extname(file.file_name))
+    file_extension = file.file_name |> Path.extname() |> String.downcase()
+    ~w(.jpg .jpeg .gif .png) |> Enum.member?(file_extension)
   end
 
-  @doc """
-  Defines a thumbnail transformation.
-
-  The function returns a thumbnail version of size 250x250,
-  if the version in the storage_dir/2 is `:thumb`. The original
-  image as well as it's thumbnail version are stored in that case.
-  """
-  def transform(:thumb, _) do
-    {:convert, "-strip -thumbnail 250x250^ -gravity center -extent 250x250 -format png", :png}
+  def transform(:original, _) do
+    {:convert,
+     "-strip -quality 75 -thumbnail 600x800^ -gravity center -extent 600x800 -format jpg"}
   end
 
   @doc """

@@ -4,7 +4,9 @@ defmodule SnitchApiWeb.ProductView do
   alias Snitch.Data.Schema.Image
   alias Snitch.Data.Schema.Variation
   alias Snitch.Data.Schema.Product, as: ProductSchema
-  alias Snitch.Data.Model.{Product, ProductReview}
+  alias Snitch.Data.Model.ProductReview
+  alias Snitch.Data.Model.Product
+  alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Core.Tools.MultiTenancy.Repo
   import Ecto.Query
 
@@ -31,6 +33,19 @@ defmodule SnitchApiWeb.ProductView do
     :display_max_retail_price
   ])
 
+  def name(product), do: append_option_value_in_name(product)
+
+  defp append_option_value_in_name(%{options: [], name: name}), do: name
+
+  defp append_option_value_in_name(%{options: options, name: name}) do
+    postfix =
+      options
+      |> Enum.map(&String.capitalize(&1.value))
+      |> Enum.join(",")
+
+    name <> " (" <> postfix <> ")"
+  end
+
   def selling_price(product) do
     Money.round(product.selling_price, currency_digits: :cash)
   end
@@ -53,7 +68,7 @@ defmodule SnitchApiWeb.ProductView do
     url =
       case product.images |> List.first() do
         nil -> nil
-        image -> Product.image_url(image.name, product)
+        image -> ImageModel.image_url(image.name, product)
       end
 
     %{"default_product_url" => url}
@@ -68,22 +83,25 @@ defmodule SnitchApiWeb.ProductView do
           images = product.images
 
           if images != [] do
-            images
+            get_images(images, product)
           else
-            get_parent_images(product)
+            %{images: images, parent_product: parent_product} = get_parent_images(product)
+            get_images(images, parent_product)
           end
 
         products ->
-          product.images
+          get_images(product.images, product)
       end
+  end
 
-    case product_images do
+  defp get_images(images, product) do
+    case images do
       [] ->
         [%{"product_url" => nil}]
 
       images ->
         images
-        |> Enum.map(fn image -> %{"product_url" => Product.image_url(image.name, product)} end)
+        |> Enum.map(fn image -> %{"product_url" => ImageModel.image_url(image.name, product)} end)
     end
   end
 
@@ -92,12 +110,12 @@ defmodule SnitchApiWeb.ProductView do
 
     case variant do
       nil ->
-        []
+        %{images: [], parent_product: nil}
 
       _ ->
         parent_id = variant.parent_product_id
         parent_product = Repo.get_by(ProductSchema, id: parent_id) |> Repo.preload([:images])
-        parent_product.images
+        %{images: parent_product.images, parent_product: parent_product}
     end
   end
 

@@ -14,7 +14,10 @@ defmodule Snitch.Demo.PaymentMethod do
     params = %{
       name: name,
       code: code,
-      provider: provider
+      provider: provider,
+      preferences:
+        provider.preferences()
+        |> Enum.into(%{}, fn credential -> {credential, ""} end)
     }
 
     %PaymentMethod{} |> PaymentMethod.create_changeset(params) |> Repo.insert!()

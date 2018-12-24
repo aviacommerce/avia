@@ -7,8 +7,10 @@ defmodule Snitch.Data.Model.Product do
 
   import Ecto.Query
   alias Ecto.Multi
-  alias Snitch.Data.Schema.{Image, Product, Variation}
+  alias Snitch.Data.Model.Image, as: ImageModel
+  alias Snitch.Data.Schema.{Image, Product, Variation, Taxon}
   alias Snitch.Tools.Helper.ImageUploader
+  alias Snitch.Tools.ElasticSearch.ProductStore, as: ESProductStore
 
   @product_states [:active, :in_active, :draft]
 
@@ -25,6 +27,11 @@ defmodule Snitch.Data.Model.Product do
     QH.get(Product, query_params, Repo)
   end
 
+  @spec get_product_list() :: [Product.t()]
+  def get_product_list() do
+    Repo.all(admin_display_product_query())
+  end
+
   @doc """
   Get listtable product
   Return following product
@@ -32,11 +39,33 @@ defmodule Snitch.Data.Model.Product do
   - Parent product (Product that has variants)
   In short returns product excluding the variant products
   """
-  @spec get_product_list() :: [Product.t()]
-  def get_product_list() do
-    child_product_ids = from(c in Variation, select: c.child_product_id) |> Repo.all()
-    query = from(p in Product, where: p.state == "active" and p.id not in ^child_product_ids)
-    Repo.all(query)
+  def admin_display_product_query() do
+    child_product_ids =
+      Variation
+      |> select([v], v.child_product_id)
+      |> Repo.all()
+
+    Product
+    |> where([p], p.state == "active" and p.id not in ^child_product_ids)
+  end
+
+  @doc """
+  Get listtable product
+  Return following product
+  - Standalone product.(Product that do not have variants)
+  - Variant product (excluding their parent)
+  In short returns product excluding the parent products
+  """
+  def sellable_products_query() do
+    parent_product_ids =
+      Variation
+      |> distinct([v], v.parent_product_id)
+      |> select([v], v.parent_product_id)
+      |> Repo.all()
+
+    Product
+    |> join(:left, [p], v in Variation, v.child_product_id == p.id)
+    |> where([p, v], p.state != "in_active" and p.id not in ^parent_product_ids)
   end
 
   def get_product_with_default_image(product) do
@@ -91,7 +120,12 @@ defmodule Snitch.Data.Model.Product do
   """
   @spec update(Product.t(), map) :: {:ok, Product.t()} | {:error, Ecto.Changeset.t()}
   def update(product, params) do
-    QH.update(Product, params, product, Repo)
+    with {:ok, product} <- QH.update(Product, params, product, Repo) do
+      ESProductStore.index_product_to_es(product)
+      {:ok, product}
+    else
+      {:error, error} -> {:error, error}
+    end
   end
 
   @doc """
@@ -113,6 +147,41 @@ defmodule Snitch.Data.Model.Product do
          changeset <- Product.delete_changeset(product) do
       Repo.update(changeset)
     end
+  end
+
+  @doc """
+  Deletes all product that fall under a particular category and all its children
+  category
+  """
+  @spec delete_by_category(Taxon.t()) :: {:ok, [Products.t()]} | {:error, :delete_failed}
+  def delete_by_category(%Taxon{} = taxon) do
+    with product_by_category_query <- Product.product_by_category_query(taxon.id),
+         product_delete_query <- Product.set_delete_fields(product_by_category_query) do
+      total_products =
+        from(p in product_by_category_query, select: count(p.id))
+        |> Repo.one()
+
+      {delete_product_count, products_ids} =
+        Repo.update_all(product_delete_query, [], returning: [:id])
+
+      if(total_products == delete_product_count) do
+        {:ok, products_ids}
+      else
+        {:error, :delete_failed}
+      end
+    end
+  end
+
+  @doc """
+  Gets all product under a particular product category.
+
+  All category tree is considered under the category the search is done.
+  """
+  @spec get_products_by_category(integer) :: [Product.t()]
+  def get_products_by_category(taxon_id) do
+    taxon_id
+    |> Product.product_by_category_query()
+    |> Repo.all()
   end
 
   @doc """
@@ -154,17 +223,7 @@ defmodule Snitch.Data.Model.Product do
     |> Multi.run(:store_image, fn %{product: product} ->
       store_images(product, params)
     end)
-    |> persist()
-  end
-
-  @doc """
-  Returns the url of the location where image is stored.
-  Takes as input `name` of the image and the `Product.t()`
-  struct.
-  """
-  @spec image_url(String.t(), Product.t()) :: String.t()
-  def image_url(name, product) do
-    ImageUploader.url({name, product})
+    |> ImageModel.persist()
   end
 
   @doc """
@@ -190,27 +249,18 @@ defmodule Snitch.Data.Model.Product do
     end)
     |> Multi.delete_all(:delete, query)
     |> remove_image_from_store()
-    |> persist()
+    |> ImageModel.persist()
   end
 
   ####################### Private Functions ########################
-
-  defp persist(multi) do
-    case Repo.transaction(multi) do
-      {:ok, _} ->
-        {:ok, "success"}
-
-      {:error, _, failed_value, _} ->
-        {:error, failed_value}
-    end
-  end
 
   defp store_images(product, params) do
     uploads = params["images"]
 
     uploads =
       Enum.map(uploads, fn
-        %{"image" => %Plug.Upload{} = upload} ->
+        %{"image" => %{filename: name, path: path, url: url, type: type} = upload} ->
+          upload = %Plug.Upload{filename: name, path: path, content_type: type}
           ImageUploader.store({upload, product})
 
         _ ->
@@ -263,10 +313,6 @@ defmodule Snitch.Data.Model.Product do
           {:error, "not found"}
       end
     end)
-  end
-
-  def image_url(name, product) do
-    ImageUploader.url({name, product})
   end
 
   def get_selling_prices(product_ids) do

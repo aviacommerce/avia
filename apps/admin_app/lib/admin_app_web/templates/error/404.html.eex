@@ -1,0 +1,10 @@
+
+<div class= "not_found">
+  <h1>404 - Page Not Found</h1>
+  <p>We're sorry. The Web address you entered is not a functioning page on our site.</p>
+
+  <div class="phx-hero">
+     <p><a href="/">Go to homepage</a></p>
+  </div>
+
+</div>  

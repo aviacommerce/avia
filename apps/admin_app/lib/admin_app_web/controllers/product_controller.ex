@@ -7,6 +7,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Data.Model.ProductPrototype, as: PrototypeModel
   alias Snitch.Domain.Taxonomy
+  alias Snitch.Tools.Helper.Rummage, as: RummageHelper
 
   alias Snitch.Data.Schema.{
     Image,
@@ -21,6 +22,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Tools.Helper.Query
   alias Snitch.Data.Model.StockItem, as: StockModel
   alias Snitch.Data.Schema.StockItem, as: StockSchema
+  alias Snitch.Data.Model.Image, as: ImageModel
   alias AdminAppWeb.ProductView
 
   import Phoenix.View, only: [render_to_string: 3]
@@ -52,7 +54,11 @@ defmodule AdminAppWeb.ProductController do
 
   def new(conn, _params) do
     changeset = ProductSchema.create_changeset(%ProductSchema{}, %{})
-    render(conn, "new.html", changeset: changeset)
+
+    render(conn, "new.html",
+      changeset: changeset,
+      rummage_params: RummageHelper.get_rummage_params(conn)
+    )
   end
 
   def create(conn, %{"product" => params}) do
@@ -62,7 +68,11 @@ defmodule AdminAppWeb.ProductController do
       {:error, changeset} ->
         conn = %{conn | request_path: product_path(conn, :new)}
         conn = %{conn | params: conn.params |> Map.put("taxon_id", Map.get(params, "taxon_id"))}
-        render(conn, "new.html", changeset: %{changeset | action: :new})
+
+        render(conn, "new.html",
+          changeset: %{changeset | action: :new},
+          rummage_params: RummageHelper.get_rummage_params(conn)
+        )
     end
   end
 
@@ -71,14 +81,22 @@ defmodule AdminAppWeb.ProductController do
 
     with %ProductSchema{} = product <- ProductModel.get(id) |> Repo.preload(preloads) do
       changeset = ProductSchema.create_changeset(product, params)
-      render(conn, "edit.html", changeset: changeset, parent_product: product)
+
+      rummage_params = RummageHelper.get_rummage_params(conn)
+
+      render(conn, "edit.html",
+        changeset: changeset,
+        parent_product: product,
+        rummage_params: rummage_params
+      )
     end
   end
 
   def update(conn, %{"product" => params}) do
     with %ProductSchema{} = product <- ProductModel.get(params["id"]),
          {:ok, product} <- ProductModel.update(product, params) do
-      save_publish_redirect_handler(conn, product, params)
+      updated_params = conn.params |> Map.take(["rummage"]) |> Map.merge(params)
+      save_publish_redirect_handler(conn, product, updated_params)
     end
   end
 
@@ -135,7 +153,11 @@ defmodule AdminAppWeb.ProductController do
 
   def add_images(conn, %{"product_images" => product_images, "product_id" => id}) do
     product = preload_product_images(id)
-    images = (product_images["images"] ++ product.images) |> parse_images()
+
+    images =
+      product
+      |> parse_images(product_images["images"] ++ product.images)
+
     params = %{"images" => images}
 
     case ProductModel.add_images(product, params) do
@@ -193,9 +215,13 @@ defmodule AdminAppWeb.ProductController do
     end
   end
 
-  defp parse_images(image_list) do
+  defp parse_images(product, image_list) do
     Enum.reduce(image_list, [], fn
       %Plug.Upload{} = image, acc ->
+        image = ImageModel.handle_image_value(image)
+
+        image = image |> Map.put(:url, ImageModel.image_url(image.filename, product))
+
         [%{"image" => image} | acc]
 
       image, acc ->
@@ -204,11 +230,11 @@ defmodule AdminAppWeb.ProductController do
     end)
   end
 
-  def delete(conn, %{"id" => id}) do
+  def delete(conn, %{"id" => id} = params) do
     with {:ok, _product} <- ProductModel.delete(id) do
       conn
       |> put_flash(:info, "Product deleted successfully")
-      |> redirect(to: product_path(conn, :index))
+      |> redirect_with_updated_conn(params)
     end
   end
 
@@ -221,19 +247,19 @@ defmodule AdminAppWeb.ProductController do
              "theme_id" => params["theme_id"]
            }) do
       {:ok, _product} = Repo.update(changeset)
-      redirect(conn, to: product_path(conn, :index))
+      redirect(conn, to: product_path(conn, :edit, params["product_id"]))
     else
       _ ->
         conn
         |> put_flash(:error, "Failed to create variant")
-        |> redirect(to: product_path(conn, :index))
+        |> redirect(to: product_path(conn, :edit, params["product_id"]))
     end
   end
 
   def select_category(conn, _params) do
     with {:ok, taxonomy} <- Taxonomy.get_default_taxonomy(),
          taxonomy <- Repo.preload(taxonomy, :root),
-         taxons <- Taxonomy.get_child_taxons(taxonomy.root.id) do
+         {:ok, taxons} <- Taxonomy.get_child_taxons(taxonomy.root.id) do
       render(conn, "product_category.html", taxons: taxons)
     else
       {:error, :not_found} ->

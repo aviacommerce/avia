@@ -1,6 +1,5 @@
 defmodule AdminAppWeb.Router do
   use AdminAppWeb, :router
-  use Plug.ErrorHandler
   use Sentry.Plug
 
   pipeline :browser do
@@ -34,6 +33,7 @@ defmodule AdminAppWeb.Router do
 
     get("/", PageController, :index)
 
+    get("/orders/export_orders", OrderController, :export_order)
     get("/orders/:category", OrderController, :index)
     get("/orders", OrderController, :index)
     get("/orders/:number/detail", OrderController, :show)
@@ -136,7 +136,17 @@ defmodule AdminAppWeb.Router do
     resources("/option_types", OptionTypeController)
     get("/categories/:taxon_id", TaxonomyController, :index)
     get("/taxon/:taxon_id", TaxonomyController, :taxon_edit)
+    delete("/taxon/:taxon_id", TaxonomyController, :taxon_delete)
+    get("/taxon/:taxon_id/aggregate", TaxonomyController, :taxon_delete_aggregate)
     put("/taxonomy/update", TaxonomyController, :update_taxon)
     post("/product_option_values/:id", OptionTypeController, :update)
+  end
+
+  scope "/", AdminAppWeb do
+    pipe_through([:browser, :authentication])
+
+    # Don't add phoenix routes after this route as, all routes that does not match
+    # Phoenix routes goes to react app. 
+    get("/*path", ReactController, :index)
   end
 end

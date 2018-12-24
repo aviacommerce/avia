@@ -14,7 +14,8 @@
             brands: @brands,
             stock_locations: @stock_locations,
             themes: @themes,
-            token: @token
+            token: @token,
+            rummage_params: @rummage_params
         %>
     </div>
   <div>

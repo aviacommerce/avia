@@ -10,6 +10,7 @@ defmodule AdminAppWeb.PaymentMethodView do
 
   def capitalize(data) do
     data
+    |> String.capitalize()
   end
 
   def providers() do

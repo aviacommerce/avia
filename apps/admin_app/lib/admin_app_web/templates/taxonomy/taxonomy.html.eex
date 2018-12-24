@@ -1,5 +1,5 @@
 <div class="list-container">
-  <h4 class="p-3 m-0">Taxonomy</h4> 
+  <h4 class="p-3 m-0">Taxonomy</h4>
   <div class="col-12">
     <div class="card col-12">
       <div class="taxonomy">
@@ -19,6 +19,9 @@
               </button>
             </div>
             <div class="modal-body">
+              <div id="new-taxon-danger" class="alert alert-danger">
+                Request failed
+              </div>
               <form action="/taxonomy" method="post" class="taxonform" >
                 <input type="hidden" value="<%= @token %>" name="_csrf_token"/>
                 <div class="form-group">
@@ -53,6 +56,30 @@
             </div>
             <div class="modal-body" id="taxon-edit-body">
               <div id="taxon-edit-loader" class="loader"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal" id="deletetaxon-modal" role="dialog" >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2 class="modal-title">Delete Taxon</h2>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div id="delete-taxon-danger" class="alert alert-danger">
+                Request failed
+              </div>
+              <div id="taxon-delete-body">
+              </div>
+              <div id="taxon-delete-loader" class="loader"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+              <button id="taxon_delete" type="button" class="btn btn-primary">Yes</button>
             </div>
           </div>
         </div>

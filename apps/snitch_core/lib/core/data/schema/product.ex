@@ -5,7 +5,11 @@ defmodule Snitch.Data.Schema.Product do
 
   use Snitch.Data.Schema
   use Rummage.Ecto
+
+  import Ecto.Query
+
   alias Snitch.Data.Schema.Product.NameSlug
+  alias Snitch.Domain.Taxonomy
 
   alias Snitch.Data.Schema.{
     Variation,
@@ -44,6 +48,10 @@ defmodule Snitch.Data.Schema.Product do
     field(:weight, :decimal, default: Decimal.new(0))
     field(:is_active, :boolean, default: true)
 
+    # Track tenant name during elasticsearch
+    # multitenant query on all schemas at once
+    field(:tenant, :string, virtual: true)
+
     field(:state, ProductStateEnum, default: :draft)
 
     # Following fields are used in context of import
@@ -54,6 +62,8 @@ defmodule Snitch.Data.Schema.Product do
 
     has_many(:variations, Variation, foreign_key: :parent_product_id, on_replace: :delete)
     has_many(:variants, through: [:variations, :child_product])
+
+    has_one(:parent_variation, Variation, foreign_key: :child_product_id)
 
     many_to_many(
       :products,
@@ -144,6 +154,20 @@ defmodule Snitch.Data.Schema.Product do
     |> validate_amount(:selling_price)
     |> NameSlug.maybe_generate_slug()
     |> NameSlug.unique_constraint()
+  end
+
+  def product_by_category_query(taxon_id) do
+    {:ok, categories} = Taxonomy.get_all_children_and_self(taxon_id)
+
+    categories_ids = Enum.map(categories, & &1.id)
+
+    from(p in __MODULE__, where: p.taxon_id in ^categories_ids)
+  end
+
+  def set_delete_fields(%Ecto.Query{} = product_query) do
+    from(p in product_query,
+      update: [set: [state: "deleted", deleted_at: ^NaiveDateTime.utc_now(), taxon_id: nil]]
+    )
   end
 
   defp theme_change_check(changeset) do

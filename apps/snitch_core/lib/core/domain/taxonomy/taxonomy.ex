@@ -11,9 +11,11 @@ defmodule Snitch.Domain.Taxonomy do
   import Ecto.Query
 
   alias Ecto.Multi
-  alias Snitch.Data.Schema.{Taxon, Taxonomy, Image}
+  alias Snitch.Data.Model.Image, as: ImageModel
+  alias Snitch.Data.Schema.{Taxon, Taxonomy, Image, Product}
   alias Snitch.Tools.Helper.Taxonomy, as: Helper
   alias Snitch.Tools.Helper.ImageUploader
+  alias Snitch.Data.Model.Product, as: ProductModel
 
   @doc """
   Adds child taxon to left, right or child of parent taxon.
@@ -21,12 +23,38 @@ defmodule Snitch.Domain.Taxonomy do
   Positon can take follwoing values.
   Position - :left | :right | :child
   """
-  @spec add_taxon(Taxon.t(), Taxon.t(), atom) :: Taxon.t()
+  @spec add_taxon(Taxon.t(), Taxon.t(), atom) :: {:ok, Taxon.t()} | {:error, Ecto.Changeset.t()}
   def add_taxon(%Taxon{} = parent, %Taxon{} = child, position) do
-    %Taxon{child | taxonomy_id: parent.taxonomy.id}
-    |> Repo.preload(:taxonomy)
-    |> create(parent, position)
-    |> AsNestedSet.execute(Repo)
+    try do
+      taxon =
+        %Taxon{child | taxonomy_id: parent.taxonomy.id}
+        |> Repo.preload(:taxonomy)
+        |> create(parent, position)
+        |> AsNestedSet.execute(Repo)
+
+      {:ok, taxon}
+    rescue
+      error in Ecto.InvalidChangesetError ->
+        {:error, error.changeset}
+    end
+  end
+
+  @doc """
+  Checks if the taxon is a root taxon.
+
+  Note: If taxon is not asscoaited with taxonomy RuntimeError will be raised.
+  """
+  @spec is_root?(Taxon.t()) :: boolean()
+  def is_root?(%Taxon{} = taxon) do
+    taxon = Repo.preload(taxon, :taxonomy)
+
+    case taxon.taxonomy do
+      nil ->
+        raise "No taxonomy is associated with taxon"
+
+      _ ->
+        taxon.id == taxon.taxonomy.root_id
+    end
   end
 
   @doc """
@@ -138,10 +166,48 @@ defmodule Snitch.Domain.Taxonomy do
     |> Enum.map(&Helper.convert_to_map/1)
   end
 
+  @doc """
+  Gets all immediate children for a particular category
+  """
+  @spec get_child_taxons(integer()) :: [Taxon.t()]
   def get_child_taxons(taxon_id) do
-    Repo.all(from(taxon in Taxon, where: taxon.parent_id == ^taxon_id))
+    case get_taxon(taxon_id) do
+      %Taxon{} = taxon ->
+        taxons =
+          taxon
+          |> AsNestedSet.children()
+          |> AsNestedSet.execute(Repo)
+
+        {:ok, taxons}
+
+      _ ->
+        {:error, :not_found}
+    end
   end
 
+  @doc """
+  Gets all the taxons under a taxon tree
+  """
+  @spec get_all_children_and_self(integer()) :: {:ok, [Taxon.t()]} | {:error, :not_found}
+  def get_all_children_and_self(taxon_id) do
+    case get_taxon(taxon_id) do
+      %Taxon{} = taxon ->
+        taxons =
+          taxon
+          |> AsNestedSet.self_and_descendants()
+          |> AsNestedSet.execute(Repo)
+
+        {:ok, taxons}
+
+      _ ->
+        {:error, :not_found}
+    end
+  end
+
+  @doc """
+  Gets all the ancestor taxons till the root level
+  """
+  @spec get_ancestors(integer()) :: {:ok, [Taxon.t()]} | {:error, :not_found}
   def get_ancestors(taxon_id) do
     case Repo.get(Taxon, taxon_id) do
       nil ->
@@ -169,130 +235,103 @@ defmodule Snitch.Domain.Taxonomy do
     Repo.get_by(Taxon, name: name)
   end
 
-  def create_taxon(parent_taxon, %{image: "undefined"} = taxon_params) do
+  def create_taxon(parent_taxon, %{image: nil} = taxon_params) do
     taxon_struct = %Taxon{name: taxon_params.name}
-    taxon = add_taxon(parent_taxon, taxon_struct, :child)
 
-    Taxon.update_changeset(
-      taxon,
-      Map.put(taxon_params, :variation_theme_ids, taxon_params.themes)
-    )
-    |> Repo.update()
+    with {:ok, taxon} <- add_taxon(parent_taxon, taxon_struct, :child) do
+      Taxon.update_changeset(
+        taxon,
+        Map.put(taxon_params, :variation_theme_ids, taxon_params.themes)
+      )
+      |> Repo.update()
+    end
   end
 
-  def create_taxon(parent_taxon, taxon_params) do
+  @doc """
+  Updates all category slug based on the name.
+
+  Warning: This methods should be used only when the slug are not present.
+  Running this method might change the existing slug if the tree of above a
+  category is modified.
+  """
+  def update_all_categories_slug() do
+    Taxon
+    |> Repo.all()
+    |> Enum.map(&Taxon.changeset(&1, %{}))
+    |> Enum.map(&Repo.update(&1))
+  end
+
+  def create_taxon(parent_taxon, %{image: image} = taxon_params) do
     multi =
       Multi.new()
-      |> Multi.run(:image, fn _ ->
-        QH.create(Image, taxon_params, Repo)
-      end)
-      |> Multi.run(:taxon, fn _ ->
+      |> Multi.run(:struct, fn _ ->
         taxon_struct = %Taxon{name: taxon_params.name}
-        taxon = add_taxon(parent_taxon, taxon_struct, :child)
-        {:ok, taxon}
+        add_taxon(parent_taxon, taxon_struct, :child)
       end)
-      |> Multi.run(:image_taxon, fn %{image: image, taxon: taxon} ->
+      |> Multi.run(:image, fn %{struct: struct} ->
+        params = %{"image" => Map.put(image, :url, ImageModel.image_url(image.filename, struct))}
+        QH.create(Image, params, Repo)
+      end)
+      |> Multi.run(:association, fn %{image: image, struct: struct} ->
         params = Map.put(%{}, :taxon_image, %{image_id: image.id})
 
         Taxon.update_changeset(
-          taxon,
+          struct,
           Map.put(params, :variation_theme_ids, taxon_params.themes)
         )
         |> Repo.update()
       end)
-      |> upload_image_multi(taxon_params.image)
-      |> persist()
+      |> ImageModel.upload_image_multi(taxon_params.image)
+      |> ImageModel.persist()
   end
 
   @doc """
   Update the given taxon.
   """
-  def update_taxon(taxon, %{image: nil} = params) do
+  def update_taxon(taxon, %{"image" => nil} = params) do
     taxon |> Taxon.update_changeset(params) |> Repo.update()
   end
 
-  def update_taxon(taxon, %{image: image} = params) do
-    old_image = taxon.image
-
-    Multi.new()
-    |> Multi.run(:image, fn _ ->
-      QH.create(Image, params, Repo)
-    end)
-    |> Multi.run(:taxon, fn %{image: image} ->
-      params = Map.put(params, :taxon_image, %{image_id: image.id})
-      taxon |> Taxon.update_changeset(params) |> Repo.update()
-    end)
-    |> delete_image_multi(old_image, taxon)
-    |> upload_image_multi(params.image)
-    |> persist()
+  def update_taxon(taxon, %{"image" => image} = params) do
+    ImageModel.update(Taxon, taxon, params, "taxon_image")
   end
 
   @doc """
   Create a taxonomy with given name.
   """
   def create_taxonomy(name) do
-    multi =
-      Multi.new()
-      |> Multi.run(:taxonomy, fn _ ->
-        %Taxonomy{name: name} |> Repo.insert()
-      end)
-      |> Multi.run(:root_taxon, fn %{taxonomy: taxonomy} ->
-        taxon = %Taxon{name: name, taxonomy_id: taxonomy.id} |> add_root
-        {:ok, taxon}
-      end)
-      |> Repo.transaction()
+    Multi.new()
+    |> Multi.run(:taxonomy, fn _ ->
+      %Taxonomy{name: name} |> Repo.insert()
+    end)
+    |> Multi.run(:root_taxon, fn %{taxonomy: taxonomy} ->
+      taxon = %Taxon{name: name, taxonomy_id: taxonomy.id} |> add_root
+      {:ok, taxon}
+    end)
+    |> Repo.transaction()
   end
 
   @doc """
-  Delete a taxon
+  Delete a taxon along with all the products associated with that taxon tree.
   """
-  def delete_taxon(taxon) do
-    taxon |> AsNestedSet.delete() |> AsNestedSet.execute(Repo)
-  end
+  def delete_taxon(taxon_id) do
+    case get_taxon(taxon_id) do
+      %Taxon{} = taxon ->
+        Multi.new()
+        |> Multi.run(:delete_products, fn _ -> ProductModel.delete_by_category(taxon) end)
+        |> Multi.run(:category, fn _ -> do_delete_taxon(taxon) end)
+        |> Repo.transaction()
 
-  defp persist(multi) do
-    case Repo.transaction(multi) do
-      {:ok, multi_result} ->
-        {:ok, multi_result.taxon}
-
-      {:error, _, failed_value, _} ->
-        {:error, failed_value}
+      nil ->
+        {:error, :not_found}
     end
   end
 
-  def image_url(name, taxon) do
-    ImageUploader.url({name, taxon})
-  end
+  defp do_delete_taxon(%Taxon{} = taxon) do
+    taxon
+    |> AsNestedSet.delete()
+    |> AsNestedSet.execute(Snitch.Core.Tools.MultiTenancy.Repo)
 
-  defp upload_image_multi(multi, %Plug.Upload{} = image) do
-    Multi.run(multi, :image_upload, fn %{taxon: taxon} ->
-      case ImageUploader.store({image, taxon}) do
-        {:ok, _} ->
-          {:ok, taxon}
-
-        _ ->
-          {:error, "upload error"}
-      end
-    end)
-  end
-
-  defp delete_image_multi(multi, nil, taxon) do
-    multi
-  end
-
-  defp delete_image_multi(multi, image, taxon) do
-    multi
-    |> Multi.run(:remove_from_upload, fn _ ->
-      case ImageUploader.delete({image.name, taxon}) do
-        :ok ->
-          {:ok, "success"}
-
-        _ ->
-          {:error, "not_found"}
-      end
-    end)
-    |> Multi.run(:delete_image, fn _ ->
-      QH.delete(Image, image.id, Repo)
-    end)
+    {:ok, taxon}
   end
 end
