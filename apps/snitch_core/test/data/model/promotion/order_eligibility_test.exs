@@ -48,7 +48,7 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblityTest do
 
   describe "rules_check with match_policy 'all'" do
     setup do
-      products = insert_list(3, :product, %{promotionable: false})
+      products = insert_list(3, :product, %{promotionable: true})
 
       order = insert(:order, state: :delivery)
 
@@ -104,7 +104,7 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblityTest do
 
   describe "rules_check with match_policy 'any'" do
     setup do
-      products = insert_list(3, :product, %{promotionable: false})
+      products = insert_list(3, :product, %{promotionable: true})
 
       order = insert(:order, state: :delivery)
 

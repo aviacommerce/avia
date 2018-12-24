@@ -10,17 +10,44 @@ defmodule Snitch.Data.Schema.PromotionRule do
 
   @type t :: %__MODULE__{}
 
+  defmacro __using__(_opts) do
+    quote do
+      @behaviour Snitch.Data.Schema.PromotionRule
+
+      def line_item_actionable?(_line_item, _rule) do
+        true
+      end
+
+      defoverridable(line_item_actionable?: 2)
+    end
+  end
+
   @doc """
   Checks if the supplied order meets the condition specified
   in the supplied rule.
   """
-  @callback eligible(order :: Order.t(), rule :: __MODULE__.t()) ::
-              true | {false, reason :: String.t()}
+  @callback eligible(order :: Order.t(), rule_data :: map) :: true | {false, reason :: String.t()}
 
   @doc """
   Returns the name of the rule.
   """
   @callback rule_name() :: name :: String.t()
+
+  @doc """
+  Checks whether the `line_item` is actionable or not.
+
+  All the rules adopting the `PromotionRule` behaviour can implement their own
+  custom logic for the function. By default the function returns true
+  for all the line_items.
+
+  ### Note
+  Any rule which anyhow will affect the action on `line_item` should implement
+  this function.
+  """
+  @callback line_item_actionable?(
+              line_item :: LineItem.t(),
+              rule :: PromotionRule.t()
+            ) :: boolean()
 
   schema "snitch_promotion_rules" do
     field(:name, :string)
