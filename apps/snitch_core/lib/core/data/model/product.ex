@@ -10,6 +10,7 @@ defmodule Snitch.Data.Model.Product do
   alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Data.Schema.{Image, Product, Variation, Taxon}
   alias Snitch.Tools.Helper.ImageUploader
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   @product_states [:active, :in_active, :draft]
 
@@ -19,6 +20,13 @@ defmodule Snitch.Data.Model.Product do
   @spec get_all() :: [Product.t()]
   def get_all do
     Repo.all(Product)
+  end
+
+  @doc """
+  Returns all Products with the given list of entities preloaded
+  """
+  def get_all_with_preloads(preloads) do
+    Repo.all(Product) |> Repo.preload(preloads)
   end
 
   @spec get(map | non_neg_integer) :: Product.t() | nil
@@ -280,6 +288,26 @@ defmodule Snitch.Data.Model.Product do
           {:error, "not found"}
       end
     end)
+  end
+
+  # TODO This needs to be replaced and we need a better system to identify
+  # the type of product.
+  def is_parent_product(product_id) when is_binary(product_id) do
+    query =
+      from(
+        p in "snitch_product_variants",
+        where: p.parent_product_id == ^(product_id |> String.to_integer()),
+        select: fragment("count(*)")
+      )
+
+    count = Repo.one(query)
+    count > 0
+  end
+
+  def is_child_product(product) do
+    query = from(c in Variation, where: c.child_product_id == ^product.id)
+    count = Repo.aggregate(query, :count, :id)
+    count > 0
   end
 
   def get_selling_prices(product_ids) do

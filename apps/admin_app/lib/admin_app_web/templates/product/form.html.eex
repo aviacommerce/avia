@@ -10,7 +10,7 @@
       <a class="nav-link active" href="#tab1default" data-toggle="tab">Product Detail</a>
    </li>
    <%= if  @conn.request_path != product_path(@conn, :new) do %>
-   <%= if !is_child_product(@parent_product) do %>
+   <%= if !Product.is_child_product(@parent_product) do %>
     <li class="nav-item">
       <a class="nav-link" href="#tab2default" data-toggle="tab">Variants</a>
     </li>
@@ -188,7 +188,7 @@
       <% end %>
     </div>
    <% else %>
-    <%= if !is_child_product(@parent_product) do %>
+    <%= if !Product.is_child_product(@parent_product) do %>
       <div class="tab-pane fade p-3" id="tab2default" >
         <div class="alert alert-info">
           You can add Product Variants by adding Variation Themes to <span class="badge badge-info"> <%= get_product_category(@parent_product.taxon_id) %> </span> category.
@@ -260,7 +260,7 @@
   <%= if  @conn.request_path != product_path(@conn, :new) do %>
   <div class="tab-pane fade pt-2 p-3"  id="tab4default">
     <form accept-charset="UTF-8" action="/product/stock" method="post">
-      <%= if is_parent_product(@conn.params["id"]) do %>
+      <%= if Product.is_parent_product(@conn.params["id"]) do %>
       <div class="form-group required">
         <label>Variant</label>
         <%= select :stock, :product_id, get_variant_option(@parent_product.variants), class: "form-control"%>

@@ -1,6 +1,6 @@
 defmodule AdminAppWeb.DataExportMail do
   @moduledoc """
-  Composing email to send order/product data export.
+  Composing email to send data export.
   """
 
   import Swoosh.Email
