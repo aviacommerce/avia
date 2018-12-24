@@ -55,8 +55,3 @@ window.addEventListener("unload", handleDocumentUnload, false);
 $(document).ready(() => {
   select2Selector();
 });
-
-const elmDiv = document.getElementById("elm-main");
-if (elmDiv) {
-  Elm.Main.embed(elmDiv);
-}
