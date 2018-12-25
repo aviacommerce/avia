@@ -31,6 +31,20 @@ config :triplex,
   reserved_tenants: ["www", "api", "demo", "admin"],
   migrations_path: "migrations"
 
-import_config "#{Mix.env()}.exs"
+config :snitch_core, Snitch.Tools.ElasticsearchCluster,
+  url: System.get_env("ELASTIC_HOST"),
+  # username: "username",
+  # password: "password",
+  api: Elasticsearch.API.HTTP,
+  json_library: Poison,
+  indexes: %{
+    products: %{
+      settings: "priv/elasticsearch/products.json",
+      store: Snitch.Tools.ElasticSearch.ProductStore,
+      sources: [Snitch.Data.Schema.Product],
+      bulk_page_size: 5000,
+      bulk_wait_interval: 15_000
+    }
+  }
 
-import_config("elasticsearch.exs")
+import_config "#{Mix.env()}.exs"
