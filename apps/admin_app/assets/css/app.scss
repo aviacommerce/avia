@@ -1,6 +1,7 @@
 /* This file is for your main application css. */
 
 @import "~bootstrap/scss/bootstrap";
+$fa-font-path: "~font-awesome/fonts";
 @import "~font-awesome/scss/font-awesome";
 @import "custom/custom";
 @import "sidebar";
