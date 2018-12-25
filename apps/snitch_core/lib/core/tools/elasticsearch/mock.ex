@@ -3,11 +3,12 @@ defmodule Snitch.Tools.ElasticsearchMock do
 
   @impl true
   def request(_config, :get, "/products/1", _data, _opts) do
-    {:ok, %HTTPoison.Response{
-      status_code: 404,
-      body: %{
-        "status" => "not_found"
-      }
-    }}
+    {:ok,
+     %HTTPoison.Response{
+       status_code: 404,
+       body: %{
+         "status" => "not_found"
+       }
+     }}
   end
 end

@@ -35,15 +35,15 @@ defmodule SnitchApiWeb.ProductView do
 
   def name(product), do: append_option_value_in_name(product)
 
-
   defp append_option_value_in_name(%{options: options, name: name}) when is_list(options) do
     postfix =
-    options
-    |> Enum.map(&String.capitalize(&1.value))
-    |> Enum.join(",")
+      options
+      |> Enum.map(&String.capitalize(&1.value))
+      |> Enum.join(",")
 
     name <> " (" <> postfix <> ")"
   end
+
   defp append_option_value_in_name(%{name: name}), do: name
 
   def selling_price(product) do
