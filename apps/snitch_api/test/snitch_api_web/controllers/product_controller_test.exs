@@ -10,9 +10,7 @@ defmodule SnitchApiWeb.ProductControllerTest do
   alias Snitch.Tools.ElasticSearch.ProductStore
 
   setup %{conn: conn} do
-    ESCluster
-    |> Cluster.Config.get()
-    |> Index.clean_starting_with("products_test", 0)
+    Elasticsearch.delete(ESCluster, "products_test")
 
     Index.create_from_file(
       ESCluster,
@@ -28,13 +26,13 @@ defmodule SnitchApiWeb.ProductControllerTest do
     {:ok, conn: conn}
   end
 
-  @tag :skip
+  # @tag :skip
   test "lists all products entries on index", %{conn: conn} do
     conn = get(conn, product_path(conn, :index))
     assert json_response(conn, 200)["data"]
   end
 
-  @tag :skip
+  # @tag :skip
   test "shows chosen resource product", %{conn: conn} do
     product = insert(:product, state: "active")
     ProductStore.index_product_to_es(product)
@@ -47,7 +45,7 @@ defmodule SnitchApiWeb.ProductControllerTest do
            }
   end
 
-  @tag :skip
+  # @tag :skip
   test "Products, search contains name and pagination", %{conn: conn} do
     product1 = insert(:product, %{state: "active"})
     product2 = insert(:product, %{state: "active"})
@@ -69,7 +67,7 @@ defmodule SnitchApiWeb.ProductControllerTest do
     assert response == 3
   end
 
-  @tag :skip
+  # @tag :skip
   test "Products, sort by newly inserted", %{conn: conn} do
     product = insert(:product, %{state: "active"})
     ProductStore.index_product_to_es(product)
