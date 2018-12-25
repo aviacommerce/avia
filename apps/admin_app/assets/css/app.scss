@@ -1,13 +1,11 @@
 /* This file is for your main application css. */
 
-@import "bootstrap";
-@import "font-awesome";
-@import "dropdown";
+@import "~bootstrap/scss/bootstrap";
+$fa-font-path: "~font-awesome/fonts";
+@import "~font-awesome/scss/font-awesome";
 @import "custom/custom";
-@import "dropdown";
 @import "sidebar";
 @import "listing";
-
 .in-progress {
   cursor: url(/images/in-progress.cur) 25 15, auto !important;
 }
