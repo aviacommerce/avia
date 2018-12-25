@@ -101,7 +101,21 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
   end
 
   defp avg_rating(product) do
-    PRModel.review_aggregate(product)
+    %{
+      average_rating: average_rating,
+      review_count: review_count,
+      rating_list: rating_list
+    } = PRModel.review_aggregate(product)
+
+    %{
+      average_rating: average_rating |> Decimal.round(1) |> Decimal.to_float(),
+      review_count: review_count,
+      rating_list:
+        Enum.map(rating_list, fn {k, %{value: v, position: p}} ->
+          {k, %{value: v |> Decimal.round(1) |> Decimal.to_float(), position: p}}
+        end)
+        |> Enum.into(%{})
+    }
   end
 
   defp suggest_keywords(%{name: name, meta_keywords: meta_keywords}) do

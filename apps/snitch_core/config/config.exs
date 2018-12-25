@@ -32,5 +32,3 @@ config :triplex,
   migrations_path: "migrations"
 
 import_config "#{Mix.env()}.exs"
-
-import_config("elasticsearch.exs")

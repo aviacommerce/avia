@@ -21,3 +21,19 @@ config :logger, level: :info
 config :argon2_elixir,
   t_cost: 1,
   m_cost: 8
+
+config :snitch_core, Snitch.Tools.ElasticsearchCluster,
+  url: "http://localhost:9200",
+  # username: "username",
+  # password: "password",
+  api: Elasticsearch.API.HTTP,
+  json_library: Poison,
+  indexes: %{
+    products_test: %{
+      settings: "priv/elasticsearch/products.json",
+      store: Snitch.Tools.ElasticSearch.ProductStore,
+      sources: [Snitch.Data.Schema.Product],
+      bulk_page_size: 5000,
+      bulk_wait_interval: 15_000
+    }
+  }

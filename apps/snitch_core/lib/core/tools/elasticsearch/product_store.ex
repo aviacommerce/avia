@@ -21,7 +21,8 @@ defmodule Snitch.Tools.ElasticSearch.ProductStore do
     reviews: [rating_option_vote: :rating_option],
     options: [:option_type]
   ]
-  @index "products"
+
+  @index if Mix.env() == :test, do: "products_test", else: "products"
 
   @impl true
   @doc """
@@ -57,7 +58,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductStore do
         @index
       )
 
-  def index_product_to_es(%{state: :in_active} = product),
+  def index_product_to_es(product),
     do: Elasticsearch.delete_document(EC, %{product | tenant: Repo.get_prefix()}, @index)
 
   def search_products(query),
