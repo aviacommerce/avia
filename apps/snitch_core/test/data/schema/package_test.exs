@@ -57,7 +57,7 @@ defmodule Snitch.Data.Schema.PackageTest do
   @update_params %{
     shipping_methods: [],
     tracking: %{id: "some_tracking_id"},
-    state: "ready!",
+    state: "ready",
     cost: Money.zero(:USD),
     shipping_tax: Money.zero(:USD),
     origin_id: -1,
