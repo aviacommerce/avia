@@ -11,16 +11,6 @@ defmodule AdminAppWeb.Exporter do
   alias Snitch.Data.Schema.{Order, Product}
   alias AdminAppWeb.DataExportMail
 
-  defp get_columns(type) do
-    case type do
-      "order" ->
-        ~w(id number line_items_count order_total billing_address shipping_address inserted_at updated_at user_id state)a
-
-      "product" ->
-        ~w(id name product_type slug state max_retail_price selling_price variant_count taxon_name weight height depth store theme_id is_active)a
-    end
-  end
-
   def csv_exporter(user, "order") do
     OrderEx.csv_exporter(user)
   end
@@ -58,9 +48,9 @@ defmodule AdminAppWeb.Exporter do
     ProductEx.xlsx_exporter(user)
   end
 
-  def xlsx_exporter(user, type, data_list) do
+  def xlsx_exporter(user, type, data_list, columns) do
     binary_data =
-      xlsx_generator(data_list, type)
+      xlsx_generator(data_list, type, columns)
       |> Elixlsx.write_to("/tmp/#{type}s.xlsx")
 
     attachment = "/tmp/#{type}s.xlsx"
@@ -68,8 +58,8 @@ defmodule AdminAppWeb.Exporter do
     DataExportMail.data_export_mail(attachment, user, "xlsx", type)
   end
 
-  def xlsx_generator(data_list, type) do
-    columns = get_columns(type) |> Enum.map(&Atom.to_string(&1))
+  def xlsx_generator(data_list, type, columns) do
+    columns = columns |> Enum.map(&Atom.to_string(&1))
 
     rows =
       data_list

@@ -21,7 +21,7 @@ defmodule AdminAppWeb.Exporter.Product do
 
   def xlsx_exporter(user) do
     data_list = ProductModel.get_all_with_preloads(@preloads)
-    Exporter.xlsx_exporter(user, "product", data_list)
+    Exporter.xlsx_exporter(user, "product", data_list, @columns)
   end
 
   defp get_product_type(product) do

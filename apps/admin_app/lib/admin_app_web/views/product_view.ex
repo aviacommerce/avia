@@ -21,7 +21,15 @@ defmodule AdminAppWeb.ProductView do
   end
 
   def can_add_variant(product) do
-    has_themes(product) && !Product.is_child_product(product)
+    has_themes(product) && !is_child_product(product)
+  end
+
+  defp is_child_product(product) do
+    Product.is_child_product(product)
+  end
+
+  defp is_parent_product(product_id) do
+    Product.is_parent_product(product_id)
   end
 
   def has_themes(product) do

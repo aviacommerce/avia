@@ -18,7 +18,7 @@ defmodule AdminAppWeb.Exporter.Order do
 
   def xlsx_exporter(user) do
     data_list = OrderModel.get_all_with_preloads(@preloads)
-    Exporter.xlsx_exporter(user, "order", data_list)
+    Exporter.xlsx_exporter(user, "order", data_list, @columns)
   end
 
   def parse_line(%Order{} = order) do

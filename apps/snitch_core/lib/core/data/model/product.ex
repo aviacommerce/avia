@@ -30,6 +30,9 @@ defmodule Snitch.Data.Model.Product do
     Repo.all(Product) |> Repo.preload(preloads)
   end
 
+  @doc """
+  Returns all Products with the given parameters.
+  """
   @spec get(map | non_neg_integer) :: Product.t() | nil
   def get(query_params) do
     QH.get(Product, query_params, Repo)
