@@ -44,7 +44,7 @@ defmodule AdminApp.OrderContext do
 
     Enum.filter(orders, fn order ->
       Enum.any?(order.packages, fn package ->
-        package.state == "processing"
+        package.state == :processing
       end)
     end)
   end
@@ -56,7 +56,7 @@ defmodule AdminApp.OrderContext do
 
     Enum.filter(orders, fn order ->
       Enum.any?(order.packages, fn package ->
-        package.state == "ready"
+        package.state == :ready
       end)
     end)
   end
@@ -68,7 +68,7 @@ defmodule AdminApp.OrderContext do
 
     Enum.filter(orders, fn order ->
       Enum.any?(order.packages, fn package ->
-        package.state == "shipped" || package.state == "delivered"
+        package.state == :shipped || package.state == :delivered
       end)
     end)
   end
