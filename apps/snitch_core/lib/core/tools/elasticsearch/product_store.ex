@@ -21,7 +21,8 @@ defmodule Snitch.Tools.ElasticSearch.ProductStore do
     reviews: [rating_option_vote: :rating_option],
     options: [:option_type]
   ]
-  @index "products"
+
+  @index if Mix.env() == :test, do: "products_test", else: "products"
 
   @impl true
   @doc """
@@ -49,16 +50,36 @@ defmodule Snitch.Tools.ElasticSearch.ProductStore do
     result
   end
 
-  def index_product_to_es(%{state: :active} = product),
+  # Indexes only sellable products/variants
+  def index_product_to_es(product) do
+    product = Repo.preload(%{product | tenant: Repo.get_prefix()}, [:variants | @preload])
+
+    case product.variants do
+      [] ->
+        index_product_to_es(product, true)
+
+      variants ->
+        Enum.map(
+          variants,
+          fn variant ->
+            %{variant | tenant: Repo.get_prefix()}
+            |> Repo.preload(@preload)
+            |> index_product_to_es(true)
+          end
+        )
+    end
+  end
+
+  def index_product_to_es(%{state: :active} = product, true),
     do:
       Elasticsearch.put_document!(
         EC,
-        Repo.preload(%{product | tenant: Repo.get_prefix()}, @preload),
+        product,
         @index
       )
 
-  def index_product_to_es(%{state: :in_active} = product),
-    do: Elasticsearch.delete_document(EC, %{product | tenant: Repo.get_prefix()}, @index)
+  def index_product_to_es(product, true),
+    do: Elasticsearch.delete_document(EC, product, @index)
 
   def search_products(query),
     do: Elasticsearch.post!(EC, "/#{@index}/_doc/_search", query)
