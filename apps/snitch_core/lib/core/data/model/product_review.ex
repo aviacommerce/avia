@@ -114,13 +114,12 @@ defmodule Snitch.Data.Model.ProductReview do
                |> Decimal.div(count)
                |> Decimal.mult(100)
                |> Decimal.round(1)
-               |> Decimal.to_float()
          }}
       end
 
     %{
       review_detail
-      | average_rating: sum |> Decimal.div(count) |> Decimal.round(1) |> Decimal.to_float(),
+      | average_rating: sum |> Decimal.div(count) |> Decimal.round(1),
         review_count: count,
         rating_list: rating_summary
     }
