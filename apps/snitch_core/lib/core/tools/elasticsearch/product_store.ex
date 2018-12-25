@@ -55,8 +55,18 @@ defmodule Snitch.Tools.ElasticSearch.ProductStore do
     product = Repo.preload(%{product | tenant: Repo.get_prefix()}, [:variants | @preload])
 
     case product.variants do
-      [] -> index_product_to_es(product, true)
-      variants -> Enum.map(variants, &index_product_to_es(&1, true))
+      [] ->
+        index_product_to_es(product, true)
+
+      variants ->
+        Enum.map(
+          variants,
+          fn variant ->
+            %{variant | tenant: Repo.get_prefix()}
+            |> Repo.preload(@preload)
+            |> index_product_to_es(true)
+          end
+        )
     end
   end
 

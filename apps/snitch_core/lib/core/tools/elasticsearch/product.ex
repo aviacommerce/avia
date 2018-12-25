@@ -4,8 +4,6 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
   alias Snitch.Data.Model.ProductReview, as: PRModel
   alias Snitch.Data.Model.Image, as: ImageModel
 
-  @cache_name :snitch_cache
-
   def id(product), do: "#{product.tenant}_#{product.id}"
   def routing(_), do: false
   def type(_product), do: "product"
