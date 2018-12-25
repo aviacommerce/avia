@@ -52,6 +52,17 @@ module.exports = (env, options) => ({
         use: {
           loader: "babel-loader"
         }
+      },
+      {
+        test: /\.(png|woff|woff2|eot|ttf|svg)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 10000
+            }
+          }
+        ]
       }
     ]
   },
