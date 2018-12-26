@@ -23,10 +23,31 @@ defmodule Snitch.Domain.Calculator.FlatRate do
 
   def compute(%Order{} = order, params) do
     order_total = OrderDomain.total_amount(order)
-    min(order_total.amount, params.amount)
+
+    case Decimal.cmp(order_total.amount, params.amount) do
+      :eq ->
+        params.amount
+
+      :gt ->
+        params.amount
+
+      _ ->
+        order_total.amount
+    end
   end
 
   def compute(%LineItem{} = item, params) do
-    min(item.unit_price.amount * item.quantity, params.amount)
+    item_total = item.unit_price.amount * item.quantity
+
+    case Decimal.cmp(item_total, params.amount) do
+      :eq ->
+        params.amount
+
+      :gt ->
+        params.amount
+
+      _ ->
+        item_total
+    end
   end
 end

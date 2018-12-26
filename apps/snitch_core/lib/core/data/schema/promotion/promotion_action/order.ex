@@ -37,7 +37,7 @@ defmodule Snitch.Data.Schema.PromotionAction.OrderAction do
         {String.to_existing_atom(key), value}
       end
 
-    amount = calculator.compute(order, params) * -1
+    amount = order |> calculator.compute(params) |> Decimal.mult(-1)
     params = set_adjustment_params(order, promotion, action, amount)
 
     case PromotionAdjustment.create(params) do

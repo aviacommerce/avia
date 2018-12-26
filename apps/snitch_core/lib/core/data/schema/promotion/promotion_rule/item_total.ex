@@ -44,10 +44,14 @@ defmodule Snitch.Data.Schema.PromotionRule.ItemTotal do
   end
 
   defp satisfies_rule?(order_total, rule_data) do
-    check_against_range(order_total, rule_data["lower_range"], rule_data["upper_range"])
+    check_against_range(
+      order_total,
+      Decimal.new(rule_data["lower_range"]),
+      Decimal.new(rule_data["upper_range"])
+    )
   end
 
-  defp check_against_range(order_total, lower_range, 0.0 = _upper_range) do
+  defp check_against_range(order_total, lower_range, %Decimal{}) do
     currency = order_total.currency
     lower_range = Money.new!(currency, lower_range)
 

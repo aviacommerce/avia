@@ -18,6 +18,10 @@ defenum(PromotionActionEnum,
   "Elixir.Snitch.Data.Schema.PromotionAction.LineItemAction": 1
 )
 
+# The below enum is only for handling casting and listing purpose at present.
+# Since they are being used in embedded schemas at present actual
+# model names are stored.
+# TODO look for a way to handle enums in embedded schemas.
 defenum(ActionCalculators,
   "Elixir.Snitch.Domain.Calculator.FlatRate": 0,
   "Elixir.Snitch.Domain.Calculator.FlatPercent": 1

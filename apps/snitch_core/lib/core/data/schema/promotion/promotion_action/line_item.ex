@@ -37,7 +37,7 @@ defmodule Snitch.Data.Schema.PromotionAction.LineItemAction do
     adjustments =
       Enum.map(order.line_items, fn line_item ->
         if Promotion.line_item_actionable?(line_item, promotion) do
-          amount = calculator.compute(order, params) * -1
+          amount = order |> calculator.compute(params) |> Decimal.mult(-1)
           create_line_item_adjustment(order, promotion, action, amount, line_item)
         else
           false

@@ -20,7 +20,7 @@ defmodule Snitch.Data.Model.AdjustmentTest do
     end
 
     test "fails if adjustable_type not valid" do
-      params = %{adjustable_type: :xyz, adjustable_id: 1, amount: -10}
+      params = %{adjustable_type: :xyz, adjustable_id: 1, amount: Decimal.new(-10)}
 
       assert {:error, changeset} = Adjustment.create(params)
       assert %{adjustable_type: ["is invalid"]} == errors_on(changeset)
@@ -30,7 +30,12 @@ defmodule Snitch.Data.Model.AdjustmentTest do
   describe "update/1" do
     test "updates successfully" do
       line_item = insert(:line_item)
-      params = %{adjustable_type: :line_item, adjustable_id: line_item.id, amount: -10}
+
+      params = %{
+        adjustable_type: :line_item,
+        adjustable_id: line_item.id,
+        amount: Decimal.new(-10)
+      }
 
       {:ok, adjustment} = Adjustment.create(params)
       assert adjustment.eligible == false

@@ -48,7 +48,14 @@ defmodule Snitch.Data.Model.PromotionAdjustment do
         join: p_adj in PromotionAdjustment,
         on: adj.id == p_adj.adjustment_id,
         where: p_adj.order_id == ^order.id,
-        select: %{amount: adj.amount, eligible: adj.eligible, id: adj.id}
+        select: %AdjustmentSchema{
+          amount: adj.amount,
+          eligible: adj.eligible,
+          id: adj.id,
+          label: adj.label,
+          adjustable_type: adj.adjustable_type,
+          adjustable_id: adj.adjustable_id
+        }
       )
 
     Repo.all(query)
@@ -60,7 +67,14 @@ defmodule Snitch.Data.Model.PromotionAdjustment do
         join: p_adj in PromotionAdjustment,
         on: adj.id == p_adj.adjustment_id,
         where: p_adj.order_id == ^order.id and p_adj.promotion_id == ^promotion.id,
-        select: %{amount: adj.amount, eligible: adj.eligible, id: adj.id}
+        select: %AdjustmentSchema{
+          amount: adj.amount,
+          eligible: adj.eligible,
+          id: adj.id,
+          label: adj.label,
+          adjustable_type: adj.adjustable_type,
+          adjustable_id: adj.adjustable_id
+        }
       )
 
     Repo.all(query)
@@ -72,7 +86,14 @@ defmodule Snitch.Data.Model.PromotionAdjustment do
         join: p_adj in PromotionAdjustment,
         on: adj.id == p_adj.adjustment_id,
         where: p_adj.order_id == ^order.id and adj.eligible == true,
-        select: %{amount: adj.amount, eligible: adj.eligible, id: adj.id}
+        select: %AdjustmentSchema{
+          amount: adj.amount,
+          eligible: adj.eligible,
+          id: adj.id,
+          label: adj.label,
+          adjustable_type: adj.adjustable_type,
+          adjustable_id: adj.adjustable_id
+        }
       )
 
     Repo.all(query)
@@ -121,7 +142,7 @@ defmodule Snitch.Data.Model.PromotionAdjustment do
       adjustable_type: params.adjustable_type,
       adjustable_id: params.adjustable_id,
       amount: params.amount,
-      label: params.promotion.name <> "#{params.amount}"
+      label: params.promotion.code <> "(#{params.amount})"
     }
   end
 
