@@ -1,8 +1,7 @@
 version: '3' 
 services:
-  db: 
-    image: postgres
-    container_name: aviacommerce-dev-postgres
+  db:
+    image: postgres:11.1-alpine
     restart: always
     ports:
       - "5432:5432"
@@ -13,5 +12,7 @@ services:
     container_name: aviacommerce-dev
     ports:
       - "4000:4000"
+    stdin_open: true
+    tty: true
     links:
       - db

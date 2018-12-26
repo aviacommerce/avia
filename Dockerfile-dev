@@ -1,16 +1,27 @@
-FROM ubuntu:18.04
-FROM node:10.14.1-alpine
-FROM surnet/alpine-wkhtmltopdf:3.7-0.12.5-full
-FROM elixir:1.7.3-slim
-
-ENV APP_HOME /avia-backend
-
-RUN mkdir $APP_HOME
-WORKDIR $APP_HOME
+# FROM postgres:11.1-alpine
+FROM elixir:1.7.3-slim as builder
 
 # Before running following commands, configure
 # 1. 'env/local.env' file.
 # 2. `/apps/snitch_core/config/dev.exs' file
+
+ENV APP_HOME /avia-backend
+ENV AWS_ACCESS_KEY_ID dasdas
+ENV AWS_SECRET_ACCESS_KEY dasdas
+ENV BUCKET_NAME dsadas
+ENV AWS_REGION dasda
+ENV SENDGRID_API_KEY dassad
+ENV PASSWORD_RESET_SALT dsadas
+ENV TOKEN_MAXIMUM_AGE sdasda
+ENV FRONTEND_CHECKOUT_URL http://localhost:4200/checkout/
+ENV HOSTED_PAYMENT_URL http://localhost:3000/api/v1/hosted-payment/
+ENV SUPPORT_URL https://admin.aviacommerce.org
+ENV WKHTML_PATH /usr/bin/wkhtmltopdf
+
+RUN mkdir $APP_HOME
+WORKDIR $APP_HOME
+
+# ADD . $APP_HOME
 
 #Install git
 RUN apt-get update \
@@ -27,29 +38,53 @@ RUN apt-get clean \
   && yarn global add elm@0.18.0 \
   && elm-package install -y
 
-ADD . $APP_HOME
+# Umbrella
+COPY mix.exs mix.lock ./
+COPY config config
 
-RUN yes Y | mix local.hex
+# Apps
+COPY apps apps
+RUN mix do local.hex --force, local.rebar --force
+RUN mix do deps.get, deps.compile
 
-RUN ["/bin/bash", "-c", "source env/local.env"] \
-  && mix deps.get \
-  && mix compile
+# Install npm/elm pacakges
+RUN cd apps/admin_app/assets \
+  && yarn install \
+  && cd elm && elm-package install --yes
 
-# Setting application database
+# Create assets build for admin app
+RUN cd apps/admin_app/assets \
+  && node node_modules/brunch/bin/brunch build \
+  && cd .. \
+  && mix phx.digest
 
-RUN ["/bin/bash", "-c", "source env/local.env"] \
-  && cd apps/snitch_core \
+RUN apt-get clean \
+  && apt-get update \
+  && apt-get -y install curl tar file xz-utils build-essential cron \
+  && apt-get -y install python-certbot-nginx \
+  && apt-get -y install imagemagick wkhtmltopdf xvfb \
+  # Resolves issue `QXcbConnection: Could not connect to display`
+  # https://github.com/JazzCore/python-pdfkit/wiki/Using-wkhtmltopdf-without-X-server#debianubuntu
+  && printf '#!/bin/bash\nxvfb-run -a --server-args="-screen 0, 1024x768x24" /usr/bin/wkhtmltopdf -q $*' > /usr/bin/wkhtmltopdf.sh \
+  && chmod a+x /usr/bin/wkhtmltopdf.sh \
+  && ln -s /usr/bin/wkhtmltopdf.sh /usr/local/bin/wkhtmltopdf \
+  && apt-get install -y --no-install-recommends locales \
+  # Supress earlang vm waning form locale issue
+  && export LANG=en_US.UTF-8 \
+  && echo $LANG UTF-8 > /etc/locale.gen \
+  && locale-gen \
+  && update-locale LANG=$LANG \
+  # Remove unwanted package after use
+  && apt-get purge -y curl file xz-utils build-essential locales \
+  && apt-get -y autoremove \
+  && apt-get -y clean
+
+RUN cd apps/snitch_core \
   && mix ecto.create \
   && mix ecto.migrate \
   && mix run priv/repo/seed/seeds.exs
 
-# Setting up assets
-
-RUN ["/bin/bash", "-c", "source env/local.env"] \
-  && cd apps/addmin_app/assets \
+RUN cd apps/addmin_app/assets \
   && npm install
 
-# Run the server
-
-RUN ["/bin/bash", "-c", "source env/local.env"] \
-  && iex -S mix phx.server
+RUN iex -S mix phx.server
