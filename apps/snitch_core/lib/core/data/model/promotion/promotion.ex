@@ -7,6 +7,12 @@ defmodule Snitch.Data.Model.Promotion do
   alias Snitch.Data.Model.PromotionAdjustment
   alias Snitch.Data.Schema.Promotion
 
+  @messages %{
+    coupon_applied: "promotion applied",
+    better_coupon: "better promotion already exists",
+    failed: "promotion activation failed"
+  }
+
   @doc """
   Applies a coupon to the supplied order depending on some
   conditions.
@@ -49,10 +55,14 @@ defmodule Snitch.Data.Model.Promotion do
   end
 
   @doc """
-  Returns a list of ids of `products` which can be activated by `promotion actions`
-  related to `line_items`.
+  Returns whether the supplied `line item` can be activated or not
+  by the promotion line_item related action.
 
-  In case no rules are set `true` is returned for the supplied `line_item`.
+  The line_item is evaluated against promotion rules which contain
+  data that affects a line_item.
+
+  In case no rules are set for the promotion `true` is returned for the
+  supplied `line_item`.
   """
   @spec line_item_actionable?(line_item :: LineItem.t(), Promotion.t()) :: boolean()
   def line_item_actionable?(line_item, %Promotion{match_policy: "all"} = promotion) do
@@ -83,7 +93,7 @@ defmodule Snitch.Data.Model.Promotion do
       previous_discount: previous_discount,
       previous_eligible_adjustment_ids: prev_eligible_ids,
       current_adjustment_ids: current_adjustment_ids
-    } = get_discount_amounts(order, promotion)
+    } = get_adjustment_manifest(order, promotion)
 
     if current_discount > previous_discount do
       case PromotionAdjustment.activate_adjustments(
@@ -91,29 +101,29 @@ defmodule Snitch.Data.Model.Promotion do
              current_adjustment_ids
            ) do
         {:ok, _data} ->
-          {:ok, "promotion applied"}
+          {:ok, @messages.coupon_applied}
 
         {:error, _data} ->
-          {:error, "promotion activation failed"}
+          {:error, @messages.failed}
       end
     else
-      {:error, "better promotion already exists"}
+      {:error, @messages.better_coupon}
     end
   end
 
-  defp get_discount_amounts(order, promotion) do
+  defp get_adjustment_manifest(order, promotion) do
     current_adjustments = PromotionAdjustment.order_adjustments_for_promotion(order, promotion)
 
     current_discount =
-      Enum.reduce(current_adjustments, 0, fn adjustment, acc ->
-        -1 * adjustment.amount + acc
+      Enum.reduce(current_adjustments, Decimal.new(0), fn adjustment, acc ->
+        adjustment.amount |> Decimal.mult(-1) |> Decimal.add(acc)
       end)
 
     previous_eligible_adjustments = PromotionAdjustment.eligible_order_adjustments(order)
 
     previous_discount =
       Enum.reduce(previous_eligible_adjustments, 0, fn adjustment, acc ->
-        -1 * adjustment.amount + acc
+        adjustment.amount |> Decimal.mult(-1) |> Decimal.add(acc)
       end)
 
     %{

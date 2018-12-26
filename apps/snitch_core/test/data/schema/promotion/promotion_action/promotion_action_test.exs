@@ -85,6 +85,30 @@ defmodule Snitch.Data.Schema.PromotionActionTest do
                  {"invalid_preferences", %{calculator_preferences: [%{amount: ["is invalid"]}]}}
              ]
     end
+
+    test "fails for checks on percent calculator" do
+      promotion = insert(:promotion)
+
+      params = %{
+        name: "Order Item Total",
+        module: "Elixir.Snitch.Data.Schema.PromotionAction.OrderAction",
+        # amount needs to be a decimal value
+        preferences: %{
+          calculator_module: "Elixir.Snitch.Domain.Calculator.FlatPercent",
+          ## will fail as percent amount can not be greater than 100
+          calculator_preferences: %{percent_amount: 110}
+        },
+        promotion_id: promotion.id
+      }
+
+      assert %{valid?: false} = changeset = PromotionAction.changeset(%PromotionAction{}, params)
+
+      assert changeset.errors == [
+               preferences:
+                 {"invalid_preferences",
+                  %{calculator_preferences: [%{percent_amount: ["must be less than 100"]}]}}
+             ]
+    end
   end
 
   describe "changeset/2 with 'line item action'" do

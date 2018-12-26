@@ -58,6 +58,7 @@ defmodule Snitch.Data.Model.Promotion.Eligibility do
     # TODO add check for promotion_applied once it is done
 
     with true <- OrderEligiblity.valid_order_state(order),
+         true <- OrderEligiblity.promotion_applied(order, promotion),
          true <- OrderEligiblity.order_promotionable(order),
          true <- OrderEligiblity.rules_check(order, promotion) do
       true

@@ -86,7 +86,7 @@ defmodule Snitch.Data.Model.PromotionAdjustmentTest do
   defp set_rules_and_actions(promotion, cost, product_ids) do
     insert(:item_total_rule,
       promotion: promotion,
-      preferences: %{lower_range: Decimal.sub(cost.amount, 1), upper_range: 0.0}
+      preferences: %{lower_range: Decimal.sub(cost.amount, 1), upper_range: Decimal.new(0)}
     )
 
     insert(:product_rule,

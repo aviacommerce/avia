@@ -41,7 +41,7 @@ defmodule Snitch.Factory.Promotion do
           module: "Elixir.Snitch.Data.Schema.PromotionAction.OrderAction",
           preferences: %{
             calculator_module: "Elixir.Snitch.Domain.Calculator.FlatRate",
-            calculator_preferences: %{amount: 5}
+            calculator_preferences: %{amount: Decimal.new(5)}
           },
           promotion: build(:promotion)
         }
@@ -53,7 +53,7 @@ defmodule Snitch.Factory.Promotion do
           module: "Elixir.Snitch.Data.Schema.PromotionAction.LineItemAction",
           preferences: %{
             calculator_module: "Elixir.Snitch.Domain.Calculator.FlatRate",
-            calculator_preferences: %{amount: 5}
+            calculator_preferences: %{amount: Decimal.new(5)}
           },
           promotion: build(:promotion)
         }

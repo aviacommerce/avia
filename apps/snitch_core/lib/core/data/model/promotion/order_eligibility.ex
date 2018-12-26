@@ -4,10 +4,12 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblity do
   a promotion can be applied to the order.
   """
   use Snitch.Data.Model
+  alias Snitch.Data.Model.PromotionAdjustment
 
   @valid_order_states ~w(delivery address)a
   @success_message "promotion applicable"
   @error_message "coupon not applicable"
+  @coupon_applied "coupon already applied"
 
   @doc """
   Checks if the `promotion` is already applied to the order.
@@ -17,11 +19,15 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblity do
   Tracks by checking if adjustments already exist for the order for the
   supplied `promotion`
 
-  ##TODO Add logic once the adjustments are done.
   """
-  defp promotion_applied(order, promotion) do
-    ## TODO Add logic once the adjustments are done.
-    true
+  def promotion_applied(order, promotion) do
+    case PromotionAdjustment.order_adjustments_for_promotion(order, promotion) do
+      [] ->
+        true
+
+      _list ->
+        {false, @coupon_applied}
+    end
   end
 
   @doc """
