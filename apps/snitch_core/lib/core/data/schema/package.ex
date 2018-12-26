@@ -53,7 +53,7 @@ defmodule Snitch.Data.Schema.Package do
 
   schema "snitch_packages" do
     field(:number, Nanoid, autogenerate: true)
-    field(:state, :string)
+    field(:state, PackageStateEnum)
     field(:shipped_at, :utc_datetime)
     field(:tracking, :map)
     embeds_many(:shipping_methods, EmbeddedShippingMethod, on_replace: :delete)

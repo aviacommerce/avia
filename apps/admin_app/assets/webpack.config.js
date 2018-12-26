@@ -5,6 +5,7 @@ const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const webpack = require("webpack");
+const MiniCSSExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = (env, options) => ({
   optimization: {
@@ -13,9 +14,10 @@ module.exports = (env, options) => ({
       new OptimizeCSSAssetsPlugin({})
     ]
   },
-  entry: {
-    "./js/app.js": ["./js/app.js"].concat(glob.sync("./vendor/**/*.js"))
-  },
+  entry: [
+    path.join(__dirname, "js/app.js"),
+    path.join(__dirname, "css/app.scss")
+  ],
   output: {
     filename: "app.js",
     path: path.resolve(__dirname, "../priv/static/js")
@@ -36,6 +38,15 @@ module.exports = (env, options) => ({
         }
       },
       {
+        test: /\.scss$/,
+        use: [
+          MiniCSSExtractPlugin.loader,
+          "css-loader",
+          "postcss-loader",
+          "sass-loader"
+        ]
+      },
+      {
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
@@ -43,8 +54,15 @@ module.exports = (env, options) => ({
         }
       },
       {
-        test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader"]
+        test: /\.(png|woff|woff2|eot|ttf|svg)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 10000
+            }
+          }
+        ]
       }
     ]
   },
