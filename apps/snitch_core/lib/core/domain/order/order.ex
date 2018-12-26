@@ -180,7 +180,7 @@ defmodule Snitch.Domain.Order do
     order = Repo.preload(order, :packages)
 
     Enum.all?(order.packages, fn package ->
-      package.state == "delivered"
+      package.state == :delivered
     end)
   end
 end
