@@ -34,9 +34,7 @@ RUN apt-get clean \
   && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
   && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
   && curl -sL https://deb.nodesource.com/setup_8.x | bash \
-  && apt-get install -y nodejs yarn \
-  && yarn global add elm@0.18.0 \
-  && elm-package install -y
+  && apt-get install -y nodejs yarn
 
 # Umbrella
 COPY mix.exs mix.lock ./
@@ -46,11 +44,6 @@ COPY config config
 COPY apps apps
 RUN mix do local.hex --force, local.rebar --force
 RUN mix do deps.get, deps.compile
-
-# Install npm/elm pacakges
-RUN cd apps/admin_app/assets \
-  && yarn install \
-  && cd elm && elm-package install --yes
 
 # Create assets build for admin app
 RUN cd apps/admin_app/assets \
