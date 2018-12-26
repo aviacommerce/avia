@@ -1,14 +1,11 @@
-@import 'variables';
+@import "variables";
 @import "switch";
-@import "bootstrap";
 @import "login";
 @import "font-face";
-
 body {
   font-family: "avia1" !important;
   color: $main-sub-color;
   background-color: $gray-101;
-
   .stickformbutton {
     position: fixed;
     bottom: -16px;
@@ -17,33 +14,27 @@ body {
     margin-left: -31px;
     padding: 8px 10px 4px;
     border-top: 1px solid $bordercolor1;
-
     .col-sm-10 {
       padding: 0px 11px 0px 5px;
     }
   }
-
   a:hover {
     color: $main-sub-color;
     text-decoration: none;
   }
-
   .btn-primary:not(:disabled):not(.disabled):active,
   .btn-primary:not(:disabled):not(.disabled).active,
-  .show>.btn-primary.dropdown-toggle {
+  .show > .btn-primary.dropdown-toggle {
     color: $white;
     background-color: $main-sub-color;
     border-color: $main-sub-color;
   }
-
   .prealative {
     position: relative;
   }
-
   .cpointer {
     cursor: pointer;
   }
-
   .dropdown-toggle::after {
     display: inline-block;
     width: 0;
@@ -56,11 +47,9 @@ body {
     border-bottom: 0;
     border-left: 0.3em solid transparent;
   }
-
   a {
     color: $main-sub-color;
   }
-
   .required {
     &:after {
       color: $red;
@@ -72,86 +61,72 @@ body {
       top: -5px;
     }
   }
-
   .list-group-item.active {
     background-color: $main-sub-color;
     border-color: $main-sub-color;
   }
-
   .btn-secondary {
     height: 38px;
     line-height: 1.6;
     padding: 8px 12px;
     background-color: transparent;
   }
-
   .btn-primary {
     background-color: $main-sub-color;
-    font-size: .875em;
+    font-size: 0.875em;
     color: $white;
     border-color: $main-sub-color;
     height: 38px;
     line-height: 1.6;
     padding: 8px 12px;
-
     &:hover {
-      background-color: $btn-hover-color + 10;
-      font-size: .875em;
+      background-color: darken($btn-hover-color, 10);
+      font-size: 0.875em;
       border-color: $btn-hover-color;
     }
-
     &:focus {
       box-shadow: none;
       background-color: $btn-hover-color;
     }
-
     &:not(:disabled):not(.disabled):active:focus,
     &:not(:disabled):not(.disabled).active:focus,
-    .show>.btn-primary.dropdown-toggle:focus {
+    .show > .btn-primary.dropdown-toggle:focus {
       box-shadow: none;
       background-color: $btn-hover-color;
     }
   }
-
   .border-custom {
     border-radius: 3px;
     background-color: $white;
     border: 1px solid $bordercolor1;
-    border-bottom-color: $bordercolor2
+    border-bottom-color: $bordercolor2;
   }
-
   .btn-outline-secondary {
     border-color: $gray-102;
-    color: $txt-lightdark - 45;
+    color: lighten($txt-lightdark, 45);
     font-weight: bold;
-
     &:hover {
-      color: $txt-lightdark - 90;
+      color: lighten($txt-lightdark, 90);
       background-color: $gray-101;
       border-color: $gray-102;
     }
-
     &:focus {
       box-shadow: none;
     }
   }
-
   .btn-outline-secondary:not(:disabled):not(.disabled):active:focus,
   .btn-outline-secondary:not(:disabled):not(.disabled).active:focus,
-  .show>.btn-outline-secondary.dropdown-toggle:focus {
+  .show > .btn-outline-secondary.dropdown-toggle:focus {
     box-shadow: none;
   }
-
   .btn {
     border-radius: 3px;
     font-size: 14px;
     font-weight: bold;
   }
-
   .select2-container .select2-selection--single {
     height: 2.8rem;
   }
-
   .form-control,
   .select2-container .select2-selection--single {
     border-radius: 3px;
@@ -162,22 +137,17 @@ body {
     border-style: solid;
     border-width: 1px;
     color: $main-sub-color;
-
     &:hover {
       border-color: $txt-lightdark;
     }
-
     &:focus {
       border-color: rgba($black, 0.8);
       box-shadow: none;
     }
   }
-
   .card {
-    @extend .py-3,
-    .border-custom
+    @extend .py-3, .border-custom;
   }
-
   .form-group.required {
     label::after {
       color: #f55753;
@@ -189,12 +159,10 @@ body {
       top: -5px;
     }
   }
-
   .not_found {
     text-align: center;
-    border: 1px solid red
+    border: 1px solid red;
   }
-
   .loader {
     background-image: url("/images/loader.svg");
     height: 30px;
@@ -202,30 +170,25 @@ body {
     background-repeat: no-repeat;
     background-position: center;
   }
-
   .img-wrap {
     position: relative;
     font-size: 0;
   }
-
   .imgcol .col-3 {
     max-width: 150px;
   }
-
   .product-info {
     visibility: hidden;
-    font-size:24px;
+    font-size: 24px;
     top: 4px;
     color: grey;
     right: 8px;
     position: absolute;
   }
-
   #checkimage {
     zoom: 1.8;
     position: absolute;
   }
-
   .img-wrap .product-delete {
     position: absolute;
     top: 4px;
@@ -236,18 +199,16 @@ body {
     color: $black;
     font-weight: bold;
     cursor: pointer;
-    opacity: .2;
+    opacity: 0.2;
     text-align: center;
     font-size: 22px;
     line-height: 10px;
     border-radius: 50%;
   }
-
   .img-wrap img {
     width: 150px;
     height: 100px;
   }
-
   .img-wrap:hover .product-delete {
     opacity: 1;
   }
@@ -280,17 +241,13 @@ body {
 
 .nav {
   background-color: $white;
-
   a {
     padding: 9px 18px;
-
     .flag {
       display: table;
       width: 100%;
-
       .flag-img {
         padding-right: 12px;
-
         .icon {
           display: inline-block;
           fill: currentColor;
@@ -300,18 +257,15 @@ body {
         }
       }
     }
-
     .flag-body,
     .flag-img {
       display: table-cell;
       vertical-align: middle;
     }
   }
-
   .navshophead {
     padding: 16px 11px;
     cursor: pointer;
-
     .shopdpdown {
       left: 10px !important;
       top: 20px !important;
@@ -319,17 +273,14 @@ body {
       border-top: 0 solid $bordercolor1;
       border-radius: 0;
       padding: 0px;
-
       a {
         border-top: 1px solid $bordercolor1;
         border-right: 0 solid $bordercolor1;
       }
     }
-
     .dropdown-toggle {
       padding: 3px;
       margin-bottom: 10px;
-
       &:after {
         top: 1px;
         left: -3px;
@@ -339,7 +290,6 @@ body {
         border-bottom: 0;
         border-left: 3px solid transparent;
       }
-
       span {
         display: inline-block;
         padding: 8px 0px 8px 3px;
