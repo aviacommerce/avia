@@ -53,6 +53,7 @@ defmodule Snitch.Data.Schema.Product do
     field(:tenant, :string, virtual: true)
 
     field(:state, ProductStateEnum, default: :draft)
+    field(:inventory_tracking, InventoryTrackingEnum, default: :none)
 
     # Following fields are used in context of import
     field(:store, :string, default: "avia")
