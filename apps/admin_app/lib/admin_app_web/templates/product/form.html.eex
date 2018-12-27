@@ -128,13 +128,12 @@
     <% end %>
   </div>
 
-
   <div class="tab-pane p-3 fade in show p-3" id="inventory_tab">
     <%= form_for @changeset, @action, [multipart: true], fn f ->  %>
       <%= hidden_input f, :id %>
       <fieldset id="inventory_tracking" data-selected="<%= @parent_product.inventory_tracking %>" >
       <div class="custom-control custom-radio">
-        <input type="radio" class="custom-control-input" id="inventory_track_none" value="none" name="product[inventory_tracking]" checked>
+        <input type="radio" class="custom-control-input" id="inventory_track_none" value="none" name="product[inventory_tracking]" >
         <label class="custom-control-label" for="inventory_track_none">Do not track inventory</label>
       </div>
       <div class="custom-control custom-radio">
