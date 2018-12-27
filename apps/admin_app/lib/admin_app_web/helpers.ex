@@ -33,7 +33,7 @@ defmodule AdminAppWeb.Helpers do
   end
 
   def month_name(month_number) when month_number in 1..12 do
-    Elixir.Timex.month_shortname(1)
+    Elixir.Timex.month_shortname(month_number)
   end
 
   @doc """
