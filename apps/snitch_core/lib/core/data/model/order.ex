@@ -201,7 +201,7 @@ defmodule Snitch.Data.Model.Order do
   def get_all, do: Repo.all(Order)
 
   @doc """
-  Returns all Orders with the given list of entities preloaded
+    Returns all Orders with the given list of entities preloaded
   """
   def get_all_with_preloads(preloads) do
     Repo.all(Order) |> Repo.preload(preloads)
