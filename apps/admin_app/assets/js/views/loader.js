@@ -12,6 +12,7 @@ import DashboardIndexView from './dashboard/index';
 import Shipping_policyIndexView from './shipping_policy/index'
 import Shipping_policyEditView from './shipping_policy/edit'
 import Stock_locationNewView from './stock_location/new'
+import Stock_locationEditView from './stock_location/new'
 // Collection of specific view modules
 const views = {
   TaxonomyIndexView,
@@ -25,6 +26,7 @@ const views = {
   DashboardIndexView,
   ProductNewView,
   Stock_locationNewView,
+  Stock_locationEditView,
   Shipping_policyIndexView,
   Shipping_policyEditView
 };

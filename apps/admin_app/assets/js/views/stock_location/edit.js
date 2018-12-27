@@ -11,4 +11,3 @@ export default class View extends MainView {
       super.unmount();
     }
 }
-
