@@ -4,8 +4,6 @@ defmodule AdminAppWeb.Helpers do
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.{Order, Product}
 
-  @months ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"]
-
   def extract_changeset_data(changeset) do
     if changeset.valid?() do
       {:ok, Params.data(changeset)}
@@ -35,7 +33,7 @@ defmodule AdminAppWeb.Helpers do
   end
 
   def month_name(month_number) when month_number in 1..12 do
-    Enum.at(@months, month_number - 1)
+    Elixir.Timex.month_shortname(1)
   end
 
   @doc """
