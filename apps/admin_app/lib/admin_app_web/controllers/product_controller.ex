@@ -112,6 +112,15 @@ defmodule AdminAppWeb.ProductController do
     redirect_with_updated_conn(conn, params)
   end
 
+  def toggle_variant_state(conn, %{"state" => state, "id" => product_id}) do
+    product = ProductModel.get(%{id: product_id})
+    ProductModel.update(product, %{state: state})
+
+    conn
+    |> put_status(200)
+    |> json(%{state: state})
+  end
+
   defp get_html_string(product, image) do
     render_to_string(
       ProductView,

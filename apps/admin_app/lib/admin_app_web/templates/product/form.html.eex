@@ -167,6 +167,8 @@
               <%= for option_type <- get_option_types(@parent_product) do %>
               <th><%= option_type.display_name %></th>
               <% end %>
+              <th>State</th>
+              <th>Activate</th>
               <th></th>
             </tr>
           </thead>
@@ -177,6 +179,18 @@
               <%= for option <- variant.options do %>
               <td class="option-value" contenteditable="true" data-option_value_id="<%= option.id %>"><%= option.value %></td>
               <% end %>
+              <td class="variant_state"><%= variant.state %></td>
+              <td class="variant_activate">
+                <label class="switch">
+                  <input type="hidden" value="<%= variant.id %>" class="variant_id">
+                  <%= if variant.state == :active do %>
+                    <input type="checkbox" class="switch-input" checked>
+                  <% else %>
+                    <input type="checkbox" class="switch-input">
+                  <% end %>  
+                  <span class="slider round"></span>
+                </label>
+              </td>
               <td>
                 <%= link("Edit", to: product_path(@conn, :edit, variant.id), class: "btn btn-primary") %>
               </td>

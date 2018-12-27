@@ -78,6 +78,7 @@ defmodule AdminAppWeb.Router do
     get("/taxonomy", TaxonomyController, :show_default_taxonomy)
     resources("/taxonomy", TaxonomyController, only: [:create])
 
+    get("/variant_state", ProductController, :toggle_variant_state)
     get("/products/:product_id/property", ProductController, :index_property)
     get("/products/:product_id/property/new", ProductController, :new_property)
     get("/products/:product_id/property/:property_id/edit", ProductController, :edit_property)

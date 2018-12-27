@@ -13,6 +13,7 @@ export default class View extends MainView {
     handleImageSelect();
     deleteImage();
     setupProduct();
+    onToggleActivation();
     addEventToProductFormButtons();
 
   }
@@ -32,6 +33,23 @@ export function imageOnEnter() {
   $(document).delegate('#product-images', 'change', function (event) {
     event.preventDefault();
     handleSubmitImage();
+  });
+}
+
+export function onToggleActivation() {
+  $(document).delegate('.variant_activate', 'change', function (event) {
+    var id = $(this).find('.variant_id').val();
+    var target_element = $(this).find('.variant_state');
+    var state = ( $(this).find('.switch-input').prop("checked") == true) ? "active" : "draft";
+    var data = {state: state, id: id};
+    $.ajax({
+      url: `/variant_state`,
+      type: "GET",
+      data: data,
+      success: function (json) {
+        target_element.text(state);
+      }
+    });
   });
 }
 
