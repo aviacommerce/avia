@@ -86,7 +86,7 @@ defmodule Snitch.Data.Schema.Product do
   end
 
   @required_fields ~w(name selling_price max_retail_price taxon_id shipping_category_id)a
-  @optional_fields ~w(description meta_description meta_keywords meta_title brand_id height width depth weight state)a
+  @optional_fields ~w(description meta_description meta_keywords meta_title brand_id height width depth weight state inventory_tracking)a
 
   def create_changeset(model, params \\ %{}) do
     common_changeset(model, params)
