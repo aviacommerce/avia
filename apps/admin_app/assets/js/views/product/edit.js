@@ -39,7 +39,7 @@ export function imageOnEnter() {
 export function onToggleActivation() {
   $(document).delegate('.variant_activate', 'change', function (event) {
     var id = $(this).find('.variant_id').val();
-    var target_element = $(this).find('.variant_state');
+    var target_element = $(this);
     var state = ( $(this).find('.switch-input').prop("checked") == true) ? "active" : "draft";
     var data = {state: state, id: id};
     $.ajax({
@@ -47,7 +47,7 @@ export function onToggleActivation() {
       type: "GET",
       data: data,
       success: function (json) {
-        target_element.text(state);
+        target_element.closest(".product_variants").find(".variant_state").text(state);
       }
     });
   });

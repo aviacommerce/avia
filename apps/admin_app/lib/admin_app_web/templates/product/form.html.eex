@@ -174,7 +174,7 @@
           </thead>
           <tbody>
             <%= for variant <- @parent_product.variants do %>
-            <tr>
+            <tr class="product_variants">
               <td><%= variant.id %></td>
               <%= for option <- variant.options do %>
               <td class="option-value" contenteditable="true" data-option_value_id="<%= option.id %>"><%= option.value %></td>
