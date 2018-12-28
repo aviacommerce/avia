@@ -1,6 +1,4 @@
 defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
-  alias Snitch.Core.Tools.MultiTenancy.Repo
-  # alias Snitch.Data.Model.Product, as: ProductModel
   alias Snitch.Data.Model.ProductReview, as: PRModel
   alias Snitch.Data.Model.Image, as: ImageModel
 
@@ -9,27 +7,25 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
   def type(_product), do: "product"
 
   def encode(product) do
-    actual_product = parent_or_standalone_product(product)
+    self_or_parent_product = parent_or_standalone_product(product)
     # Example => "Iphone 6s (Space Grey, 32GB, 2GB RAM)"
     product = append_option_value_in_name(product)
 
     %{
       name: product.name,
       suggest_keywords: suggest_keywords(product),
-      slug: actual_product.slug,
-      parent_id: actual_product.id,
+      slug: self_or_parent_product.slug,
+      parent_id: self_or_parent_product.id,
       # description: product.description,
       selling_price: product.selling_price,
       max_retail_price: product.max_retail_price,
-      rating_summary: avg_rating(actual_product),
-      options: Enum.map(product.options, &option_map/1),
-      taxon_path: gen_taxon_path(product.taxon),
+      rating_summary: avg_rating(self_or_parent_product),
       images: product_images(product),
       updated_at: product.updated_at,
-      tenant: product.tenant
+      tenant: product.tenant,
+      filters: generate_filter_fields(product, self_or_parent_product)
       # meta_keywords: product.meta_keywords,
     }
-    |> Map.merge(brand_map(product.brand))
   end
 
   defp parent_or_standalone_product(%{parent_variation: nil} = product), do: product
@@ -46,30 +42,37 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
     %{product | name: product.name <> " (" <> postfix <> ")"}
   end
 
+  defp generate_filter_fields(product, self_or_parent_product) do
+    [
+      gen_taxon_path(product.taxon)
+      | Enum.map(product.options, &option_map/1) ++ brand_map(self_or_parent_product.brand)
+    ]
+  end
+
   defp gen_taxon_path(nil), do: []
 
   defp gen_taxon_path(taxon) do
-    taxon = Repo.preload(taxon, :parent)
-    gen_taxon_path(taxon.parent) ++ [%{id: taxon.id, name: taxon.name}]
+    [%{id: "Category", value: taxon.name}]
+    # taxon = Repo.preload(taxon, :parent)
+    # gen_taxon_path(taxon.parent) ++ [%{id: taxon.id, name: taxon.name}]
   end
 
   defp option_map(option) do
     %{
-      name: option.option_type.name,
+      id: option.option_type.display_name,
       value: option.value
     }
   end
 
-  defp brand_map(nil), do: %{}
+  defp brand_map(nil), do: []
 
   defp brand_map(brand) do
-    %{
-      # Products can have optional brand
-      brand: %{
-        id: brand.id,
-        name: brand.name
+    [
+      %{
+        id: "Brand",
+        value: brand.name
       }
-    }
+    ]
   end
 
   # If stand alone product, then use its images

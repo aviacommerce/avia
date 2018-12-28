@@ -23,7 +23,9 @@ defmodule Snitch.Tools.Helper.ImageUploader do
 
   def transform(:original, _) do
     {:convert,
-     "-strip -quality 75 -thumbnail 600x800^ -gravity center -extent 600x800 -format jpg"}
+     fn input, output ->
+       "#{input} -strip -gravity center -extent 600x800 -format jpg jpg:#{output}"
+     end, :jpg}
   end
 
   @doc """

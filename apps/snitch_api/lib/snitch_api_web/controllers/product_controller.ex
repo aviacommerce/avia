@@ -44,7 +44,11 @@ defmodule SnitchApiWeb.ProductController do
       conn,
       JaSerializer.format(ESPView, products, conn,
         page: page,
-        meta: %{aggregations: aggregations, total: total}
+        meta: %{
+          "aggregations" => aggregations,
+          "total" => total,
+          "appliedParams" => params
+        }
       )
     )
   end
