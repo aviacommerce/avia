@@ -17,7 +17,9 @@ defmodule Snitch.Tools.ElasticSearch.ProductStore do
     # This will benifit unless forced preload
     # like => Repo.preload(taxon, :parent, force: true)
     taxon: [parent: [parent: [parent: :parent]]],
-    parent_variation: [parent_product: [:images, reviews: [rating_option_vote: :rating_option]]],
+    parent_variation: [
+      parent_product: [:brand, :images, reviews: [rating_option_vote: :rating_option]]
+    ],
     reviews: [rating_option_vote: :rating_option],
     options: [:option_type]
   ]
