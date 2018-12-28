@@ -184,12 +184,12 @@
                 <label class="switch">
                   <input type="hidden" value="<%= variant.id %>" class="variant_id">
                   <%= if variant.state == :active do %>
-                    <input type="checkbox" class="switch-input" checked>
+                   <input type="checkbox" class="switch-input" checked>
                   <% else %>
-                    <input type="checkbox" class="switch-input">
-                  <% end %>  
-                  <span class="slider round"></span>
-                </label>
+                   <input type="checkbox" class="switch-input">
+                  <% end %>
+                 <span class="slider round"></span>
+               </label>
               </td>
               <td>
                 <%= link("Edit", to: product_path(@conn, :edit, variant.id), class: "btn btn-primary") %>

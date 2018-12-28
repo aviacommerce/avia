@@ -114,11 +114,18 @@ defmodule AdminAppWeb.ProductController do
 
   def toggle_variant_state(conn, %{"state" => state, "id" => product_id}) do
     product = ProductModel.get(%{id: product_id})
-    ProductModel.update(product, %{state: state})
 
-    conn
-    |> put_status(200)
-    |> json(%{state: state})
+    case ProductModel.update(product, %{state: state}) do
+      {:ok, _} ->
+        conn
+        |> put_status(200)
+        |> json(%{state: state})
+
+      {:error, reason} ->
+        conn
+        |> put_flash(:error, reason)
+        |> json(%{state: "error occured"})
+    end
   end
 
   defp get_html_string(product, image) do
