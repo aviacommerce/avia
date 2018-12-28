@@ -28,7 +28,11 @@ defmodule Snitch.Data.Model.Product do
   """
   @spec get_all_with_preloads(list) :: [Product.t()]
   def get_all_with_preloads(preloads) do
-    Repo.all(Product) |> Repo.preload(preloads)
+    try do
+      Repo.all(Product) |> Repo.preload(preloads)
+    rescue
+      e in ArgumentError -> nil
+    end
   end
 
   @doc """

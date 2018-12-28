@@ -4,6 +4,7 @@ defmodule Snitch.Data.Model.ProductTest do
   import Snitch.Factory
   alias Snitch.Data.Model.Product
   alias Snitch.Data.Schema.Product, as: ProductSchema
+  alias Snitch.Data.Schema.Variation
   alias Snitch.Tools.Helper.Taxonomy
   alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
   alias Snitch.Repo
@@ -155,6 +156,24 @@ defmodule Snitch.Data.Model.ProductTest do
     end
   end
 
+  describe "sellable products list" do
+
+    test "if product has no variants" do
+      assert [%ProductSchema{}] = Product.sellable_products_query() |> Repo.all
+    end
+
+    test "if product has variants" do
+      attrs = %{products: [build(:variant)]}
+      product = insert(:product, attrs)
+      variant = product.products |> List.first()
+      variation = insert(:variation, %{parent_product: product, child_product: variant})
+      sellable_products = Product.sellable_products_query() |> Repo.all |> Enum.map(& &1.id)
+      assert Enum.member?(sellable_products, variant.id) == true
+      refute Enum.member?(sellable_products, product.id)
+    end
+
+  end
+
   describe "image handling - " do
     setup do
       product = insert(:product)
@@ -175,16 +194,30 @@ defmodule Snitch.Data.Model.ProductTest do
       assert {:ok, "success"} = Product.delete_image(new_product.id, image.id)
     end
 
-    test "product preloading with images and taxon" do
-      preloads = [:images]
-      product = Product.get_all_with_preloads(preloads) |> List.first()
-      assert product.images == []
-    end
-
     test "pass empty list of images to a product" do
       product = insert(:product) |> Repo.preload(:images)
       ip = %{"images" => []}
       assert {:error, _} = Product.add_images(product, ip)
+    end
+  end
+
+  describe "product preloading" do
+    setup do
+      attrs = %{products: [build(:variant)]}
+      product = insert(:product, attrs)
+      [product: product]
+    end
+
+    test "with valid preload params" do
+      preloads = [:products ]
+      product = Product.get_all_with_preloads(preloads) |> List.first()
+      assert product.products != nil 
+    end
+
+    test "with invalid preload params" do
+      preloads = [:imag]
+      products = Product.get_all_with_preloads(preloads)
+      assert products == nil
     end
   end
 
