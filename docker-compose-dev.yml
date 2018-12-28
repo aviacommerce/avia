@@ -1,10 +1,5 @@
 version: '3' 
 services:
-  db:
-    image: postgres:11.1-alpine
-    restart: always
-    ports:
-      - "5432:5432"
   webapp:
     build:
       context: .
@@ -12,7 +7,31 @@ services:
     container_name: aviacommerce-dev
     ports:
       - "4000:4000"
-    stdin_open: true
-    tty: true
+    depends_on:
+      - db
+      - elasticsearch
+      - kibana
     links:
       - db
+      - elasticsearch
+      - kibana
+  db:
+    image: postgres:10
+    container_name: db
+    environment:
+      - POSTGRES_USER=snitch_dev
+      - POSTGRES_PASSWORD=snitch_dev
+      - POSTGRES_DB=snitch_dev
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.3.2
+    ports:
+      - "5601:5601"
+    container_name: kibana

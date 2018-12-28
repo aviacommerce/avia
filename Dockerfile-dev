@@ -1,9 +1,10 @@
-# FROM postgres:11.1-alpine
 FROM elixir:1.7.3-slim as builder
 
 # Before running following commands, configure
 # 1. 'env/local.env' file.
 # 2. `/apps/snitch_core/config/dev.exs' file
+
+EXPOSE 4000
 
 ENV APP_HOME /avia-backend
 ENV AWS_ACCESS_KEY_ID dasdas
@@ -17,11 +18,12 @@ ENV FRONTEND_CHECKOUT_URL http://localhost:4200/checkout/
 ENV HOSTED_PAYMENT_URL http://localhost:3000/api/v1/hosted-payment/
 ENV SUPPORT_URL https://admin.aviacommerce.org
 ENV WKHTML_PATH /usr/bin/wkhtmltopdf
+ENV ELASTIC_HOST http://localhost:9200/
 
 RUN mkdir $APP_HOME
 WORKDIR $APP_HOME
 
-# ADD . $APP_HOME
+ADD . $APP_HOME
 
 #Install git
 RUN apt-get update \
@@ -47,7 +49,8 @@ RUN mix do deps.get, deps.compile
 
 # Create assets build for admin app
 RUN cd apps/admin_app/assets \
-  && node node_modules/brunch/bin/brunch build \
+  && yarn install \
+  && yarn deploy \
   && cd .. \
   && mix phx.digest
 
@@ -72,12 +75,15 @@ RUN apt-get clean \
   && apt-get -y autoremove \
   && apt-get -y clean
 
-RUN cd apps/snitch_core \
-  && mix ecto.create \
-  && mix ecto.migrate \
-  && mix run priv/repo/seed/seeds.exs
+# RUN cd apps/addmin_app/assets \
+  # && npm install
 
-RUN cd apps/addmin_app/assets \
-  && npm install
+CMD ["mix", "ecto.create"]
 
-RUN iex -S mix phx.server
+CMD ["mix", "ecto.migrate"]
+
+CMD ["mix", "run apps/snitch_core/priv/repo/seed/seeds.exs"]
+
+CMD mix cmd --app snitch_core mix elasticsearch.build products --cluster Snitch.Tools.ElasticsearchCluster
+
+CMD ["mix", "phx.server"]
