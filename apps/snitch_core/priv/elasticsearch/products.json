@@ -63,30 +63,8 @@
             }
           }
         },
-        "taxon_path": {
-          "type": "nested",
-          "properties": {
-            "id": {
-              "type": "long"
-            },
-            "name": {
-              "type": "keyword"
-            }
-          }
-        },
         "tenant": {
           "type": "keyword"
-        },
-        "brand" : {
-          "type": "nested",
-          "properties": {
-            "id": {
-              "type": "long"
-            },
-            "name": {
-              "type": "keyword"
-            }
-          }
         },
         "suggest_keywords": {
           "type": "completion",
@@ -105,14 +83,14 @@
         "updated_at": {
           "type": "date"
         },
-        "options": {
+        "filters" : {
           "type": "nested",
-          "properties": {
-            "name": {
-              "type": "keyword"
+          "properties" : {
+            "id" : {
+              "type" : "keyword"
             },
-            "value": {
-              "type": "keyword"
+            "value" : {
+              "type" : "keyword"
             }
           }
         }
