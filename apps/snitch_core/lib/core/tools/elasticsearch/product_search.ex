@@ -23,79 +23,82 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
 
     page = gen_page_links(total, params, conn)
 
-    {collection, page, aggregations, total}
+    {collection, page, format_aggregations(aggregations), total}
   end
 
-  @doc """
-  Develops the query based on the giver params..
-  This supports the following api calling...
-  - /products
-  - /products/slug
-  - /products?sort=price-asc-rank
-  - /products?sort=price-desc-rank
-  - /products?sort=date
-  - /products?sort=avg_rating
-  - /products?sort=A-Z&filter[name]=Hill's
-  - /products?sort=A-Z&filter[name]=Hill's&page[limit]=2&page[offset]=2
-  - /products?sort=A-Z&filter[name]=Hill's&page[limit]=2
-  """
-  def convert_to_elastic_query(params) do
-    {number, size} = extract_page_params(params)
+  defp convert_to_elastic_query(params) do
+    {offset, limit} = extract_page_params(params)
 
     query = %{
       "sort" => %{},
       "query" => %{
         "bool" => %{
           "must" =>
-            (tenant_query() ++ match_keywords(params)) ++
-              taxon_query(params) ++ brand_query(params)
+            tenant_query() ++ generate_query_from_filter_string(params) ++ match_keywords(params)
         }
       },
-      "aggs" => aggregate_query(params)
+      "aggs" => aggregate_query()
     }
 
     query
     |> sorting_query(params)
-    |> paginate(number, size)
+    |> paginate(offset, limit)
   end
 
-  def aggregate_query(params) do
-    %{
-      "brand" => %{
-        "terms" => %{
-          "field" => "brand"
-        }
-      },
-      "categories" => category_aggs(params),
-      "options" => filter_opts_aggs(params)
-    }
+  defp generate_query_from_filter_string(%{"f" => ""}), do: []
+
+  defp generate_query_from_filter_string(%{"f" => f}) do
+    f
+    |> String.splitter("::")
+    |> Stream.flat_map(fn filter_string ->
+      [filter, values] = String.split(filter_string, ":")
+      primary_filter_query({filter, String.split(values, ",")})
+    end)
+    |> Enum.into([])
   end
 
-  defp category_aggs(_params) do
-    %{
-      "nested" => %{
-        "path" => "taxon_path"
-      },
-      "aggs" => %{
-        "taxon" => %{
-          "terms" => %{
-            "script" => "doc['taxon_path.id'].value + '|' + doc['taxon_path.name'].value"
+  defp generate_query_from_filter_string(_), do: []
+
+  defp primary_filter_query({_, []}), do: []
+  defp primary_filter_query({_, [""]}), do: []
+
+  defp primary_filter_query({filter, values}) do
+    [
+      %{
+        "nested" => %{
+          "path" => "filters",
+          "query" => %{
+            "bool" => %{
+              "filter" => [
+                %{
+                  "term" => %{
+                    "filters.id" => filter
+                  }
+                },
+                %{
+                  "terms" => %{
+                    "filters.value" => values
+                  }
+                }
+              ]
+            }
           }
         }
       }
-    }
+    ]
   end
 
-  defp filter_opts_aggs(_params) do
+  defp aggregate_query() do
     %{
-      "nested" => %{
-        "path" => "variants.options"
-      },
-      "aggs" => %{
-        "option" => %{
-          "terms" => %{
-            "script" =>
-              "doc['variants.options.name'].value + '|' + doc['variants.options.value'].value"
+      "filters" => %{
+        "nested" => %{
+          "path" => "filters"
+        },
+        "aggs" => %{
+          "aggregations" => %{
+            "terms" => %{
+              "script" => "doc['filters.id'].value + '|' + doc['filters.value'].value"
+            }
           }
         }
       }
@@ -112,12 +115,14 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
     ]
   end
 
-  defp match_keywords(%{"filter" => %{"name" => name}}) do
+  defp match_keywords(%{"q" => ""}), do: []
+
+  defp match_keywords(%{"q" => query}) do
     [
       %{
         "match" => %{
           "name" => %{
-            "query" => name,
+            "query" => query,
             "operator" => "and",
             "fuzziness" => "AUTO"
           }
@@ -127,41 +132,6 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
   end
 
   defp match_keywords(_), do: []
-
-  defp taxon_query(%{"taxon" => taxon}) do
-    [
-      %{
-        "nested" => %{
-          "path" => "taxon_path",
-          "query" => %{
-            "bool" => %{
-              "filter" => [
-                %{
-                  "match" => %{
-                    "taxon_path.id" => taxon
-                  }
-                }
-              ]
-            }
-          }
-        }
-      }
-    ]
-  end
-
-  defp taxon_query(_), do: []
-
-  defp brand_query(%{"product_brand" => brand}) do
-    [
-      %{
-        "term" => %{
-          "brand" => brand
-        }
-      }
-    ]
-  end
-
-  defp brand_query(_), do: []
 
   defp sorting_query(query, params) do
     case params["sort"] do
@@ -192,7 +162,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
     end
   end
 
-  def get_base_url(conn) do
+  defp get_base_url(conn) do
     case conn.req_headers
          |> Enum.filter(fn {x, _y} -> x == "host" end)
          |> Enum.at(0) do
@@ -201,24 +171,14 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
     end
   end
 
-  @doc """
-  This extracts the page parameters and converts to integer
-  """
-  def extract_page_params(params) do
-    case params do
-      %{"page" => page} ->
-        {String.to_integer(page["offset"]), String.to_integer(page["limit"])}
+  defp extract_page_params(%{"rows" => limit, "o" => offset}),
+    do: {String.to_integer(offset), String.to_integer(limit)}
 
-      _ ->
-        {1, Application.get_env(:ja_serializer, :page_size, 2)}
-    end
-  end
+  defp extract_page_params(_), do: {0, Application.get_env(:ja_serializer, :page_size, 2)}
 
-  @doc """
-  Generates the pagination links like `prev` `self` `next` `last` using
-  data-collection and params-page
-  """
-  def gen_page_links(total, params, conn) do
+  # Generates the pagination links like `prev` `self` `next` `last` using
+  # data-collection and params-page
+  defp gen_page_links(total, params, conn) do
     {number, size} = extract_page_params(params)
 
     JaSerializer.Builder.PaginationLinks.build(
@@ -232,16 +192,49 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
     )
   end
 
-  @doc """
-  This develops the query according to the page parameters.
-  """
-  def paginate(query, page_number, size) do
+  # This develops the query according to the page parameters.
+  defp paginate(query, offset, limit) do
     Map.merge(
       query,
       %{
-        "from" => (page_number - 1) * size,
-        "size" => size
+        "from" => offset,
+        "size" => limit
       }
     )
+  end
+
+  defp format_aggregations(aggregations) do
+    %{
+      "filters" => %{"aggregations" => %{"buckets" => filters}}
+    } = aggregations
+
+    %{
+      "filters" => format_id_value_key_aggs(filters)
+    }
+  end
+
+  defp format_id_value_key_aggs(filters) do
+    filters
+    |> Enum.reduce(
+      %{},
+      fn %{"key" => key, "doc_count" => count}, acc ->
+        [id, value] = String.split(key, "|")
+
+        Map.merge(acc, %{
+          id => %{
+            "id" => id,
+            "filterValues" => [
+              %{
+                "id" => value,
+                "count" => count,
+                "meta" => ""
+              }
+              | (acc[id] && acc[id]["filterValues"]) || []
+            ]
+          }
+        })
+      end
+    )
+    |> Map.values()
   end
 end
