@@ -140,13 +140,14 @@ defmodule AdminAppWeb.Router do
     get("/taxon/:taxon_id/aggregate", TaxonomyController, :taxon_delete_aggregate)
     put("/taxonomy/update", TaxonomyController, :update_taxon)
     post("/product_option_values/:id", OptionTypeController, :update)
+    post("/stock", StockController, :update_stock)
   end
 
   scope "/", AdminAppWeb do
     pipe_through([:browser, :authentication])
 
     # Don't add phoenix routes after this route as, all routes that does not match
-    # Phoenix routes goes to react app. 
+    # Phoenix routes goes to react app.
     get("/*path", ReactController, :index)
   end
 end

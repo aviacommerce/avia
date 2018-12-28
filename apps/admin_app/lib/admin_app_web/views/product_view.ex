@@ -6,7 +6,7 @@ defmodule AdminAppWeb.ProductView do
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Domain.Taxonomy
 
-  alias Snitch.Data.Model.{GeneralConfiguration, Product, ProductProperty, Property, StockItem}
+  alias Snitch.Data.Model.{GeneralConfiguration, Product, ProductProperty, Property, StockItem, StockLocation}
   alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Data.Schema
   import Ecto.Query
@@ -15,6 +15,10 @@ defmodule AdminAppWeb.ProductView do
   @search_keys ["rummage", "search", "state", "search_term"]
   @sort_field_keys ["rummage", "sort", "field"]
   @sort_order_keys ["rummage", "sort", "order"]
+
+  def active_stock_locaton() do
+    StockLocation.active()
+  end
 
   def themes_options(product) do
     Enum.map(product.taxon.variation_themes, fn theme -> {theme.name, theme.id} end)

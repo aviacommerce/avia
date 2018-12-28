@@ -137,8 +137,28 @@
         <label class="custom-control-label" for="inventory_track_none">Do not track inventory</label>
       </div>
       <div class="custom-control custom-radio">
-        <input type="radio" class="custom-control-input" id="inventory_track_product" value="product" name="product[inventory_tracking]">
+        <input type="radio" class="custom-control-input" id="inventory_track_product" value="product" name="product[inventory_tracking]" data-toggle="collapse" data-target="#product_tracking">
         <label class="custom-control-label" for="inventory_track_product">Track inventory for this product</label>
+      </div>
+      <div id="product_tracking" class="collapse p-2">
+        <table class="table col-9">
+          <thead>
+            <tr>
+              <th >Stock Location</th>
+              <th >Current stock level</th>
+              <th >Low stock level</th>
+            </tr>
+          </thead>
+          <tbody>
+          <%= for stock_location <- active_stock_locaton() do %>
+            <tr data-stock-location="<%= stock_location.id %>" data-product="<%= @parent_product.id %>" >
+              <td><%= stock_location.name %></td>
+              <td><%= text_input :stock, :count_on_hand, class: "form-control", name: "current_stock" %></td>
+              <td><%= text_input :stock, :stock_low_level, class: "form-control", name: "stock_low" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+        </table>
       </div>
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="inventory_track_variant" value="variant" name="product[inventory_tracking]">

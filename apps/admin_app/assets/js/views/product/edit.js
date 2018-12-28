@@ -15,6 +15,7 @@ export default class View extends MainView {
     setupProduct();
     addEventToProductFormButtons();
     setSelectedInventoryTracking();
+    setupProductTracking();
   }
 
   unmount() {
@@ -27,6 +28,31 @@ export default class View extends MainView {
 
 var selDiv;
 var storedFile = [];
+
+export function setupProductTracking() {
+  $("#product_tracking input[name=current_stock]").on("blur", function() { handle_stock(this)})
+  $("#product_tracking input[name=stock_low]").on("blur", function() { handle_stock(this)})
+}
+
+export function handle_stock(stock_edit_element){
+  let $tr = $(stock_edit_element).closest("tr")
+  let stock_location_id = $tr.attr("data-stock-location")
+  let product_id = $tr.attr("data-product")
+
+  let current_stock = $tr.find("input[name=current_stock]").val() || "0"
+  let low_stock = $tr.find("input[name=stock_low]").val() || "0"
+
+  const data = {stock_location_id: stock_location_id, current_stock: current_stock, low_stock: low_stock, product_id: product_id   }
+
+  fetch("/api/stock", {
+  method: 'POST',
+  body: JSON.stringify(data),
+  headers:{
+    'Content-Type': 'application/json'
+  }})
+  .then((res) => {
+  })
+}
 
 export function setSelectedInventoryTracking() {
   let inventory_tracking = $("#inventory_tracking").attr("data-selected");

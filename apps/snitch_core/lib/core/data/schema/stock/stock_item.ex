@@ -39,7 +39,6 @@ defmodule Snitch.Data.Schema.StockItem do
   def update_changeset(%__MODULE__{} = stock_item, params) do
     stock_item
     |> cast(params, @update_fields)
-    |> handle_count()
     |> common_changeset()
   end
 
