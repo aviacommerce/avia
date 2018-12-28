@@ -51,8 +51,9 @@ defmodule SnitchApiWeb.ProductControllerTest do
     :timer.sleep(1000)
 
     params = %{
-      "filter" => %{"name" => "product"},
-      "page" => %{"limit" => 3, "offset" => "1"}
+      "q" => "product",
+      "rows" => "50",
+      "o" => "0"
     }
 
     conn = get(conn, product_path(conn, :index, params))
