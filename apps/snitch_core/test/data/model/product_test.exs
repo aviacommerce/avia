@@ -54,6 +54,33 @@ defmodule Snitch.Data.Model.ProductTest do
     [valid_attrs: valid_attrs, valid_params: valid_params, image_params: image_params]
   end
 
+  describe "product relation" do
+    setup do
+      attrs = %{products: [build(:variant)]}
+      parent_product = insert(:product, attrs)
+      variant = parent_product.products |> List.first()
+      [parent_product: parent_product, variant: variant]
+    end
+
+    test "if it is a parent", %{parent_product: parent_product} do
+      is_parent = Product.is_parent_product(to_string(parent_product.id))
+      assert is_parent == true
+    end
+
+    test "if it is a child",  %{variant: variant} do  
+      is_child = Product.is_child_product(variant)
+      assert is_child == true
+    end
+
+    test "if it is neither child nor parent" do
+      product = insert(:product)
+      is_child = Product.is_child_product(product)
+      is_parent = Product.is_parent_product(to_string(product.id))
+      assert is_child == false
+      assert is_parent == false
+    end
+  end
+
   describe "get" do
     test "product", %{valid_attrs: va} do
       assert product_returned = Product.get(va.product_id)
@@ -146,6 +173,12 @@ defmodule Snitch.Data.Model.ProductTest do
       new_product = product |> Repo.preload(:images, force: true)
       image = new_product.images |> List.first()
       assert {:ok, "success"} = Product.delete_image(new_product.id, image.id)
+    end
+
+    test "product preloading with images and taxon" do
+      preloads = [:images]
+      product = Product.get_all_with_preloads(preloads) |> List.first()
+      assert product.images == []
     end
 
     test "pass empty list of images to a product" do
