@@ -51,7 +51,7 @@ defmodule SnitchApiWeb.ProductControllerTest do
     :timer.sleep(1000)
 
     params = %{
-      "q" => "product"},
+      "q" => "product",
       "rows" => "50",
       "o" => "0"
     }

@@ -116,6 +116,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
   end
 
   defp match_keywords(%{"q" => ""}), do: []
+
   defp match_keywords(%{"q" => query}) do
     [
       %{
@@ -129,6 +130,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
       }
     ]
   end
+
   defp match_keywords(_), do: []
 
   defp sorting_query(query, params) do
