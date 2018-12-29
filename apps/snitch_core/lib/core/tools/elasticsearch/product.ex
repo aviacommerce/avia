@@ -23,7 +23,8 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
       images: product_images(product),
       updated_at: product.updated_at,
       tenant: product.tenant,
-      filters: generate_filter_fields(product, self_or_parent_product)
+      filters: generate_filter_fields(product, self_or_parent_product),
+      discount: product_discount(product)
       # meta_keywords: product.meta_keywords,
     }
   end
@@ -52,7 +53,7 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
   defp gen_taxon_path(nil), do: []
 
   defp gen_taxon_path(taxon) do
-    [%{id: "Category", value: taxon.name}]
+    %{id: "Category", value: taxon.name}
     # taxon = Repo.preload(taxon, :parent)
     # gen_taxon_path(taxon.parent) ++ [%{id: taxon.id, name: taxon.name}]
   end
@@ -122,5 +123,13 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
   defp suggest_keywords(%{name: name, meta_keywords: meta_keywords}) do
     keywords = String.split(name, ~r(\s+)) ++ String.split(meta_keywords || "", ~r(\s*\,\s*))
     Enum.filter(keywords, &("" != &1))
+  end
+
+  defp product_discount(product) do
+    product.selling_price.amount
+    |> Decimal.div(product.max_retail_price.amount)
+    |> Decimal.mult(100)
+    |> Decimal.round(0)
+    |> Decimal.to_integer()
   end
 end

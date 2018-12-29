@@ -9,6 +9,9 @@
           "type": "integer",
           "index": false
         },
+        "discount": {
+          "type": "integer"
+        },
         "images": {
           "type": "nested",
           "properties": {
@@ -41,6 +44,7 @@
           }
         },
         "selling_price": {
+          "type": "nested",
           "properties": {
             "amount": {
               "type": "double"
