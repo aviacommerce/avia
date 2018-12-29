@@ -16,6 +16,7 @@ export default class View extends MainView {
     addEventToProductFormButtons();
     setSelectedInventoryTracking();
     setupProductTracking();
+    handleInventoryTrackingToggle();
   }
 
   unmount() {
@@ -29,29 +30,48 @@ export default class View extends MainView {
 var selDiv;
 var storedFile = [];
 
-export function setupProductTracking() {
-  $("#product_tracking input[name=current_stock]").on("blur", function() { handle_stock(this)})
-  $("#product_tracking input[name=stock_low]").on("blur", function() { handle_stock(this)})
+export function handleInventoryTrackingToggle() {
+  $("input[type=radio][name='product[inventory_tracking]']").on(
+    "change",
+    function() {
+      this.value == "product"
+        ? $("#product_tracking").slideDown("fast")
+        : $("#product_tracking").slideUp("fast");
+    }
+  );
 }
 
-export function handle_stock(stock_edit_element){
-  let $tr = $(stock_edit_element).closest("tr")
-  let stock_location_id = $tr.attr("data-stock-location")
-  let product_id = $tr.attr("data-product")
+export function setupProductTracking() {
+  $("#product_tracking input[name=current_stock]").on("blur", function() {
+    handle_stock(this);
+  });
+  $("#product_tracking input[name=stock_low]").on("blur", function() {
+    handle_stock(this);
+  });
+}
 
-  let current_stock = $tr.find("input[name=current_stock]").val() || "0"
-  let low_stock = $tr.find("input[name=stock_low]").val() || "0"
+export function handle_stock(stock_edit_element) {
+  let $tr = $(stock_edit_element).closest("tr");
+  let stock_location_id = $tr.attr("data-stock-location");
+  let product_id = $tr.attr("data-product");
 
-  const data = {stock_location_id: stock_location_id, current_stock: current_stock, low_stock: low_stock, product_id: product_id   }
+  let current_stock = $tr.find("input[name=current_stock]").val() || "0";
+  let low_stock = $tr.find("input[name=stock_low]").val() || "0";
+
+  const data = {
+    stock_location_id: stock_location_id,
+    current_stock: current_stock,
+    low_stock: low_stock,
+    product_id: product_id
+  };
 
   fetch("/api/stock", {
-  method: 'POST',
-  body: JSON.stringify(data),
-  headers:{
-    'Content-Type': 'application/json'
-  }})
-  .then((res) => {
-  })
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  }).then(res => {});
 }
 
 export function setSelectedInventoryTracking() {
