@@ -129,8 +129,7 @@
   </div>
 
   <div class="tab-pane p-3 fade in show p-3" id="inventory_tab">
-    <%= form_for @changeset, @action, [multipart: true], fn f ->  %>
-      <%= hidden_input f, :id %>
+    <%= form_for @changeset, product_path(@conn, :update_inventory_tracking, @parent_product), [multipart: true, method: "patch"], fn f ->  %>
       <fieldset id="inventory_tracking" data-selected="<%= @parent_product.inventory_tracking %>" >
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="inventory_track_none" value="none" name="product[inventory_tracking]" >
@@ -141,24 +140,51 @@
         <label class="custom-control-label" for="inventory_track_product">Track inventory for this product</label>
       </div>
       <div id="product_tracking" class="collapse p-2">
-        <table class="table col-9">
-          <thead>
-            <tr>
-              <th >Stock Location</th>
-              <th >Current stock level</th>
-              <th >Low stock level</th>
-            </tr>
-          </thead>
-          <tbody>
-          <%= for stock_location <- active_stock_locaton() do %>
-            <tr data-stock-location="<%= stock_location.id %>" data-product="<%= @parent_product.id %>" >
-              <td><%= stock_location.name %></td>
-              <td><%= text_input :stock, :count_on_hand, class: "form-control", name: "current_stock" %></td>
-              <td><%= text_input :stock, :stock_low_level, class: "form-control", name: "stock_low" %></td>
-            </tr>
-          <% end %>
-        </tbody>
-        </table>
+        <%= hidden_input :stock, :product_id, value: @parent_product.id, class: "form-control" %>
+        <div class="col-9">
+          <div class="form-group row">
+            <label class="col-sm-6">
+              <div class="label required">
+                Stock Location
+              </div>
+            </label>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <%= select :stock, :stock_location_id, active_stock_locaton(), class: "form-control" %>
+              </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-6">
+              <div class="label required">
+                Current Stock Level
+              </div>
+              <div class="label-txt">
+                How many units of this product do you currently have in stock?
+              </div>
+            </label>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <%= text_input :stock, :count_on_hand, class: "form-control" %>
+              </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-6">
+              <div class="label">
+                Low Stock Level
+              </div>
+              <div class="label-txt">
+                When inventory levels fall below this number, the product option will be flagged as low stock.
+              </div>
+            </label>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <%= text_input :stock, :inventory_warning_level, class: "form-control" %>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="inventory_track_variant" value="variant" name="product[inventory_tracking]">

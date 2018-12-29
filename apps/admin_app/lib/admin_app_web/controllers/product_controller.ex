@@ -8,6 +8,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Data.Model.ProductPrototype, as: PrototypeModel
   alias Snitch.Domain.Taxonomy
   alias Snitch.Tools.Helper.Rummage, as: RummageHelper
+  alias Snitch.Domain.Inventory
 
   alias Snitch.Data.Schema.{
     Image,
@@ -97,6 +98,22 @@ defmodule AdminAppWeb.ProductController do
          {:ok, product} <- ProductModel.update(product, params) do
       updated_params = conn.params |> Map.take(["rummage"]) |> Map.merge(params)
       save_publish_redirect_handler(conn, product, updated_params)
+    end
+  end
+
+  def update_inventory_tracking(conn, %{"product" => product_params} = params) do
+    with %ProductSchema{} = product <- ProductModel.get(params["product_id"]) do
+      tracking_level = product_params["inventory_tracking"]
+
+      case tracking_level do
+        "product" ->
+          Inventory.set_inventory_tracking(product, tracking_level, params["stock"])
+
+        _ ->
+          Inventory.set_inventory_tracking(product, tracking_level)
+      end
+
+      redirect(conn, to: product_path(conn, :edit, product.id))
     end
   end
 
