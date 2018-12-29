@@ -139,7 +139,7 @@
         <input type="radio" class="custom-control-input" id="inventory_track_product" value="product" name="product[inventory_tracking]">
         <label class="custom-control-label" for="inventory_track_product">Track inventory for this product</label>
       </div>
-      <div id="product_tracking" class="p-2">
+      <div id="product_tracking" class="card m-2">
         <%= hidden_input :stock, :product_id, value: @parent_product.id, class: "form-control" %>
         <div class="col-9">
           <div class="form-group row">
