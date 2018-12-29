@@ -126,11 +126,15 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
   end
 
   defp product_discount(product) do
-    product.max_retail_price.amount
-    |> Decimal.sub(product.selling_price.amount)
-    |> Decimal.div(product.max_retail_price.amount)
-    |> Decimal.mult(100)
-    |> Decimal.round(0)
-    |> Decimal.to_integer()
+    try do
+      product.max_retail_price.amount
+      |> Decimal.sub(product.selling_price.amount)
+      |> Decimal.div(product.max_retail_price.amount)
+      |> Decimal.mult(100)
+      |> Decimal.round(0)
+      |> Decimal.to_integer()
+    rescue
+      _ -> 0
+    end
   end
 end
