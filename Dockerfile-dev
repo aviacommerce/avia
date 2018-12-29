@@ -75,15 +75,6 @@ RUN apt-get clean \
   && apt-get -y autoremove \
   && apt-get -y clean
 
-# RUN cd apps/addmin_app/assets \
-  # && npm install
+RUN ["chmod", "+x", "./docker-dev-provision.sh"]
 
-CMD ["mix", "ecto.create"]
-
-CMD ["mix", "ecto.migrate"]
-
-CMD ["mix", "run apps/snitch_core/priv/repo/seed/seeds.exs"]
-
-CMD mix cmd --app snitch_core mix elasticsearch.build products --cluster Snitch.Tools.ElasticsearchCluster
-
-CMD ["mix", "phx.server"]
+CMD ["./docker-dev-provision.sh"]
