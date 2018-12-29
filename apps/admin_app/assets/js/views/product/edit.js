@@ -31,6 +31,14 @@ var selDiv;
 var storedFile = [];
 
 export function handleInventoryTrackingToggle() {
+  const inventroy_tracking = $(
+    'input[type=radio][name="product[inventory_tracking]"]:checked'
+  ).val();
+
+  inventroy_tracking == "product"
+    ? $("#product_tracking").slideDown("fast")
+    : $("#product_tracking").slideUp("fast");
+
   $("input[type=radio][name='product[inventory_tracking]']").on(
     "change",
     function() {
