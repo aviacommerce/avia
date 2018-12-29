@@ -54,29 +54,9 @@ defmodule Snitch.Data.Schema.StockItem do
     end
   end
 
-  defp check_stock_and_warning_level(changeset) do
-    stock_warning_level =
-      get_change(changeset, :inventory_warning_level) || changeset.data.inventory_warning_level
-
-    stock_level = get_change(changeset, :count_on_hand) || changeset.data.count_on_hand
-
-    case stock_level < stock_warning_level do
-      true ->
-        add_error(
-          changeset,
-          :count_on_hand,
-          "Current stock level cannot be greater than warning level"
-        )
-
-      _ ->
-        changeset
-    end
-  end
-
   defp common_changeset(stock_item_changeset) do
     stock_item_changeset
     |> validate_number(:count_on_hand, greater_than: -1)
-    |> check_stock_and_warning_level
     |> foreign_key_constraint(:product_id)
     |> foreign_key_constraint(:stock_location_id)
   end

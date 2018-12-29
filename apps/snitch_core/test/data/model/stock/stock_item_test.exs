@@ -75,7 +75,7 @@ defmodule Snitch.Data.Model.StockItemTest do
                StockItemModel.update(%{count_on_hand: 20, id: stock_item.id})
 
       assert stock_item.count_on_hand != updated_stock_item.count_on_hand
-      assert updated_stock_item.count_on_hand == 21
+      assert updated_stock_item.count_on_hand == 20
     end
 
     test "with stock instance : Fails for INVALID attributes" do
@@ -90,7 +90,7 @@ defmodule Snitch.Data.Model.StockItemTest do
       assert {:ok, updated_stock_item} = StockItemModel.update(%{count_on_hand: 20}, stock_item)
 
       assert stock_item.count_on_hand != updated_stock_item.count_on_hand
-      assert updated_stock_item.count_on_hand == 21
+      assert updated_stock_item.count_on_hand == 20
     end
   end
 
