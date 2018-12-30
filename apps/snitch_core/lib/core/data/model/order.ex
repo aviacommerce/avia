@@ -234,8 +234,8 @@ defmodule Snitch.Data.Model.Order do
   def get_order_count_by_date(start_date, end_date) do
     Order
     |> where([o], o.inserted_at >= ^start_date and o.inserted_at <= ^end_date)
-    |> group_by([o], to_char(o.inserted_at, "DD MON YYYY"))
-    |> select([o], %{date: to_char(o.inserted_at, "DD MON YYYY"), count: count(o.id)})
+    |> group_by([o], to_char(o.inserted_at, "YYYY-MM-DD"))
+    |> select([o], %{date: to_char(o.inserted_at, "YYYY-MM-DD"), count: count(o.id)})
     |> Repo.all()
     |> Enum.sort_by(&{Map.get(&1, :date)})
   end
