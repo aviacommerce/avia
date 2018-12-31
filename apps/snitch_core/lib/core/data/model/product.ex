@@ -355,23 +355,36 @@ defmodule Snitch.Data.Model.Product do
   # the type of product.
   @spec is_parent_product(String.t()) :: true | false
   def is_parent_product(product_id) when is_binary(product_id) do
-    query =
-      from(
-        p in "snitch_product_variants",
-        where: p.parent_product_id == ^(product_id |> String.to_integer()),
-        select: fragment("count(*)")
-      )
+    status =
+      Product
+      |> Repo.get(product_id)
+      |> Repo.preload(:parent_variation)
+      |> is_parent_or_child()
 
-    count = Repo.one(query)
-    count > 0
+    case status do
+      :parent ->
+        true
+
+      _ ->
+        false
+    end
   end
 
   @spec is_child_product(Product.t()) :: true | false
   def is_child_product(product) do
-    query = from(c in Variation, where: c.child_product_id == ^product.id)
-    count = Repo.aggregate(query, :count, :id)
-    count > 0
+    status = product |> Repo.preload(:parent_variation) |> is_parent_or_child()
+
+    case status do
+      :child ->
+        true
+
+      _ ->
+        false
+    end
   end
+
+  def is_parent_or_child(%{parent_variation: nil}), do: :parent
+  def is_parent_or_child(%{parent_variation: %{parent_product: _}}), do: :child
 
   @spec get_selling_prices(List.t()) :: Map.t()
   def get_selling_prices(product_ids) do
