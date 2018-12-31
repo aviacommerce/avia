@@ -182,7 +182,7 @@ defmodule Snitch.Data.Model.ProductTest do
     end
 
     test "add images with valid params", %{image_params: ip, product: product} do
-      assert {:ok, "success"} = Product.add_images(product, ip)
+      assert {:ok, %ProductSchema{} = product} = Product.add_images(product, ip)
     end
 
     test "delete image for a product", %{product: product, image_params: ip} do
