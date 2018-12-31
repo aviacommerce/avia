@@ -4,6 +4,7 @@ defmodule Snitch.Data.Model.ProductTest do
   import Snitch.Factory
   alias Snitch.Data.Model.Product
   alias Snitch.Data.Schema.Product, as: ProductSchema
+  alias Snitch.Data.Schema.Variation
   alias Snitch.Tools.Helper.Taxonomy
   alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
   alias Snitch.Repo
@@ -52,6 +53,33 @@ defmodule Snitch.Data.Model.ProductTest do
     }
 
     [valid_attrs: valid_attrs, valid_params: valid_params, image_params: image_params]
+  end
+
+  describe "product relation" do
+    setup do
+      attrs = %{products: [build(:variant)]}
+      parent_product = insert(:product, attrs)
+      variant = parent_product.products |> List.first()
+      [parent_product: parent_product, variant: variant]
+    end
+
+    test "if it is a parent", %{parent_product: parent_product} do
+      is_parent = Product.is_parent_product(to_string(parent_product.id))
+      assert is_parent == true
+    end
+
+    test "if it is a child",  %{variant: variant} do  
+      is_child = Product.is_child_product(variant)
+      assert is_child == true
+    end
+
+    test "if it is neither child nor parent" do
+      product = insert(:product)
+      is_child = Product.is_child_product(product)
+      is_parent = Product.is_parent_product(to_string(product.id))
+      assert is_child == false
+      assert is_parent == false
+    end
   end
 
   describe "get" do
@@ -128,6 +156,24 @@ defmodule Snitch.Data.Model.ProductTest do
     end
   end
 
+  describe "sellable products list" do
+
+    test "if product has no variants" do
+      assert [%ProductSchema{}] = Product.sellable_products_query() |> Repo.all
+    end
+
+    test "if product has variants" do
+      attrs = %{products: [build(:variant)]}
+      product = insert(:product, attrs)
+      variant = product.products |> List.first()
+      variation = insert(:variation, %{parent_product: product, child_product: variant})
+      sellable_products = Product.sellable_products_query() |> Repo.all |> Enum.map(& &1.id)
+      assert Enum.member?(sellable_products, variant.id) == true
+      refute Enum.member?(sellable_products, product.id)
+    end
+
+  end
+
   describe "image handling - " do
     setup do
       product = insert(:product)
@@ -152,6 +198,26 @@ defmodule Snitch.Data.Model.ProductTest do
       product = insert(:product) |> Repo.preload(:images)
       ip = %{"images" => []}
       assert {:error, _} = Product.add_images(product, ip)
+    end
+  end
+
+  describe "product preloading" do
+    setup do
+      attrs = %{products: [build(:variant)]}
+      product = insert(:product, attrs)
+      [product: product]
+    end
+
+    test "with valid preload params" do
+      preloads = [:products ]
+      product = Product.get_all_with_preloads(preloads) |> List.first()
+      assert product.products != nil 
+    end
+
+    test "with invalid preload params" do
+      preloads = [:imag]
+      products = Product.get_all_with_preloads(preloads)
+      assert products == nil
     end
   end
 
