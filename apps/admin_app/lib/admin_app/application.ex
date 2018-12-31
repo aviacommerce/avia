@@ -21,8 +21,8 @@ defmodule AdminApp.Application do
     :ok = Honeydew.start_queue(:etsy_import_queue)
     :ok = Honeydew.start_workers(:etsy_import_queue, Avia.Etsy.ImportWorker)
 
-    :ok = Honeydew.start_queue(:export_order_queue)
-    :ok = Honeydew.start_workers(:export_order_queue, Avia.ExportOrderWorker)
+    :ok = Honeydew.start_queue(:export_data_queue)
+    :ok = Honeydew.start_workers(:export_data_queue, Avia.ExportDataWorker)
 
     :ok = Honeydew.start_queue(:category_delete_queue)
     :ok = Honeydew.start_workers(:category_delete_queue, Avia.CategoryWorker, num: 3)

@@ -343,6 +343,23 @@ defmodule AdminAppWeb.ProductController do
     generate_option_combinations(tail, result)
   end
 
+  def export_product(conn, %{"format" => format}) do
+    current_user = Guardian.Plug.current_resource(conn)
+
+    params =
+      Map.put(
+        %{"type" => "product", "format" => format, "user" => current_user},
+        "tenant",
+        Repo.get_prefix()
+      )
+
+    Honeydew.async({:export_data, [params]}, :export_data_queue)
+
+    conn
+    |> put_flash(:info, "Your request is accepted. Data will be emailed shortly")
+    |> redirect(to: page_path(conn, :index))
+  end
+
   def load_resources(conn, _opts) do
     load(conn, conn.params)
   end
