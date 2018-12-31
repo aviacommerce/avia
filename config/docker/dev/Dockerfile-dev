@@ -47,13 +47,6 @@ COPY apps apps
 RUN mix do local.hex --force, local.rebar --force
 RUN mix do deps.get, deps.compile
 
-# Create assets build for admin app
-RUN cd apps/admin_app/assets \
-  && yarn install \
-  && yarn deploy \
-  && cd .. \
-  && mix phx.digest
-
 RUN apt-get clean \
   && apt-get update \
   && apt-get -y install curl tar file xz-utils build-essential cron \
@@ -75,6 +68,7 @@ RUN apt-get clean \
   && apt-get -y autoremove \
   && apt-get -y clean
 
-RUN ["chmod", "+x", "./docker-dev-provision.sh"]
+RUN ["chmod", "+x", "./config/docker/dev/docker-dev-provision.sh"]
 
-CMD ["./docker-dev-provision.sh"]
+CMD ["./config/docker/dev/docker-dev-provision.sh"]
+
