@@ -33,6 +33,7 @@ defmodule Snitch.Factory do
     TaxRate,
     User,
     Variant,
+    Variation,
     Product,
     ProductBrand,
     ShippingCategory,
@@ -85,6 +86,10 @@ defmodule Snitch.Factory do
       selling_price: Money.new("12.99", currency()),
       max_retail_price: Money.new("14.99", currency())
     }
+  end
+
+  def variation_factory do
+    %Variation{}
   end
 
   def line_item_factory do

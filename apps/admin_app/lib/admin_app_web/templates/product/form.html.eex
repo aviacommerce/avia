@@ -10,7 +10,7 @@
       <a class="nav-link active" href="#tab1default" data-toggle="tab">Product Detail</a>
    </li>
    <%= if  @conn.request_path != product_path(@conn, :new) do %>
-   <%= if !is_child_product(@parent_product) do %>
+   <%= unless is_child_product(@parent_product) do %>
     <li class="nav-item">
       <a class="nav-link" href="#tab2default" data-toggle="tab">Variants</a>
     </li>
@@ -167,16 +167,33 @@
               <%= for option_type <- get_option_types(@parent_product) do %>
               <th><%= option_type.display_name %></th>
               <% end %>
+              <th>State</th>
+              <th>Switch State</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             <%= for variant <- @parent_product.variants do %>
-            <tr>
+            <tr class="product_variants">
               <td><%= variant.id %></td>
               <%= for option <- variant.options do %>
               <td class="option-value" contenteditable="true" data-option_value_id="<%= option.id %>"><%= option.value %></td>
               <% end %>
+              <td class="variant_state"><%= variant.state %></td>
+              <td class="variant_activate">
+                <input type="hidden" value="<%= variant.id %>" class="variant_id">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                  <label class="btn btn-sm btn-info">
+                    <input type="radio" class="switch-input" id="active" autocomplete="off">Active
+                  </label>
+                  <label class="btn btn-sm btn-info">
+                    <input type="radio" class="switch-input" id="draft" autocomplete="off">Draft
+                  </label>
+                  <label class="btn btn-sm btn-info">
+                    <input type="radio" class="switch-input" id="inactive" autocomplete="off">Inactive
+                  </label>
+                </div>
+              </td>
               <td>
                 <%= link("Edit", to: product_path(@conn, :edit, variant.id), class: "btn btn-primary") %>
               </td>
@@ -188,7 +205,7 @@
       <% end %>
     </div>
    <% else %>
-    <%= if !is_child_product(@parent_product) do %>
+    <%= unless is_child_product(@parent_product) do %>
       <div class="tab-pane fade p-3" id="tab2default" >
         <div class="alert alert-info">
           You can add Product Variants by adding Variation Themes to <span class="badge badge-info"> <%= get_product_category(@parent_product.taxon_id) %> </span> category.

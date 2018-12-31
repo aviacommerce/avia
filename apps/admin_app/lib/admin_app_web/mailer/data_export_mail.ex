@@ -1,6 +1,6 @@
 defmodule AdminAppWeb.DataExportMail do
   @moduledoc """
-  Composing email to send order export.
+  Composing email to send data export.
   """
 
   import Swoosh.Email
@@ -12,7 +12,7 @@ defmodule AdminAppWeb.DataExportMail do
     Repo.all(GC) |> List.first()
   end
 
-  def data_export_mail(attachment, user, type) do
+  def data_export_mail(attachment, user, format, type) do
     sender_email = Application.get_env(:admin_app, AdminAppWeb.Endpoint)[:sendgrid_sender_mail]
     general_config = get_config
     store_name = general_config.name
@@ -20,8 +20,8 @@ defmodule AdminAppWeb.DataExportMail do
     new()
     |> to(user.email)
     |> from({"#{store_name}", sender_email})
-    |> subject("Your orders")
-    |> text_body("Here is the #{type} export of your orders.")
+    |> subject("Your #{type}s")
+    |> text_body("Here is the #{format} export of your #{type}s.")
     |> attachment(attachment)
     |> Mailer.deliver()
   end
