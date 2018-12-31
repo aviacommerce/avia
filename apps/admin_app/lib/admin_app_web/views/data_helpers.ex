@@ -18,4 +18,5 @@ defmodule AdminAppWeb.DataHelpers do
   def formatted_list(:country), do: CountryModel.formatted_list()
   def formatted_list(:role), do: RoleModel.formatted_list()
   def formatted_list(:permissions), do: Permission.formatted_list()
+  def formatted_list(country_id), do: StateModel.formatted_state_list(country_id)
 end

@@ -1,5 +1,6 @@
 defmodule AdminAppWeb.StockLocationController do
   use AdminAppWeb, :controller
+  alias AdminAppWeb.DataHelpers
   alias Snitch.Domain.StockLocation, as: SLDomain
   alias Snitch.Data.Model.StockLocation, as: SLModel
   alias Snitch.Data.Schema.StockLocation, as: SLSchema
@@ -43,6 +44,14 @@ defmodule AdminAppWeb.StockLocationController do
         |> put_flash(:error, "Error: Some validations failed")
         |> render("new.html", changeset: %{changeset | action: :insert})
     end
+  end
+
+  def fetch_country_states(conn, %{"country_id" => country_id}) do
+    state_list = DataHelpers.formatted_list(country_id)
+
+    conn
+    |> put_status(200)
+    |> json(%{state_list: state_list})
   end
 
   defp create_zone_for_location(location) do
