@@ -24,4 +24,13 @@ defmodule Snitch.Data.Model.State do
     |> select([s], {s.name, s.id})
     |> Repo.all()
   end
+
+  @spec formatted_state_list(integer) :: [{String.t(), non_neg_integer}]
+  def formatted_state_list(country_id) do
+    State
+    |> where([s], s.country_id == ^country_id)
+    |> order_by([s], asc: s.name)
+    |> select([s], %{text: s.name, id: s.id})
+    |> Repo.all()
+  end
 end

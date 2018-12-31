@@ -13,8 +13,7 @@ defmodule AdminAppWeb.LayoutView do
   def js_view_name(conn, view_template) do
     [view_name(conn), template_name(view_template)]
     |> Enum.reverse()
-    |> List.insert_at(0, "view")
-    |> Enum.map(&String.capitalize/1)
+    |> List.insert_at(0, "View")
     |> Enum.reverse()
     |> Enum.join("")
   end
@@ -26,14 +25,16 @@ defmodule AdminAppWeb.LayoutView do
     |> view_module
     |> Phoenix.Naming.resource_name()
     |> String.replace("_view", "")
+    |> Macro.camelize()
   end
 
-  # Removes the extion from the template and reutrns
+  # Removes the extension from the template and returns
   # just the name.
   defp template_name(template) when is_binary(template) do
     template
     |> String.split(".")
     |> Enum.at(0)
+    |> Macro.camelize()
   end
 
   def check_general_settings do

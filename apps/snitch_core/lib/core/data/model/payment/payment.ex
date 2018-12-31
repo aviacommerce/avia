@@ -67,9 +67,9 @@ defmodule Snitch.Data.Model.Payment do
   def get_payment_count_by_date(start_date, end_date) do
     Payment
     |> where([p], p.inserted_at >= ^start_date and p.inserted_at <= ^end_date)
-    |> group_by([p], to_char(p.inserted_at, "DD MON YYYY"))
+    |> group_by([p], to_char(p.inserted_at, "YYYY-MM-DD"))
     |> select([p], %{
-      date: to_char(p.inserted_at, "DD MON YYYY"),
+      date: to_char(p.inserted_at, "YYYY-MM-DD"),
       count: type(sum(p.amount), p.amount)
     })
     |> Repo.all()
