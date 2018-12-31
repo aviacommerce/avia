@@ -27,6 +27,11 @@ defmodule Snitch.Data.Model.Image do
       |> persist()
   end
 
+  @spec update(Image.t(), map) :: {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
+  def update(image, params) do
+    QH.update(Image, image, params, Repo)
+  end
+
   def update(module, struct, %{"image" => image} = params, association) do
     old_image = struct.image
 

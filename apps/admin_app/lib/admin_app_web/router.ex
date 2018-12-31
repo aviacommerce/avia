@@ -33,6 +33,7 @@ defmodule AdminAppWeb.Router do
 
     get("/", PageController, :index)
 
+    get("/products/export_products", ProductController, :export_product)
     get("/fetch_states/:country_id", StockLocationController, :fetch_country_states)
     get("/orders/export_orders", OrderController, :export_order)
     get("/orders/:category", OrderController, :index)
