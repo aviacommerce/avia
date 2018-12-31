@@ -3,6 +3,9 @@ language: elixir
 otp_release:
   - 20.2
 before_install:
+  # Use sed to replace the SSH URL with the public URL, then initialize submodules
+  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+  - git submodule update --init --recursive
   - mix local.hex --force
   - mix local.rebar --force
   - mix deps.get
@@ -40,5 +43,9 @@ env:
 notifications:
   email:
     recipients:
-      - ananya95+travis@gmail.com
+      - developers@aviabird.com
 
+# Handle git submodules yourself
+git:
+  submodules: false
+  
