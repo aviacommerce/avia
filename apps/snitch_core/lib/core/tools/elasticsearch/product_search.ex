@@ -22,7 +22,6 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
       |> Map.put_new("aggregations", %{})
 
     page = gen_page_links(total, params, conn)
-
     {collection, page, format_aggregations(aggregations), total}
   end
 
@@ -52,32 +51,56 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
     |> String.splitter("::")
     |> Stream.flat_map(fn filter_string ->
       [filter, values] = String.split(filter_string, ":")
-      primary_filter_query({filter, String.split(values, ",")})
+      string_facet_query({filter, String.split(values, ",")})
     end)
     |> Enum.into([])
   end
 
   defp generate_query_from_filter_string(_), do: []
 
-  defp primary_filter_query({_, []}), do: []
-  defp primary_filter_query({_, [""]}), do: []
+  defp string_facet_query({_, []}), do: []
+  defp string_facet_query({_, [""]}), do: []
 
-  defp primary_filter_query({filter, values}) do
+  defp string_facet_query({"Category", values}) do
+    [
+      %{
+        "query" => %{
+          "nested" => %{
+            "path" => "category",
+            "query" => %{
+              "bool" => %{
+                "should" =>
+                  Enum.map(values, fn val ->
+                    %{
+                      "match" => %{
+                        "category.all_parents" => val
+                      }
+                    }
+                  end)
+              }
+            }
+          }
+        }
+      }
+    ]
+  end
+
+  defp string_facet_query({filter, values}) do
     [
       %{
         "nested" => %{
-          "path" => "filters",
+          "path" => "string_facet",
           "query" => %{
             "bool" => %{
               "filter" => [
                 %{
                   "term" => %{
-                    "filters.id" => filter
+                    "string_facet.id" => filter
                   }
                 },
                 %{
                   "terms" => %{
-                    "filters.value" => values
+                    "string_facet.value" => values
                   }
                 }
               ]
@@ -92,12 +115,12 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
     %{
       "filters" => %{
         "nested" => %{
-          "path" => "filters"
+          "path" => "string_facet"
         },
         "aggs" => %{
           "aggregations" => %{
             "terms" => %{
-              "script" => "doc['filters.id'].value + '|' + doc['filters.value'].value"
+              "script" => "doc['string_facet.id'].value + '|' + doc['string_facet.value'].value"
             }
           }
         }
