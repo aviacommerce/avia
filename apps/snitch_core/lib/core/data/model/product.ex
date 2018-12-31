@@ -10,6 +10,7 @@ defmodule Snitch.Data.Model.Product do
   alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Data.Schema.{Image, Product, Variation, Taxon}
   alias Snitch.Tools.Helper.ImageUploader
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Tools.ElasticSearch.ProductStore, as: ESProductStore
 
   @product_states [:active, :in_active, :draft]
@@ -22,6 +23,21 @@ defmodule Snitch.Data.Model.Product do
     Repo.all(Product)
   end
 
+  @doc """
+  Returns all Products with the given list of entities preloaded
+  """
+  @spec get_all_with_preloads(list) :: [Product.t()]
+  def get_all_with_preloads(preloads) do
+    try do
+      Repo.all(Product) |> Repo.preload(preloads)
+    rescue
+      e in ArgumentError -> nil
+    end
+  end
+
+  @doc """
+  Returns all Products with the given parameters.
+  """
   @spec get(map | non_neg_integer) :: Product.t() | nil
   def get(query_params) do
     QH.get(Product, query_params, Repo)
@@ -33,12 +49,29 @@ defmodule Snitch.Data.Model.Product do
   end
 
   @doc """
+  Updates the default image for a given product 
+  from the given list of images.
+  """
+  def update_default_image(product, default_image) do
+    for image <- product.images do
+      if to_string(image.id) == default_image do
+        attrs = %{is_default: true}
+        ImageModel.update(attrs, image)
+      else
+        attrs = %{is_default: false}
+        ImageModel.update(attrs, image)
+      end
+    end
+  end
+
+  @doc """
   Get listtable product
   Return following product
   - Standalone product.(Product that do not have variants)
   - Parent product (Product that has variants)
   In short returns product excluding the variant products
   """
+  @spec admin_display_product_query() :: [Product.t()]
   def admin_display_product_query() do
     child_product_ids =
       Variation
@@ -56,6 +89,7 @@ defmodule Snitch.Data.Model.Product do
   - Variant product (excluding their parent)
   In short returns product excluding the parent products
   """
+  @spec sellable_products_query() :: [Product.t()]
   def sellable_products_query() do
     parent_product_ids =
       Variation
@@ -68,12 +102,14 @@ defmodule Snitch.Data.Model.Product do
     |> where([p, v], p.state != "in_active" and p.id not in ^parent_product_ids)
   end
 
+  @spec get_product_with_default_image(Product.t()) :: Product.t()
   def get_product_with_default_image(product) do
     default_image = from(image in Image, where: image.is_default == true)
     query = from(p in Product, where: p.id == ^product.id, preload: [images: ^default_image])
     Repo.one(query)
   end
 
+  @spec get_rummage_product_list(any) :: Product.t()
   def get_rummage_product_list(rummage_opts) do
     opts =
       if rummage_opts do
@@ -315,6 +351,29 @@ defmodule Snitch.Data.Model.Product do
     end)
   end
 
+  # TODO This needs to be replaced and we need a better system to identify
+  # the type of product.
+  @spec is_parent_product(String.t()) :: true | false
+  def is_parent_product(product_id) when is_binary(product_id) do
+    query =
+      from(
+        p in "snitch_product_variants",
+        where: p.parent_product_id == ^(product_id |> String.to_integer()),
+        select: fragment("count(*)")
+      )
+
+    count = Repo.one(query)
+    count > 0
+  end
+
+  @spec is_child_product(Product.t()) :: true | false
+  def is_child_product(product) do
+    query = from(c in Variation, where: c.child_product_id == ^product.id)
+    count = Repo.aggregate(query, :count, :id)
+    count > 0
+  end
+
+  @spec get_selling_prices(List.t()) :: Map.t()
   def get_selling_prices(product_ids) do
     query = from(p in Product, select: {p.id, p.selling_price}, where: p.id in ^product_ids)
 
@@ -329,6 +388,7 @@ defmodule Snitch.Data.Model.Product do
   Ordering of product depends on many things, for now we just check
   sufficient stock is available.
   """
+  @spec is_orderable?(Product.t()) :: true | false
   def is_orderable?(product) do
     has_stock?(product)
   end
@@ -349,6 +409,7 @@ defmodule Snitch.Data.Model.Product do
     Enum.reduce(stocks, 0, fn stock, acc -> stock.count_on_hand + acc end)
   end
 
+  @spec get_product_count_by_state(DateTime.t(), DateTime.t()) :: integer
   def get_product_count_by_state(start_date, end_date) do
     child_product_ids =
       Variation
