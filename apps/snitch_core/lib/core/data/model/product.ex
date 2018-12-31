@@ -33,6 +33,22 @@ defmodule Snitch.Data.Model.Product do
   end
 
   @doc """
+  Updates the default image for a given product 
+  from the given list of images.
+  """
+  def update_default_image(product, default_image) do
+    for image <- product.images do
+      if to_string(image.id) == default_image do
+        attrs = %{is_default: true}
+        ImageModel.update(attrs, image)
+      else
+        attrs = %{is_default: false}
+        ImageModel.update(attrs, image)
+      end
+    end
+  end
+
+  @doc """
   Get listtable product
   Return following product
   - Standalone product.(Product that do not have variants)
