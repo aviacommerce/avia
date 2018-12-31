@@ -89,8 +89,7 @@ defmodule Snitch.Factory do
   end
 
   def variation_factory do
-    %Variation{
-    }
+    %Variation{}
   end
 
   def line_item_factory do
