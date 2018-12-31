@@ -20,32 +20,20 @@ defmodule AdminAppWeb.ProductView do
     Enum.map(product.taxon.variation_themes, fn theme -> {theme.name, theme.id} end)
   end
 
-  # TODO This needs to be replaced and we need a better system to identify
-  # the type of product.
-  def is_parent_product(product_id) when is_binary(product_id) do
-    query =
-      from(
-        p in "snitch_product_variants",
-        where: p.parent_product_id == ^(product_id |> String.to_integer()),
-        select: fragment("count(*)")
-      )
-
-    count = Repo.one(query)
-    count > 0
-  end
-
   def can_add_variant(product) do
     has_themes(product) && !is_child_product(product)
   end
 
-  def has_themes(product) do
-    length(product.taxon.variation_themes) > 0
+  defp is_child_product(product) do
+    Product.is_child_product(product)
   end
 
-  defp is_child_product(product) do
-    query = from(c in Variation, where: c.child_product_id == ^product.id)
-    count = Repo.aggregate(query, :count, :id)
-    count > 0
+  defp is_parent_product(product_id) do
+    Product.is_parent_product(product_id)
+  end
+
+  def has_themes(product) do
+    length(product.taxon.variation_themes) > 0
   end
 
   def has_variants(product) do
