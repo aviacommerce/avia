@@ -3,10 +3,8 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
   Product Search using elasticsearch
   """
   alias Snitch.Core.Tools.MultiTenancy.Repo
-  alias Snitch.Data.Schema.Product
 
   import Snitch.Tools.ElasticSearch.ProductStore, only: [search_products: 1]
-  import Ecto.Query
 
   def run(conn, params) do
     %{
@@ -64,20 +62,18 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
   defp string_facet_query({"Category", values}) do
     [
       %{
-        "query" => %{
-          "nested" => %{
-            "path" => "category",
-            "query" => %{
-              "bool" => %{
-                "should" =>
-                  Enum.map(values, fn val ->
-                    %{
-                      "match" => %{
-                        "category.all_parents" => val
-                      }
+        "nested" => %{
+          "path" => "category",
+          "query" => %{
+            "bool" => %{
+              "should" =>
+                Enum.map(values, fn val ->
+                  %{
+                    "match" => %{
+                      "category.all_parents" => val
                     }
-                  end)
-              }
+                  }
+                end)
             }
           }
         }

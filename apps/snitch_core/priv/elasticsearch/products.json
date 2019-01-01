@@ -105,12 +105,10 @@
           "type": "nested",
           "properties": {
             "id": {
-              "type": "keyword",
-              "index": false
+              "type": "keyword"
             },
             "value": {
-              "type": "keyword",
-              "index": false
+              "type": "keyword"
             }
           }
         },
@@ -118,8 +116,7 @@
           "type": "nested",
           "properties": {
             "id": {
-              "type": "keyword",
-              "index": false
+              "type": "keyword"
             },
             "value": {
               "type": "double"
