@@ -8,6 +8,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductStore do
 
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Model.Product, as: PM
+  alias Snitch.Data.Schema.Product, as: PS
   alias Snitch.Tools.ElasticsearchCluster, as: EC
 
   @preload [
@@ -52,13 +53,15 @@ defmodule Snitch.Tools.ElasticSearch.ProductStore do
     result
   end
 
-  # Indexes only sellable products/variants
-  def index_product_to_es(product) do
+  def update_product_to_es(id, action \\ :create) when is_binary(id),
+    do: update_product_to_es(PM.get(id), action)
+
+  def update_product_to_es(product, action) when is_map(product) do
     product = Repo.preload(%{product | tenant: Repo.get_prefix()}, [:variants | @preload])
 
     case product.variants do
       [] ->
-        index_product_to_es(product, true)
+        update_sellable_product_to_es(product, action)
 
       variants ->
         Enum.map(
@@ -66,13 +69,13 @@ defmodule Snitch.Tools.ElasticSearch.ProductStore do
           fn variant ->
             %{variant | tenant: Repo.get_prefix()}
             |> Repo.preload(@preload)
-            |> index_product_to_es(true)
+            |> update_sellable_product_to_es(action)
           end
         )
     end
   end
 
-  def index_product_to_es(%{state: :active} = product, true),
+  defp update_sellable_product_to_es(%{state: :active} = product, :create),
     do:
       Elasticsearch.put_document!(
         EC,
@@ -80,7 +83,11 @@ defmodule Snitch.Tools.ElasticSearch.ProductStore do
         @index
       )
 
-  def index_product_to_es(product, true),
+  # Incase product is not in active state, then delete the product
+  defp update_sellable_product_to_es(product, :create),
+    do: Elasticsearch.delete_document(EC, product, @index)
+
+  defp update_sellable_product_to_es(product, :delete),
     do: Elasticsearch.delete_document(EC, product, @index)
 
   def search_products(query),

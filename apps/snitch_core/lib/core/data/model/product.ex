@@ -49,7 +49,7 @@ defmodule Snitch.Data.Model.Product do
   end
 
   @doc """
-  Updates the default image for a given product 
+  Updates the default image for a given product
   from the given list of images.
   """
   def update_default_image(product, default_image) do
@@ -99,7 +99,7 @@ defmodule Snitch.Data.Model.Product do
 
     Product
     |> join(:left, [p], v in Variation, v.child_product_id == p.id)
-    |> where([p, v], p.state != "in_active" and p.id not in ^parent_product_ids)
+    |> where([p, v], p.state == "active" and p.id not in ^parent_product_ids)
   end
 
   @spec get_product_with_default_image(Product.t()) :: Product.t()
@@ -157,7 +157,7 @@ defmodule Snitch.Data.Model.Product do
   @spec update(Product.t(), map) :: {:ok, Product.t()} | {:error, Ecto.Changeset.t()}
   def update(product, params) do
     with {:ok, product} <- QH.update(Product, params, product, Repo) do
-      ESProductStore.index_product_to_es(product)
+      ESProductStore.update_product_to_es(product)
       {:ok, product}
     else
       {:error, error} -> {:error, error}
