@@ -107,7 +107,7 @@ defmodule SnitchApiWeb.ProductView do
         images
         |> Enum.map(fn image -> %{
           "small" => ImageModel.image_url(image.name, product, :small),
-          "thumb" => ImageModel.image_url(image.name, product, :thumb)
+          "thumb" => ImageModel.image_url(image.name, product, :thumb),
           "large" => ImageModel.image_url(image.name, product, :large)
         } end)
     end
