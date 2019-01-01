@@ -69,7 +69,7 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
     paths = gen_taxon_path(taxon.parent) ++ [taxon.name]
 
     %{
-      direct_parents: [taxon.parent.name],
+      direct_parent: taxon.name,
       all_parents: paths,
       paths: Enum.join(paths, ":")
     }

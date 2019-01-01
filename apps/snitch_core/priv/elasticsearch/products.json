@@ -8,7 +8,7 @@
             "all_parents" : {
               "type" : "keyword"
             },
-            "direct_parents" : {
+            "direct_parent" : {
               "type" : "keyword"
             },
             "paths" : {
