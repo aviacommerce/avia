@@ -66,7 +66,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
           "path" => "category",
           "query" => %{
             "bool" => %{
-              "should" =>
+              "must" =>
                 Enum.map(values, fn val ->
                   %{
                     "match" => %{
