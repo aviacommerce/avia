@@ -109,6 +109,18 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
 
   defp aggregate_query() do
     %{
+      "category" => %{
+        "nested" => %{
+          "path" => "category"
+        },
+        "aggs" => %{
+          "aggregations" => %{
+            "terms" => %{
+              "script" => "'Category|' + doc['category.direct_parent'].value"
+            }
+          }
+        }
+      },
       "filters" => %{
         "nested" => %{
           "path" => "string_facet"
@@ -117,6 +129,25 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
           "aggregations" => %{
             "terms" => %{
               "script" => "doc['string_facet.id'].value + '|' + doc['string_facet.value'].value"
+            }
+          }
+        }
+      },
+      "range_filters" => %{
+        "nested" => %{
+          "path" => "number_facet"
+        },
+        "aggs" => %{
+          "aggregations" => %{
+            "terms" => %{
+              "field" => "number_facet.id"
+            },
+            "aggs" => %{
+              "facet_value" => %{
+                "stats" => %{
+                  "field" => "number_facet.value"
+                }
+              }
             }
           }
         }
@@ -224,11 +255,20 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
 
   defp format_aggregations(aggregations) do
     %{
-      "filters" => %{"aggregations" => %{"buckets" => filters}}
+      "category" => %{"aggregations" => %{"buckets" => categories}},
+      "filters" => %{"aggregations" => %{"buckets" => filters}},
+      "range_filters" => %{"aggregations" => %{"buckets" => range_filters}}
     } = aggregations
 
+    # Skip categories if only one category
+    categories = case categories do
+      [_] -> []
+      _ -> categories
+    end
+
     %{
-      "filters" => format_id_value_key_aggs(filters)
+      "filters" => format_id_value_key_aggs(categories ++ filters),
+      "range_filters" => fomart_range_aggs(range_filters)
     }
   end
 
@@ -245,6 +285,32 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
             "filterValues" => [
               %{
                 "id" => value,
+                "count" => count,
+                "meta" => ""
+              }
+              | (acc[id] && acc[id]["filterValues"]) || []
+            ]
+          }
+        })
+      end
+    )
+    |> Map.values()
+  end
+
+  defp fomart_range_aggs(filters) do
+    filters
+    |> Enum.reduce(
+      %{},
+      fn %{"key" => id, "doc_count" => count, "facet_value" => %{"min" => min, "max"=> max}}, acc ->
+
+        Map.merge(acc, %{
+          id => %{
+            "id" => id,
+            "min" => min,
+            "max" => max,
+            "filterValues" => [
+              %{
+                "id" => id,
                 "count" => count,
                 "meta" => ""
               }
