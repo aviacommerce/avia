@@ -64,6 +64,13 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
     ]
   end
 
+  defp gen_category_info(nil),
+    do: %{
+      direct_parent: "Other",
+      all_parents: ["Other"],
+      paths: "Other"
+    }
+
   defp gen_category_info(taxon) do
     taxon = Repo.preload(taxon, :parent)
     paths = gen_taxon_path(taxon.parent) ++ [taxon.name]
