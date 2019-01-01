@@ -122,7 +122,7 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
 
   defp image_map(product, image) do
     %{
-      product_url: ImageModel.image_url(image.name, product)
+      product_url: ImageModel.image_url(image.name, product, :thumb)
     }
   end
 
