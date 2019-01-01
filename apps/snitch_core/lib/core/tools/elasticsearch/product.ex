@@ -163,6 +163,7 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
       |> Decimal.div(product.max_retail_price.amount)
       |> Decimal.mult(100)
       |> Decimal.round(0)
+      |> Decimal.abs()
       |> Decimal.to_integer()
     rescue
       _ -> 0
