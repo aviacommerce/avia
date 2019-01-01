@@ -355,7 +355,6 @@
           <div class="label-txt">Total count for all the products at all stock locations</div>
         </label>
         <div class="col-sm-6">
-          <p><%= count_on_hand(@conn) %></p>
         </div>
       </div>
 

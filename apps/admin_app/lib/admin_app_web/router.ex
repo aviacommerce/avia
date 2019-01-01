@@ -146,7 +146,12 @@ defmodule AdminAppWeb.Router do
     get("/taxon/:taxon_id/aggregate", TaxonomyController, :taxon_delete_aggregate)
     put("/taxonomy/update", TaxonomyController, :update_taxon)
     post("/product_option_values/:id", OptionTypeController, :update)
-    post("/stock", StockController, :update_stock)
+  end
+
+  scope "/api", AdminAppWeb.Api do
+    pipe_through(:api)
+
+    post("/stock", StockController, :get_stock)
   end
 
   scope "/", AdminAppWeb do

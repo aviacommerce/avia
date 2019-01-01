@@ -17,6 +17,7 @@ export default class View extends MainView {
     setSelectedInventoryTracking();
     setupProductTracking();
     handleInventoryTrackingToggle();
+    handleStockForProductLevel();
   }
 
   unmount() {
@@ -29,6 +30,43 @@ export default class View extends MainView {
 
 var selDiv;
 var storedFile = [];
+
+export function handleStockForProductLevel() {
+  let stockLocationId = $("#product_tracking #stock_stock_location_id").val();
+  let productId = $("#product_tracking #stock_product_id").val();
+
+  getStockForProductLevel(productId, stockLocationId)
+
+  $("#product_tracking #stock_stock_location_id").on("change", function() {
+      let stockLocationId = this.value
+      let productId = $("#product_tracking #stock_product_id").val();
+
+      getStockForProductLevel(productId, stockLocationId)
+  })
+}
+
+export function getStockForProductLevel(productId, stockLocationId) {
+  $.ajax({
+    url: `/api/stock`,
+    type: "POST",
+    data: {product_id: productId, stock_location_id: stockLocationId},
+    success: function(json) {
+      let $stock_level = $("#product_tracking #stock_count_on_hand");
+      let $low_stock_level = $("#product_tracking #stock_inventory_warning_level")
+
+      let stock_level = 0;
+      let low_stock_level = 0;
+
+      if(json.data.length > 0){
+        stock_level = json.data[0].count_on_hand;
+        low_stock_level = json.data[0].inventory_warning_level;
+      }
+
+      $stock_level.val(stock_level);
+      $low_stock_level.val(low_stock_level);
+    }
+  });
+}
 
 export function handleInventoryTrackingToggle() {
   const inventory_tracking = $(

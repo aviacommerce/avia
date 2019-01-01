@@ -88,4 +88,13 @@ defmodule Snitch.Data.Model.StockItem do
       on: st.stock_location_id == sl.id and sl.active == true
     )
   end
+
+  def get_stock(product_id, stock_location_id) do
+    from(
+      st in StockItemSchema,
+      where: st.product_id == ^product_id and st.stock_location_id == ^stock_location_id,
+      select: st
+    )
+    |> Repo.all()
+  end
 end
