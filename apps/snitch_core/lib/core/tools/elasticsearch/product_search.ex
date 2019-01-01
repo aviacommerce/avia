@@ -282,13 +282,13 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
         Map.merge(acc, %{
           id => %{
             "id" => id,
-            "filterValues" => [
+            "values" => [
               %{
                 "id" => value,
                 "count" => count,
                 "meta" => ""
               }
-              | (acc[id] && acc[id]["filterValues"]) || []
+              | (acc[id] && acc[id]["values"]) || []
             ]
           }
         })
@@ -308,13 +308,13 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
             "id" => id,
             "min" => min,
             "max" => max,
-            "filterValues" => [
+            "values" => [
               %{
                 "id" => id,
                 "count" => count,
                 "meta" => ""
               }
-              | (acc[id] && acc[id]["filterValues"]) || []
+              | (acc[id] && acc[id]["values"]) || []
             ]
           }
         })
