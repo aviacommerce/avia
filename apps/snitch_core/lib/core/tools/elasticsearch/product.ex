@@ -163,10 +163,14 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
       |> Decimal.div(product.max_retail_price.amount)
       |> Decimal.mult(100)
       |> Decimal.round(0)
-      |> Decimal.abs()
       |> Decimal.to_integer()
+      |> format_discount()
     rescue
       _ -> 0
     end
   end
+
+  defp format_discount(discount) when discount > 100, do: 100
+  defp format_discount(discount) when discount < 0, do: 0
+  defp format_discount(discount), do: discount
 end
