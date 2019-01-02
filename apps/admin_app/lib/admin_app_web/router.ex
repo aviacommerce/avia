@@ -152,6 +152,7 @@ defmodule AdminAppWeb.Router do
     pipe_through(:api)
 
     post("/stock", StockController, :get_stock)
+    post("/stock_update", StockController, :update_stock)
   end
 
   scope "/", AdminAppWeb do

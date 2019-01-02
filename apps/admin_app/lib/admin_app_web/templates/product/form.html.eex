@@ -15,7 +15,7 @@
    <%= if  @conn.request_path != product_path(@conn, :new) do %>
    <%= if !is_child_product(@parent_product) do %>
     <li class="nav-item">
-      <a class="nav-link" href="#tab2default" data-toggle="tab">Variants</a>
+      <a class="nav-link" href="#options_tab" data-toggle="tab">Option and SKU's</a>
     </li>
    <% end %>
    <%= if can_add_variant(@parent_product) do %>
@@ -205,65 +205,151 @@
 
   <%= if  @conn.request_path != product_path(@conn, :new) do %>
    <%= if can_add_variant(@parent_product)  do %>
-    <div class="tab-pane fade p-3" id="tab2default" >
-      <div style="background: #f8f9fa;">
-        <div class="form-group required">
-          <label>Variation Theme</label>
-          <%= select :theme, :theme_id, themes_options(@parent_product), selected: @parent_product.theme_id ,prompt: "", class: "form-control", id: "product_theme_id" %>
-        </div>
-        <div id="variation_options" style="padding: 10px 0px 10px 0px;"></div>
-        <div class="modal fade" id="theme_change_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Warning</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <div class="alert alert-danger" role="alert">
-                  Changing the variation theme would remove all the existing variants,
-                  are you sure you want to proceed?
+    <div class="tab-pane fade p-3" id="options_tab" >
+      <div class="row">
+        <div class="col-3">
+            <!-- required for floating -->
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs tabs-left">
+                <li class="active"><a href="#options" data-toggle="tab">Options</a></li>
+                <li><a href="#skus" data-toggle="tab">SKU's</a></li>
+              </ul>
+            </div>
+        <div class="col-9">
+              <!-- Tab panes -->
+          <div class="tab-content">
+              <div class="tab-pane active" id="options">
+                <div style="background: #f8f9fa;">
+                  <div class="form-group required">
+                    <label>Variation Theme</label>
+                    <%= select :theme, :theme_id, themes_options(@parent_product), selected: @parent_product.theme_id ,prompt: "", class: "form-control", id: "product_theme_id" %>
+                  </div>
+                  <div id="variation_options" style="padding: 10px 0px 10px 0px;"></div>
+                  <div class="modal fade" id="theme_change_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLongTitle">Warning</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <div class="alert alert-danger" role="alert">
+                            Changing the variation theme would remove all the existing variants,
+                            are you sure you want to proceed?
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+                          <button id="theme_change_confirm" type="button" class="btn btn-primary">Yes</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
-                <button id="theme_change_confirm" type="button" class="btn btn-primary">Yes</button>
+
+              <div class="tab-pane" id="skus">
+                <%= if has_variants(@parent_product) do %>
+                <div class="product_has_variants">
+                  <h3>Product Variants</h3>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <%= for option_type <- get_option_types(@parent_product) do %>
+                        <th><%= option_type.display_name %></th>
+                        <% end %>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <%= for variant <- @parent_product.variants do %>
+                      <tr>
+                        <%= for option <- variant.options do %>
+                        <td class="option-value" contenteditable="true" data-option_value_id="<%= option.id %>"><%= option.value %></td>
+                        <% end %>
+                        <td>
+                          <%= link("Edit", to: product_path(@conn, :edit, variant.id), class: "btn btn-primary") %>
+                          <button name="variant_stock_add" type="button" class="btn btn-primary" data-prdouct-id="<%= variant.id %>">Add stock</button>
+                        </td>
+                      </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
+              <% end %>
+
+              <div class="modal fade" id="variant_stock_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLongTitle">Warning</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <div id="variant_tracking" class="card m-2">
+                        <%= hidden_input :stock, :product_id, value: @parent_product.id, class: "form-control" %>
+                        <div class="col-12">
+                          <div class="form-group row">
+                            <label class="col-sm-6">
+                              <div class="label required">
+                                Stock Location
+                              </div>
+                            </label>
+                            <div class="col-sm-6">
+                              <div class="form-group">
+                                <%= select :stock, :stock_location_id, active_stock_locaton(), class: "form-control" %>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-6">
+                              <div class="label required">
+                                Current Stock Level
+                              </div>
+                              <div class="label-txt">
+                                How many units of this product do you currently have in stock?
+                              </div>
+                            </label>
+                            <div class="col-sm-6">
+                              <div class="form-group">
+                                <%= text_input :stock, :count_on_hand, class: "form-control" %>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-6">
+                              <div class="label">
+                                Low Stock Level
+                              </div>
+                              <div class="label-txt">
+                                When inventory levels fall below this number, the product option will be flagged as low stock.
+                              </div>
+                            </label>
+                            <div class="col-sm-6">
+                              <div class="form-group">
+                                <%= text_input :stock, :inventory_warning_level, class: "form-control" %>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+                      <button id="variant_stock_confirm" type="button" class="btn btn-primary">Yes</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               </div>
             </div>
-          </div>
         </div>
       </div>
-      <%= if has_variants(@parent_product) do %>
-      <div class="product_has_variants">
-        <h3>Product Variants</h3>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Product ID</th>
-              <%= for option_type <- get_option_types(@parent_product) do %>
-              <th><%= option_type.display_name %></th>
-              <% end %>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <%= for variant <- @parent_product.variants do %>
-            <tr>
-              <td><%= variant.id %></td>
-              <%= for option <- variant.options do %>
-              <td class="option-value" contenteditable="true" data-option_value_id="<%= option.id %>"><%= option.value %></td>
-              <% end %>
-              <td>
-                <%= link("Edit", to: product_path(@conn, :edit, variant.id), class: "btn btn-primary") %>
-              </td>
-            </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-      <% end %>
     </div>
    <% else %>
     <%= if !is_child_product(@parent_product) do %>

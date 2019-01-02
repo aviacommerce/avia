@@ -12,7 +12,7 @@ defmodule Snitch.Domain.Inventory do
 
   def add_stock(product, stock_params) do
     with {:ok, stock} <- check_stock(product.id, stock_params["stock_location_id"]),
-         {:ok, updated_stock} <- StockModel.update(stock, stock_params) do
+         {:ok, updated_stock} <- StockModel.update(stock_params, stock) do
       {:ok, updated_stock}
     end
   end

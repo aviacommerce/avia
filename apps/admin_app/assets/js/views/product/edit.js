@@ -17,7 +17,8 @@ export default class View extends MainView {
     setSelectedInventoryTracking();
     setupProductTracking();
     handleInventoryTrackingToggle();
-    handleStockForProductLevel();
+    handleStockForProductTracking();
+    handleStockForVariantTracking();
   }
 
   unmount() {
@@ -31,39 +32,113 @@ export default class View extends MainView {
 var selDiv;
 var storedFile = [];
 
-export function handleStockForProductLevel() {
+export function handleStockForVariantTracking() {
+  $(":button[name=variant_stock_add]").click(function() {
+    let productId = $(this).attr("data-prdouct-id");
+    $("#variant_tracking #stock_product_id").val(productId);
+
+    let stockLocationId = $("#variant_tracking #stock_stock_location_id").val();
+    getStockForVariantLevel(productId, stockLocationId);
+
+    $("#variant_stock_modal").modal(`show`);
+  });
+
+  $("#variant_tracking #stock_stock_location_id").on("change", function() {
+    let stockLocationId = this.value;
+    let productId = $("#variant_tracking #stock_product_id").val();
+
+    getStockForVariantLevel(productId, stockLocationId);
+  });
+
+  $("#variant_stock_modal #variant_stock_confirm").click(function() {
+    let productId = $("#variant_tracking #stock_product_id").val();
+    let stockLocationId = $("#variant_tracking #stock_stock_location_id").val();
+    let stockLevel = $("#variant_tracking #stock_count_on_hand").val();
+    let lowStockLevel = $(
+      "#variant_tracking #stock_inventory_warning_level"
+    ).val();
+
+    const data = {
+      stock: {
+        product_id: productId,
+        stock_location_id: stockLocationId,
+        count_on_hand: stockLevel,
+        inventory_warning_level: lowStockLevel
+      }
+    };
+
+    $.ajax({
+      url: `/api/stock_update`,
+      type: "POST",
+      data: data,
+      success: function(json) {
+        $("#variant_stock_modal").modal(`hide`);
+        window.location.reload();
+      }
+    });
+  });
+}
+
+export function getStockForVariantLevel(productId, stockLocationId) {
+  $.ajax({
+    url: `/api/stock`,
+    type: "POST",
+    data: { product_id: productId, stock_location_id: stockLocationId },
+    success: function(json) {
+      let $stockLevel = $("#variant_tracking #stock_count_on_hand");
+      let $lowStockLevel = $(
+        "#variant_tracking #stock_inventory_warning_level"
+      );
+
+      let stockLevel = 0;
+      let lowStockLevel = 0;
+
+      if (json.data.length > 0) {
+        stockLevel = json.data[0].count_on_hand;
+        lowStockLevel = json.data[0].inventory_warning_level;
+      }
+
+      $stockLevel.val(stockLevel);
+      $lowStockLevel.val(lowStockLevel);
+    }
+  });
+}
+
+export function handleStockForProductTracking() {
   let stockLocationId = $("#product_tracking #stock_stock_location_id").val();
   let productId = $("#product_tracking #stock_product_id").val();
 
-  getStockForProductLevel(productId, stockLocationId)
+  getStockForProductLevel(productId, stockLocationId);
 
   $("#product_tracking #stock_stock_location_id").on("change", function() {
-      let stockLocationId = this.value
-      let productId = $("#product_tracking #stock_product_id").val();
+    let stockLocationId = this.value;
+    let productId = $("#product_tracking #stock_product_id").val();
 
-      getStockForProductLevel(productId, stockLocationId)
-  })
+    getStockForProductLevel(productId, stockLocationId);
+  });
 }
 
 export function getStockForProductLevel(productId, stockLocationId) {
   $.ajax({
     url: `/api/stock`,
     type: "POST",
-    data: {product_id: productId, stock_location_id: stockLocationId},
+    data: { product_id: productId, stock_location_id: stockLocationId },
     success: function(json) {
-      let $stock_level = $("#product_tracking #stock_count_on_hand");
-      let $low_stock_level = $("#product_tracking #stock_inventory_warning_level")
+      let $stockLevel = $("#product_tracking #stock_count_on_hand");
+      let $lowStockLevel = $(
+        "#product_tracking #stock_inventory_warning_level"
+      );
 
-      let stock_level = 0;
-      let low_stock_level = 0;
+      let stockLevel = 0;
+      let lowStockLevel = 0;
 
-      if(json.data.length > 0){
-        stock_level = json.data[0].count_on_hand;
-        low_stock_level = json.data[0].inventory_warning_level;
+      if (json.data.length > 0) {
+        stockLevel = json.data[0].count_on_hand;
+        lowStockLevel = json.data[0].inventory_warning_level;
       }
 
-      $stock_level.val(stock_level);
-      $low_stock_level.val(low_stock_level);
+      $stockLevel.val(stockLevel);
+      $lowStockLevel.val(lowStockLevel);
     }
   });
 }
