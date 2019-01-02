@@ -50,7 +50,7 @@ defmodule Snitch.Tools.Helper.ImageUploader do
   Overrides the storage directory where images would be stored.
   """
   def storage_dir(_version, {_file, scope}) do
-    tenant = Repo.get_prefix
+    tenant = Repo.get_prefix()
     scope_dir = get_scope_name(scope) <> "_" <> tenant
     "uploads/images/#{scope_dir}/#{scope.id}/images/"
   end
