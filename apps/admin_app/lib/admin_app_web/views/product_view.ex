@@ -64,7 +64,7 @@ defmodule AdminAppWeb.ProductView do
   end
 
   def get_brand_options(brands) do
-    Enum.map(brands, fn brand -> {brand.name, brand.id} end)
+    Enum.map(brands, &{&1.name, &1.id})
   end
 
   def get_amount(nil) do
