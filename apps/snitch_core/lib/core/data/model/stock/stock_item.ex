@@ -94,6 +94,10 @@ defmodule Snitch.Data.Model.StockItem do
     )
   end
 
+  @doc """
+  Returns the stock items for a particular product and stock location
+  """
+  @spec get_stock(integer, integer) :: [StockItemSchema.t()]
   def get_stock(product_id, stock_location_id) do
     from(
       st in StockItemSchema,
