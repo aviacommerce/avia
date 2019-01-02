@@ -10,7 +10,7 @@
       <a class="nav-link active" href="#tab1default" data-toggle="tab">Product Detail</a>
    </li>
    <%= if  @conn.request_path != product_path(@conn, :new) do %>
-   <%= if !is_child_product(@parent_product) do %>
+   <%= unless is_child_product(@parent_product) do %>
     <li class="nav-item">
       <a class="nav-link" href="#inventory_tab" data-toggle="tab">Inventory</a>
     </li>

@@ -55,8 +55,8 @@
                    Export Orders
                   </a>
                   <div class="dropdown-menu dropdown-menu-right">
-                    <%= link("CSV", to: order_path(@conn, :export_order, %{"type" => "csv"}), class: "dropdown-item")%>
-                    <%= link("XLSX", to: order_path(@conn, :export_order, %{"type" => "xlsx"}), class: "dropdown-item")%>
+                    <%= link("CSV", to: order_path(@conn, :export_order, %{"format" => "csv"}), class: "dropdown-item")%>
+                    <%= link("XLSX", to: order_path(@conn, :export_order, %{"format" => "xlsx"}), class: "dropdown-item")%>
                   </div>
                </div>
             </div>

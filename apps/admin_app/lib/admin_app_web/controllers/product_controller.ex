@@ -9,6 +9,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Domain.Taxonomy
   alias Snitch.Tools.Helper.Rummage, as: RummageHelper
   alias Snitch.Domain.Inventory
+  alias Snitch.Tools.ElasticSearch.ProductStore, as: ESProductStore
 
   alias Snitch.Data.Schema.{
     Image,
@@ -122,6 +123,22 @@ defmodule AdminAppWeb.ProductController do
     redirect_with_updated_conn(conn, params)
   end
 
+  def toggle_variant_state(conn, %{"state" => state, "id" => product_id}) do
+    product = ProductModel.get(%{id: product_id})
+
+    case ProductModel.update(product, %{state: state}) do
+      {:ok, _} ->
+        conn
+        |> put_status(200)
+        |> json(%{state: state})
+
+      {:error, reason} ->
+        conn
+        |> put_flash(:error, reason)
+        |> json(%{state: "error occured"})
+    end
+  end
+
   defp get_html_string(product, image) do
     render_to_string(
       ProductView,
@@ -140,25 +157,12 @@ defmodule AdminAppWeb.ProductController do
   def update_default_image(conn, %{"product_id" => id, "default_image" => default_image}) do
     product = preload_product_images(id)
 
-    for image <- product.images do
-      if to_string(image.id) == default_image do
-        attrs = %{is_default: true}
-        update_image(attrs, image)
-      else
-        attrs = %{is_default: false}
-        update_image(attrs, image)
-      end
-    end
+    ProductModel.update_default_image(product, default_image)
+    ESProductStore.index_product_to_es(product)
 
     conn
     |> put_status(200)
     |> json(%{msg: "Update successful"})
-  end
-
-  defp update_image(attrs, image) do
-    image
-    |> Image.update_changeset(attrs)
-    |> Repo.update()
   end
 
   def add_images(conn, %{"product_images" => product_images, "product_id" => id}) do
@@ -171,14 +175,15 @@ defmodule AdminAppWeb.ProductController do
     params = %{"images" => images}
 
     case ProductModel.add_images(product, params) do
-      {:ok, _} ->
+      {:ok, updated_product} ->
+        ESProductStore.index_product_to_es(updated_product)
         associated_images = product.images
         product = product |> Repo.preload(:images, force: true)
 
         product_images =
           case Enum.empty?(associated_images) do
             true ->
-              update_image(%{is_default: true}, product.images |> List.first())
+              ImageModel.update(%{is_default: true}, product.images |> List.first())
               product = product |> Repo.preload(:images, force: true)
               product.images
 
@@ -214,6 +219,10 @@ defmodule AdminAppWeb.ProductController do
 
     case ProductModel.delete_image(product_id, image_id) do
       {:ok, _} ->
+        product_id
+        |> ProductModel.get()
+        |> ESProductStore.index_product_to_es()
+
         conn
         |> put_status(200)
         |> json(%{data: "success"})
@@ -257,6 +266,7 @@ defmodule AdminAppWeb.ProductController do
              "theme_id" => params["theme_id"]
            }) do
       {:ok, _product} = Repo.update(changeset)
+      ESProductStore.index_product_to_es(parent_product)
       redirect(conn, to: product_path(conn, :edit, params["product_id"]))
     else
       _ ->
@@ -333,6 +343,23 @@ defmodule AdminAppWeb.ProductController do
       end)
 
     generate_option_combinations(tail, result)
+  end
+
+  def export_product(conn, %{"format" => format}) do
+    current_user = Guardian.Plug.current_resource(conn)
+
+    params =
+      Map.put(
+        %{"type" => "product", "format" => format, "user" => current_user},
+        "tenant",
+        Repo.get_prefix()
+      )
+
+    Honeydew.async({:export_data, [params]}, :export_data_queue)
+
+    conn
+    |> put_flash(:info, "Your request is accepted. Data will be emailed shortly")
+    |> redirect(to: page_path(conn, :index))
   end
 
   def load_resources(conn, _opts) do
