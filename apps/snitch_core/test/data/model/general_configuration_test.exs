@@ -47,7 +47,7 @@ defmodule Snitch.Data.Model.GeneralConfigurationTest do
     test "successfully along with image", %{image_params: ip, valid_params: vp} do
       vp = vp |> Map.put("image", ip)
       assert {:ok, general_config} = GCModel.create(vp)
-      path = Path.wildcard("uploads/images/**/#{general_config.id}/") |> List.first()
+      path = Path.wildcard("uploads/**/images/**/#{general_config.id}/") |> List.first()
       cleanup(path)
     end
 
@@ -71,7 +71,7 @@ defmodule Snitch.Data.Model.GeneralConfigurationTest do
       gc = gc |> Repo.preload(:image)
       params = %{} |> Map.put("image", new_image)
       assert {:ok, general_config} = GCModel.update(gc, params)
-      path = Path.wildcard("uploads/images/**/#{general_config.id}") |> List.first()
+      path = Path.wildcard("uploads/**/images/**/#{general_config.id}") |> List.first()
       cleanup(path)
     end
 
