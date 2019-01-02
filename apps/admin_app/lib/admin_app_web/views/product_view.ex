@@ -107,11 +107,11 @@ defmodule AdminAppWeb.ProductView do
   end
 
   def get_variant_option(variants) do
-    Enum.map(variants, fn variant -> {variant.name, variant.id} end)
+    Enum.map(variants, &{&1.name, &1.id})
   end
 
   def get_stock_locations_option(locations) do
-    Enum.map(locations, fn location -> {location.name, location.id} end)
+    Enum.map(locations, &{&1.name, &1.id})
   end
 
   def get_shipping_category() do
