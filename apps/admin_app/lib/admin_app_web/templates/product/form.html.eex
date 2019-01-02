@@ -10,12 +10,10 @@
       <a class="nav-link active" href="#tab1default" data-toggle="tab">Product Detail</a>
    </li>
    <%= if  @conn.request_path != product_path(@conn, :new) do %>
-   <li class="nav-item">
-     <a class="nav-link" href="#inventory_tab" data-toggle="tab">Inventory</a>
-   </li>
-   <% end %>
-   <%= if  @conn.request_path != product_path(@conn, :new) do %>
    <%= if !is_child_product(@parent_product) do %>
+    <li class="nav-item">
+      <a class="nav-link" href="#inventory_tab" data-toggle="tab">Inventory</a>
+    </li>
     <li class="nav-item">
       <a class="nav-link" href="#options_tab" data-toggle="tab">Option and SKU's</a>
     </li>
@@ -127,7 +125,7 @@
     <% end %>
   </div>
 
-  <%= if  @conn.request_path != product_path(@conn, :new) do %>
+  <%= if  @conn.request_path != product_path(@conn, :new) and !is_child_product(@parent_product) do %>
     <div class="tab-pane p-3 fade in show p-3" id="inventory_tab">
     <%= form_for @changeset, product_path(@conn, :update_inventory_tracking, @parent_product), [multipart: true, method: "patch"], fn f ->  %>
       <fieldset id="inventory_tracking" data-selected="<%= @parent_product.inventory_tracking %>" >
@@ -204,7 +202,7 @@
   </div>
   <% end %>
 
-  <%= if  @conn.request_path != product_path(@conn, :new) do %>
+  <%= if  @conn.request_path != product_path(@conn, :new) and !is_child_product(@parent_product) do %>
     <div class="tab-pane fade p-3" id="options_tab" >
       <div class="row">
         <div class="col-3">
