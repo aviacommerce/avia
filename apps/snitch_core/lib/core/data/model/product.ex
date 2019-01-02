@@ -253,10 +253,10 @@ defmodule Snitch.Data.Model.Product do
   @spec add_images(Product.t(), map) :: {:ok, map} | {:error, any()}
   def add_images(product, params) do
     Multi.new()
-    |> Multi.run(:product, fn _ ->
+    |> Multi.run(:struct, fn _ ->
       QH.update(Product, params, product, Repo)
     end)
-    |> Multi.run(:store_image, fn %{product: product} ->
+    |> Multi.run(:store_image, fn %{struct: product} ->
       store_images(product, params)
     end)
     |> ImageModel.persist()
