@@ -5,11 +5,19 @@ defmodule Snitch.Domain.Inventory do
 
   alias Snitch.Data.Model.StockItem, as: StockModel
   alias Snitch.Data.Schema.StockItem, as: StockSchema
+  alias Snitch.Data.Schema.Product
   alias Snitch.Data.Model.Product, as: ProductModel
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
   use Snitch.Domain
 
+  @doc """
+  Updates the stock with stock fields passed for a product
+
+  If the stock item is not present for a particular product and stock location,
+  it created and then updated with the stock item params.
+  """
+  @spec add_stock(Product.t(), map) :: {:ok, StockSchema.t()} | {:error, Ecto.Changeset.t()}
   def add_stock(product, stock_params) do
     with {:ok, stock} <- check_stock(product.id, stock_params["stock_location_id"]),
          {:ok, updated_stock} <- StockModel.update(stock_params, stock) do
