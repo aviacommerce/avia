@@ -39,7 +39,6 @@ defmodule Snitch.Tools.ElasticSearch.ProductStore do
 
       query =
         PM.sellable_products_query()
-        |> where([p, v], is_nil(p.deleted_at))
         |> select([p, v], merge(p, %{tenant: ^tenant}))
         |> preload([], ^@preload)
 
