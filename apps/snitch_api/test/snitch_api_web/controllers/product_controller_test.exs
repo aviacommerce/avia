@@ -33,7 +33,7 @@ defmodule SnitchApiWeb.ProductControllerTest do
 
   test "shows chosen resource product", %{conn: conn, taxon: taxon} do
     product = insert(:product, state: "active", taxon: taxon)
-    ProductStore.index_product_to_es(product)
+    ProductStore.update_product_to_es(product)
     :timer.sleep(1000)
     conn = get(conn, product_path(conn, :show, product.slug))
 
@@ -47,7 +47,7 @@ defmodule SnitchApiWeb.ProductControllerTest do
     product1 = insert(:product, state: "active", taxon: taxon)
     product2 = insert(:product, state: "active", taxon: taxon)
     product3 = insert(:product, state: "active", taxon: taxon)
-    Enum.map([product1, product2, product3], &ProductStore.index_product_to_es/1)
+    Enum.map([product1, product2, product3], &ProductStore.update_product_to_es/1)
     :timer.sleep(1000)
 
     params = %{
@@ -67,7 +67,7 @@ defmodule SnitchApiWeb.ProductControllerTest do
 
   test "Products, sort by newly inserted", %{conn: conn, taxon: taxon} do
     product = insert(:product, state: "active", taxon: taxon)
-    ProductStore.index_product_to_es(product)
+    ProductStore.update_product_to_es(product)
     :timer.sleep(1000)
 
     params = %{

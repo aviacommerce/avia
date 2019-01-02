@@ -53,7 +53,9 @@ defmodule Snitch.Tools.ElasticSearch.ProductStore do
     result
   end
 
-  def update_product_to_es(id, action \\ :create) when is_binary(id),
+  def update_product_to_es(id, action \\ :create)
+
+  def update_product_to_es(id, action) when is_binary(id),
     do: update_product_to_es(PM.get(id), action)
 
   def update_product_to_es(product, action) when is_map(product) do
@@ -75,7 +77,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductStore do
     end
   end
 
-  defp update_sellable_product_to_es(%{state: :active} = product, :create),
+  defp update_sellable_product_to_es(%{state: :active, deleted_at: nil} = product, :create),
     do:
       Elasticsearch.put_document!(
         EC,

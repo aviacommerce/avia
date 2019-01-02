@@ -97,19 +97,23 @@ defmodule SnitchApiWeb.ProductView do
   defp get_images(images, product) do
     case images do
       [] ->
-        [%{
-          "small" => "",
-          "thumb" => "",
-          "large" => ""
-        }]
+        [
+          %{
+            "small" => "",
+            "thumb" => "",
+            "large" => ""
+          }
+        ]
 
       images ->
         images
-        |> Enum.map(fn image -> %{
-          "small" => ImageModel.image_url(image.name, product, :small),
-          "thumb" => ImageModel.image_url(image.name, product, :thumb),
-          "large" => ImageModel.image_url(image.name, product, :large)
-        } end)
+        |> Enum.map(fn image ->
+          %{
+            "small" => ImageModel.image_url(image.name, product, :small),
+            "thumb" => ImageModel.image_url(image.name, product, :thumb),
+            "large" => ImageModel.image_url(image.name, product, :large)
+          }
+        end)
     end
   end
 
