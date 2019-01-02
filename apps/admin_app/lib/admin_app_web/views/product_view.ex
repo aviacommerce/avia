@@ -29,7 +29,7 @@ defmodule AdminAppWeb.ProductView do
   end
 
   def themes_options(product) do
-    Enum.map(product.taxon.variation_themes, fn theme -> {theme.name, theme.id} end)
+    Enum.map(product.taxon.variation_themes, &{&1.name, &1.id})
   end
 
   def can_add_variant(product) do
