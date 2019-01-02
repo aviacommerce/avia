@@ -7,7 +7,7 @@ defmodule Snitch.Tools.Helper.ImageUploader do
   use Arc.Definition
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
-  @versions [:original]
+  @versions [:thumb, :large, :small]
 
   # function override to store images locally.
   def __storage do
@@ -22,37 +22,22 @@ defmodule Snitch.Tools.Helper.ImageUploader do
     ~w(.jpg .jpeg .gif .png) |> Enum.member?(file_extension)
   end
 
-  def transform(:original, _) do
-    {:convert,
-     fn input, output ->
-       """
-       -filter Triangle
-       -define filter:support=2
-       -thumbnail 600x800
-       -unsharp 0.25x0.25+8+0.065
-       -dither None
-       -posterize 136
-       -quality 82
-       -define jpeg:fancy-upsampling=off
-       -define png:compression-filter=5
-       -define png:compression-level=9
-       -define png:compression-strategy=1
-       -define png:exclude-chunk=all
-       -interlace none
-       -colorspace sRGB
-       -strip #{input}
-       -format jpg jpg:#{output}
-       """
-     end, :jpg}
+  def transform(:large, _) do
+    {:convert, &image_formatter(&1, &2, "600x800"), :jpg}
   end
 
-  @doc """
-  Overrides the storage directory where images would be stored.
-  """
-  def storage_dir(_version, {_file, scope}) do
+  def transform(:small, _) do
+    {:convert, &image_formatter(&1, &2, "90x120"), :jpg}
+  end
+
+  def transform(:thumb, _) do
+    {:convert, &image_formatter(&1, &2, "210x280"), :jpg}
+  end
+
+  def storage_dir(version, {_file, scope}) do
     tenant = Repo.get_prefix()
     scope_dir = get_scope_name(scope)
-    "uploads/#{tenant}/images/#{scope_dir}/#{scope.id}/images/"
+    "uploads/#{tenant}/images/#{scope_dir}/#{scope.id}/images/#{version}"
   end
 
   defp get_scope_name(scope) do
@@ -62,5 +47,29 @@ defmodule Snitch.Tools.Helper.ImageUploader do
     |> Enum.reverse()
     |> hd
     |> String.downcase()
+  end
+
+  defp image_formatter(input, output, size) do
+    """
+    #{input}
+    -filter Triangle
+    -define filter:support=2
+    -thumbnail #{size}
+    -unsharp 0.25x0.25+8+0.065
+    -dither None
+    -posterize 136
+    -quality 85
+    -define jpeg:fancy-upsampling=off
+    -define png:compression-filter=5
+    -define png:compression-level=9
+    -define png:compression-strategy=1
+    -define png:exclude-chunk=all
+    -interlace Plane
+    -colorspace sRGB
+    -background white
+    -alpha remove
+    -strip
+    -format jpg jpg:#{output}
+    """
   end
 end
