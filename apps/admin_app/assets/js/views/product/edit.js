@@ -212,24 +212,35 @@ export function imageOnEnter() {
 }
 
 export function setVariantState() {
-  $(".product_variants").each(function(){
-    var state = $(this).find('.variant_state').text();
-    $(this).find(`.switch-input[id=${state}]`).closest('label').addClass('active'); 
-  }); 
+  $(".product_variants").each(function() {
+    var state = $(this)
+      .find(".variant_state")
+      .text();
+    $(this)
+      .find(`.switch-input[id=${state}]`)
+      .closest("label")
+      .addClass("active");
+  });
 }
 
 export function switchVariantState() {
-  $(document).on('change', '.switch-input', function (event) {
-    var id = $(this).closest('.variant_activate').find('.variant_id').val();
+  $(document).on("change", ".switch-input", function(event) {
+    var id = $(this)
+      .closest(".variant_activate")
+      .find(".variant_id")
+      .val();
     var target_element = $(this);
-    var state = $(this).prop("id")
-    var data = {state: state};
+    var state = $(this).prop("id");
+    var data = { state: state };
     $.ajax({
       url: `/variant_state/${id}`,
       type: "PATCH",
       data: data,
-      success: function (json) {
-        target_element.closest(".product_variants").find(".variant_state").text(state);
+      success: function(json) {
+        target_element
+          .closest(".product_variants")
+          .find(".variant_state")
+          .text(state);
       }
     });
   });
