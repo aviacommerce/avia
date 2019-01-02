@@ -205,7 +205,6 @@
   <% end %>
 
   <%= if  @conn.request_path != product_path(@conn, :new) do %>
-   <%= if can_add_variant(@parent_product)  do %>
     <div class="tab-pane fade p-3" id="options_tab" >
       <div class="row">
         <div class="col-3">
@@ -220,6 +219,7 @@
               <!-- Tab panes -->
           <div class="tab-content">
               <div class="tab-pane active" id="options">
+                <%= if has_themes(@parent_product) do %>
                 <div style="background: #f8f9fa;">
                   <div class="form-group required">
                     <label>Variation Theme</label>
@@ -249,6 +249,12 @@
                     </div>
                   </div>
                 </div>
+                <% else %>
+                 <div class="alert alert-info">
+                   You can add SKU's by adding Variation Themes to <span class="badge badge-info"> <%= get_product_category(@parent_product.taxon_id) %> </span> category.
+                   <br> Click to <%= link("Add variation theme", to: "/taxonomy?taxon_id=#{@parent_product.taxon_id}", class: "btn btn-primary") %>
+                 </div>
+                <% end %>
               </div>
 
               <div class="tab-pane" id="skus">
@@ -282,7 +288,9 @@
                   </table>
                 </div>
               <% else %>
-                <p>No SKUs have been created. Create a SKU from the <strong>Options tab</strong> by selecting appropriate variation theme.</p>
+                <div class="alert alert-info">
+                  <p>No SKUs have been created. Create a SKU from the <strong>Options tab</strong> by selecting appropriate variation theme.</p>
+                </div>
               <% end %>
 
               <div class="modal fade" id="variant_stock_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -350,7 +358,6 @@
                   </div>
                 </div>
               </div>
-
               </div>
             </div>
         </div>
@@ -365,8 +372,8 @@
         </div>
       </div>
     <% end %>
-   <% end %>
   <% end %>
+
   <%= if  @conn.request_path != product_path(@conn, :new) do %>
   <div class="tab-pane fade p-3" id="tab3default">
     <div>
