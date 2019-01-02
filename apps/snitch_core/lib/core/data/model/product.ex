@@ -452,7 +452,7 @@ defmodule Snitch.Data.Model.Product do
   @doc """
   Checks if a product tracks inventory by variant tracking
   """
-  @spec is_variant_tracking_enabled?(product) :: true | false
+  @spec is_variant_tracking_enabled?(Product.t()) :: true | false
   def is_variant_tracking_enabled?(product) do
     Product.is_variant_tracking_enabled?(product)
   end
