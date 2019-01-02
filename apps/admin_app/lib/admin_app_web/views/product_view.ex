@@ -49,7 +49,7 @@ defmodule AdminAppWeb.ProductView do
   end
 
   def is_variant_tracking_enabled(product) do
-    product.inventory_tracking == :variant
+    Product.is_variant_tracking_enabled?(product)
   end
 
   def has_variants(product) do

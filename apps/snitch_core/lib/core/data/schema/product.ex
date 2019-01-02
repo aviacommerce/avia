@@ -191,6 +191,10 @@ defmodule Snitch.Data.Schema.Product do
 
     put_change(changeset, :variations, variant_changes)
   end
+
+  def is_variant_tracking_enabled?(product) do
+    product.inventory_tracking == :variant
+  end
 end
 
 defmodule Snitch.Data.Schema.Product.NameSlug do

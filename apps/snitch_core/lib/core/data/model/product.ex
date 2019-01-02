@@ -448,4 +448,12 @@ defmodule Snitch.Data.Model.Product do
     product = Repo.preload(product, :variants)
     length(product.variants) > 0
   end
+
+  @doc """
+  Checks if a product tracks inventory by variant tracking
+  """
+  @spec is_variant_tracking_enabled?(product) :: true | false
+  def is_variant_tracking_enabled?(product) do
+    Product.is_variant_tracking_enabled?(product)
+  end
 end
