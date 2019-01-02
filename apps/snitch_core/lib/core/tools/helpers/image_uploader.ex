@@ -5,6 +5,7 @@ defmodule Snitch.Tools.Helper.ImageUploader do
   Contains utilties to store and transform the image.
   """
   use Arc.Definition
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   @versions [:original]
 
@@ -49,8 +50,9 @@ defmodule Snitch.Tools.Helper.ImageUploader do
   Overrides the storage directory where images would be stored.
   """
   def storage_dir(_version, {_file, scope}) do
+    tenant = Repo.get_prefix()
     scope_dir = get_scope_name(scope)
-    "uploads/images/#{scope_dir}/#{scope.id}/images/"
+    "uploads/#{tenant}/images/#{scope_dir}/#{scope.id}/images/"
   end
 
   defp get_scope_name(scope) do
