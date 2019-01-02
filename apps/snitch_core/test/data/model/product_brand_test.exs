@@ -41,7 +41,7 @@ defmodule Snitch.Data.Model.ProductBrandTest do
     test "successfully along with image", %{image_params: ip, valid_params: vp} do
       vp = vp |> Map.put("image", ip)
       assert {:ok, product_brand} = PBModel.create(vp)
-      path = Path.wildcard("uploads/images/**/#{product_brand.id}") |> List.first()
+      path = Path.wildcard("uploads/**/images/**/#{product_brand.id}") |> List.first()
       cleanup(path)
     end
 
@@ -65,7 +65,7 @@ defmodule Snitch.Data.Model.ProductBrandTest do
       pb = pb |> Repo.preload(:image)
       params = %{} |> Map.put("image", new_image)
       assert {:ok, product_brand} = PBModel.update(pb, params)
-      path = Path.wildcard("uploads/images/**/#{product_brand.id}") |> List.first()
+      path = Path.wildcard("uploads/**/images/**/#{product_brand.id}") |> List.first()
       cleanup(path)
     end
 
@@ -85,7 +85,7 @@ defmodule Snitch.Data.Model.ProductBrandTest do
       vp = vp |> Map.put("image", ip)
       {:ok, product_brand} = PBModel.create(vp)
       assert {:ok, "success"} = PBModel.delete(product_brand.id)
-      path = Path.wildcard("uploads/images/**/#{product_brand.id}") |> List.first()
+      path = Path.wildcard("uploads/**/images/**/#{product_brand.id}") |> List.first()
       cleanup(path)
     end
 

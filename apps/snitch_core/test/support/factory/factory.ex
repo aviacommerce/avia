@@ -84,7 +84,8 @@ defmodule Snitch.Factory do
       description: sequence(:description, &"description-#{&1}"),
       slug: sequence(:slug, &"Hill's-#{&1}"),
       selling_price: Money.new("12.99", currency()),
-      max_retail_price: Money.new("14.99", currency())
+      max_retail_price: Money.new("14.99", currency()),
+      state: :active
     }
   end
 

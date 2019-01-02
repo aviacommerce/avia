@@ -2,12 +2,29 @@
   "mappings": {
     "_doc": {
       "properties": {
+        "category" : {
+          "type": "nested",
+          "properties" : {
+            "all_parents" : {
+              "type" : "keyword"
+            },
+            "direct_parent" : {
+              "type" : "keyword"
+            },
+            "paths" : {
+              "type" : "keyword"
+            }
+          }
+        },
         "slug": {
           "type": "keyword"
         },
         "parent_id": {
           "type": "integer",
           "index": false
+        },
+        "discount": {
+          "type": "integer"
         },
         "images": {
           "type": "nested",
@@ -41,6 +58,7 @@
           }
         },
         "selling_price": {
+          "type": "nested",
           "properties": {
             "amount": {
               "type": "double"
@@ -83,14 +101,25 @@
         "updated_at": {
           "type": "date"
         },
-        "filters" : {
+        "string_facet": {
           "type": "nested",
-          "properties" : {
-            "id" : {
-              "type" : "keyword"
+          "properties": {
+            "id": {
+              "type": "keyword"
             },
-            "value" : {
-              "type" : "keyword"
+            "value": {
+              "type": "keyword"
+            }
+          }
+        },
+        "number_facet": {
+          "type": "nested",
+          "properties": {
+            "id": {
+              "type": "keyword"
+            },
+            "value": {
+              "type": "double"
             }
           }
         }
