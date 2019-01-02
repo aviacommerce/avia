@@ -68,7 +68,12 @@ defmodule Snitch.Data.Model.StockItem do
   @spec total_on_hand(non_neg_integer) :: integer
   def total_on_hand(variant_id) do
     stock_items = with_active_stock_location_query(variant_id)
-    Repo.one(from(st in stock_items, select: sum(st.count_on_hand)))
+    stock = Repo.one(from(st in stock_items, select: sum(st.count_on_hand)))
+
+    case stock do
+      nil -> 0
+      stock -> stock
+    end
   end
 
   @doc """

@@ -127,7 +127,7 @@
 
   <%= if  @conn.request_path != product_path(@conn, :new) and !is_child_product(@parent_product) do %>
     <div class="tab-pane p-3 fade in show p-3" id="inventory_tab">
-    <%= form_for @changeset, product_path(@conn, :update_inventory_tracking, @parent_product), [multipart: true, method: "patch"], fn f ->  %>
+      <%= form_for @changeset, product_path(@conn, :update_inventory_tracking, @parent_product), [multipart: true, method: "patch"], fn f ->  %>
       <fieldset id="inventory_tracking" data-selected="<%= @parent_product.inventory_tracking %>" >
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="inventory_track_none" value="none" name="product[inventory_tracking]" >
@@ -189,21 +189,22 @@
         <label class="custom-control-label" for="inventory_track_variant">Track inventory by variants (from variants tab above)</label>
       </div>
     </fieldset>
-      <div class="form-group row stickformbutton">
-      <div class="col-sm-10">
-        <%= button("Cancel", to: product_path(@conn, :index), method: "get",  type: "button",
-          class: "btn btn-secondary btn-outline-secondary submit-btn float-left") %>
-          <div class="float-right">
-            <%= submit "Save", class: "btn  btn-primary submit-btn", id: "form-save-btn" %>
+        <div class="form-group row stickformbutton">
+          <div class="col-sm-10">
+            <%= button("Cancel", to: product_path(@conn, :index), method: "get",  type: "button",
+            class: "btn btn-secondary btn-outline-secondary submit-btn float-left") %>
+            <div class="float-right">
+              <%= submit "Save", class: "btn  btn-primary submit-btn", id: "form-save-btn" %>
+            </div>
           </div>
-      </div>
+        </div>
+      <% end %>
     </div>
-    <% end %>
-  </div>
   <% end %>
 
-  <%= if  @conn.request_path != product_path(@conn, :new) and !is_child_product(@parent_product) do %>
-    <div class="tab-pane fade p-3" id="options_tab" >
+  <%= if  @conn.request_path != product_path(@conn, :new) do %>
+    <%= if !is_child_product(@parent_product) do %>
+      <div class="tab-pane fade p-3" id="options_tab" >
       <div class="row">
         <div class="col-3">
             <!-- required for floating -->
@@ -258,7 +259,6 @@
               <div class="tab-pane" id="skus">
                 <%= if has_variants(@parent_product) do %>
                 <div class="product_has_variants">
-                  <h3>Product Variants</h3>
                   <table class="table">
                     <thead>
                       <tr>
@@ -367,14 +367,6 @@
         </div>
       </div>
     </div>
-   <% else %>
-    <%= if !is_child_product(@parent_product) do %>
-      <div class="tab-pane fade p-3" id="tab2default" >
-        <div class="alert alert-info">
-          You can add Product Variants by adding Variation Themes to <span class="badge badge-info"> <%= get_product_category(@parent_product.taxon_id) %> </span> category.
-          <br> Click to <%= link("Add variation theme", to: "/taxonomy?taxon_id=#{@parent_product.taxon_id}", class: "btn btn-primary") %>
-        </div>
-      </div>
     <% end %>
   <% end %>
 
