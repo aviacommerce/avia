@@ -114,7 +114,6 @@ defmodule AdminAppWeb.Router do
   scope "/", AdminAppWeb do
     pipe_through(:avoid_csrf)
     post("/products/variants/new", ProductController, :new_variant)
-    post("/product/stock", ProductController, :add_stock)
   end
 
   scope "/", AdminAppWeb do

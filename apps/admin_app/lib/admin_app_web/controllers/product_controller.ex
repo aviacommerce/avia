@@ -286,22 +286,6 @@ defmodule AdminAppWeb.ProductController do
     end
   end
 
-  def add_stock(conn, %{"stock" => params}) do
-    with {:ok, stock} <- check_stock(params["product_id"], params["location_id"]),
-         {:ok, _updated_stock} <- StockModel.update(params, stock) do
-      redirect(conn, to: product_path(conn, :index))
-    end
-  end
-
-  defp check_stock(product_id, location_id) do
-    query_fields = %{product_id: product_id, stock_location_id: location_id}
-
-    case StockModel.get(query_fields) do
-      %StockSchema{} = stock_item -> {:ok, stock_item}
-      nil -> StockModel.create(product_id, location_id, 0, false)
-    end
-  end
-
   def generate_variant_params(parent_product, options) do
     options =
       options
