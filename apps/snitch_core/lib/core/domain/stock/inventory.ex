@@ -25,7 +25,7 @@ defmodule Snitch.Domain.Inventory do
     end
   end
 
-  def set_inventory_tracking(product, inventory_tracking, stock_params)
+  def set_inventory_tracking(product, inventory_tracking, %{"stock" => stock_params})
       when inventory_tracking in ["product", :product] do
     {:ok, stock_item} = check_stock(product.id, stock_params["stock_location_id"])
 
@@ -35,9 +35,16 @@ defmodule Snitch.Domain.Inventory do
     end)
     |> Ecto.Multi.run(:stock, fn _ -> StockModel.update(stock_params, stock_item) end)
     |> Repo.transaction()
+    |> case do
+      {:ok, multi_result} ->
+        {:ok, multi_result.inventory_tracking}
+
+      {:error, _, error, _} ->
+        {:error, error}
+    end
   end
 
-  def set_inventory_tracking(product, inventory_tracking) do
+  def set_inventory_tracking(product, inventory_tracking, _params) do
     ProductModel.update(product, %{inventory_tracking: inventory_tracking})
   end
 

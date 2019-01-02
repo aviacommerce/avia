@@ -104,14 +104,7 @@ defmodule AdminAppWeb.ProductController do
   def update_inventory_tracking(conn, %{"product" => product_params} = params) do
     with %ProductSchema{} = product <- ProductModel.get(params["product_id"]) do
       tracking_level = product_params["inventory_tracking"]
-
-      case tracking_level do
-        "product" ->
-          Inventory.set_inventory_tracking(product, tracking_level, params["stock"])
-
-        _ ->
-          Inventory.set_inventory_tracking(product, tracking_level)
-      end
+      Inventory.set_inventory_tracking(product, tracking_level, params)
 
       redirect(conn, to: product_path(conn, :edit, product.id))
     end
