@@ -148,7 +148,7 @@
             </label>
             <div class="col-sm-6">
               <div class="form-group">
-                <%= select :stock, :stock_location_id, active_stock_locaton(), class: "form-control" %>
+                <%= select :stock, :stock_location_id, active_stock_location(), class: "form-control" %>
               </div>
             </div>
           </div>
@@ -335,7 +335,7 @@
                             </label>
                             <div class="col-sm-6">
                               <div class="form-group">
-                                <%= select :stock, :stock_location_id, active_stock_locaton(), class: "form-control" %>
+                                <%= select :stock, :stock_location_id, active_stock_location(), class: "form-control" %>
                               </div>
                             </div>
                           </div>

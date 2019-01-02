@@ -24,9 +24,8 @@ defmodule AdminAppWeb.ProductView do
   @sort_field_keys ["rummage", "sort", "field"]
   @sort_order_keys ["rummage", "sort", "order"]
 
-  def active_stock_locaton() do
-    StockLocation.active()
-    |> Enum.map(fn x -> {x.name, x.id} end)
+  def active_stock_location() do
+    Enum.map(StockLocation.active(), &{&1.name, &1.id})
   end
 
   def themes_options(product) do
