@@ -243,4 +243,8 @@ defmodule AdminAppWeb.ProductView do
   defp generate_taxon_text([head | tail], acc) do
     generate_taxon_text(tail, acc <> "#{head.name} > ")
   end
+
+  def get_total_stock(variant) do
+    StockItem.total_on_hand(variant.id)
+  end
 end

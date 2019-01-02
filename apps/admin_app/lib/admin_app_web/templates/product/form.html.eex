@@ -260,6 +260,7 @@
                         <%= for option_type <- get_option_types(@parent_product) do %>
                         <th><%= option_type.display_name %></th>
                         <% end %>
+                        <th>Stock</th>
                         <th></th>
                       </tr>
                     </thead>
@@ -269,6 +270,7 @@
                         <%= for option <- variant.options do %>
                         <td class="option-value" contenteditable="true" data-option_value_id="<%= option.id %>"><%= option.value %></td>
                         <% end %>
+                        <td><%= get_total_stock(variant) %></td>
                         <td>
                           <%= link("Edit", to: product_path(@conn, :edit, variant.id), class: "btn btn-primary") %>
                           <button name="variant_stock_add" type="button" class="btn btn-primary" data-prdouct-id="<%= variant.id %>">Add stock</button>
@@ -278,6 +280,8 @@
                     </tbody>
                   </table>
                 </div>
+              <% else %>
+                <p>No SKUs have been created. Create a SKU from the <strong>Options tab</strong> by selecting appropriate variation theme.</p>
               <% end %>
 
               <div class="modal fade" id="variant_stock_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
