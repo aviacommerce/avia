@@ -55,6 +55,10 @@ defmodule AdminAppWeb.ProductView do
     length(product.taxon.variation_themes) > 0
   end
 
+  def is_variant_tracking_enabled(product) do
+    product.inventory_tracking == :variant
+  end
+
   defp is_child_product(product) do
     query = from(c in Variation, where: c.child_product_id == ^product.id)
     count = Repo.aggregate(query, :count, :id)
