@@ -68,7 +68,7 @@ defmodule Snitch.Data.Model.ProductTest do
       assert is_parent == true
     end
 
-    test "if it is a child",  %{variant: variant} do  
+    test "if it is a child", %{variant: variant} do
       is_child = Product.is_child_product(variant)
       assert is_child == true
     end
@@ -157,9 +157,8 @@ defmodule Snitch.Data.Model.ProductTest do
   end
 
   describe "sellable products list" do
-
     test "if product has no variants" do
-      assert [%ProductSchema{}] = Product.sellable_products_query() |> Repo.all
+      assert [%ProductSchema{}] = Product.sellable_products_query() |> Repo.all()
     end
 
     test "if product has variants" do
@@ -167,11 +166,10 @@ defmodule Snitch.Data.Model.ProductTest do
       product = insert(:product, attrs)
       variant = product.products |> List.first()
       variation = insert(:variation, %{parent_product: product, child_product: variant})
-      sellable_products = Product.sellable_products_query() |> Repo.all |> Enum.map(& &1.id)
+      sellable_products = Product.sellable_products_query() |> Repo.all() |> Enum.map(& &1.id)
       assert Enum.member?(sellable_products, variant.id) == true
       refute Enum.member?(sellable_products, product.id)
     end
-
   end
 
   describe "image handling - " do
@@ -209,9 +207,9 @@ defmodule Snitch.Data.Model.ProductTest do
     end
 
     test "with valid preload params" do
-      preloads = [:products ]
+      preloads = [:products]
       product = Product.get_all_with_preloads(preloads) |> List.first()
-      assert product.products != nil 
+      assert product.products != nil
     end
 
     test "with invalid preload params" do
@@ -285,17 +283,9 @@ defmodule Snitch.Data.Model.ProductTest do
       product = insert(:product)
       {:ok, updated_product} = Product.update(product, %{state: :active, taxon_id: taxon.id})
 
-      next_date =
-        product.inserted_at
-        |> NaiveDateTime.to_date()
-        |> Date.add(1)
-        |> Date.to_string()
-        |> get_naive_date_time()
+      product_state_count = Product.get_product_count_by_state() |> List.first()
 
-      product_state_count =
-        Product.get_product_count_by_state(product.inserted_at, next_date) |> List.first()
-
-      assert product_state_count.count == 1
+      assert product_state_count.count == 2
       assert product_state_count.state == :active
     end
   end
