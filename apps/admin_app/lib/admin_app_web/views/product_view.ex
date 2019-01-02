@@ -52,12 +52,6 @@ defmodule AdminAppWeb.ProductView do
     product.inventory_tracking == :variant
   end
 
-  defp is_child_product(product) do
-    query = from(c in Variation, where: c.child_product_id == ^product.id)
-    count = Repo.aggregate(query, :count, :id)
-    count > 0
-  end
-
   def has_variants(product) do
     product.variants |> length > 0
   end
