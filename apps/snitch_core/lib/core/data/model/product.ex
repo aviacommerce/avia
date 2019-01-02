@@ -49,7 +49,7 @@ defmodule Snitch.Data.Model.Product do
   end
 
   @doc """
-  Updates the default image for a given product 
+  Updates the default image for a given product
   from the given list of images.
   """
   def update_default_image(product, default_image) do
@@ -438,5 +438,14 @@ defmodule Snitch.Data.Model.Product do
     |> group_by([p], p.state)
     |> select([p], %{state: p.state, count: count(p.id)})
     |> Repo.all()
+  end
+
+  @doc """
+  Checks if a product has variants or not
+  """
+  @spec has_variants?(Product.t()) :: true | false
+  def has_variants?(product) do
+    product = Repo.preload(product, :variants)
+    length(product.variants) > 0
   end
 end

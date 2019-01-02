@@ -53,7 +53,7 @@ defmodule AdminAppWeb.ProductView do
   end
 
   def has_variants(product) do
-    product.variants |> length > 0
+    Product.has_variants?(product)
   end
 
   def get_option_types(product) do
