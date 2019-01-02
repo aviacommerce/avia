@@ -9,9 +9,11 @@
    <li class="nav-item">
       <a class="nav-link active" href="#tab1default" data-toggle="tab">Product Detail</a>
    </li>
+   <%= if  @conn.request_path != product_path(@conn, :new) do %>
    <li class="nav-item">
      <a class="nav-link" href="#inventory_tab" data-toggle="tab">Inventory</a>
    </li>
+   <% end %>
    <%= if  @conn.request_path != product_path(@conn, :new) do %>
    <%= if !is_child_product(@parent_product) do %>
     <li class="nav-item">
@@ -125,7 +127,8 @@
     <% end %>
   </div>
 
-  <div class="tab-pane p-3 fade in show p-3" id="inventory_tab">
+  <%= if  @conn.request_path != product_path(@conn, :new) do %>
+    <div class="tab-pane p-3 fade in show p-3" id="inventory_tab">
     <%= form_for @changeset, product_path(@conn, :update_inventory_tracking, @parent_product), [multipart: true, method: "patch"], fn f ->  %>
       <fieldset id="inventory_tracking" data-selected="<%= @parent_product.inventory_tracking %>" >
       <div class="custom-control custom-radio">
@@ -199,6 +202,7 @@
     </div>
     <% end %>
   </div>
+  <% end %>
 
   <%= if  @conn.request_path != product_path(@conn, :new) do %>
    <%= if can_add_variant(@parent_product)  do %>
