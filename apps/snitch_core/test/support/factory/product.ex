@@ -10,7 +10,8 @@ defmodule Snitch.Factory.Product do
           slug: sequence(:slug, &"product-#{&1}"),
           selling_price: Money.new("12.99", currency()),
           max_retail_price: Money.new("14.99", currency()),
-          shipping_category: build(:shipping_category)
+          shipping_category: build(:shipping_category),
+          state: :active
         }
       end
     end
