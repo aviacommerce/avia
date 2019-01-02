@@ -8,7 +8,6 @@ defmodule Snitch.Tools.ElasticSearch.ProductStore do
 
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Model.Product, as: PM
-  alias Snitch.Data.Schema.Product, as: PS
   alias Snitch.Tools.ElasticsearchCluster, as: EC
 
   @preload [
