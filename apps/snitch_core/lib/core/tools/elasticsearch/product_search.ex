@@ -3,10 +3,8 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
   Product Search using elasticsearch
   """
   alias Snitch.Core.Tools.MultiTenancy.Repo
-  alias Snitch.Data.Schema.Product
 
   import Snitch.Tools.ElasticSearch.ProductStore, only: [search_products: 1]
-  import Ecto.Query
 
   def run(conn, params) do
     %{
@@ -22,7 +20,6 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
       |> Map.put_new("aggregations", %{})
 
     page = gen_page_links(total, params, conn)
-
     {collection, page, format_aggregations(aggregations), total}
   end
 
@@ -34,7 +31,9 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
       "query" => %{
         "bool" => %{
           "must" =>
-            tenant_query() ++ generate_query_from_filter_string(params) ++ match_keywords(params)
+            tenant_query() ++
+              generate_query_from_string_facet(params) ++
+              generate_query_from_number_facet(params) ++ match_keywords(params)
         }
       },
       "aggs" => aggregate_query()
@@ -45,39 +44,109 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
     |> paginate(offset, limit)
   end
 
-  defp generate_query_from_filter_string(%{"f" => ""}), do: []
+  defp generate_query_from_string_facet(%{"f" => ""}), do: []
 
-  defp generate_query_from_filter_string(%{"f" => f}) do
+  defp generate_query_from_string_facet(%{"f" => f}) do
     f
     |> String.splitter("::")
     |> Stream.flat_map(fn filter_string ->
       [filter, values] = String.split(filter_string, ":")
-      primary_filter_query({filter, String.split(values, ",")})
+      string_facet_query({filter, String.split(values, ",")})
     end)
     |> Enum.into([])
   end
 
-  defp generate_query_from_filter_string(_), do: []
+  defp generate_query_from_string_facet(_), do: []
 
-  defp primary_filter_query({_, []}), do: []
-  defp primary_filter_query({_, [""]}), do: []
+  defp string_facet_query({_, []}), do: []
+  defp string_facet_query({_, [""]}), do: []
 
-  defp primary_filter_query({filter, values}) do
+  defp string_facet_query({"Category", values}) do
     [
       %{
         "nested" => %{
-          "path" => "filters",
+          "path" => "category",
+          "query" => %{
+            "bool" => %{
+              "must" =>
+                Enum.map(values, fn val ->
+                  %{
+                    "match" => %{
+                      "category.all_parents" => val
+                    }
+                  }
+                end)
+            }
+          }
+        }
+      }
+    ]
+  end
+
+  defp string_facet_query({filter, values}) do
+    [
+      %{
+        "nested" => %{
+          "path" => "string_facet",
           "query" => %{
             "bool" => %{
               "filter" => [
                 %{
                   "term" => %{
-                    "filters.id" => filter
+                    "string_facet.id" => filter
                   }
                 },
                 %{
                   "terms" => %{
-                    "filters.value" => values
+                    "string_facet.value" => values
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  end
+
+  defp generate_query_from_number_facet(%{"rf" => ""}), do: []
+
+  defp generate_query_from_number_facet(%{"rf" => rf}) do
+    rf
+    |> String.splitter("::")
+    |> Stream.flat_map(fn filter_string ->
+      [filter, values] = String.split(filter_string, ":")
+      number_facet_query({filter, String.split(values, ",")})
+    end)
+    |> Enum.into([])
+  end
+
+  defp generate_query_from_number_facet(_), do: []
+
+  defp number_facet_query({_, []}), do: []
+  defp number_facet_query({_, [""]}), do: []
+
+  defp number_facet_query({filter, [value | _]}) do
+    [min, max] = String.split(value, " TO ")
+
+    [
+      %{
+        "nested" => %{
+          "path" => "number_facet",
+          "query" => %{
+            "bool" => %{
+              "filter" => [
+                %{
+                  "term" => %{
+                    "number_facet.id" => filter
+                  }
+                },
+                %{
+                  "range" => %{
+                    "number_facet.value" => %{
+                      "gte" => min,
+                      "lte" => max
+                    }
                   }
                 }
               ]
@@ -90,14 +159,45 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
 
   defp aggregate_query() do
     %{
-      "filters" => %{
+      "category" => %{
         "nested" => %{
-          "path" => "filters"
+          "path" => "category"
         },
         "aggs" => %{
           "aggregations" => %{
             "terms" => %{
-              "script" => "doc['filters.id'].value + '|' + doc['filters.value'].value"
+              "script" => "'Category|' + doc['category.direct_parent'].value"
+            }
+          }
+        }
+      },
+      "filters" => %{
+        "nested" => %{
+          "path" => "string_facet"
+        },
+        "aggs" => %{
+          "aggregations" => %{
+            "terms" => %{
+              "script" => "doc['string_facet.id'].value + '|' + doc['string_facet.value'].value"
+            }
+          }
+        }
+      },
+      "range_filters" => %{
+        "nested" => %{
+          "path" => "number_facet"
+        },
+        "aggs" => %{
+          "aggregations" => %{
+            "terms" => %{
+              "field" => "number_facet.id"
+            },
+            "aggs" => %{
+              "facet_value" => %{
+                "stats" => %{
+                  "field" => "number_facet.value"
+                }
+              }
             }
           }
         }
@@ -205,11 +305,21 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
 
   defp format_aggregations(aggregations) do
     %{
-      "filters" => %{"aggregations" => %{"buckets" => filters}}
+      "category" => %{"aggregations" => %{"buckets" => categories}},
+      "filters" => %{"aggregations" => %{"buckets" => filters}},
+      "range_filters" => %{"aggregations" => %{"buckets" => range_filters}}
     } = aggregations
 
+    # Skip categories if only one category
+    categories =
+      case categories do
+        [_] -> []
+        _ -> categories
+      end
+
     %{
-      "filters" => format_id_value_key_aggs(filters)
+      "filters" => format_id_value_key_aggs(categories ++ filters),
+      "range_filters" => fomart_range_aggs(range_filters)
     }
   end
 
@@ -223,13 +333,39 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
         Map.merge(acc, %{
           id => %{
             "id" => id,
-            "filterValues" => [
+            "values" => [
               %{
                 "id" => value,
                 "count" => count,
                 "meta" => ""
               }
-              | (acc[id] && acc[id]["filterValues"]) || []
+              | (acc[id] && acc[id]["values"]) || []
+            ]
+          }
+        })
+      end
+    )
+    |> Map.values()
+  end
+
+  defp fomart_range_aggs(filters) do
+    filters
+    |> Enum.reduce(
+      %{},
+      fn %{"key" => id, "doc_count" => count, "facet_value" => %{"min" => min, "max" => max}},
+         acc ->
+        Map.merge(acc, %{
+          id => %{
+            "id" => id,
+            "min" => min,
+            "max" => max,
+            "values" => [
+              %{
+                "id" => id,
+                "count" => count,
+                "meta" => ""
+              }
+              | (acc[id] && acc[id]["values"]) || []
             ]
           }
         })

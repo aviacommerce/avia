@@ -111,8 +111,8 @@ defmodule Snitch.Data.Model.Image do
   Takes as input `name` of the `image` and the corresponding
   struct.
   """
-  def image_url(name, struct) do
-    ImageUploader.url({name, struct})
+  def image_url(name, struct, version \\ :thumb) do
+    ImageUploader.url({name, struct}, version)
   end
 
   def handle_image_value(%Plug.Upload{} = file) do

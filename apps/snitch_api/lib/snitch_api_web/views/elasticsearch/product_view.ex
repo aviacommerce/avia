@@ -13,7 +13,8 @@ defmodule SnitchApiWeb.Elasticsearch.ProductView do
     :rating_summary,
     :selling_price,
     :max_retail_price,
-    :brand
+    :brand,
+    :discount
   ])
 
   defp source(product), do: product["_source"]
@@ -42,4 +43,6 @@ defmodule SnitchApiWeb.Elasticsearch.ProductView do
   defp max_retail_price(product), do: source(product)["max_retail_price"]
 
   defp brand(product), do: source(product)["brand"]
+
+  defp discount(product), do: source(product)["discount"]
 end
