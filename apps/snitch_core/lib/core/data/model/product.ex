@@ -174,8 +174,8 @@ defmodule Snitch.Data.Model.Product do
   def delete(id) do
     with %Product{} = product <- get(id),
          changeset <- Product.delete_changeset(product) do
-      Path.wildcard("uploads/**/images/**/#{product.id}")
-      |> File.rm_rf()
+      product = product |> Repo.preload(:images)
+      Enum.map(product.images, &delete_image(product.id, &1.id))
       Repo.update(changeset)
     end
   end
