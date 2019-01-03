@@ -200,23 +200,25 @@ defmodule Snitch.Data.Model.ProductTest do
     end
 
     test "set default image", %{image_params: ip, product: product} do
-
-      [ ok: %Image{is_default: true} = image,  ok: %Image{}] = update_default_image(ip, product)
+      [ok: %Image{is_default: true} = image, ok: %Image{}] = update_default_image(ip, product)
       assert image.is_default == true
     end
-
   end
 
   defp update_default_image(ip, product) do
-    images = [%{
-      "image" => %{
-        filename: "AfddfPbZGc4WuAVLYwwyo.png",
-        path: @img_new,
-        type: "image/png",
-        url: "/xyz"
+    images = [
+      %{
+        "image" => %{
+          filename: "AfddfPbZGc4WuAVLYwwyo.png",
+          path: @img_new,
+          type: "image/png",
+          url: "/xyz"
+        }
       }
-    } | ip["images"] ]
-    {:ok,  %ProductSchema{} = product} = Product.add_images(product, %{"images" => images})
+      | ip["images"]
+    ]
+
+    {:ok, %ProductSchema{} = product} = Product.add_images(product, %{"images" => images})
     image = product.images |> List.first()
     Product.update_default_image(product, to_string(image.id))
   end
