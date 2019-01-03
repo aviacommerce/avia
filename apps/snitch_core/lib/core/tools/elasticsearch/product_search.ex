@@ -164,11 +164,8 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
         "size" => 0,
         "query" => %{
           "bool" => %{
-            "must" => tenant_query(),
-            "should" =>
-              match_keywords(params) ++
-                generate_query_from_string_facet(params) ++
-                generate_query_from_number_facet(params)
+            "must" => tenant_query() ++ match_keywords(params),
+            "should" => generate_query_from_string_facet(params)
           }
         },
         "aggs" => %{
