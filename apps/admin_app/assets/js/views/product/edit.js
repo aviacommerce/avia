@@ -36,6 +36,8 @@ var storedFile = [];
 
 export function handleStockForVariantTracking() {
   $(":button[name=variant_stock_add]").click(function() {
+    $("#variant_stock_error_msg").slideUp("fast");
+
     let productId = $(this).attr("data-prdouct-id");
     $("#variant_tracking #stock_product_id").val(productId);
 
@@ -53,6 +55,8 @@ export function handleStockForVariantTracking() {
   });
 
   $("#variant_stock_modal #variant_stock_confirm").click(function() {
+    $("#variant_stock_error_msg").slideUp("fast");
+
     let productId = $("#variant_tracking #stock_product_id").val();
     let stockLocationId = $("#variant_tracking #stock_stock_location_id").val();
     let stockLevel = $("#variant_tracking #stock_count_on_hand").val();
@@ -76,6 +80,9 @@ export function handleStockForVariantTracking() {
       success: function(json) {
         $("#variant_stock_modal").modal(`hide`);
         window.location.reload();
+      },
+      error: function(json) {
+        $("#variant_stock_error_msg").slideDown("slow");
       }
     });
   });

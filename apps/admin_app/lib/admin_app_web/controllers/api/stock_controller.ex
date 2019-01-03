@@ -15,6 +15,11 @@ defmodule AdminAppWeb.Api.StockController do
     with %Product{} = product <- ProductModel.get(params["stock"]["product_id"]),
          {:ok, stock} <- Inventory.add_stock(product, params["stock"]) do
       render(conn, "stocks.json", %{stocks: [stock]})
+    else
+      {:error, _changeset} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(%{error: %{message: "Bad request"}})
     end
   end
 end

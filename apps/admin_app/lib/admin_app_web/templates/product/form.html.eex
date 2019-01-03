@@ -324,6 +324,9 @@
                       </button>
                     </div>
                     <div class="modal-body">
+                      <div id="variant_stock_error_msg" class="alert alert-danger">
+                        Request failed
+                      </div>
                       <div id="variant_tracking" class="card m-2">
                         <%= hidden_input :stock, :product_id, value: @parent_product.id, class: "form-control" %>
                         <div class="col-12">
