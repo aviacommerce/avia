@@ -18,8 +18,8 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
       slug: self_or_parent_product.slug,
       parent_id: self_or_parent_product.id,
       # description: product.description,
-      selling_price: product.selling_price,
-      max_retail_price: product.max_retail_price,
+      selling_price: format_money(product.selling_price),
+      max_retail_price: format_money(product.max_retail_price),
       rating_summary: avg_rating(self_or_parent_product),
       images: product_images(product),
       updated_at: product.updated_at,
@@ -55,7 +55,7 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
     [
       %{
         id: "Price",
-        value: product.selling_price.amount |> Decimal.to_float()
+        value: Decimal.to_float(product.selling_price.amount)
       },
       %{
         id: "Discount",
@@ -154,6 +154,13 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
   defp suggest_keywords(%{name: name, meta_keywords: meta_keywords}) do
     keywords = String.split(name, ~r(\s+)) ++ String.split(meta_keywords || "", ~r(\s*\,\s*))
     Enum.filter(keywords, &("" != &1))
+  end
+
+  defp format_money(money) do
+    %{
+      "currency" => money.currency,
+      "amount" => Decimal.to_float(money.amount)
+    }
   end
 
   defp product_discount(product) do

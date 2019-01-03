@@ -17,7 +17,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
       params
       |> convert_to_elastic_query
       |> search_products
-      |> Map.put_new("aggregations", %{})
+      |> Map.put_new("aggregations", generate_aggregations(params))
 
     page = gen_page_links(total, params, conn)
     {collection, page, format_aggregations(aggregations), total}
@@ -35,8 +35,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
               generate_query_from_string_facet(params) ++
               generate_query_from_number_facet(params) ++ match_keywords(params)
         }
-      },
-      "aggs" => aggregate_query()
+      }
     }
 
     query
@@ -68,7 +67,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
           "path" => "category",
           "query" => %{
             "bool" => %{
-              "must" =>
+              "should" =>
                 Enum.map(values, fn val ->
                   %{
                     "match" => %{
@@ -157,52 +156,67 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
     ]
   end
 
-  defp aggregate_query() do
+  defp generate_aggregations(params) do
     %{
-      "category" => %{
-        "nested" => %{
-          "path" => "category"
-        },
-        "aggs" => %{
-          "aggregations" => %{
-            "terms" => %{
-              "script" => "'Category|' + doc['category.direct_parent'].value"
-            }
+      "aggregations" => aggregations
+    } =
+      search_products(%{
+        "size" => 0,
+        "query" => %{
+          "bool" => %{
+            "must" => tenant_query() ++ match_keywords(params),
+            "should" => generate_query_from_string_facet(params)
           }
-        }
-      },
-      "filters" => %{
-        "nested" => %{
-          "path" => "string_facet"
         },
         "aggs" => %{
-          "aggregations" => %{
-            "terms" => %{
-              "script" => "doc['string_facet.id'].value + '|' + doc['string_facet.value'].value"
-            }
-          }
-        }
-      },
-      "range_filters" => %{
-        "nested" => %{
-          "path" => "number_facet"
-        },
-        "aggs" => %{
-          "aggregations" => %{
-            "terms" => %{
-              "field" => "number_facet.id"
+          "category" => %{
+            "nested" => %{
+              "path" => "category"
             },
             "aggs" => %{
-              "facet_value" => %{
-                "stats" => %{
-                  "field" => "number_facet.value"
+              "aggregations" => %{
+                "terms" => %{
+                  "script" => "'Category|' + doc['category.direct_parent'].value"
+                }
+              }
+            }
+          },
+          "filters" => %{
+            "nested" => %{
+              "path" => "string_facet"
+            },
+            "aggs" => %{
+              "aggregations" => %{
+                "terms" => %{
+                  "script" =>
+                    "doc['string_facet.id'].value + '|' + doc['string_facet.value'].value"
+                }
+              }
+            }
+          },
+          "range_filters" => %{
+            "nested" => %{
+              "path" => "number_facet"
+            },
+            "aggs" => %{
+              "aggregations" => %{
+                "terms" => %{
+                  "field" => "number_facet.id"
+                },
+                "aggs" => %{
+                  "facet_value" => %{
+                    "stats" => %{
+                      "field" => "number_facet.value"
+                    }
+                  }
                 }
               }
             }
           }
         }
-      }
-    }
+      })
+
+    aggregations
   end
 
   defp tenant_query() do
