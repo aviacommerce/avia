@@ -335,6 +335,21 @@ defmodule Snitch.Data.Model.ProductTest do
     end
   end
 
+  describe "has_variants?/1" do
+    test "product variant exist" do
+      attrs = %{products: [build(:variant)]}
+      product = insert(:product, attrs)
+
+      assert Product.has_variants?(product)
+    end
+
+    test "product variant does not exist" do
+      product = insert(:product)
+
+      refute Product.has_variants?(product)
+    end
+  end
+
   defp get_naive_date_time(date) do
     Date.from_iso8601(date)
     |> elem(1)
