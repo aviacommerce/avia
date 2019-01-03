@@ -415,8 +415,7 @@ defmodule Snitch.Data.Model.Product do
     Enum.reduce(stocks, 0, fn stock, acc -> stock.count_on_hand + acc end)
   end
 
-  @spec get_product_count_by_state(DateTime.t(), DateTime.t()) :: integer
-  def get_product_count_by_state(start_date, end_date) do
+  def get_product_count_by_state() do
     child_product_ids =
       Variation
       |> select([v], v.child_product_id)
@@ -425,8 +424,7 @@ defmodule Snitch.Data.Model.Product do
     Product
     |> where(
       [p],
-      p.inserted_at >= ^start_date and p.inserted_at <= ^end_date and p.state in ^@product_states and
-        p.id not in ^child_product_ids
+      p.state in ^@product_states and p.id not in ^child_product_ids
     )
     |> group_by([p], p.state)
     |> select([p], %{state: p.state, count: count(p.id)})

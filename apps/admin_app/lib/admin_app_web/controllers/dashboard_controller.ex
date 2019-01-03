@@ -9,10 +9,16 @@ defmodule AdminAppWeb.DashboardController do
 
     conn
     |> assign(:order_state_counts, get_order_state_count(start_date, end_date))
-    |> assign(:product_state_counts, get_product_state_count(start_date, end_date))
+    |> assign(:product_state_counts, get_product_state_count())
     |> assign(:order_datepoints, get_order_datapoints(start_date, end_date))
     |> assign(:payment_datapoints, get_payment_datapoints(start_date, end_date))
+    |> assign(:start_date, naive_date_to_string(start_date))
+    |> assign(:end_date, naive_date_to_string(end_date))
     |> render("index.html")
+  end
+
+  defp naive_date_to_string(date) do
+    date |> NaiveDateTime.to_date() |> Date.to_string()
   end
 
   defp get_naive_date_time(date, time, default_date \\ Date.utc_today())
@@ -53,8 +59,8 @@ defmodule AdminAppWeb.DashboardController do
     Model.Order.get_order_count_by_state(start_date, end_date)
   end
 
-  defp get_product_state_count(start_date, end_date) do
-    Model.Product.get_product_count_by_state(start_date, end_date)
+  defp get_product_state_count() do
+    Model.Product.get_product_count_by_state()
   end
 
   @spec get_order_datapoints(any(), any()) :: %{data: any(), labels: any()}
