@@ -78,7 +78,7 @@ defmodule Snitch.Data.Model.ProductTest do
       is_child = Product.is_child_product(product)
       is_parent = Product.is_parent_product(to_string(product.id))
       assert is_child == false
-      assert is_parent == false
+      assert is_parent == true
     end
   end
 
@@ -182,7 +182,7 @@ defmodule Snitch.Data.Model.ProductTest do
     end
 
     test "add images with valid params", %{image_params: ip, product: product} do
-      assert {:ok, "success"} = Product.add_images(product, ip)
+      assert {:ok, %ProductSchema{} = product} = Product.add_images(product, ip)
     end
 
     test "delete image for a product", %{product: product, image_params: ip} do

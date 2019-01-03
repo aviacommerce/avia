@@ -1,6 +1,7 @@
 defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
   alias Snitch.Data.Model.ProductReview, as: PRModel
   alias Snitch.Data.Model.Image, as: ImageModel
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def id(product), do: "#{product.tenant}_#{product.id}"
   def routing(_), do: false
@@ -23,7 +24,9 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
       images: product_images(product),
       updated_at: product.updated_at,
       tenant: product.tenant,
-      filters: generate_filter_fields(product, self_or_parent_product)
+      string_facet: generate_string_facet(product, self_or_parent_product),
+      number_facet: generate_number_facet(product, self_or_parent_product),
+      category: gen_category_info(product.taxon)
       # meta_keywords: product.meta_keywords,
     }
   end
@@ -42,19 +45,48 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
     %{product | name: product.name <> " (" <> postfix <> ")"}
   end
 
-  defp generate_filter_fields(product, self_or_parent_product) do
+  defp generate_string_facet(product, self_or_parent_product) do
     [
-      gen_taxon_path(product.taxon)
-      | Enum.map(product.options, &option_map/1) ++ brand_map(self_or_parent_product.brand)
+      Enum.map(product.options, &option_map/1) ++ brand_map(self_or_parent_product.brand)
     ]
+  end
+
+  defp generate_number_facet(product, _) do
+    [
+      %{
+        id: "Price",
+        value: product.selling_price.amount |> Decimal.to_float()
+      },
+      %{
+        id: "Discount",
+        value: product_discount(product)
+      }
+    ]
+  end
+
+  defp gen_category_info(nil),
+    do: %{
+      direct_parent: "Other",
+      all_parents: ["Other"],
+      paths: "Other"
+    }
+
+  defp gen_category_info(taxon) do
+    taxon = Repo.preload(taxon, :parent)
+    paths = gen_taxon_path(taxon.parent) ++ [taxon.name]
+
+    %{
+      direct_parent: taxon.name,
+      all_parents: paths,
+      paths: Enum.join(paths, ":")
+    }
   end
 
   defp gen_taxon_path(nil), do: []
 
   defp gen_taxon_path(taxon) do
-    [%{id: "Category", value: taxon.name}]
-    # taxon = Repo.preload(taxon, :parent)
-    # gen_taxon_path(taxon.parent) ++ [%{id: taxon.id, name: taxon.name}]
+    taxon = Repo.preload(taxon, parent: :parent)
+    gen_taxon_path(taxon.parent) ++ [taxon.name]
   end
 
   defp option_map(option) do
@@ -97,7 +129,7 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
 
   defp image_map(product, image) do
     %{
-      product_url: ImageModel.image_url(image.name, product)
+      product_url: ImageModel.image_url(image.name, product, :thumb)
     }
   end
 
@@ -123,4 +155,22 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
     keywords = String.split(name, ~r(\s+)) ++ String.split(meta_keywords || "", ~r(\s*\,\s*))
     Enum.filter(keywords, &("" != &1))
   end
+
+  defp product_discount(product) do
+    try do
+      product.max_retail_price.amount
+      |> Decimal.sub(product.selling_price.amount)
+      |> Decimal.div(product.max_retail_price.amount)
+      |> Decimal.mult(100)
+      |> Decimal.round(0)
+      |> Decimal.to_integer()
+      |> format_discount()
+    rescue
+      _ -> 0
+    end
+  end
+
+  defp format_discount(discount) when discount > 100, do: 100
+  defp format_discount(discount) when discount < 0, do: 0
+  defp format_discount(discount), do: discount
 end

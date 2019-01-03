@@ -52,16 +52,8 @@ defmodule Snitch.Data.Model.Product do
   Updates the default image for a given product
   from the given list of images.
   """
-  def update_default_image(product, default_image) do
-    for image <- product.images do
-      if to_string(image.id) == default_image do
-        attrs = %{is_default: true}
-        ImageModel.update(attrs, image)
-      else
-        attrs = %{is_default: false}
-        ImageModel.update(attrs, image)
-      end
-    end
+  def update_default_image(%{images: images}, default_image) do
+    Enum.map(images, &ImageModel.update(%{is_default: to_string(&1.id) == default_image}, &1))
   end
 
   @doc """
@@ -71,7 +63,6 @@ defmodule Snitch.Data.Model.Product do
   - Parent product (Product that has variants)
   In short returns product excluding the variant products
   """
-  @spec admin_display_product_query() :: [Product.t()]
   def admin_display_product_query() do
     child_product_ids =
       Variation
@@ -89,7 +80,6 @@ defmodule Snitch.Data.Model.Product do
   - Variant product (excluding their parent)
   In short returns product excluding the parent products
   """
-  @spec sellable_products_query() :: [Product.t()]
   def sellable_products_query() do
     parent_product_ids =
       Variation
@@ -99,7 +89,10 @@ defmodule Snitch.Data.Model.Product do
 
     Product
     |> join(:left, [p], v in Variation, v.child_product_id == p.id)
-    |> where([p, v], p.state != "in_active" and p.id not in ^parent_product_ids)
+    |> where(
+      [p, v],
+      p.state == "active" and is_nil(p.deleted_at) and p.id not in ^parent_product_ids
+    )
   end
 
   @spec get_product_with_default_image(Product.t()) :: Product.t()
@@ -157,7 +150,7 @@ defmodule Snitch.Data.Model.Product do
   @spec update(Product.t(), map) :: {:ok, Product.t()} | {:error, Ecto.Changeset.t()}
   def update(product, params) do
     with {:ok, product} <- QH.update(Product, params, product, Repo) do
-      ESProductStore.index_product_to_es(product)
+      ESProductStore.update_product_to_es(product)
       {:ok, product}
     else
       {:error, error} -> {:error, error}
@@ -253,10 +246,10 @@ defmodule Snitch.Data.Model.Product do
   @spec add_images(Product.t(), map) :: {:ok, map} | {:error, any()}
   def add_images(product, params) do
     Multi.new()
-    |> Multi.run(:product, fn _ ->
+    |> Multi.run(:struct, fn _ ->
       QH.update(Product, params, product, Repo)
     end)
-    |> Multi.run(:store_image, fn %{product: product} ->
+    |> Multi.run(:store_image, fn %{struct: product} ->
       store_images(product, params)
     end)
     |> ImageModel.persist()
@@ -355,23 +348,36 @@ defmodule Snitch.Data.Model.Product do
   # the type of product.
   @spec is_parent_product(String.t()) :: true | false
   def is_parent_product(product_id) when is_binary(product_id) do
-    query =
-      from(
-        p in "snitch_product_variants",
-        where: p.parent_product_id == ^(product_id |> String.to_integer()),
-        select: fragment("count(*)")
-      )
+    status =
+      Product
+      |> Repo.get(product_id)
+      |> Repo.preload(:parent_variation)
+      |> is_parent_or_child()
 
-    count = Repo.one(query)
-    count > 0
+    case status do
+      :parent ->
+        true
+
+      _ ->
+        false
+    end
   end
 
   @spec is_child_product(Product.t()) :: true | false
   def is_child_product(product) do
-    query = from(c in Variation, where: c.child_product_id == ^product.id)
-    count = Repo.aggregate(query, :count, :id)
-    count > 0
+    status = product |> Repo.preload(:parent_variation) |> is_parent_or_child()
+
+    case status do
+      :child ->
+        true
+
+      _ ->
+        false
+    end
   end
+
+  def is_parent_or_child(%{parent_variation: nil}), do: :parent
+  def is_parent_or_child(%{parent_variation: %{parent_product: _}}), do: :child
 
   @spec get_selling_prices(List.t()) :: Map.t()
   def get_selling_prices(product_ids) do

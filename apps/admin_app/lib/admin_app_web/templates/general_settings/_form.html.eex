@@ -28,9 +28,13 @@
                   <div class="label-txt">Default currency of the store</div>
               </label>
               <div class="col-sm-9 input-group">
-                <%= select f, :currency, get_currency(), value: "USD", class: "form-control", disabled: true %>
+                <%= if @method == "put" do %>
+                    <%= select f, :currency, get_currency(), value: f.data.currency, class: "form-control", disabled: true %>
+                    <%= hidden_input f, :currency, class: "form-control", value: f.data.currency %>
+                <% else %>
+                    <%= select f, :currency, get_currency(), class: "form-control"%>
+                <% end %>
               </div>
-              <%= hidden_input f, :currency, class: "form-control", value: "USD" %>
             </div>
             <%= if @changeset.data.image != nil do %>
                 <div class="img-wrap col-3 p-1">
