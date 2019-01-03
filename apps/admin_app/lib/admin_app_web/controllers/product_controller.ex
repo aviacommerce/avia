@@ -5,14 +5,12 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Data.Model.Product, as: ProductModel
   alias Snitch.Data.Model
   alias Snitch.Data.Schema.Product, as: ProductSchema
-  alias Snitch.Data.Model.ProductPrototype, as: PrototypeModel
   alias Snitch.Domain.Taxonomy
   alias Snitch.Tools.Helper.Rummage, as: RummageHelper
   alias Snitch.Domain.Inventory
   alias Snitch.Tools.ElasticSearch.ProductStore, as: ESProductStore
 
   alias Snitch.Data.Schema.{
-    Image,
     ProductBrand,
     StockLocation,
     VariationTheme,
@@ -20,7 +18,6 @@ defmodule AdminAppWeb.ProductController do
     Property
   }
 
-  alias Snitch.Tools.Money
   alias Snitch.Tools.Helper.Query
   alias Snitch.Data.Model.StockItem, as: StockModel
   alias Snitch.Data.Schema.StockItem, as: StockSchema
@@ -158,7 +155,7 @@ defmodule AdminAppWeb.ProductController do
     product = preload_product_images(id)
 
     ProductModel.update_default_image(product, default_image)
-    ESProductStore.index_product_to_es(product)
+    ESProductStore.update_product_to_es(product)
 
     conn
     |> put_status(200)
@@ -176,7 +173,7 @@ defmodule AdminAppWeb.ProductController do
 
     case ProductModel.add_images(product, params) do
       {:ok, updated_product} ->
-        ESProductStore.index_product_to_es(updated_product)
+        ESProductStore.update_product_to_es(updated_product)
         associated_images = product.images
         product = product |> Repo.preload(:images, force: true)
 
@@ -221,7 +218,7 @@ defmodule AdminAppWeb.ProductController do
       {:ok, _} ->
         product_id
         |> ProductModel.get()
-        |> ESProductStore.index_product_to_es()
+        |> ESProductStore.update_product_to_es()
 
         conn
         |> put_status(200)
@@ -250,7 +247,8 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def delete(conn, %{"id" => id} = params) do
-    with {:ok, _product} <- ProductModel.delete(id) do
+    with _ <- ESProductStore.update_product_to_es(id, :delete),
+         {:ok, _product} <- ProductModel.delete(id) do
       conn
       |> put_flash(:info, "Product deleted successfully")
       |> redirect_with_updated_conn(params)
@@ -266,7 +264,7 @@ defmodule AdminAppWeb.ProductController do
              "theme_id" => params["theme_id"]
            }) do
       {:ok, _product} = Repo.update(changeset)
-      ESProductStore.index_product_to_es(parent_product)
+      ESProductStore.update_product_to_es(parent_product)
       redirect(conn, to: product_path(conn, :edit, params["product_id"]))
     else
       _ ->

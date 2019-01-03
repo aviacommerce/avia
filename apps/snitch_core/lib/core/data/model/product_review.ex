@@ -45,7 +45,7 @@ defmodule Snitch.Data.Model.ProductReview do
       %{product_id: product_id} = params
       params = %{product_id: product_id, review_id: review.id}
       return = QH.create(ProductReview, params, Repo)
-      ESProductStore.index_product_to_es(Repo.get(Product, product_id))
+      ESProductStore.update_product_to_es(Repo.get(Product, product_id))
       return
     end)
     |> persist()

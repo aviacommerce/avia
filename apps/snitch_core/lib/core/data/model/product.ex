@@ -52,16 +52,8 @@ defmodule Snitch.Data.Model.Product do
   Updates the default image for a given product
   from the given list of images.
   """
-  def update_default_image(product, default_image) do
-    for image <- product.images do
-      if to_string(image.id) == default_image do
-        attrs = %{is_default: true}
-        ImageModel.update(attrs, image)
-      else
-        attrs = %{is_default: false}
-        ImageModel.update(attrs, image)
-      end
-    end
+  def update_default_image(%{images: images}, default_image) do
+    Enum.map(images, &ImageModel.update(%{is_default: to_string(&1.id) == default_image}, &1))
   end
 
   @doc """
@@ -71,7 +63,6 @@ defmodule Snitch.Data.Model.Product do
   - Parent product (Product that has variants)
   In short returns product excluding the variant products
   """
-  @spec admin_display_product_query() :: [Product.t()]
   def admin_display_product_query() do
     child_product_ids =
       Variation
@@ -89,7 +80,6 @@ defmodule Snitch.Data.Model.Product do
   - Variant product (excluding their parent)
   In short returns product excluding the parent products
   """
-  @spec sellable_products_query() :: [Product.t()]
   def sellable_products_query() do
     parent_product_ids =
       Variation
@@ -99,7 +89,10 @@ defmodule Snitch.Data.Model.Product do
 
     Product
     |> join(:left, [p], v in Variation, v.child_product_id == p.id)
-    |> where([p, v], p.state != "in_active" and p.id not in ^parent_product_ids)
+    |> where(
+      [p, v],
+      p.state == "active" and is_nil(p.deleted_at) and p.id not in ^parent_product_ids
+    )
   end
 
   @spec get_product_with_default_image(Product.t()) :: Product.t()
@@ -157,7 +150,7 @@ defmodule Snitch.Data.Model.Product do
   @spec update(Product.t(), map) :: {:ok, Product.t()} | {:error, Ecto.Changeset.t()}
   def update(product, params) do
     with {:ok, product} <- QH.update(Product, params, product, Repo) do
-      ESProductStore.index_product_to_es(product)
+      ESProductStore.update_product_to_es(product)
       {:ok, product}
     else
       {:error, error} -> {:error, error}
@@ -422,8 +415,7 @@ defmodule Snitch.Data.Model.Product do
     Enum.reduce(stocks, 0, fn stock, acc -> stock.count_on_hand + acc end)
   end
 
-  @spec get_product_count_by_state(DateTime.t(), DateTime.t()) :: integer
-  def get_product_count_by_state(start_date, end_date) do
+  def get_product_count_by_state() do
     child_product_ids =
       Variation
       |> select([v], v.child_product_id)
@@ -432,8 +424,7 @@ defmodule Snitch.Data.Model.Product do
     Product
     |> where(
       [p],
-      p.inserted_at >= ^start_date and p.inserted_at <= ^end_date and p.state in ^@product_states and
-        p.id not in ^child_product_ids
+      p.state in ^@product_states and p.id not in ^child_product_ids
     )
     |> group_by([p], p.state)
     |> select([p], %{state: p.state, count: count(p.id)})

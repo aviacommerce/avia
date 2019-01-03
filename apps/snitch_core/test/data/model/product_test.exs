@@ -283,17 +283,9 @@ defmodule Snitch.Data.Model.ProductTest do
       product = insert(:product)
       {:ok, updated_product} = Product.update(product, %{state: :active, taxon_id: taxon.id})
 
-      next_date =
-        product.inserted_at
-        |> NaiveDateTime.to_date()
-        |> Date.add(1)
-        |> Date.to_string()
-        |> get_naive_date_time()
+      product_state_count = Product.get_product_count_by_state() |> List.first()
 
-      product_state_count =
-        Product.get_product_count_by_state(product.inserted_at, next_date) |> List.first()
-
-      assert product_state_count.count == 1
+      assert product_state_count.count == 2
       assert product_state_count.state == :active
     end
   end

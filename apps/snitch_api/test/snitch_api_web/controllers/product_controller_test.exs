@@ -23,7 +23,7 @@ defmodule SnitchApiWeb.ProductControllerTest do
       |> put_req_header("accept", "application/vnd.api+json")
       |> put_req_header("content-type", "application/vnd.api+json")
 
-    {:ok, conn: conn}
+    {:ok, conn: conn, taxon: insert(:taxon)}
   end
 
   test "lists all products entries on index", %{conn: conn} do
@@ -31,9 +31,9 @@ defmodule SnitchApiWeb.ProductControllerTest do
     assert json_response(conn, 200)["data"]
   end
 
-  test "shows chosen resource product", %{conn: conn} do
-    product = insert(:product, state: "active")
-    ProductStore.index_product_to_es(product)
+  test "shows chosen resource product", %{conn: conn, taxon: taxon} do
+    product = insert(:product, state: "active", taxon: taxon)
+    ProductStore.update_product_to_es(product)
     :timer.sleep(1000)
     conn = get(conn, product_path(conn, :show, product.slug))
 
@@ -43,11 +43,11 @@ defmodule SnitchApiWeb.ProductControllerTest do
            }
   end
 
-  test "Products, search contains name and pagination", %{conn: conn} do
-    product1 = insert(:product, %{state: "active"})
-    product2 = insert(:product, %{state: "active"})
-    product3 = insert(:product, %{state: "active"})
-    Enum.map([product1, product2, product3], &ProductStore.index_product_to_es/1)
+  test "Products, search contains name and pagination", %{conn: conn, taxon: taxon} do
+    product1 = insert(:product, state: "active", taxon: taxon)
+    product2 = insert(:product, state: "active", taxon: taxon)
+    product3 = insert(:product, state: "active", taxon: taxon)
+    Enum.map([product1, product2, product3], &ProductStore.update_product_to_es/1)
     :timer.sleep(1000)
 
     params = %{
@@ -65,9 +65,9 @@ defmodule SnitchApiWeb.ProductControllerTest do
     assert response == 3
   end
 
-  test "Products, sort by newly inserted", %{conn: conn} do
-    product = insert(:product, %{state: "active"})
-    ProductStore.index_product_to_es(product)
+  test "Products, sort by newly inserted", %{conn: conn, taxon: taxon} do
+    product = insert(:product, state: "active", taxon: taxon)
+    ProductStore.update_product_to_es(product)
     :timer.sleep(1000)
 
     params = %{

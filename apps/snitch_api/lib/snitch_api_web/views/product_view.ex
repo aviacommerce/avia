@@ -68,7 +68,7 @@ defmodule SnitchApiWeb.ProductView do
     url =
       case product.images |> List.first() do
         nil -> nil
-        image -> ImageModel.image_url(image.name, product)
+        image -> ImageModel.image_url(image.name, product, :thumb)
       end
 
     %{"default_product_url" => url}
@@ -97,11 +97,23 @@ defmodule SnitchApiWeb.ProductView do
   defp get_images(images, product) do
     case images do
       [] ->
-        [%{"product_url" => nil}]
+        [
+          %{
+            "small" => "",
+            "thumb" => "",
+            "large" => ""
+          }
+        ]
 
       images ->
         images
-        |> Enum.map(fn image -> %{"product_url" => ImageModel.image_url(image.name, product)} end)
+        |> Enum.map(fn image ->
+          %{
+            "small" => ImageModel.image_url(image.name, product, :small),
+            "thumb" => ImageModel.image_url(image.name, product, :thumb),
+            "large" => ImageModel.image_url(image.name, product, :large)
+          }
+        end)
     end
   end
 
