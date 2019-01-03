@@ -43,17 +43,6 @@ defmodule Snitch.Data.Schema.StockItem do
     |> common_changeset()
   end
 
-  defp handle_count(changeset) do
-    case get_change(changeset, :count_on_hand) do
-      nil ->
-        changeset
-
-      count ->
-        count_on_hand = changeset.data.count_on_hand + count
-        put_change(changeset, :count_on_hand, count_on_hand)
-    end
-  end
-
   defp common_changeset(stock_item_changeset) do
     stock_item_changeset
     |> validate_number(:count_on_hand, greater_than: -1)
