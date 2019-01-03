@@ -338,7 +338,7 @@ defmodule Snitch.Data.Model.Product do
 
   defp remove_image_from_store(multi) do
     Multi.run(multi, :remove_from_upload, fn %{image: image, product: product} ->
-      case ImageUploader.delete({image.name, product}) do
+      case ImageModel.delete_image(image.name, product) do
         :ok ->
           {:ok, "success"}
 
