@@ -335,6 +335,39 @@ defmodule Snitch.Data.Model.ProductTest do
     end
   end
 
+  describe "has_variants?/1" do
+    test "product variant exist" do
+      attrs = %{products: [build(:variant)]}
+      product = insert(:product, attrs)
+
+      assert Product.has_variants?(product)
+    end
+
+    test "product variant does not exist" do
+      product = insert(:product)
+
+      refute Product.has_variants?(product)
+    end
+  end
+
+  describe "is_variant_tracking_enabled?/1" do
+    test "inventory tracking is enabled" do
+      product = insert(:product, inventory_tracking: :variant)
+
+      assert Product.is_variant_tracking_enabled?(product)
+    end
+
+    test "inventory tracking is not enabled" do
+      product = insert(:product, inventory_tracking: :product)
+
+      refute Product.is_variant_tracking_enabled?(product)
+
+      product = insert(:product, inventory_tracking: :none)
+
+      refute Product.is_variant_tracking_enabled?(product)
+    end
+  end
+
   defp get_naive_date_time(date) do
     Date.from_iso8601(date)
     |> elem(1)

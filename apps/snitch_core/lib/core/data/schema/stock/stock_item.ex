@@ -10,6 +10,7 @@ defmodule Snitch.Data.Schema.StockItem do
 
   schema "snitch_stock_items" do
     field(:count_on_hand, :integer, default: 0)
+    field(:inventory_warning_level, :integer, default: 0)
     field(:backorderable, :boolean, default: false)
 
     belongs_to(:product, Product)
@@ -19,7 +20,7 @@ defmodule Snitch.Data.Schema.StockItem do
   end
 
   @create_fields ~w(product_id stock_location_id count_on_hand)a
-  @update_fields ~w(count_on_hand)a
+  @update_fields ~w(count_on_hand inventory_warning_level)a
 
   @doc """
   Returns a `StockItem` changeset to create a new `stock_item`.
@@ -39,19 +40,7 @@ defmodule Snitch.Data.Schema.StockItem do
   def update_changeset(%__MODULE__{} = stock_item, params) do
     stock_item
     |> cast(params, @update_fields)
-    |> handle_count()
     |> common_changeset()
-  end
-
-  defp handle_count(changeset) do
-    case get_change(changeset, :count_on_hand) do
-      nil ->
-        changeset
-
-      count ->
-        count_on_hand = changeset.data.count_on_hand + count
-        put_change(changeset, :count_on_hand, count_on_hand)
-    end
   end
 
   defp common_changeset(stock_item_changeset) do

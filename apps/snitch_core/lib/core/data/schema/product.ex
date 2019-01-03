@@ -53,6 +53,7 @@ defmodule Snitch.Data.Schema.Product do
     field(:tenant, :string, virtual: true)
 
     field(:state, ProductStateEnum, default: :draft)
+    field(:inventory_tracking, InventoryTrackingEnum, default: :none)
 
     # Following fields are used in context of import
     field(:store, :string, default: "avia")
@@ -85,7 +86,7 @@ defmodule Snitch.Data.Schema.Product do
   end
 
   @required_fields ~w(name selling_price max_retail_price taxon_id shipping_category_id)a
-  @optional_fields ~w(description meta_description meta_keywords meta_title brand_id height width depth weight state)a
+  @optional_fields ~w(description meta_description meta_keywords meta_title brand_id height width depth weight state inventory_tracking)a
 
   def create_changeset(model, params \\ %{}) do
     common_changeset(model, params)
@@ -189,6 +190,10 @@ defmodule Snitch.Data.Schema.Product do
       end)
 
     put_change(changeset, :variations, variant_changes)
+  end
+
+  def is_variant_tracking_enabled?(product) do
+    product.inventory_tracking == :variant
   end
 end
 

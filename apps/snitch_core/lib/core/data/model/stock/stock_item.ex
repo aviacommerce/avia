@@ -68,7 +68,12 @@ defmodule Snitch.Data.Model.StockItem do
   @spec total_on_hand(non_neg_integer) :: integer
   def total_on_hand(variant_id) do
     stock_items = with_active_stock_location_query(variant_id)
-    Repo.one(from(st in stock_items, select: sum(st.count_on_hand)))
+    stock = Repo.one(from(st in stock_items, select: sum(st.count_on_hand)))
+
+    case stock do
+      nil -> 0
+      stock -> stock
+    end
   end
 
   @doc """
@@ -87,5 +92,18 @@ defmodule Snitch.Data.Model.StockItem do
       join: sl in StockLocationSchema,
       on: st.stock_location_id == sl.id and sl.active == true
     )
+  end
+
+  @doc """
+  Returns the stock items for a particular product and stock location
+  """
+  @spec get_stock(integer, integer) :: [StockItemSchema.t()]
+  def get_stock(product_id, stock_location_id) do
+    from(
+      st in StockItemSchema,
+      where: st.product_id == ^product_id and st.stock_location_id == ^stock_location_id,
+      select: st
+    )
+    |> Repo.all()
   end
 end

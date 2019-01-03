@@ -6,7 +6,15 @@ defmodule AdminAppWeb.ProductView do
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Domain.Taxonomy
 
-  alias Snitch.Data.Model.{GeneralConfiguration, Product, ProductProperty, Property, StockItem}
+  alias Snitch.Data.Model.{
+    GeneralConfiguration,
+    Product,
+    ProductProperty,
+    Property,
+    StockItem,
+    StockLocation
+  }
+
   alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Data.Schema
   import Ecto.Query
@@ -16,8 +24,12 @@ defmodule AdminAppWeb.ProductView do
   @sort_field_keys ["rummage", "sort", "field"]
   @sort_order_keys ["rummage", "sort", "order"]
 
+  def active_stock_location() do
+    Enum.map(StockLocation.active(), &{&1.name, &1.id})
+  end
+
   def themes_options(product) do
-    Enum.map(product.taxon.variation_themes, fn theme -> {theme.name, theme.id} end)
+    Enum.map(product.taxon.variation_themes, &{&1.name, &1.id})
   end
 
   def can_add_variant(product) do
@@ -36,8 +48,12 @@ defmodule AdminAppWeb.ProductView do
     length(product.taxon.variation_themes) > 0
   end
 
+  def is_variant_tracking_enabled(product) do
+    Product.is_variant_tracking_enabled?(product)
+  end
+
   def has_variants(product) do
-    product.variants |> length > 0
+    Product.has_variants?(product)
   end
 
   def get_option_types(product) do
@@ -48,7 +64,7 @@ defmodule AdminAppWeb.ProductView do
   end
 
   def get_brand_options(brands) do
-    Enum.map(brands, fn brand -> {brand.name, brand.id} end)
+    Enum.map(brands, &{&1.name, &1.id})
   end
 
   def get_amount(nil) do
@@ -91,11 +107,11 @@ defmodule AdminAppWeb.ProductView do
   end
 
   def get_variant_option(variants) do
-    Enum.map(variants, fn variant -> {variant.name, variant.id} end)
+    Enum.map(variants, &{&1.name, &1.id})
   end
 
   def get_stock_locations_option(locations) do
-    Enum.map(locations, fn location -> {location.name, location.id} end)
+    Enum.map(locations, &{&1.name, &1.id})
   end
 
   def get_shipping_category() do
@@ -217,5 +233,9 @@ defmodule AdminAppWeb.ProductView do
 
   defp generate_taxon_text([head | tail], acc) do
     generate_taxon_text(tail, acc <> "#{head.name} > ")
+  end
+
+  def get_total_stock(variant) do
+    StockItem.total_on_hand(variant.id)
   end
 end
