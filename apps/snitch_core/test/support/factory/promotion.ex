@@ -21,7 +21,7 @@ defmodule Snitch.Factory.Promotion do
         %PromotionRule{
           name: "Order Item Total",
           module: "Elixir.Snitch.Data.Schema.PromotionRule.ItemTotal",
-          preferences: %{lower_range: 10, upper_range: 100},
+          preferences: %{lower_range: Decimal.new(10), upper_range: Decimal.new(5)},
           promotion: build(:promotion)
         }
       end

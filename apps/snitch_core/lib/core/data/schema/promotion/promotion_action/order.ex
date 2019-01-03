@@ -9,6 +9,7 @@ defmodule Snitch.Data.Schema.PromotionAction.OrderAction do
   @behaviour Snitch.Data.Schema.PromotionAction
 
   @type t :: %__MODULE__{}
+  @name "whole order adjustment"
 
   embedded_schema do
     # The field is using ActionCalculators enum but it has no
@@ -47,6 +48,10 @@ defmodule Snitch.Data.Schema.PromotionAction.OrderAction do
       {:error, _data} ->
         false
     end
+  end
+
+  def action_name() do
+    @name
   end
 
   ####################### Private Functions #####################

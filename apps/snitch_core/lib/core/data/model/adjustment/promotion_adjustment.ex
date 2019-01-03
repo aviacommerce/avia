@@ -99,6 +99,25 @@ defmodule Snitch.Data.Model.PromotionAdjustment do
     Repo.all(query)
   end
 
+  def promotion_adjustments(promotion) do
+    query =
+      from(adj in AdjustmentSchema,
+        join: p_adj in PromotionAdjustment,
+        on: adj.id == p_adj.adjustment_id,
+        where: p_adj.promotion_id == ^promotion.id,
+        select: %AdjustmentSchema{
+          amount: adj.amount,
+          eligible: adj.eligible,
+          id: adj.id,
+          label: adj.label,
+          adjustable_type: adj.adjustable_type,
+          adjustable_id: adj.adjustable_id
+        }
+      )
+
+    Repo.all(query)
+  end
+
   def activate_adjustments(prev_eligible_ids, current_adjustment_ids) do
     Multi.new()
     |> Multi.run(:remove_eligible_adjustments, fn _ ->

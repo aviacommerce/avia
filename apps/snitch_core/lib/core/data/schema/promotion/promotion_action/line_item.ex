@@ -9,6 +9,7 @@ defmodule Snitch.Data.Schema.PromotionAction.LineItemAction do
 
   @behaviour Snitch.Data.Schema.PromotionAction
   @type t :: %__MODULE__{}
+  @name "per line item adjustment"
 
   embedded_schema do
     field(:calculator_module, ActionCalculators)
@@ -45,6 +46,10 @@ defmodule Snitch.Data.Schema.PromotionAction.LineItemAction do
       end)
 
     Enum.any?(adjustments, fn adj -> adj == true end)
+  end
+
+  def action_name() do
+    @name
   end
 
   ########################  private functions #################

@@ -34,6 +34,11 @@ defmodule Snitch.Data.Schema.PromotionAction do
               action :: PromotionAction.t()
             ) :: boolean()
 
+  @doc """
+  Returns the name of the action.
+  """
+  @callback action_name() :: String.t()
+
   schema "snitch_promotion_actions" do
     field(:name, :string)
     field(:module, PromotionActionEnum)
@@ -45,8 +50,8 @@ defmodule Snitch.Data.Schema.PromotionAction do
     timestamps()
   end
 
-  @required_params ~w(name module)a
-  @optional_params ~w(preferences promotion_id)a
+  @required_params ~w(name module preferences)a
+  @optional_params ~w(promotion_id)a
   @create_params @required_params ++ @optional_params
 
   def changeset(%__MODULE__{} = action, params) do

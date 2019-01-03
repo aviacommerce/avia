@@ -26,6 +26,7 @@ defmodule Snitch.Data.Schema.Promotion do
     field(:archived_at, UnixTimestamp, default: 0)
 
     # associations
+
     has_many(:rules, PromotionRule, on_replace: :delete, on_delete: :delete_all)
     has_many(:actions, PromotionAction, on_replace: :delete, on_delete: :delete_all)
 
@@ -34,7 +35,7 @@ defmodule Snitch.Data.Schema.Promotion do
 
   @required_fields ~w(code name)a
   @optional_fields ~w(description starts_at expires_at usage_limit match_policy
-    active? code archived_at)a
+    active? archived_at)a
 
   @create_fields @optional_fields ++ @required_fields
 
@@ -45,6 +46,8 @@ defmodule Snitch.Data.Schema.Promotion do
     promotion
     |> cast(params, @create_fields)
     |> common_changeset()
+    |> cast_assoc(:rules, with: &PromotionRule.changeset/2)
+    |> cast_assoc(:actions, with: &PromotionAction.changeset/2)
   end
 
   @doc """
@@ -93,6 +96,8 @@ defmodule Snitch.Data.Schema.Promotion do
     promotion
     |> cast(params, @create_fields)
     |> common_changeset()
+    |> cast_assoc(:rules, with: &PromotionRule.changeset/2)
+    |> cast_assoc(:actions, with: &PromotionAction.changeset/2)
   end
 
   defp common_changeset(changeset) do
