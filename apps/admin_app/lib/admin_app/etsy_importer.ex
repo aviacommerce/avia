@@ -157,6 +157,7 @@ defmodule Avia.Etsy.Importer do
       path: file_path
     }
 
+    product = %{product | tenant: Repo.get_prefix()}
     {:ok, filename} = ImageUploader.store({upload, product})
     filename
   end
