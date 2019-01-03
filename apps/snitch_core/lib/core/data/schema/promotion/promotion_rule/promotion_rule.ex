@@ -60,8 +60,8 @@ defmodule Snitch.Data.Schema.PromotionRule do
     timestamps()
   end
 
-  @required_params ~w(name module)a
-  @optional_params ~w(preferences promotion_id)a
+  @required_params ~w(name module preferences)a
+  @optional_params ~w(promotion_id)a
   @create_params @required_params ++ @optional_params
 
   @doc """

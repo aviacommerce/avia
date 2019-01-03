@@ -85,10 +85,14 @@ defmodule Snitch.Data.Model.Promotion.Applicability do
   otherwise returns true.
   """
   def usage_limit_check(promotion) do
-    if promotion.usage_limit > promotion.current_usage_count do
+    if promotion.usage_limit == 0 do
       true
     else
-      {false, @errors.expired}
+      if promotion.usage_limit > promotion.current_usage_count do
+        true
+      else
+        {false, @errors.expired}
+      end
     end
   end
 end

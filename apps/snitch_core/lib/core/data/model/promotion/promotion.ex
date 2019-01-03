@@ -14,6 +14,109 @@ defmodule Snitch.Data.Model.Promotion do
   }
 
   @doc """
+  Creates a promotion with the supplied params.
+
+  The params can have a list of `rules` provided under the rules key
+  as well as `actions` under the key actions.
+
+  The `rules` and `actions` are casted with the promotion.
+
+  ## See also
+  `Ecto.Changeset.cast_assoc/3`
+  """
+  @spec create(map) :: {:ok, Promotion.t()} | {:error, Ecto.Changeset.t()}
+  def create(params) do
+    QH.create(Promotion, params, Repo)
+  end
+
+  @doc """
+  Updates the `promotion` with supplied `params`.
+
+  Before updating an action it is verified if it is archived or
+  ongoing. In case the promotion has started(ongoing) it can not be updated.
+  An archived promotion can also not be updated.
+  """
+  @spec update(Package.t(), map) ::
+          {:ok, Ecto.Schema.t()}
+          | {:error, Ecto.Changeset.t()}
+          | {:error, String.t()}
+  def update(promotion, params) do
+    with {false, _message} <- archived(promotion),
+         {false, _message} <- ongoing(promotion) do
+      promotion = Repo.preload(promotion, [:actions, :rules])
+      QH.update(Promotion, params, promotion, Repo)
+    else
+      {true, message} ->
+        {:error, message}
+    end
+  end
+
+  @doc """
+  Checks if the promotion is `archived`.
+
+  Returns `{true, message}` or `{false, message}` based on whether it is archived
+  or not.
+  """
+  def archived(promotion) do
+    if promotion.archived_at == 0 do
+      {false, "promotion is active"}
+    else
+      {true, "promotion no longer active"}
+    end
+  end
+
+  @doc """
+  Checks if the promotion is ongoing.
+
+  Returns `{true, message}` or `{false, message}` based on whether it is archived
+  or not.
+  """
+  def ongoing(promotion) do
+    active = promotion.active?
+
+    date_check =
+      DateTime.compare(promotion.starts_at, DateTime.utc_now()) == :lt and
+        DateTime.compare(promotion.expires_at, DateTime.utc_now()) == :gt
+
+    if active && date_check && has_adjustments?(promotion) do
+      {true, "promotion ongoing"}
+    else
+      {false, "promotion not active"}
+    end
+  end
+
+  @doc """
+  Arhcives a promotion.
+
+  An archived promotion can not be used for any order. Also, it can not
+  be updated. It is mainly for keeping a track of the adjustments created
+  for the promotion.
+  """
+  @spec update(Package.t(), map) ::
+          {:ok, Promotion.t()}
+          | {:error, Ecto.Changeset.t()}
+  def archive(promotion) do
+    params = %{archived_at: DateTime.to_unix(DateTime.utc_now())}
+    QH.update(Promotion, params, promotion, Repo)
+  end
+
+  @spec get(map) :: Promotion.t() | nil
+  def get(query_fields) do
+    Promotion |> QH.get(query_fields, Repo) |> Repo.preload([:actions, :rules])
+  end
+
+  @doc """
+  Returns a list of promotions.
+
+  Returns only those promotions which are not archived.
+  """
+  def get_all() do
+    date_time = 0
+    query = from(p in Promotion, where: p.archived_at == ^date_time)
+    Repo.all(query)
+  end
+
+  @doc """
   Applies a coupon to the supplied order depending on some
   conditions.
 
@@ -87,6 +190,16 @@ defmodule Snitch.Data.Model.Promotion do
 
   ############################## private functions ####################
 
+  defp has_adjustments?(promotion) do
+    case PromotionAdjustment.promotion_adjustments(promotion) do
+      [] ->
+        false
+
+      _list ->
+        true
+    end
+  end
+
   defp process_adjustments(order, promotion) do
     %{
       current_discount: current_discount,
@@ -101,13 +214,26 @@ defmodule Snitch.Data.Model.Promotion do
              current_adjustment_ids
            ) do
         {:ok, _data} ->
-          {:ok, @messages.coupon_applied}
+          update_usage_count(promotion)
 
         {:error, _data} ->
           {:error, @messages.failed}
       end
     else
       {:error, @messages.better_coupon}
+    end
+  end
+
+  defp update_usage_count(promotion) do
+    current_usage_count = promotion.current_usage_count
+    params = %{current_usage_count: current_usage_count + 1}
+
+    case QH.update(Promotion, params, promotion, Repo) do
+      {:ok, _data} ->
+        {:ok, @messages.coupon_applied}
+
+      _ ->
+        {:error, @messages.failed}
     end
   end
 

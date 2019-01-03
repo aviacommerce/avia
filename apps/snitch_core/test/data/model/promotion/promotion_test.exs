@@ -14,6 +14,173 @@ defmodule Snitch.Data.Model.PromotionTest do
   }
   @coupon_applied "coupon already applied"
 
+  @rule_params [
+    %{
+      name: "Order Item Total",
+      module: "Elixir.Snitch.Data.Schema.PromotionRule.ItemTotal",
+      preferences: %{lower_range: Decimal.new(10), upper_range: Decimal.new(100)}
+    },
+    %{
+      name: "Product Rule",
+      module: "Elixir.Snitch.Data.Schema.PromotionRule.Product",
+      preferences: %{product_list: [1, 2, 3, 4], match_policy: "all"}
+    }
+  ]
+
+  @action_params [
+    %{
+      name: "Order Action",
+      module: "Elixir.Snitch.Data.Schema.PromotionAction.OrderAction",
+      preferences: %{
+        calculator_module: "Elixir.Snitch.Domain.Calculator.FlatRate",
+        calculator_preferences: %{amount: Decimal.new(10)}
+      }
+    },
+    %{
+      name: "LineItem Action",
+      module: "Elixir.Snitch.Data.Schema.PromotionAction.LineItemAction",
+      preferences: %{
+        calculator_module: "Elixir.Snitch.Domain.Calculator.FlatRate",
+        calculator_preferences: %{amount: Decimal.new(5)}
+      }
+    }
+  ]
+
+  describe "create/1" do
+    test "create a promotion with rules and actions" do
+      params = %{
+        code: "OFF5",
+        name: "5off",
+        starts_at: Timex.shift(DateTime.utc_now(), hours: 2),
+        expires_at: Timex.shift(DateTime.utc_now(), hours: 8),
+        rules: @rule_params,
+        actions: @action_params
+      }
+
+      {:ok, promotion} = Promotion.create(params)
+      assert length(promotion.rules) == 2
+      assert length(promotion.actions) == 2
+    end
+
+    test "fails if error on a rule" do
+      [r_param_1, r_param_2] = @rule_params
+
+      rule_params = [
+        Map.put(r_param_1, :preferences, %{lower_range: "abc", upper_range: Decimal.new(10)}),
+        r_param_2
+      ]
+
+      params = %{
+        code: "OFF5",
+        name: "5off",
+        starts_at: Timex.shift(DateTime.utc_now(), hours: 2),
+        expires_at: Timex.shift(DateTime.utc_now(), hours: 8),
+        rules: rule_params,
+        actions: @action_params
+      }
+
+      {:error, changeset} = Promotion.create(params)
+
+      assert %{rules: [%{preferences: [%{lower_range: ["is invalid"]}]}, %{}]} =
+               get_changeset_error(changeset)
+    end
+
+    test "fails if error on an action" do
+      [a_param_1, a_param_2] = @action_params
+
+      action_params = [
+        Map.put(a_param_1, :preferences, %{
+          calculator_module: "Elixir.Snitch.Domain.Calculator.FlatRate",
+          calculator_preferences: %{amount: "abc"}
+        }),
+        a_param_2
+      ]
+
+      params = %{
+        code: "OFF5",
+        name: "5off",
+        starts_at: Timex.shift(DateTime.utc_now(), hours: 2),
+        expires_at: Timex.shift(DateTime.utc_now(), hours: 8),
+        rules: @rule_params,
+        actions: action_params
+      }
+
+      {:error, changeset} = Promotion.create(params)
+
+      assert %{
+               actions: [
+                 %{preferences: [%{calculator_preferences: [%{amount: ["is invalid"]}]}]},
+                 %{}
+               ]
+             } = get_changeset_error(changeset)
+    end
+  end
+
+  describe "update/2" do
+    test "updates successfully" do
+      promotion = insert(:promotion)
+      insert(:item_total_rule, promotion: promotion)
+      insert(:promotion_order_action, promotion: promotion)
+
+      params = %{
+        code: "10OFF",
+        rules: @rule_params
+      }
+
+      {:ok, updated_promotion} = Promotion.update(promotion, params)
+      assert promotion.id == updated_promotion.id
+      assert promotion.code != updated_promotion.code
+      assert promotion.rules != updated_promotion.rules
+    end
+
+    test "update fails as promotion archived" do
+      promotion =
+        insert(:promotion,
+          archived_at: DateTime.to_unix(DateTime.utc_now())
+        )
+
+      insert(:item_total_rule, promotion: promotion)
+      insert(:promotion_order_action, promotion: promotion)
+
+      params = %{
+        code: "10OFF"
+      }
+
+      {:error, message} = Promotion.update(promotion, params)
+      assert message == "promotion no longer active"
+    end
+
+    test "update fails if promotion ongoing" do
+      item_info = %{quantity: 2, unit_price: Money.new!(currency(), 10)}
+      order_params = setup_order(item_info)
+
+      %{promotion: promotion} = apply_promotion(order_params)
+
+      params = %{
+        code: "10OFF"
+      }
+
+      {:error, message} = Promotion.update(promotion, params)
+      assert message == "promotion ongoing"
+    end
+  end
+
+  describe "get_all/0" do
+    test "return all promotions" do
+      # insert promotion but archive it
+      insert(:promotion,
+        code: "10Off",
+        archived_at: DateTime.to_unix(DateTime.utc_now())
+      )
+
+      # insert promotion which is not archived
+      insert(:promotion)
+
+      promotions = Promotion.get_all()
+      assert length(promotions) == 1
+    end
+  end
+
   describe "line_item_actionable?/2" do
     setup do
       products = insert_list(3, :product, %{promotionable: true})
@@ -340,5 +507,13 @@ defmodule Snitch.Data.Model.PromotionTest do
       product_ids: product_ids,
       order_total: cost
     }
+  end
+
+  defp get_changeset_error(changeset) do
+    traverse_errors(changeset, fn {_msg, opts} ->
+      Enum.reduce(opts, %{}, fn {key, value}, acc ->
+        Map.put(acc, key, value)
+      end)
+    end)
   end
 end

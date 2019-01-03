@@ -13,7 +13,8 @@ defmodule Snitch.Data.Schema.PromotionRuleTest do
 
     assert %{
              module: ["can't be blank"],
-             name: ["can't be blank"]
+             name: ["can't be blank"],
+             preferences: ["can't be blank"]
            } == errors_on(changeset)
   end
 
