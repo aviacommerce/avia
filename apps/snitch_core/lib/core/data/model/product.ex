@@ -174,6 +174,8 @@ defmodule Snitch.Data.Model.Product do
   def delete(id) do
     with %Product{} = product <- get(id),
          changeset <- Product.delete_changeset(product) do
+      Path.wildcard("uploads/**/images/**/#{product.id}")
+      |> File.rm_rf()
       Repo.update(changeset)
     end
   end
@@ -324,7 +326,7 @@ defmodule Snitch.Data.Model.Product do
     Multi.run(multi, :product, fn _ ->
       case get(product_id) do
         nil ->
-          {:error, "prodcut not found"}
+          {:error, "product not found"}
 
         product ->
           {:ok, product}
