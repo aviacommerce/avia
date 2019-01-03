@@ -75,9 +75,7 @@ defmodule Snitch.Domain.Package do
       stock_item =
         StockItem.get(%{product_id: item.product_id, stock_location_id: stock_location_id})
 
-      # count_on_hand needs to be negative while updating
-      # stock item count
-      count_on_hand = 0 - item.quantity
+      count_on_hand = stock_item.count_on_hand - item.quantity
       StockItem.update(%{count_on_hand: count_on_hand}, stock_item)
     end)
   end

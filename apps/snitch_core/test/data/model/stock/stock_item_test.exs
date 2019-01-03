@@ -75,7 +75,7 @@ defmodule Snitch.Data.Model.StockItemTest do
                StockItemModel.update(%{count_on_hand: 20, id: stock_item.id})
 
       assert stock_item.count_on_hand != updated_stock_item.count_on_hand
-      assert updated_stock_item.count_on_hand == 21
+      assert updated_stock_item.count_on_hand == 20
     end
 
     test "with stock instance : Fails for INVALID attributes" do
@@ -90,7 +90,7 @@ defmodule Snitch.Data.Model.StockItemTest do
       assert {:ok, updated_stock_item} = StockItemModel.update(%{count_on_hand: 20}, stock_item)
 
       assert stock_item.count_on_hand != updated_stock_item.count_on_hand
-      assert updated_stock_item.count_on_hand == 21
+      assert updated_stock_item.count_on_hand == 20
     end
   end
 
@@ -151,7 +151,7 @@ defmodule Snitch.Data.Model.StockItemTest do
 
   describe "total_on_hand/1" do
     test "return nil for invalid variant id" do
-      assert nil == StockItemModel.total_on_hand(-1)
+      assert 0 == StockItemModel.total_on_hand(-1)
     end
 
     test "return total count on hand in all stock items for a variant at active locations" do
@@ -166,6 +166,25 @@ defmodule Snitch.Data.Model.StockItemTest do
         |> Enum.reduce(0, &Kernel.+/2)
 
       assert total_count_on_hand == StockItemModel.total_on_hand(variant.id)
+    end
+  end
+
+  describe "get_stock/2" do
+    test "return stock successfully" do
+      variant = insert(:variant)
+      active_stock_location = insert(:stock_location, active: true)
+      insert(:stock_item, product: variant, stock_location: active_stock_location)
+      stock_items = insert_list(3, :stock_item, product: variant)
+
+      stock = StockItemModel.get_stock(variant.id, active_stock_location.id)
+      assert length(stock) == 1
+    end
+
+    test "no stock for product" do
+      variant = insert(:variant)
+      active_stock_location = insert(:stock_location, active: true)
+
+      assert StockItemModel.get_stock(variant.id, active_stock_location.id) == []
     end
   end
 end

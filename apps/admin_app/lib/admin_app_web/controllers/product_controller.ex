@@ -7,6 +7,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Domain.Taxonomy
   alias Snitch.Tools.Helper.Rummage, as: RummageHelper
+  alias Snitch.Domain.Inventory
   alias Snitch.Tools.ElasticSearch.ProductStore, as: ESProductStore
 
   alias Snitch.Data.Schema.{
@@ -95,6 +96,15 @@ defmodule AdminAppWeb.ProductController do
          {:ok, product} <- ProductModel.update(product, params) do
       updated_params = conn.params |> Map.take(["rummage"]) |> Map.merge(params)
       save_publish_redirect_handler(conn, product, updated_params)
+    end
+  end
+
+  def update_inventory_tracking(conn, %{"product" => product_params} = params) do
+    with %ProductSchema{} = product <- ProductModel.get(params["product_id"]) do
+      tracking_level = product_params["inventory_tracking"]
+      Inventory.set_inventory_tracking(product, tracking_level, params)
+
+      redirect(conn, to: product_path(conn, :edit, product.id))
     end
   end
 
@@ -274,22 +284,6 @@ defmodule AdminAppWeb.ProductController do
         conn
         |> put_flash(:error, "Taxonomy not found")
         |> redirect(to: "/")
-    end
-  end
-
-  def add_stock(conn, %{"stock" => params}) do
-    with {:ok, stock} <- check_stock(params["product_id"], params["location_id"]),
-         {:ok, _updated_stock} <- StockModel.update(params, stock) do
-      redirect(conn, to: product_path(conn, :index))
-    end
-  end
-
-  defp check_stock(product_id, location_id) do
-    query_fields = %{product_id: product_id, stock_location_id: location_id}
-
-    case StockModel.get(query_fields) do
-      %StockSchema{} = stock_item -> {:ok, stock_item}
-      nil -> StockModel.create(product_id, location_id, 0, false)
     end
   end
 

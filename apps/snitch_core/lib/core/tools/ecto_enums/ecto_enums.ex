@@ -20,3 +20,9 @@ defenum(PackageStateEnum,
   delivered: 5,
   complete: 6
 )
+
+defenum(InventoryTrackingEnum,
+  none: 0,
+  product: 1,
+  variant: 2
+)

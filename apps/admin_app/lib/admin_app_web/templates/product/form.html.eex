@@ -12,16 +12,16 @@
    <%= if  @conn.request_path != product_path(@conn, :new) do %>
    <%= unless is_child_product(@parent_product) do %>
     <li class="nav-item">
-      <a class="nav-link" href="#tab2default" data-toggle="tab">Variants</a>
+      <a class="nav-link" href="#inventory_tab" data-toggle="tab">Inventory</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#options_tab" data-toggle="tab">Option and SKU's</a>
     </li>
    <% end %>
    <%= if can_add_variant(@parent_product) do %>
    <% end %>
    <li class="nav-item">
       <a class="nav-link" href="#tab3default" data-toggle="tab">Images</a>
-   </li>
-   <li class="nav-item">
-      <a class="nav-link" href="#tab4default" data-toggle="tab">Stock</a>
    </li>
    <li class="nav-item">
       <a class="nav-link" href="#tab5default" data-toggle="tab">Properties</a>
@@ -125,96 +125,271 @@
     <% end %>
   </div>
 
-  <%= if  @conn.request_path != product_path(@conn, :new) do %>
-   <%= if can_add_variant(@parent_product)  do %>
-    <div class="tab-pane fade p-3" id="tab2default" >
-      <div style="background: #f8f9fa;">
-        <div class="form-group required">
-          <label>Variation Theme</label>
-          <%= select :theme, :theme_id, themes_options(@parent_product), selected: @parent_product.theme_id ,prompt: "", class: "form-control", id: "product_theme_id" %>
-        </div>
-        <div id="variation_options" style="padding: 10px 0px 10px 0px;"></div>
-        <div class="modal fade" id="theme_change_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Warning</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
+  <%= if  @conn.request_path != product_path(@conn, :new) and !is_child_product(@parent_product) do %>
+    <div class="tab-pane p-3 fade in show p-3" id="inventory_tab">
+      <%= form_for @changeset, product_path(@conn, :update_inventory_tracking, @parent_product), [multipart: true, method: "patch"], fn f ->  %>
+      <fieldset id="inventory_tracking" data-selected="<%= @parent_product.inventory_tracking %>" >
+      <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" id="inventory_track_none" value="none" name="product[inventory_tracking]" >
+        <label class="custom-control-label" for="inventory_track_none">Do not track inventory</label>
+      </div>
+      <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" id="inventory_track_product" value="product" name="product[inventory_tracking]">
+        <label class="custom-control-label" for="inventory_track_product">Track inventory for this product</label>
+      </div>
+      <div id="product_tracking" class="card m-2">
+        <%= hidden_input :stock, :product_id, value: @parent_product.id, class: "form-control" %>
+        <div class="col-9">
+          <div class="form-group row">
+            <label class="col-sm-6">
+              <div class="label required">
+                Stock Location
               </div>
-              <div class="modal-body">
-                <div class="alert alert-danger" role="alert">
-                  Changing the variation theme would remove all the existing variants,
-                  are you sure you want to proceed?
-                </div>
+            </label>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <%= select :stock, :stock_location_id, active_stock_location(), class: "form-control" %>
               </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
-                <button id="theme_change_confirm" type="button" class="btn btn-primary">Yes</button>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-6">
+              <div class="label required">
+                Current Stock Level
+              </div>
+              <div class="label-txt">
+                How many units of this product do you currently have in stock?
+              </div>
+            </label>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <%= text_input :stock, :count_on_hand, class: "form-control" %>
+              </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-6">
+              <div class="label">
+                Low Stock Level
+              </div>
+              <div class="label-txt">
+                When inventory levels fall below this number, the product option will be flagged as low stock.
+              </div>
+            </label>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <%= text_input :stock, :inventory_warning_level, class: "form-control" %>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <%= if has_variants(@parent_product) do %>
-      <div class="product_has_variants">
-        <h3>Product Variants</h3>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Product ID</th>
-              <%= for option_type <- get_option_types(@parent_product) do %>
-              <th><%= option_type.display_name %></th>
-              <% end %>
-              <th>State</th>
-              <th>Switch State</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <%= for variant <- @parent_product.variants do %>
-            <tr class="product_variants">
-              <td><%= variant.id %></td>
-              <%= for option <- variant.options do %>
-              <td class="option-value" contenteditable="true" data-option_value_id="<%= option.id %>"><%= option.value %></td>
-              <% end %>
-              <td class="variant_state"><%= variant.state %></td>
-              <td class="variant_activate">
-                <input type="hidden" value="<%= variant.id %>" class="variant_id">
-                <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                  <label class="btn btn-sm btn-info">
-                    <input type="radio" class="switch-input" id="active" autocomplete="off">Active
-                  </label>
-                  <label class="btn btn-sm btn-info">
-                    <input type="radio" class="switch-input" id="draft" autocomplete="off">Draft
-                  </label>
-                  <label class="btn btn-sm btn-info">
-                    <input type="radio" class="switch-input" id="inactive" autocomplete="off">Inactive
-                  </label>
-                </div>
-              </td>
-              <td>
-                <%= link("Edit", to: product_path(@conn, :edit, variant.id), class: "btn btn-primary") %>
-              </td>
-            </tr>
-            <% end %>
-          </tbody>
-        </table>
+      <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" id="inventory_track_variant" value="variant" name="product[inventory_tracking]">
+        <label class="custom-control-label" for="inventory_track_variant">Track inventory by variants (from variants tab above)</label>
       </div>
+    </fieldset>
+        <div class="form-group row stickformbutton">
+          <div class="col-sm-10">
+            <%= button("Cancel", to: product_path(@conn, :index), method: "get",  type: "button",
+            class: "btn btn-secondary btn-outline-secondary submit-btn float-left") %>
+            <div class="float-right">
+              <%= submit "Save", class: "btn  btn-primary submit-btn", id: "form-save-btn" %>
+            </div>
+          </div>
+        </div>
       <% end %>
     </div>
-   <% else %>
-    <%= unless is_child_product(@parent_product) do %>
-      <div class="tab-pane fade p-3" id="tab2default" >
-        <div class="alert alert-info">
-          You can add Product Variants by adding Variation Themes to <span class="badge badge-info"> <%= get_product_category(@parent_product.taxon_id) %> </span> category.
-          <br> Click to <%= link("Add variation theme", to: "/taxonomy?taxon_id=#{@parent_product.taxon_id}", class: "btn btn-primary") %>
+  <% end %>
+
+  <%= if  @conn.request_path != product_path(@conn, :new) do %>
+    <%= if !is_child_product(@parent_product) do %>
+      <div class="tab-pane fade p-3" id="options_tab" >
+      <div class="row">
+        <div class="col-3">
+            <!-- required for floating -->
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs tabs-left">
+                <li class="active"><a href="#options" data-toggle="tab">Options</a></li>
+                <li><a href="#skus" data-toggle="tab">SKU's</a></li>
+              </ul>
+            </div>
+        <div class="col-9">
+              <!-- Tab panes -->
+          <div class="tab-content">
+              <div class="tab-pane active" id="options">
+                <%= if has_themes(@parent_product) do %>
+                <div style="background: #f8f9fa;">
+                  <div class="form-group required">
+                    <label>Variation Theme</label>
+                    <%= select :theme, :theme_id, themes_options(@parent_product), selected: @parent_product.theme_id ,prompt: "", class: "form-control", id: "product_theme_id" %>
+                  </div>
+                  <div id="variation_options" style="padding: 10px 0px 10px 0px;"></div>
+                  <div class="modal fade" id="theme_change_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLongTitle">Warning</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <div class="alert alert-danger" role="alert">
+                            Changing the variation theme would remove all the existing variants,
+                            are you sure you want to proceed?
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+                          <button id="theme_change_confirm" type="button" class="btn btn-primary">Yes</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <% else %>
+                 <div class="alert alert-info">
+                   You can add SKU's by adding Variation Themes to <span class="badge badge-info"> <%= get_product_category(@parent_product.taxon_id) %> </span> category.
+                   <br> Click to <%= link("Add variation theme", to: "/taxonomy?taxon_id=#{@parent_product.taxon_id}", class: "btn btn-primary") %>
+                 </div>
+                <% end %>
+              </div>
+
+              <div class="tab-pane" id="skus">
+                <%= if has_variants(@parent_product) do %>
+                <div class="product_has_variants">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <%= for option_type <- get_option_types(@parent_product) do %>
+                        <th><%= option_type.display_name %></th>
+                        <% end %>
+                        <th>State</th>
+                        <th>Switch State</th>
+                        <%= if is_variant_tracking_enabled(@parent_product) do %>
+                          <th>Stock</th>
+                        <% end %>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <%= for variant <- @parent_product.variants do %>
+                      <tr  class="product_variants">
+                        <%= for option <- variant.options do %>
+                        <td class="option-value" contenteditable="true" data-option_value_id="<%= option.id %>"><%= option.value %></td>
+                        <% end %>
+                        <td class="variant_state"><%= variant.state %></td>
+                        <td class="variant_activate">
+                          <input type="hidden" value="<%= variant.id %>" class="variant_id">
+                          <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                            <label class="btn btn-sm btn-info">
+                              <input type="radio" class="switch-input" id="active" autocomplete="off">Active
+                            </label>
+                            <label class="btn btn-sm btn-info">
+                              <input type="radio" class="switch-input" id="draft" autocomplete="off">Draft
+                            </label>
+                            <label class="btn btn-sm btn-info">
+                              <input type="radio" class="switch-input" id="inactive" autocomplete="off">Inactive
+                            </label>
+                          </div>
+                        </td>
+                        <%= if is_variant_tracking_enabled(@parent_product) do %>
+                          <td><%= get_total_stock(variant) %></td>
+                        <% end %>
+                        <td>
+                          <%= link("Edit", to: product_path(@conn, :edit, variant.id), class: "btn btn-primary") %>
+                          <%= if is_variant_tracking_enabled(@parent_product) do %>
+                            <button name="variant_stock_add" type="button" class="btn btn-primary" data-prdouct-id="<%= variant.id %>">Add stock</button>
+                          <% end %>
+                        </td>
+                      </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
+              <% else %>
+                <div class="alert alert-info">
+                  <p>No SKUs have been created. Create a SKU from the <strong>Options tab</strong> by selecting appropriate variation theme.</p>
+                </div>
+              <% end %>
+
+              <div class="modal fade" id="variant_stock_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLongTitle">Add Stock</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <div id="variant_stock_error_msg" class="alert alert-danger">
+                        Request failed
+                      </div>
+                      <div id="variant_tracking" class="card m-2">
+                        <%= hidden_input :stock, :product_id, value: @parent_product.id, class: "form-control" %>
+                        <div class="col-12">
+                          <div class="form-group row">
+                            <label class="col-sm-6">
+                              <div class="label required">
+                                Stock Location
+                              </div>
+                            </label>
+                            <div class="col-sm-6">
+                              <div class="form-group">
+                                <%= select :stock, :stock_location_id, active_stock_location(), class: "form-control" %>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-6">
+                              <div class="label required">
+                                Current Stock Level
+                              </div>
+                              <div class="label-txt">
+                                How many units of this product do you currently have in stock?
+                              </div>
+                            </label>
+                            <div class="col-sm-6">
+                              <div class="form-group">
+                                <%= text_input :stock, :count_on_hand, class: "form-control" %>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group row">
+                            <label class="col-sm-6">
+                              <div class="label">
+                                Low Stock Level
+                              </div>
+                              <div class="label-txt">
+                                When inventory levels fall below this number, the product option will be flagged as low stock.
+                              </div>
+                            </label>
+                            <div class="col-sm-6">
+                              <div class="form-group">
+                                <%= text_input :stock, :inventory_warning_level, class: "form-control" %>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+                      <button id="variant_stock_confirm" type="button" class="btn btn-primary">Yes</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              </div>
+            </div>
         </div>
       </div>
+    </div>
     <% end %>
-   <% end %>
   <% end %>
+
   <%= if  @conn.request_path != product_path(@conn, :new) do %>
   <div class="tab-pane fade p-3" id="tab3default">
     <div>
@@ -274,62 +449,7 @@
     </div>
   </div>
   <% end %>
-  <%= if  @conn.request_path != product_path(@conn, :new) do %>
-  <div class="tab-pane fade pt-2 p-3"  id="tab4default">
-    <form accept-charset="UTF-8" action="/product/stock" method="post">
-      <%= if is_parent_product(@conn.params["id"]) do %>
-      <div class="form-group required">
-        <label>Variant</label>
-        <%= select :stock, :product_id, get_variant_option(@parent_product.variants), class: "form-control"%>
-      </div>
-      <% else %>
-      <%= hidden_input :stock, :product_id, value: @conn.params["id"] %>
-      <% end %>
 
-      <div class="form-group row ">
-        <label  class="col-sm-3 col-form-label">
-          <div class="label required">
-            Count on hand
-          </div>
-          <div class="label-txt">Total count for all the products at all stock locations</div>
-        </label>
-        <div class="col-sm-6">
-          <p><%= count_on_hand(@conn) %></p>
-        </div>
-      </div>
-
-      <div class="form-group row ">
-        <label  class="col-sm-3 col-form-label">
-          <div class="label required">
-            Stock Location
-          </div>
-          <div class="label-txt">Select default location for this product.</div>
-        </label>
-        <div class="col-sm-9">
-          <%= select :stock, :location_id, get_stock_locations_option(@stock_locations), class: "form-control"%>
-        </div>
-      </div>
-      <div class="form-group row ">
-        <label  class="col-sm-3 col-form-label">
-          <div class="label required">
-            Count
-          </div>
-          <div class="label-txt">Total quantity of the product for this stock location.</div>
-        </label>
-        <div class="col-sm-9">
-          <%= text_input :stock, :count_on_hand , class: "form-control"%>
-        </div>
-      </div>
-      <div class="form-group row stickformbutton">
-        <div class="col-sm-10">
-          <%= submit "Add Stock", class: "btn  btn-primary submit-btn float-right" %>
-          <%= button("Cancel", to: product_path(@conn, :index), method: "get", type: "button",
-            class: "btn btn-secondary btn-outline-secondary submit-btn float-left") %>
-        </div>
-      </div>
-    </form>
-  </div>
-  <% end %>
   <%= if  @conn.request_path != product_path(@conn, :new) do %>
     <div class="tab-pane fade pt-2"  id="tab5default">
       <%= render "property_index.html",

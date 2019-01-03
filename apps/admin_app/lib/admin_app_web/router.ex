@@ -85,6 +85,12 @@ defmodule AdminAppWeb.Router do
     get("/products/:product_id/property/:property_id/edit", ProductController, :edit_property)
     post("/products/:product_id/property/create", ProductController, :create_property)
 
+    patch(
+      "/products/:product_id/inventory_tracking",
+      ProductController,
+      :update_inventory_tracking
+    )
+
     get("/dashboard", DashboardController, :index)
 
     post(
@@ -111,7 +117,6 @@ defmodule AdminAppWeb.Router do
     pipe_through(:avoid_csrf)
     patch("/variant_state/:id", ProductController, :toggle_variant_state)
     post("/products/variants/new", ProductController, :new_variant)
-    post("/product/stock", ProductController, :add_stock)
   end
 
   scope "/", AdminAppWeb do
@@ -145,11 +150,18 @@ defmodule AdminAppWeb.Router do
     post("/product_option_values/:id", OptionTypeController, :update)
   end
 
+  scope "/api", AdminAppWeb.Api do
+    pipe_through(:api)
+
+    post("/stock", StockController, :get_stock)
+    post("/stock_update", StockController, :update_stock)
+  end
+
   scope "/", AdminAppWeb do
     pipe_through([:browser, :authentication])
 
     # Don't add phoenix routes after this route as, all routes that does not match
-    # Phoenix routes goes to react app. 
+    # Phoenix routes goes to react app.
     get("/*path", ReactController, :index)
   end
 end

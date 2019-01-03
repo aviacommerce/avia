@@ -430,4 +430,21 @@ defmodule Snitch.Data.Model.Product do
     |> select([p], %{state: p.state, count: count(p.id)})
     |> Repo.all()
   end
+
+  @doc """
+  Checks if a product has variants or not
+  """
+  @spec has_variants?(Product.t()) :: true | false
+  def has_variants?(product) do
+    product = Repo.preload(product, :variants)
+    length(product.variants) > 0
+  end
+
+  @doc """
+  Checks if a product tracks inventory by variant tracking
+  """
+  @spec is_variant_tracking_enabled?(Product.t()) :: true | false
+  def is_variant_tracking_enabled?(product) do
+    Product.is_variant_tracking_enabled?(product)
+  end
 end
