@@ -28,3 +28,5 @@ erl_crash.dump
 
 /vendor/
 /uploads/images/
+
+**/.DS_Store

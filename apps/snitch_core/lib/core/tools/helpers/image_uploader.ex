@@ -35,9 +35,8 @@ defmodule Snitch.Tools.Helper.ImageUploader do
   end
 
   def storage_dir(version, {_file, scope}) do
-    tenant = Repo.get_prefix()
     scope_dir = get_scope_name(scope)
-    "uploads/#{tenant}/images/#{scope_dir}/#{scope.id}/images/#{version}"
+    "uploads/#{scope.tenant}/images/#{scope_dir}/#{scope.id}/images/#{version}"
   end
 
   defp get_scope_name(scope) do

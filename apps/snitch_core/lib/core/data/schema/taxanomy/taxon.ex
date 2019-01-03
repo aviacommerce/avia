@@ -15,6 +15,7 @@ defmodule Snitch.Data.Schema.Taxon do
     field(:rgt, :integer)
     field(:variation_theme_ids, {:array, :binary}, virtual: true)
     field(:slug, :string)
+    field(:tenant, :string, virtual: true)
 
     has_one(:taxon_image, TaxonImage, on_replace: :delete)
     has_one(:image, through: [:taxon_image, :image])

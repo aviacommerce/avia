@@ -203,7 +203,7 @@ defmodule Snitch.Demo.Product do
   end
 
   defp upload_image(%Plug.Upload{} = image, product) do
-    case ImageUploader.store({image, product}) do
+    case ImageModel.store(image, product) do
       {:ok, _} ->
         {:ok, product}
 
