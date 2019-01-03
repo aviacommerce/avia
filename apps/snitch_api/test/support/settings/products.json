@@ -58,7 +58,6 @@
           }
         },
         "selling_price": {
-          "type": "nested",
           "properties": {
             "amount": {
               "type": "double"
