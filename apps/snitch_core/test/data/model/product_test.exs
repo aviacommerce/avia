@@ -4,7 +4,7 @@ defmodule Snitch.Data.Model.ProductTest do
   import Snitch.Factory
   alias Snitch.Data.Model.Product
   alias Snitch.Data.Schema.Product, as: ProductSchema
-  alias Snitch.Data.Schema.Variation
+  alias Snitch.Data.Schema.{Variation, Image}
   alias Snitch.Tools.Helper.Taxonomy
   alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
   alias Snitch.Repo
@@ -19,6 +19,7 @@ defmodule Snitch.Data.Model.ProductTest do
   }
 
   @img "test/support/image.png"
+  @img_new "test/support/image_new.png"
 
   setup do
     product = insert(:product)
@@ -197,6 +198,29 @@ defmodule Snitch.Data.Model.ProductTest do
       ip = %{"images" => []}
       assert {:error, _} = Product.add_images(product, ip)
     end
+
+    test "set default image", %{image_params: ip, product: product} do
+      [ok: %Image{is_default: true} = image, ok: %Image{}] = update_default_image(ip, product)
+      assert image.is_default == true
+    end
+  end
+
+  defp update_default_image(ip, product) do
+    images = [
+      %{
+        "image" => %{
+          filename: "AfddfPbZGc4WuAVLYwwyo.png",
+          path: @img_new,
+          type: "image/png",
+          url: "/xyz"
+        }
+      }
+      | ip["images"]
+    ]
+
+    {:ok, %ProductSchema{} = product} = Product.add_images(product, %{"images" => images})
+    image = product.images |> List.first()
+    Product.update_default_image(product, to_string(image.id))
   end
 
   describe "product preloading" do
