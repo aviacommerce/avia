@@ -291,7 +291,7 @@ defmodule Snitch.Data.Model.Product do
         %{"image" => %{filename: name, path: path, url: url, type: type} = upload} ->
           upload = %Plug.Upload{filename: name, path: path, content_type: type}
           product = %{product | tenant: Repo.get_prefix()}
-          ImageUploader.store({upload, product})
+          ImageModel.store(upload, product)
 
         _ ->
           {:ok, "success"}

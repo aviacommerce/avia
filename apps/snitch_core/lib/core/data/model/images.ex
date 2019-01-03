@@ -80,6 +80,11 @@ defmodule Snitch.Data.Model.Image do
     end)
   end
 
+  def store(image, struct) do
+    struct = %{struct | tenant: Repo.get_prefix()}
+    ImageUploader.store({image, struct})
+  end
+
   def upload_image_multi(multi, %{filename: name, path: path, type: type} = image) do
     Multi.run(multi, :image_upload, fn %{struct: struct} ->
       image = %Plug.Upload{filename: name, path: path, content_type: type}
