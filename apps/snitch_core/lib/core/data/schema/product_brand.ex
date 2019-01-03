@@ -10,6 +10,7 @@ defmodule Snitch.Data.Schema.ProductBrand do
 
   schema "snitch_product_brands" do
     field(:name, :string, null: false)
+    field(:tenant, :string, virtual: true)
     timestamps()
 
     has_many(:products, Product, foreign_key: :brand_id)
