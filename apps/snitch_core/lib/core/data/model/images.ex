@@ -65,6 +65,8 @@ defmodule Snitch.Data.Model.Image do
   def delete_image_multi(multi, image, struct) do
     multi
     |> Multi.run(:remove_from_upload, fn _ ->
+      struct = %{struct | tenant: Repo.get_prefix()}
+
       case ImageUploader.delete({image.name, struct}) do
         :ok ->
           {:ok, "success"}
@@ -113,6 +115,7 @@ defmodule Snitch.Data.Model.Image do
   struct.
   """
   def image_url(name, struct, version \\ :thumb) do
+    struct = %{struct | tenant: Repo.get_prefix()}
     ImageUploader.url({name, struct}, version)
   end
 
