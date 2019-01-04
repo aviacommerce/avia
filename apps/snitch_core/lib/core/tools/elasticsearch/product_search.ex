@@ -4,6 +4,10 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
 
   # TODO : NEEDS A FULL REFACTOR BY @pkrawat1
   # ===== !!!!!! DONOT MODIFY ME !!!!!! =====
+
+  Architecture reference ( IN PROGRESS) : https://project-a.github.io/on-site-search-design-patterns-for-e-commerce/#index-pages-not-products
+  Aggregation reference : https://stackoverflow.com/questions/41369749/elasticsearch-generic-facets-structure-calculating-aggregations-combined-wit
+
   """
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
