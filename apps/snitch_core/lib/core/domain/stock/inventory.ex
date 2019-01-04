@@ -4,6 +4,7 @@ defmodule Snitch.Domain.Inventory do
   """
 
   alias Snitch.Data.Model.StockItem, as: StockModel
+  alias Snitch.Data.Model.StockLocation, as: SLModel
   alias Snitch.Data.Schema.StockItem, as: StockSchema
   alias Snitch.Data.Schema.Product
   alias Snitch.Data.Model.Product, as: ProductModel
@@ -23,6 +24,24 @@ defmodule Snitch.Domain.Inventory do
          {:ok, updated_stock} <- StockModel.update(stock_params, stock) do
       {:ok, updated_stock}
     end
+  end
+
+  @doc """
+  Reduces stock for a product at particular stock location by the amount passed.
+  """
+  def reduce_stock(product_id, stock_location_id, reduce_count) do
+    with product <- ProductModel.get(product_id),
+         stock_location <- SLModel.get(stock_location_id),
+         {:ok, stock_item} <- check_stock(product.id, stock_location.id) do
+      do_reduce_stock(stock_item, reduce_count, product.inventory_tracking)
+    end
+  end
+
+  defp do_reduce_stock(stock_item, _, :none), do: {:ok, stock_item}
+
+  defp do_reduce_stock(stock_item, reduce_count, inventory_tracking) do
+    new_stock_count = stock_item.count_on_hand - reduce_count
+    StockModel.update(%{count_on_hand: new_stock_count}, stock_item)
   end
 
   def set_inventory_tracking(product, inventory_tracking, %{"stock" => stock_params})
