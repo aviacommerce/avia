@@ -119,7 +119,7 @@ defmodule Snitch.Data.Model.Image do
   end
 
   def check_arc_config do
-    Application.get_env(:arc, :storage) == Arc.Storage.Local && Mix.env() != :test
+    Application.get_env(:arc, :storage) == Arc.Storage.Local
   end
 
   @doc """
