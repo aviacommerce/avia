@@ -71,14 +71,11 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
           "path" => "category",
           "query" => %{
             "bool" => %{
-              "should" =>
-                Enum.map(values, fn val ->
-                  %{
-                    "match" => %{
-                      "category.all_parents" => val
-                    }
-                  }
-                end)
+              "must" => %{
+                "terms" => %{
+                  "category.all_parents" => values
+                }
+              }
             }
           }
         }
@@ -162,19 +159,19 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
 
   defp generate_aggregations(params) do
     aggregation_query =
-      %{
-        "full_filter_aggs" => %{
-          "filter" => filter_query(params),
-          "aggs" => %{
-            "category" => category_aggs_query(),
-            "filters" => filters_aggs_query(),
-            "range_filters" => range_filters_aggs_query()
+      Map.merge(
+        %{
+          "full_filter_aggs" => %{
+            "filter" => filter_query(params),
+            "aggs" => %{
+              "category" => category_aggs_query(),
+              "filters" => filters_aggs_query(),
+              "range_filters" => range_filters_aggs_query()
+            }
           }
-        }
-      }
-      |> Map.merge(generate_string_facet_aggs_query(params))
-
-    # |> Map.merge(generate_string_facet_aggs_query(params))
+        },
+        generate_string_facet_aggs_query(params)
+      )
 
     %{
       "aggregations" => aggregations
@@ -207,43 +204,62 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
   defp string_facet_aggs_query(_, [], _), do: {}
   defp string_facet_aggs_query(_, [""], _), do: {}
 
-  defp string_facet_aggs_query("Category", values, %{"f" => f} = params) do
+  defp string_facet_aggs_query("Category", _, params) do
     escaped_filter_param = escape_filter_from_params("Category", params)
 
     {
-      "selected_category_aggs",
+      "special_agg_Category",
       %{
         "filter" => filter_query(%{params | "f" => escaped_filter_param}),
         "aggs" => %{
-          "category" => category_aggs_query()
+          "special_agg_Category" => category_aggs_query()
         }
       }
     }
   end
 
-  defp string_facet_aggs_query(filter, values, params) do
+  defp string_facet_aggs_query(filter, _, params) do
     escaped_filter_param = escape_filter_from_params(filter, params)
 
-    {
-      "selected_#{filter}_aggs",
-      %{
-        "filter" => filter_query(%{params | "f" => escaped_filter_param}),
-        "aggs" => %{
-          "filters" => filters_aggs_query()
-        }
-      }
-    }
+    {"special_agg_#{filter}",
+     %{
+       "filter" => filter_query(%{params | "f" => escaped_filter_param}),
+       "aggs" => %{
+         "special_agg_#{filter}" => %{
+           "nested" => %{
+             "path" => "string_facet"
+           },
+           "aggs" => %{
+             "aggregation" => %{
+               "filter" => %{
+                 "match" => %{
+                   "string_facet.id" => filter
+                 }
+               },
+               "aggs" => %{
+                 "aggregations" => %{
+                   "terms" => %{
+                     "size" => 1000,
+                     "script" =>
+                       "doc['string_facet.id'].value + '|' + doc['string_facet.value'].value"
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }}
   end
 
   defp escape_filter_from_params(filter, %{"f" => f} = _params) do
-    f =
-      f
-      |> String.splitter("::")
-      |> Stream.filter(&(!match?([^f, _], String.split(&1, ":"))))
-      |> Enum.join("::")
+    f
+    |> String.splitter("::")
+    |> Stream.filter(&(!match?([^filter, _], String.split(&1, ":"))))
+    |> Enum.join("::")
   end
 
-  def category_aggs_query() do
+  defp category_aggs_query() do
     %{
       "nested" => %{
         "path" => "category"
@@ -258,7 +274,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
     }
   end
 
-  def filters_aggs_query() do
+  defp filters_aggs_query() do
     %{
       "nested" => %{
         "path" => "string_facet"
@@ -273,7 +289,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
     }
   end
 
-  def range_filters_aggs_query() do
+  defp range_filters_aggs_query() do
     %{
       "nested" => %{
         "path" => "number_facet"
@@ -394,34 +410,32 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
   end
 
   defp format_aggregations(aggregations) do
-    IO.inspect(aggregations)
-
     %{
       "full_filter_aggs" => %{
-        "category" => %{"aggregations" => %{"buckets" => categories}},
-        "filters" => %{"aggregations" => %{"buckets" => filters}},
+        "category" => %{"aggregations" => %{"buckets" => category_buckets}},
+        "filters" => %{"aggregations" => %{"buckets" => filter_buckets}},
         "range_filters" => %{"aggregations" => %{"buckets" => range_filters}}
       }
     } = aggregations
 
-    # Skip categories if only one category
-    categories =
-      case categories do
-        [_] -> []
-        _ -> categories
-      end
+    filter_buckets =
+      (category_buckets ++ filter_buckets) ++ Enum.flat_map(aggregations, &format_special_agg/1)
 
     %{
-      "filters" => format_id_value_key_aggs(categories ++ filters),
+      "filters" => format_id_value_key_aggs(filter_buckets),
       "range_filters" => fomart_range_aggs(range_filters)
     }
   end
 
-  defp format_id_value_key_aggs(filters) do
-    filters
+  defp format_id_value_key_aggs(buckets) do
+    buckets
+    |> Enum.map(fn %{"key" => key, "doc_count" => count} ->
+      {key, count}
+    end)
+    |> Enum.into(%{})
     |> Enum.reduce(
       %{},
-      fn %{"key" => key, "doc_count" => count}, acc ->
+      fn {key, count}, acc ->
         [id, value] = String.split(key, "|")
 
         Map.merge(acc, %{
@@ -466,5 +480,29 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
       end
     )
     |> Map.values()
+  end
+
+  defp format_special_agg({"special_agg_Category", aggs}) do
+    %{
+      "special_agg_Category" => %{
+        "aggregations" => %{"buckets" => buckets}
+      }
+    } = aggs
+
+    buckets
+  end
+
+  defp format_special_agg({key, aggs}) do
+    with "special_agg_" <> _ <- key do
+      %{
+        "aggregation" => %{
+          "aggregations" => %{"buckets" => buckets}
+        }
+      } = aggs[key]
+
+      buckets
+    else
+      _ -> []
+    end
   end
 end
