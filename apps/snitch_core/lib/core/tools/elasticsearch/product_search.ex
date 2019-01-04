@@ -164,14 +164,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
     aggregation_query =
       %{
         "full_filter_aggs" => %{
-          "filter" => %{
-            "bool" => %{
-              "must" =>
-                tenant_query() ++
-                  generate_query_from_string_facet(params) ++
-                  generate_query_from_number_facet(params) ++ match_keywords(params)
-            }
-          },
+          "filter" => filter_query(params),
           "aggs" => %{
             "category" => category_aggs_query(),
             "filters" => filters_aggs_query(),
@@ -246,10 +239,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
     f =
       f
       |> String.splitter("::")
-      |> Stream.filter(fn filter_string ->
-        [filter, _] = String.split(filter_string, ":")
-        filter != filter
-      end)
+      |> Stream.filter(&(!match?([^f, _], String.split(&1, ":"))))
       |> Enum.join("::")
   end
 
