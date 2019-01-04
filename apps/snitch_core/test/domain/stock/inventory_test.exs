@@ -168,9 +168,9 @@ defmodule Snitch.Domain.PackageItemTest do
     end
 
     test "stock reduced for product with variant and product tracking" do
-      variant = build(:variant)
-      attrs = %{products: [variant], inventory_tracking: :product}
+      attrs = %{products: [build(:variant)], inventory_tracking: :product}
       parent_product = insert(:product, attrs)
+      variant = parent_product.products |> List.first()
       stock_location = insert(:stock_location)
 
       stock_item =
@@ -180,9 +180,58 @@ defmodule Snitch.Domain.PackageItemTest do
           stock_location: stock_location
         )
 
+      # Reduce stock by passing the actual product
       {:ok, stock} = Inventory.reduce_stock(parent_product.id, stock_location.id, 2)
 
       assert stock.count_on_hand == 8
+
+      # Reduce stock by passing any variant
+      {:ok, stock} = Inventory.reduce_stock(variant.id, stock_location.id, 2)
+
+      assert stock.count_on_hand == 6
+
+      # Reduce stock beyond the stock
+      {:error, changeset} = Inventory.reduce_stock(parent_product.id, stock_location.id, 7)
+
+      refute changeset.valid?
+
+      assert changeset.errors == [
+               count_on_hand:
+                 {"must be greater than %{number}", [validation: :number, number: -1]}
+             ]
+    end
+
+    test "stock reduce for product with variant and variant tracking" do
+      attrs = %{products: [build(:variant)], inventory_tracking: :variant}
+      parent_product = insert(:product, attrs)
+      variant = parent_product.products |> List.first()
+      stock_location = insert(:stock_location)
+
+      stock_item =
+        insert(:stock_item,
+          count_on_hand: 10,
+          product: variant,
+          stock_location: stock_location
+        )
+
+      # Reduce stock using variant product
+      {:ok, stock} = Inventory.reduce_stock(variant.id, stock_location.id, 2)
+
+      assert stock.count_on_hand == 8
+
+      # Reduce stock using parent product
+      {:error, :variant_not_found} =
+        Inventory.reduce_stock(parent_product.id, stock_location.id, 2)
+
+      # Reduce stock beyond the stock
+      {:error, changeset} = Inventory.reduce_stock(variant.id, stock_location.id, 10)
+
+      refute changeset.valid?
+
+      assert changeset.errors == [
+               count_on_hand:
+                 {"must be greater than %{number}", [validation: :number, number: -1]}
+             ]
     end
   end
 end

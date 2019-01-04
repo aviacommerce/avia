@@ -31,15 +31,34 @@ defmodule Snitch.Domain.Inventory do
   """
   def reduce_stock(product_id, stock_location_id, reduce_count) do
     with product <- ProductModel.get(product_id),
-         stock_location <- SLModel.get(stock_location_id),
-         {:ok, stock_item} <- check_stock(product.id, stock_location.id) do
-      do_reduce_stock(stock_item, reduce_count, product.inventory_tracking)
+         product_with_inventory <- ProductModel.product_with_inventory_tracking(product),
+         stock_location <- SLModel.get(stock_location_id) do
+      perform_stock_reduce(product, product_with_inventory, stock_location, reduce_count)
     end
   end
 
-  defp do_reduce_stock(stock_item, _, :none), do: {:ok, stock_item}
+  defp perform_stock_reduce(actual_product, product_with_tracking, stock_location, count) do
+    case product_with_tracking.inventory_tracking do
+      :none ->
+        check_stock(product_with_tracking.id, stock_location.id)
 
-  defp do_reduce_stock(stock_item, reduce_count, inventory_tracking) do
+      :product ->
+        {:ok, stock} = check_stock(product_with_tracking.id, stock_location.id)
+        do_reduce_stock(stock, count)
+
+      :variant ->
+        case ProductModel.is_child_product(actual_product) do
+          true ->
+            {:ok, stock} = check_stock(actual_product.id, stock_location.id)
+            do_reduce_stock(stock, count)
+
+          _ ->
+            {:error, :variant_not_found}
+        end
+    end
+  end
+
+  defp do_reduce_stock(stock_item, reduce_count) do
     new_stock_count = stock_item.count_on_hand - reduce_count
     StockModel.update(%{count_on_hand: new_stock_count}, stock_item)
   end

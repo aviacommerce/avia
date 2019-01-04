@@ -390,6 +390,17 @@ defmodule Snitch.Data.Model.Product do
     end)
   end
 
+  def product_with_inventory_tracking(product) do
+    case is_child_product(product) do
+      true ->
+        parent_product = Repo.preload(product, parent_variation: :parent_product)
+        parent_product.parent_variation.parent_product
+
+      false ->
+        product
+    end
+  end
+
   @doc """
   Ordering of product depends on many things, for now we just check
   sufficient stock is available.
