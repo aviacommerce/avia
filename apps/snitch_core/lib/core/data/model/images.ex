@@ -126,7 +126,14 @@ defmodule Snitch.Data.Model.Image do
   """
   def image_url(name, struct, version \\ :thumb) do
     struct = %{struct | tenant: Repo.get_prefix()}
-    ImageUploader.url({name, struct}, version)
+    url = ImageUploader.url({name, struct}, version)
+
+    if Mix.env() == :dev do
+      base_path = Application.app_dir(:admin_app) |> String.replace("_build/dev/lib", "apps")
+      Path.join(["/"], Path.relative_to(url, base_path))
+    else
+      url
+    end
   end
 
   def handle_image_value(%Plug.Upload{} = file) do
