@@ -6,7 +6,11 @@ defmodule AdminAppWeb.ErrorView do
   end
 
   def render("401.json", _assigns) do
-    "data not found"
+    %{
+      error: %{
+        message: "data not found"
+      }
+    }
   end
 
   # In case no render clause matches or no

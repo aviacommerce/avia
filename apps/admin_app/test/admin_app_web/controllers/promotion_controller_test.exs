@@ -83,7 +83,7 @@ defmodule AdminAppWeb.PromotionControllerTest do
       assert %{"actions" => _actions, "rules" => _rules, "attributes" => _attributes} = data
     end
 
-    test "fails if error on rule", %{conn: conn} do
+    test "fails if error on any params", %{conn: conn} do
       [r_param_1, r_param_2] = @rule_params
 
       rule_params = [
@@ -124,7 +124,106 @@ defmodule AdminAppWeb.PromotionControllerTest do
                  },
                  %{}
                ]
-             } = data
+             } = data["errors"]
+    end
+  end
+
+  describe "update/2" do
+    test "updates successfully", %{conn: conn} do
+      promotion = insert(:promotion)
+      insert(:item_total_rule, promotion: promotion)
+      insert(:promotion_order_action, promotion: promotion)
+
+      params = %{
+        data: %{
+          code: "10OFF",
+          rules: @rule_params
+        }
+      }
+
+      conn = put(conn, promotion_path(conn, :update, promotion.id), params)
+      response = json_response(conn, 200)
+      assert response["attributes"]["id"] == promotion.id
+      assert response["attributes"]["code"] != promotion.code
+    end
+
+    test "fails if promotion archived", %{conn: conn} do
+      promotion =
+        insert(:promotion,
+          archived_at: DateTime.to_unix(DateTime.utc_now())
+        )
+
+      insert(:item_total_rule, promotion: promotion)
+      insert(:promotion_order_action, promotion: promotion)
+
+      params = %{
+        data: %{
+          code: "10OFF"
+        }
+      }
+
+      conn = put(conn, promotion_path(conn, :update, promotion.id), params)
+      response = json_response(conn, 422)
+
+      assert %{"error" => %{"message" => "promotion no longer active"}} = response
+    end
+
+    test "fails if error on params", %{conn: conn} do
+      promotion = insert(:promotion)
+      insert(:item_total_rule, promotion: promotion)
+      insert(:promotion_order_action, promotion: promotion)
+
+      params = %{
+        data: %{
+          code: 1
+        }
+      }
+
+      conn = put(conn, promotion_path(conn, :update, promotion.id), params)
+      response = json_response(conn, 422)
+
+      assert %{
+               "code" => [
+                 %{
+                   "errors" => %{"type" => "string", "validation" => "cast"},
+                   "message" => "is invalid"
+                 }
+               ]
+             } = response["errors"]
+    end
+  end
+
+  describe "edit/2" do
+    test "get data successfully", %{conn: conn} do
+      promotion = insert(:promotion)
+      insert(:item_total_rule, promotion: promotion)
+      insert(:promotion_order_action, promotion: promotion)
+
+      conn = get(conn, promotion_path(conn, :edit, promotion.id))
+      response = json_response(conn, 200)
+
+      assert %{"actions" => _actions, "rules" => _rules, "attributes" => _attributes} = response
+    end
+
+    test "fails if id not found", %{conn: conn} do
+      conn = get(conn, promotion_path(conn, :edit, -1))
+      response = json_response(conn, 401)
+
+      assert %{"message" => "data not found"} = response["error"]
+    end
+  end
+
+  describe "delete/2" do
+    test "archive successfully", %{conn: conn} do
+      promotion = insert(:promotion)
+      insert(:item_total_rule, promotion: promotion)
+      insert(:promotion_order_action, promotion: promotion)
+
+      assert promotion.archived_at == 0
+
+      conn = delete(conn, promotion_path(conn, :delete, promotion.id))
+      response = json_response(conn, 200)
+      assert %{"message" => "promotion archived"} = response
     end
   end
 

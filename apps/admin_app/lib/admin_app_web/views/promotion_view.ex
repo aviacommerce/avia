@@ -63,15 +63,26 @@ defmodule AdminAppWeb.PromotionView do
   end
 
   def render("changeset_error.json", %{changeset: changeset}) do
-    Changeset.traverse_errors(changeset, fn
-      %Ecto.Changeset{data: %Promotion{}}, _field, {msg, opts} ->
-        %{message: msg, errors: Enum.into(opts, %{})}
+    errors =
+      Changeset.traverse_errors(changeset, fn
+        %Ecto.Changeset{data: %Promotion{}}, _field, {msg, opts} ->
+          %{message: msg, errors: Enum.into(opts, %{})}
 
-      %Ecto.Changeset{data: %PromotionAction{}, changes: changes}, _field, {msg, opts} ->
-        %{name: changes.name, message: msg, errors: opts}
+        %Ecto.Changeset{data: %PromotionAction{}, changes: changes}, _field, {msg, opts} ->
+          %{name: changes.name, message: msg, errors: opts}
 
-      %Ecto.Changeset{data: %PromotionRule{}, changes: changes}, _field, {msg, opts} ->
-        %{name: changes.name, message: msg, errors: opts}
-    end)
+        %Ecto.Changeset{data: %PromotionRule{}, changes: changes}, _field, {msg, opts} ->
+          %{name: changes.name, message: msg, errors: opts}
+      end)
+
+    %{errors: errors}
+  end
+
+  def render("error_message.json", %{message: message}) do
+    %{
+      error: %{
+        message: message
+      }
+    }
   end
 end

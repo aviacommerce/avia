@@ -24,11 +24,12 @@ defmodule AdminAppWeb.PromotionController do
     end
   end
 
-  def update(conn, %{"data" => data}) do
-    id = String.to_integer(data["id"])
+  def update(conn, %{"data" => data, "id" => id}) do
+    id = String.to_integer(id)
 
     with promotion when not is_nil(promotion) <- Promotion.get(%{id: id}),
          {:ok, promotion} <- Promotion.update(promotion, data) do
+      promotion = Promotion.get(%{id: promotion.id})
       render(conn, "promotion.json", promotion: promotion)
     else
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -49,6 +50,8 @@ defmodule AdminAppWeb.PromotionController do
   end
 
   def edit(conn, %{"id" => id}) do
+    id = String.to_integer(id)
+
     with promotion when not is_nil(promotion) <- Promotion.get(%{id: id}) do
       render(conn, "promotion.json", promotion: promotion)
     else
@@ -60,6 +63,17 @@ defmodule AdminAppWeb.PromotionController do
   end
 
   def delete(conn, %{"id" => id}) do
+    id = String.to_integer(id)
+
+    with promotion when not is_nil(promotion) <- Promotion.get(%{id: id}),
+         {:ok, _promotion} <- Promotion.archive(promotion) do
+      conn |> put_status(200) |> json(%{message: "promotion archived"})
+    else
+      nil ->
+        conn
+        |> put_status(401)
+        |> render(AdminAppWeb.ErrorView, "401.json")
+    end
   end
 
   def rules(conn, _params) do
