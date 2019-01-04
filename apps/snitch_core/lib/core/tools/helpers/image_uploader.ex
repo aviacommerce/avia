@@ -6,6 +6,7 @@ defmodule Snitch.Tools.Helper.ImageUploader do
   """
   use Arc.Definition
   alias Snitch.Core.Tools.MultiTenancy.Repo
+  alias Snitch.Data.Model.Image
 
   @versions [:thumb, :large, :small]
 
@@ -38,11 +39,15 @@ defmodule Snitch.Tools.Helper.ImageUploader do
     scope_dir = get_scope_name(scope)
     dir = "uploads/#{scope.tenant}/images/#{scope_dir}/#{scope.id}/images/#{version}"
 
-    if Mix.env() == :dev do
-      base_path = Application.app_dir(:admin_app) |> String.replace("_build/dev/lib", "apps")
-      dir = "#{base_path}/#{dir}"
-    else
-      dir
+    case Image.check_arc_config() do
+      true ->
+        base_path =
+          Application.app_dir(:admin_app) |> String.replace("_build/#{Mix.env()}/lib", "apps")
+
+        "#{base_path}/#{dir}"
+
+      false ->
+        dir
     end
   end
 

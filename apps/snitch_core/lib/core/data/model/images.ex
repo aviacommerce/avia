@@ -118,6 +118,10 @@ defmodule Snitch.Data.Model.Image do
     end
   end
 
+  def check_arc_config do
+    Application.get_env(:arc, :storage) == Arc.Storage.Local && Mix.env() != :test
+  end
+
   @doc """
   Returns the url of the location where image is stored.
 
@@ -128,11 +132,15 @@ defmodule Snitch.Data.Model.Image do
     struct = %{struct | tenant: Repo.get_prefix()}
     url = ImageUploader.url({name, struct}, version)
 
-    if Mix.env() == :dev do
-      base_path = Application.app_dir(:admin_app) |> String.replace("_build/dev/lib", "apps")
-      Path.join(["/"], Path.relative_to(url, base_path))
-    else
-      url
+    case check_arc_config do
+      true ->
+        base_path =
+          Application.app_dir(:admin_app) |> String.replace("_build/#{Mix.env()}/lib", "apps")
+
+        Path.join(["/"], Path.relative_to(url, base_path))
+
+      false ->
+        url
     end
   end
 
