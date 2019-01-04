@@ -28,19 +28,23 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
 
     query = %{
       "sort" => %{},
-      "query" => %{
-        "bool" => %{
-          "must" =>
-            tenant_query() ++
-              generate_query_from_string_facet(params) ++
-              generate_query_from_number_facet(params) ++ match_keywords(params)
-        }
-      }
+      "query" => filter_query(params)
     }
 
     query
     |> sorting_query(params)
     |> paginate(offset, limit)
+  end
+
+  defp filter_query(params) do
+    %{
+      "bool" => %{
+        "must" =>
+          tenant_query() ++
+            generate_query_from_string_facet(params) ++
+            generate_query_from_number_facet(params) ++ match_keywords(params)
+      }
+    }
   end
 
   defp generate_query_from_string_facet(%{"f" => ""}), do: []
@@ -157,66 +161,148 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
   end
 
   defp generate_aggregations(params) do
+    aggregation_query =
+      %{
+        "full_filter_aggs" => %{
+          "filter" => %{
+            "bool" => %{
+              "must" =>
+                tenant_query() ++
+                  generate_query_from_string_facet(params) ++
+                  generate_query_from_number_facet(params) ++ match_keywords(params)
+            }
+          },
+          "aggs" => %{
+            "category" => category_aggs_query(),
+            "filters" => filters_aggs_query(),
+            "range_filters" => range_filters_aggs_query()
+          }
+        }
+      }
+      |> Map.merge(generate_string_facet_aggs_query(params))
+
+    # |> Map.merge(generate_string_facet_aggs_query(params))
+
     %{
       "aggregations" => aggregations
     } =
       search_products(%{
         "size" => 0,
-        "query" => %{
-          "bool" => %{
-            "must" => tenant_query() ++ match_keywords(params),
-            "should" => generate_query_from_string_facet(params)
-          }
-        },
+        "aggs" => aggregation_query
+      })
+
+    aggregations
+  end
+
+  defp generate_string_facet_aggs_query(%{"f" => ""}), do: %{}
+
+  defp generate_string_facet_aggs_query(%{"f" => f} = params) do
+    f
+    |> String.splitter("::")
+    |> Stream.map(fn filter_string ->
+      [filter, values] = String.split(filter_string, ":")
+      string_facet_aggs_query(filter, String.split(values, ","), params)
+    end)
+    # iex => [{"a", 1}, {"b", 1}, {}] |> Stream.filter(&!match?({}, &1)) |> Enum.into(%{})
+    # iex => %{"a" => 1, "b" => 1}
+    |> Stream.filter(&(!match?({}, &1)))
+    |> Enum.into(%{})
+  end
+
+  defp generate_string_facet_aggs_query(_), do: %{}
+
+  defp string_facet_aggs_query(_, [], _), do: {}
+  defp string_facet_aggs_query(_, [""], _), do: {}
+
+  defp string_facet_aggs_query("Category", values, %{"f" => f} = params) do
+    escaped_filter_param = escape_filter_from_params("Category", params)
+
+    {
+      "selected_category_aggs",
+      %{
+        "filter" => filter_query(%{params | "f" => escaped_filter_param}),
         "aggs" => %{
-          "category" => %{
-            "nested" => %{
-              "path" => "category"
-            },
-            "aggs" => %{
-              "aggregations" => %{
-                "terms" => %{
-                  "script" => "'Category|' + doc['category.direct_parent'].value"
-                }
-              }
-            }
+          "category" => category_aggs_query()
+        }
+      }
+    }
+  end
+
+  defp string_facet_aggs_query(filter, values, params) do
+    escaped_filter_param = escape_filter_from_params(filter, params)
+
+    {
+      "selected_#{filter}_aggs",
+      %{
+        "filter" => filter_query(%{params | "f" => escaped_filter_param}),
+        "aggs" => %{
+          "filters" => filters_aggs_query()
+        }
+      }
+    }
+  end
+
+  defp escape_filter_from_params(filter, %{"f" => f} = _params) do
+    f =
+      f
+      |> String.splitter("::")
+      |> Stream.filter(fn filter_string ->
+        [filter, _] = String.split(filter_string, ":")
+        filter != filter
+      end)
+      |> Enum.join("::")
+  end
+
+  def category_aggs_query() do
+    %{
+      "nested" => %{
+        "path" => "category"
+      },
+      "aggs" => %{
+        "aggregations" => %{
+          "terms" => %{
+            "script" => "'Category|' + doc['category.direct_parent'].value"
+          }
+        }
+      }
+    }
+  end
+
+  def filters_aggs_query() do
+    %{
+      "nested" => %{
+        "path" => "string_facet"
+      },
+      "aggs" => %{
+        "aggregations" => %{
+          "terms" => %{
+            "script" => "doc['string_facet.id'].value + '|' + doc['string_facet.value'].value"
+          }
+        }
+      }
+    }
+  end
+
+  def range_filters_aggs_query() do
+    %{
+      "nested" => %{
+        "path" => "number_facet"
+      },
+      "aggs" => %{
+        "aggregations" => %{
+          "terms" => %{
+            "field" => "number_facet.id"
           },
-          "filters" => %{
-            "nested" => %{
-              "path" => "string_facet"
-            },
-            "aggs" => %{
-              "aggregations" => %{
-                "terms" => %{
-                  "script" =>
-                    "doc['string_facet.id'].value + '|' + doc['string_facet.value'].value"
-                }
-              }
-            }
-          },
-          "range_filters" => %{
-            "nested" => %{
-              "path" => "number_facet"
-            },
-            "aggs" => %{
-              "aggregations" => %{
-                "terms" => %{
-                  "field" => "number_facet.id"
-                },
-                "aggs" => %{
-                  "facet_value" => %{
-                    "stats" => %{
-                      "field" => "number_facet.value"
-                    }
-                  }
-                }
+          "aggs" => %{
+            "facet_value" => %{
+              "stats" => %{
+                "field" => "number_facet.value"
               }
             }
           }
         }
-      })
-
-    aggregations
+      }
+    }
   end
 
   defp tenant_query() do
@@ -318,10 +404,14 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
   end
 
   defp format_aggregations(aggregations) do
+    IO.inspect(aggregations)
+
     %{
-      "category" => %{"aggregations" => %{"buckets" => categories}},
-      "filters" => %{"aggregations" => %{"buckets" => filters}},
-      "range_filters" => %{"aggregations" => %{"buckets" => range_filters}}
+      "full_filter_aggs" => %{
+        "category" => %{"aggregations" => %{"buckets" => categories}},
+        "filters" => %{"aggregations" => %{"buckets" => filters}},
+        "range_filters" => %{"aggregations" => %{"buckets" => range_filters}}
+      }
     } = aggregations
 
     # Skip categories if only one category
