@@ -1,6 +1,9 @@
 defmodule Snitch.Tools.ElasticSearch.ProductSearch do
   @moduledoc """
   Product Search using elasticsearch
+
+  # TODO : NEEDS A FULL REFACTOR BY @pkrawat1
+  # ===== !!!!!! DONOT MODIFY ME !!!!!! =====
   """
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
