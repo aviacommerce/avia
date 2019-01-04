@@ -19,6 +19,7 @@ defmodule Snitch.Data.Schema.GeneralConfiguration do
     field(:backend_url, :string)
     field(:currency, :string)
     field(:hosted_payment_url, :string)
+    field(:tenant, :string, virtual: true)
 
     has_one(:store_image, StoreLogo, on_replace: :delete)
     has_one(:image, through: [:store_image, :image])

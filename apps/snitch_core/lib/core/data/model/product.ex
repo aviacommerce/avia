@@ -173,7 +173,10 @@ defmodule Snitch.Data.Model.Product do
   @spec get(integer) :: {:ok, Product.t()} | {:error, Ecto.Changeset.t()} | nil
   def delete(id) do
     with %Product{} = product <- get(id),
+         _ <- ESProductStore.update_product_to_es(product, :delete),
          changeset <- Product.delete_changeset(product) do
+      product = product |> Repo.preload(:images)
+      Enum.map(product.images, &delete_image(product.id, &1.id))
       Repo.update(changeset)
     end
   end
@@ -290,7 +293,8 @@ defmodule Snitch.Data.Model.Product do
       Enum.map(uploads, fn
         %{"image" => %{filename: name, path: path, url: url, type: type} = upload} ->
           upload = %Plug.Upload{filename: name, path: path, content_type: type}
-          ImageUploader.store({upload, product})
+          product = %{product | tenant: Repo.get_prefix()}
+          ImageModel.store(upload, product)
 
         _ ->
           {:ok, "success"}
@@ -334,7 +338,7 @@ defmodule Snitch.Data.Model.Product do
 
   defp remove_image_from_store(multi) do
     Multi.run(multi, :remove_from_upload, fn %{image: image, product: product} ->
-      case ImageUploader.delete({image.name, product}) do
+      case ImageModel.delete_image(image.name, product) do
         :ok ->
           {:ok, "success"}
 

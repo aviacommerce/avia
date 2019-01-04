@@ -247,8 +247,7 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def delete(conn, %{"id" => id} = params) do
-    with _ <- ESProductStore.update_product_to_es(id, :delete),
-         {:ok, _product} <- ProductModel.delete(id) do
+    with {:ok, _product} <- ProductModel.delete(id) do
       conn
       |> put_flash(:info, "Product deleted successfully")
       |> redirect_with_updated_conn(params)
