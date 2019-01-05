@@ -9,6 +9,8 @@ defmodule Snitch.Data.Model.Image do
   alias Snitch.Tools.Helper.ImageUploader
   alias Ecto.Multi
 
+  @cwd File.cwd!()
+
   def create(module, %{"image" => image} = params, association) do
     multi =
       Multi.new()
@@ -130,17 +132,15 @@ defmodule Snitch.Data.Model.Image do
   """
   def image_url(name, struct, version \\ :thumb) do
     struct = %{struct | tenant: Repo.get_prefix()}
-    url = ImageUploader.url({name, struct}, version)
+    image_url = ImageUploader.url({name, struct}, version)
 
     case check_arc_config do
       true ->
-        base_path =
-          Application.app_dir(:admin_app) |> String.replace("_build/#{Mix.env()}/lib", "apps")
-
-        Path.join(["/"], Path.relative_to(url, base_path))
+        base_path = String.replace(@cwd, "snitch_core", "admin_app")
+        Path.join(["/"], Path.relative_to(image_url, base_path))
 
       false ->
-        url
+        image_url
     end
   end
 

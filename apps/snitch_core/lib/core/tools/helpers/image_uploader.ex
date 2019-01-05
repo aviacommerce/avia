@@ -9,6 +9,7 @@ defmodule Snitch.Tools.Helper.ImageUploader do
   alias Snitch.Data.Model.Image
 
   @versions [:thumb, :large, :small]
+  @cwd File.cwd!()
 
   # function override to store images locally.
   def __storage do
@@ -41,8 +42,7 @@ defmodule Snitch.Tools.Helper.ImageUploader do
 
     case Image.check_arc_config() do
       true ->
-        base_path =
-          Application.app_dir(:admin_app) |> String.replace("_build/#{Mix.env()}/lib", "apps")
+        base_path = String.replace(@cwd, "snitch_core", "admin_app")
 
         "#{base_path}/#{dir}"
 
