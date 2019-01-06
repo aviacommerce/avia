@@ -62,7 +62,7 @@ defmodule AdminAppWeb.PromotionController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
+  def archive(conn, %{"id" => id}) do
     id = String.to_integer(id)
 
     with promotion when not is_nil(promotion) <- Promotion.get(%{id: id}),

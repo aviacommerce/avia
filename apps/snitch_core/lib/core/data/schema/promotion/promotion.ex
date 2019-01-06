@@ -10,6 +10,26 @@ defmodule Snitch.Data.Schema.Promotion do
   alias Snitch.Data.Schema.{PromotionAction, PromotionRule}
   alias Snitch.Tools.EctoType.UnixTimestamp
 
+  @typedoc """
+  Represents a promotion struct.
+
+  Fields
+  - `code`: Unique code to identify the promotion. Made available to user for
+    applying a promotion.
+  - `name`: A kind of label to identify the `promotion` with.
+  - `starts_at`: The time at which the promotion will start.
+  - `expires_at`: The time at which the promotion will end.
+  - `usage_limit`: This is used to set the number of times this code can be used
+     thoroughout it's life for all the users.
+  - `current_usage_count`: Tracks the number of times the promotion has been used.
+  - `match_policy`: The policy used while checking for rules of an action, an
+    `all` policy means all the rules should be satisfied whereas an `any` policy
+    would require any one of them to be satisified.
+  `active?`: Used to mark the promotion active or inactive.
+  `archived_at`: This is used to check if a promotion archived. An archived
+    promotion means it is no longer active and is present only for record.
+  """
+
   @type t :: %__MODULE__{}
   @match_policy ~w(all any)s
 
@@ -105,7 +125,7 @@ defmodule Snitch.Data.Schema.Promotion do
     |> validate_required(@required_fields)
     |> validate_future_date(:expires_at)
     |> validate_inclusion(:match_policy, @match_policy)
-    |> validate_starts_at_with_expiry()
+    |> validate_starts_at_before_expiry()
     |> unique_constraint(:code,
       name: :unique_promotion_code,
       message: "has already been taken"
@@ -113,19 +133,59 @@ defmodule Snitch.Data.Schema.Promotion do
   end
 
   # checks if `expires_at` is after `starts_at`
-  defp validate_starts_at_with_expiry(%Ecto.Changeset{valid?: true} = changeset) do
-    with {:ok, starts_at} <- fetch_change(changeset, :starts_at),
-         {:ok, expires_at} <- fetch_change(changeset, :expires_at) do
-      if DateTime.compare(expires_at, starts_at) == :gt do
-        changeset
-      else
-        add_error(changeset, :expires_at, "expires_at should be after starts_at")
-      end
-    else
-      :error ->
-        changeset
-    end
+  defp validate_starts_at_before_expiry(%Ecto.Changeset{valid?: true} = changeset) do
+    handle_start_and_expiry_date(
+      changeset,
+      get_change(changeset, :starts_at),
+      get_change(changeset, :expires_at)
+    )
   end
 
-  defp validate_starts_at_with_expiry(changeset), do: changeset
+  defp validate_starts_at_before_expiry(changeset), do: changeset
+
+  defp handle_start_and_expiry_date(changeset, nil, nil) do
+    changeset
+  end
+
+  defp handle_start_and_expiry_date(changeset, nil = _starts_at, expires_at) do
+    {:data, date} = fetch_field(changeset, :starts_at)
+
+    handle_date_related_changeset(
+      changeset,
+      date,
+      expires_at,
+      :expires_at,
+      "expires_at should be after starts_at"
+    )
+  end
+
+  defp handle_start_and_expiry_date(changeset, starts_at, nil = _expires_at) do
+    {:data, date} = fetch_field(changeset, :expires_at)
+
+    handle_date_related_changeset(
+      changeset,
+      starts_at,
+      date,
+      :starts_at,
+      "starts_at should be before expires_at"
+    )
+  end
+
+  defp handle_start_and_expiry_date(changeset, starts_at, expires_at) do
+    handle_date_related_changeset(
+      changeset,
+      starts_at,
+      expires_at,
+      :expires_at,
+      "expires_at should be after starts_at"
+    )
+  end
+
+  defp handle_date_related_changeset(changeset, starts_at, expires_at, key, error) do
+    if DateTime.compare(expires_at, starts_at) == :gt do
+      changeset
+    else
+      add_error(changeset, key, error)
+    end
+  end
 end

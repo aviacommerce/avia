@@ -1,4 +1,4 @@
-defmodule Snitch.Data.Model.Promotion.OrderEligiblity do
+defmodule Snitch.Data.Model.Promotion.OrderEligibility do
   @moduledoc """
   Defines functions for order level checks while checking if
   a promotion can be applied to the order.
@@ -10,6 +10,12 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblity do
   @success_message "promotion applicable"
   @error_message "coupon not applicable"
   @coupon_applied "coupon already applied"
+
+  @message %{
+    applicable: "promotion applicable",
+    valid_state: "valid order state",
+    promotionable: "order promotionable"
+  }
 
   @doc """
   Checks if the `promotion` is already applied to the order.
@@ -23,7 +29,7 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblity do
   def promotion_applied(order, promotion) do
     case PromotionAdjustment.order_adjustments_for_promotion(order, promotion) do
       [] ->
-        true
+        {true, @message.applicable}
 
       _list ->
         {false, @coupon_applied}
@@ -40,7 +46,7 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblity do
   """
   def valid_order_state(order) do
     if order.state in @valid_order_states do
-      true
+      {true, @message.valid_state}
     else
       {false, "promotion not applicable to order"}
     end
@@ -60,7 +66,7 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblity do
     if Enum.any?(order.line_items, fn line_item ->
          line_item.product.promotionable == true
        end) do
-      true
+      {true, @message.promotionable}
     else
       {false, "no promotionable products found"}
     end
@@ -83,8 +89,8 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblity do
     promotion = Repo.preload(promotion, :rules)
 
     case check_eligibility(promotion.match_policy, order, promotion.rules) do
-      {true, _success_message} ->
-        true
+      {true, _success_message} = reason ->
+        reason
 
       {false, _message} = reason ->
         reason

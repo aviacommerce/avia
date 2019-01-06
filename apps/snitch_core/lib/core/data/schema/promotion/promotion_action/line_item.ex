@@ -1,13 +1,30 @@
 defmodule Snitch.Data.Schema.PromotionAction.LineItemAction do
   @moduledoc """
-  Models the actions to be applied for an `order`.
+  Models the actions to be applied for an `line_item`.
+
+  Makes use of `calculator's` to apply adjustments.
   """
 
   use Snitch.Data.Schema
   alias Snitch.Data.Model.Promotion
   alias Snitch.Data.Model.PromotionAdjustment
+  alias Snitch.Tools.Validations
 
   @behaviour Snitch.Data.Schema.PromotionAction
+
+  @typedoc """
+  Represents LineItemAction struct.
+
+  Fields:
+  - `calculator_module`: The calculator module used for calculating the discount
+     amount.
+  - `calculator_preferences`: Meta data required for performing the caculations.
+        e.g.
+          calculator: `Snitch.Domain.Calculator.FlatPercent`
+          data: flat `percent_amount`for this calculator is stored by
+          `calculator_preferences`.
+
+  """
   @type t :: %__MODULE__{}
   @name "per line item adjustment"
 
@@ -22,16 +39,19 @@ defmodule Snitch.Data.Schema.PromotionAction.LineItemAction do
     order_action
     |> cast(params, @params)
     |> validate_required(@params)
-    |> validate_calculator_preferences()
+    |> Validations.validate_embedded_data(
+      :calculator_module,
+      :calculator_preferences
+    )
   end
 
   def perform?(order, promotion, action) do
     order = Repo.preload(order, line_items: :product)
-    action_data = action.preferences
-    calculator = String.to_existing_atom(action_data["calculator_module"])
+    action_preferences = action.preferences
+    calculator = String.to_existing_atom(action_preferences["calculator_module"])
 
     params =
-      for {key, value} <- action_data["calculator_preferences"], into: %{} do
+      for {key, value} <- action_preferences["calculator_preferences"], into: %{} do
         {String.to_existing_atom(key), value}
       end
 
@@ -75,35 +95,5 @@ defmodule Snitch.Data.Schema.PromotionAction.LineItemAction do
       adjustable_type: :line_item,
       adjustable_id: item.id
     }
-  end
-
-  defp validate_calculator_preferences(%Ecto.Changeset{valid?: true} = changeset) do
-    with {:ok, module} <- fetch_change(changeset, :calculator_module),
-         {:ok, preferences} <- fetch_change(changeset, :calculator_preferences) do
-      preference_changeset = module.changeset(struct(module), preferences)
-      add_preferences_change(preference_changeset, changeset)
-    else
-      :error ->
-        changeset
-    end
-  end
-
-  defp validate_calculator_preferences(changeset), do: changeset
-
-  defp add_preferences_change(%Ecto.Changeset{valid?: true} = pref_changeset, changeset) do
-    data = pref_changeset.changes
-    put_change(changeset, :calculator_preferences, data)
-  end
-
-  defp add_preferences_change(pref_changeset, changeset) do
-    additional_info =
-      pref_changeset
-      |> traverse_errors(fn {msg, opts} ->
-        Enum.reduce(opts, msg, fn {key, value}, acc ->
-          String.replace(acc, "%{#{key}}", to_string(value))
-        end)
-      end)
-
-    add_error(changeset, :calculator_preferences, "invalid_preferences", additional_info)
   end
 end

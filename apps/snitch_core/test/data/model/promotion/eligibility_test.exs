@@ -73,7 +73,7 @@ defmodule Snitch.Data.Model.Promotion.EligibilityTest do
     product_ids = Enum.map(products, fn p -> p.id end)
 
     # item total rule will fail as lower_range is more than total
-    insert(:item_total_rule,
+    insert(:order_total_rule,
       promotion: promotion,
       preferences: %{lower_range: Decimal.add(cost.amount, 1), upper_range: 0.0}
     )

@@ -9,7 +9,6 @@ defmodule Snitch.Data.Model.Promotion do
 
   @messages %{
     coupon_applied: "promotion applied",
-    better_coupon: "better promotion already exists",
     failed: "promotion activation failed"
   }
 
@@ -188,6 +187,13 @@ defmodule Snitch.Data.Model.Promotion do
     end
   end
 
+  def update_usage_count(promotion) do
+    current_usage_count = promotion.current_usage_count
+    params = %{current_usage_count: current_usage_count + 1}
+
+    QH.update(Promotion, params, promotion, Repo)
+  end
+
   ############################## private functions ####################
 
   defp has_adjustments?(promotion) do
@@ -201,68 +207,12 @@ defmodule Snitch.Data.Model.Promotion do
   end
 
   defp process_adjustments(order, promotion) do
-    %{
-      current_discount: current_discount,
-      previous_discount: previous_discount,
-      previous_eligible_adjustment_ids: prev_eligible_ids,
-      current_adjustment_ids: current_adjustment_ids
-    } = get_adjustment_manifest(order, promotion)
-
-    if current_discount > previous_discount do
-      case PromotionAdjustment.activate_adjustments(
-             prev_eligible_ids,
-             current_adjustment_ids
-           ) do
-        {:ok, _data} ->
-          update_usage_count(promotion)
-
-        {:error, _data} ->
-          {:error, @messages.failed}
-      end
-    else
-      {:error, @messages.better_coupon}
-    end
-  end
-
-  defp update_usage_count(promotion) do
-    current_usage_count = promotion.current_usage_count
-    params = %{current_usage_count: current_usage_count + 1}
-
-    case QH.update(Promotion, params, promotion, Repo) do
+    case PromotionAdjustment.process_adjustments(order, promotion) do
       {:ok, _data} ->
         {:ok, @messages.coupon_applied}
 
-      _ ->
-        {:error, @messages.failed}
+      {:error, _message} = error ->
+        error
     end
-  end
-
-  defp get_adjustment_manifest(order, promotion) do
-    current_adjustments = PromotionAdjustment.order_adjustments_for_promotion(order, promotion)
-
-    current_discount =
-      Enum.reduce(current_adjustments, Decimal.new(0), fn adjustment, acc ->
-        adjustment.amount |> Decimal.mult(-1) |> Decimal.add(acc)
-      end)
-
-    previous_eligible_adjustments = PromotionAdjustment.eligible_order_adjustments(order)
-
-    previous_discount =
-      Enum.reduce(previous_eligible_adjustments, 0, fn adjustment, acc ->
-        adjustment.amount |> Decimal.mult(-1) |> Decimal.add(acc)
-      end)
-
-    %{
-      current_discount: current_discount,
-      previous_discount: previous_discount,
-      previous_eligible_adjustment_ids: get_adjustment_ids(previous_eligible_adjustments),
-      current_adjustment_ids: get_adjustment_ids(current_adjustments)
-    }
-  end
-
-  defp get_adjustment_ids(adjustments) do
-    Enum.map(adjustments, fn adjustment ->
-      adjustment.id
-    end)
   end
 end

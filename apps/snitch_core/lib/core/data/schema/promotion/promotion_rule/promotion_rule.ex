@@ -7,9 +7,17 @@ defmodule Snitch.Data.Schema.PromotionRule do
   """
   use Snitch.Data.Schema
   alias Snitch.Data.Schema.Promotion
+  alias Snitch.Tools.Validations
 
   @type t :: %__MODULE__{}
 
+  @doc """
+  Adds an overridable `line_item_actionable?` function to all the modules
+  adopting the `__MODULE__` behavour.
+
+  By default `line_item_actionable?` returns true, it's behaviour can be
+  modified as per need by the module adopting it.
+  """
   defmacro __using__(_opts) do
     quote do
       @behaviour Snitch.Data.Schema.PromotionRule
@@ -94,39 +102,6 @@ defmodule Snitch.Data.Schema.PromotionRule do
     changeset
     |> unique_constraint(:name)
     |> foreign_key_constraint(:promotion_id)
-    |> validate_preference_with_target()
-  end
-
-  defp validate_preference_with_target(%Ecto.Changeset{valid?: true} = changeset) do
-    with {:ok, preferences} <- fetch_change(changeset, :preferences),
-         {:ok, module} <- fetch_change(changeset, :module) do
-      preference_changeset = module.changeset(struct(module), preferences)
-      add_preferences_change(preference_changeset, changeset)
-    else
-      :error ->
-        changeset
-
-      {:error, message} ->
-        add_error(changeset, :module, message)
-    end
-  end
-
-  defp validate_preference_with_target(changeset), do: changeset
-
-  defp add_preferences_change(%Ecto.Changeset{valid?: true} = pref_changeset, changeset) do
-    data = pref_changeset.changes
-    put_change(changeset, :preferences, data)
-  end
-
-  defp add_preferences_change(pref_changeset, changeset) do
-    additional_info =
-      pref_changeset
-      |> traverse_errors(fn {msg, opts} ->
-        Enum.reduce(opts, msg, fn {key, value}, acc ->
-          String.replace(acc, "%{#{key}}", to_string(value))
-        end)
-      end)
-
-    add_error(changeset, :preferences, "invalid_preferences", additional_info)
+    |> Validations.validate_embedded_data(:module, :preferences)
   end
 end

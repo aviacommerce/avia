@@ -12,7 +12,7 @@ defmodule Snitch.Data.Model.Promotion.Eligibility do
   along with `promotion rules` to be eligible for the promotion.
   """
   alias Snitch.Data.Model.Promotion.Applicability
-  alias Snitch.Data.Model.Promotion.OrderEligiblity
+  alias Snitch.Data.Model.Promotion.OrderEligibility
 
   @success_message "coupon eligible"
 
@@ -40,11 +40,11 @@ defmodule Snitch.Data.Model.Promotion.Eligibility do
 
   ############## permission level checks ###############
   def promotion_level_check(promotion) do
-    with true <- Applicability.promotion_active?(promotion),
-         true <- Applicability.promotion_action_exists?(promotion),
-         true <- Applicability.starts_at_check(promotion),
-         true <- Applicability.expires_at_check(promotion),
-         true <- Applicability.usage_limit_check(promotion) do
+    with {true, _message} <- Applicability.promotion_active(promotion),
+         {true, _message} <- Applicability.promotion_actions_exist(promotion),
+         {true, _message} <- Applicability.starts_at_check(promotion),
+         {true, _message} <- Applicability.expires_at_check(promotion),
+         {true, _message} <- Applicability.usage_limit_check(promotion) do
       true
     else
       {false, _message} = reason ->
@@ -55,12 +55,10 @@ defmodule Snitch.Data.Model.Promotion.Eligibility do
   ############## order level checks ###############
 
   def order_level_check(order, promotion) do
-    # TODO add check for promotion_applied once it is done
-
-    with true <- OrderEligiblity.valid_order_state(order),
-         true <- OrderEligiblity.promotion_applied(order, promotion),
-         true <- OrderEligiblity.order_promotionable(order),
-         true <- OrderEligiblity.rules_check(order, promotion) do
+    with {true, _message} <- OrderEligibility.valid_order_state(order),
+         {true, _message} <- OrderEligibility.promotion_applied(order, promotion),
+         {true, _message} <- OrderEligibility.order_promotionable(order),
+         {true, _message} <- OrderEligibility.rules_check(order, promotion) do
       true
     else
       {false, _message} = reason ->

@@ -9,7 +9,7 @@ import EctoEnum
 # Also, `ecto enum` doesn't support dot separated names in the list.
 # So before adding the module name here pre-pend it with `Elixir`.
 defenum(PromotionRuleEnum,
-  "Elixir.Snitch.Data.Schema.PromotionRule.ItemTotal": 0,
+  "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal": 0,
   "Elixir.Snitch.Data.Schema.PromotionRule.Product": 1
 )
 

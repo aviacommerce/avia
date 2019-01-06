@@ -4,8 +4,7 @@ defmodule Snitch.Data.Model.PromotionAdjustmentTest do
   use ExUnit.Case
   use Snitch.DataCase
   import Snitch.Factory
-  alias Snitch.Data.Model.Promotion
-  alias Snitch.Data.Model.PromotionAdjustment
+  alias Snitch.Data.Model.{Promotion, PromotionAdjustment}
 
   describe "promotion adjustment queries" do
     setup do
@@ -76,7 +75,7 @@ defmodule Snitch.Data.Model.PromotionAdjustmentTest do
       current_adj_ids = Enum.map(adjustments, fn adjustment -> adjustment.id end)
 
       # activate adjustments for promotion1
-      {:ok, _data} = PromotionAdjustment.activate_adjustments([], current_adj_ids)
+      {:ok, _data} = PromotionAdjustment.process_adjustments(order, promotion1)
 
       data = PromotionAdjustment.eligible_order_adjustments(order)
       assert length(data) == 4
@@ -84,7 +83,7 @@ defmodule Snitch.Data.Model.PromotionAdjustmentTest do
   end
 
   defp set_rules_and_actions(promotion, cost, product_ids) do
-    insert(:item_total_rule,
+    insert(:order_total_rule,
       promotion: promotion,
       preferences: %{lower_range: Decimal.sub(cost.amount, 1), upper_range: Decimal.new(0)}
     )

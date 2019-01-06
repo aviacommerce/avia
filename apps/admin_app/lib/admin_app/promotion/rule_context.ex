@@ -1,7 +1,7 @@
 defmodule AdminApp.Promotion.RuleContext do
   @moduledoc false
 
-  @item_total Snitch.Data.Schema.PromotionRule.ItemTotal
+  @item_total Snitch.Data.Schema.PromotionRule.OrderTotal
   @product Snitch.Data.Schema.PromotionRule.Product
 
   def rule_preferences(model, params \\ %{})
@@ -24,6 +24,8 @@ defmodule AdminApp.Promotion.RuleContext do
           key: :product_list,
           type: "multi-select",
           value: params["product_list"],
+          # TODO: Add the right product search API here,
+          #       added string is only a placeholder.
           source: "/api/product/search"
         },
         %{

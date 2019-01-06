@@ -5,7 +5,7 @@ defmodule AdminAppWeb.PromotionControllerTest do
   @rule_params [
     %{
       name: "Order Item Total",
-      module: "Elixir.Snitch.Data.Schema.PromotionRule.ItemTotal",
+      module: "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal",
       preferences: %{lower_range: Decimal.new(10), upper_range: Decimal.new(100)}
     },
     %{
@@ -131,7 +131,7 @@ defmodule AdminAppWeb.PromotionControllerTest do
   describe "update/2" do
     test "updates successfully", %{conn: conn} do
       promotion = insert(:promotion)
-      insert(:item_total_rule, promotion: promotion)
+      insert(:order_total_rule, promotion: promotion)
       insert(:promotion_order_action, promotion: promotion)
 
       params = %{
@@ -153,7 +153,7 @@ defmodule AdminAppWeb.PromotionControllerTest do
           archived_at: DateTime.to_unix(DateTime.utc_now())
         )
 
-      insert(:item_total_rule, promotion: promotion)
+      insert(:order_total_rule, promotion: promotion)
       insert(:promotion_order_action, promotion: promotion)
 
       params = %{
@@ -170,7 +170,7 @@ defmodule AdminAppWeb.PromotionControllerTest do
 
     test "fails if error on params", %{conn: conn} do
       promotion = insert(:promotion)
-      insert(:item_total_rule, promotion: promotion)
+      insert(:order_total_rule, promotion: promotion)
       insert(:promotion_order_action, promotion: promotion)
 
       params = %{
@@ -196,7 +196,7 @@ defmodule AdminAppWeb.PromotionControllerTest do
   describe "edit/2" do
     test "get data successfully", %{conn: conn} do
       promotion = insert(:promotion)
-      insert(:item_total_rule, promotion: promotion)
+      insert(:order_total_rule, promotion: promotion)
       insert(:promotion_order_action, promotion: promotion)
 
       conn = get(conn, promotion_path(conn, :edit, promotion.id))
@@ -213,15 +213,15 @@ defmodule AdminAppWeb.PromotionControllerTest do
     end
   end
 
-  describe "delete/2" do
+  describe "archive/2" do
     test "archive successfully", %{conn: conn} do
       promotion = insert(:promotion)
-      insert(:item_total_rule, promotion: promotion)
+      insert(:order_total_rule, promotion: promotion)
       insert(:promotion_order_action, promotion: promotion)
 
       assert promotion.archived_at == 0
 
-      conn = delete(conn, promotion_path(conn, :delete, promotion.id))
+      conn = put(conn, promotion_path(conn, :archive, promotion.id))
       response = json_response(conn, 200)
       assert %{"message" => "promotion archived"} = response
     end

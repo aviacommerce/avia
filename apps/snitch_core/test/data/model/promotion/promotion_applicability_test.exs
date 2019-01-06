@@ -15,6 +15,11 @@ defmodule Snitch.Data.Model.Promotion.ApplicabilityTest do
     expired: "promotion has expired"
   }
 
+  @success %{
+    promo_active: "promotion active",
+    has_actions: "has actions"
+  }
+
   describe "valid_coupon_check/1" do
     test "returns error if code not found" do
       promotion = insert(:promotion)
@@ -42,11 +47,11 @@ defmodule Snitch.Data.Model.Promotion.ApplicabilityTest do
     end
   end
 
-  describe "promotion_active?/1" do
+  describe "promotion_active/1" do
     test "returns false if promotion inactive" do
       promotion = insert(:promotion, active?: false)
 
-      assert {false, message} = Applicability.promotion_active?(promotion)
+      assert {false, message} = Applicability.promotion_active(promotion)
       assert message == "promotion is not active"
     end
   end
@@ -55,13 +60,14 @@ defmodule Snitch.Data.Model.Promotion.ApplicabilityTest do
     test "returns false if promotion does not have any actions" do
       promotion = insert(:promotion)
 
-      assert {false, message} = Applicability.promotion_action_exists?(promotion)
+      assert {false, message} = Applicability.promotion_actions_exist(promotion)
       assert message == "promotion is not active"
     end
 
     test "returns true if promo action exists" do
       action = insert(:promotion_order_action)
-      assert true = Applicability.promotion_action_exists?(action.promotion)
+      assert {true, message} = Applicability.promotion_actions_exist(action.promotion)
+      assert message == @success.has_actions
     end
   end
 
@@ -72,7 +78,8 @@ defmodule Snitch.Data.Model.Promotion.ApplicabilityTest do
           starts_at: Timex.shift(DateTime.utc_now(), days: -2)
         )
 
-      assert true = Applicability.starts_at_check(promotion)
+      assert {true, message} = Applicability.starts_at_check(promotion)
+      assert message == @success.promo_active
     end
 
     test "returns false if starts_at is in future" do
@@ -93,7 +100,8 @@ defmodule Snitch.Data.Model.Promotion.ApplicabilityTest do
           expires_at: Timex.shift(DateTime.utc_now(), days: -1)
         )
 
-      assert true = Applicability.starts_at_check(promotion)
+      assert {false, message} = Applicability.expires_at_check(promotion)
+      assert message == @errors.expired
     end
 
     test "returns true if expires_at is in future" do
@@ -103,7 +111,7 @@ defmodule Snitch.Data.Model.Promotion.ApplicabilityTest do
           expires_at: Timex.shift(DateTime.utc_now(), days: 4)
         )
 
-      assert true = Applicability.starts_at_check(promotion)
+      assert {true, message} = Applicability.expires_at_check(promotion)
     end
   end
 

@@ -9,7 +9,7 @@ defmodule Snitch.Data.Model.PromtionHelperTest do
   setup do
     promotion = insert(:promotion)
     insert(:product_rule, promotion: promotion)
-    insert(:item_total_rule, promotion: promotion)
+    insert(:order_total_rule, promotion: promotion)
 
     [promotion: promotion]
   end
