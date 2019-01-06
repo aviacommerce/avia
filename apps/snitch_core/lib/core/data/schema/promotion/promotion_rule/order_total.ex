@@ -1,4 +1,4 @@
-defmodule Snitch.Data.Schema.PromotionRule.ItemTotal do
+defmodule Snitch.Data.Schema.PromotionRule.OrderTotal do
   @moduledoc """
   Models the `promotion rule` based on order total.
   """
@@ -27,11 +27,15 @@ defmodule Snitch.Data.Schema.PromotionRule.ItemTotal do
 
   @doc """
   Checks if the supplied order meets the criteria of the promotion rule
-  `item total`.
+  `order total`.
 
-  Takes as input the `order` and the data `rule_data` which in this case
-  is upper and the lower range against which the order total would be
-  evaluated.
+  Takes as input the `order` and the `rule_data` which in this case
+  is `upper_range` and the `lower_range`. Order total is evaluated against the
+  specified ranges. It should fall in between them.
+
+  ### Note
+  If the `upper_range` is not set and is 0 then upper_range is ignored and the
+  order would be evaluated only against `lower_range`.
   """
   def eligible(order, rule_data) do
     order_total = OrderDomain.total_amount(order)
@@ -44,14 +48,14 @@ defmodule Snitch.Data.Schema.PromotionRule.ItemTotal do
   end
 
   defp satisfies_rule?(order_total, rule_data) do
-    check_against_range(
+    order_total_in_range?(
       order_total,
       Decimal.new(rule_data["lower_range"]),
       Decimal.new(rule_data["upper_range"])
     )
   end
 
-  defp check_against_range(order_total, lower_range, %Decimal{}) do
+  defp order_total_in_range?(order_total, lower_range, %Decimal{}) do
     currency = order_total.currency
     lower_range = Money.new!(currency, lower_range)
 
@@ -64,7 +68,7 @@ defmodule Snitch.Data.Schema.PromotionRule.ItemTotal do
     end
   end
 
-  defp check_against_range(order_total, lower_range, upper_range) do
+  defp order_total_in_range?(order_total, lower_range, upper_range) do
     currency = order_total.currency
     lower_range = Money.new(currency, lower_range)
     upper_range = Money.new!(currency, upper_range)

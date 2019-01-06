@@ -1,6 +1,6 @@
 defmodule Snitch.Data.Model.Promotion.Applicability do
   @moduledoc """
-  Exposes functions related to
+  Exposes functions related to promotion level checks.
   """
 
   use Snitch.Data.Model
@@ -10,6 +10,11 @@ defmodule Snitch.Data.Model.Promotion.Applicability do
     not_found: "promotion not found",
     inactive: "promotion is not active",
     expired: "promotion has expired"
+  }
+
+  @success %{
+    promo_active: "promotion active",
+    has_actions: "has actions"
   }
 
   @doc """
@@ -29,15 +34,15 @@ defmodule Snitch.Data.Model.Promotion.Applicability do
     end
   end
 
-  def promotion_active?(promotion) do
+  def promotion_active(promotion) do
     if promotion.active? do
-      true
+      {true, @success.promo_active}
     else
       {false, @errors.inactive}
     end
   end
 
-  def promotion_action_exists?(promotion) do
+  def promotion_actions_exist(promotion) do
     promotion = Repo.preload(promotion, :actions)
 
     case promotion.actions do
@@ -45,7 +50,7 @@ defmodule Snitch.Data.Model.Promotion.Applicability do
         {false, @errors.inactive}
 
       _ ->
-        true
+        {true, @success.has_actions}
     end
   end
 
@@ -58,7 +63,7 @@ defmodule Snitch.Data.Model.Promotion.Applicability do
   """
   def starts_at_check(promotion) do
     if DateTime.compare(DateTime.utc_now(), promotion.starts_at) == :gt do
-      true
+      {true, @success.promo_active}
     else
       {false, @errors.inactive}
     end
@@ -72,24 +77,28 @@ defmodule Snitch.Data.Model.Promotion.Applicability do
   """
   def expires_at_check(promotion) do
     if DateTime.compare(DateTime.utc_now(), promotion.expires_at) == :lt do
-      true
+      {true, @success.promo_active}
     else
       {false, @errors.expired}
     end
   end
 
   @doc """
-  Checks for `usage limit` for the promotion.
+  Checks for `usage_limit` for the promotion.
 
-  If usage limit reached returns false and coupon code expired
-  otherwise returns true.
+  If usage limit reached returns {false, message} and coupon code expired
+  otherwise returns {true, message}.
+
+  ### Note
+  In case the `usage_limit` property of promotion has been set to zero,
+  it is being assumed that the store keeper wants the usage limit to be infinite.
   """
   def usage_limit_check(promotion) do
     if promotion.usage_limit == 0 do
-      true
+      {true, @success.promo_active}
     else
       if promotion.usage_limit > promotion.current_usage_count do
-        true
+        {true, @success.promo_active}
       else
         {false, @errors.expired}
       end

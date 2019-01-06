@@ -1,22 +1,29 @@
-defmodule Snitch.Data.Model.Promotion.OrderEligiblityTest do
+defmodule Snitch.Data.Model.Promotion.OrderEligibilityTest do
   @moduledoc false
 
   use ExUnit.Case
   use Snitch.DataCase
   import Snitch.Factory
-  alias Snitch.Data.Model.Promotion.OrderEligiblity
+  alias Snitch.Data.Model.Promotion.OrderEligibility
+
+  @message %{
+    applicable: "promotion applicable",
+    valid_state: "valid order state",
+    promotionable: "order promotionable"
+  }
 
   describe "valid_order_state/1" do
     test "returns true if order is in valid state for promotion" do
       order = insert(:order, state: :delivery)
 
-      assert true == OrderEligiblity.valid_order_state(order)
+      assert {true, message} = OrderEligibility.valid_order_state(order)
+      assert message == @message.valid_state
     end
 
     test "fails if order state not valid for promotion" do
       order = insert(:order, state: :cart)
 
-      assert {false, message} = OrderEligiblity.valid_order_state(order)
+      assert {false, message} = OrderEligibility.valid_order_state(order)
       assert message == "promotion not applicable to order"
     end
   end
@@ -31,7 +38,8 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblityTest do
       _set_line_items =
         line_items(%{order: order, variants: products, line_item_count: length(products)})
 
-      assert true == OrderEligiblity.order_promotionable(order)
+      assert {true, message} = OrderEligibility.order_promotionable(order)
+      assert message == @message.promotionable
     end
 
     test "returns {false, message} if no promotionable products found" do
@@ -41,7 +49,7 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblityTest do
       _set_line_items =
         line_items(%{order: order, variants: products, line_item_count: length(products)})
 
-      assert {false, message} = OrderEligiblity.order_promotionable(order)
+      assert {false, message} = OrderEligibility.order_promotionable(order)
       assert message == "no promotionable products found"
     end
   end
@@ -70,7 +78,7 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblityTest do
       %{promotion: promotion, order: order, products: products, total_cost: cost} = context
       product_ids = Enum.map(products, fn p -> p.id end)
 
-      insert(:item_total_rule,
+      insert(:order_total_rule,
         promotion: promotion,
         preferences: %{lower_range: Decimal.sub(cost.amount, 1), upper_range: 0.0}
       )
@@ -80,14 +88,14 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblityTest do
         preferences: %{match_policy: "all", product_list: product_ids}
       )
 
-      assert true == OrderEligiblity.rules_check(order, promotion)
+      assert {true, _message} = OrderEligibility.rules_check(order, promotion)
     end
 
     test "fails as all rules don't satisfy", context do
       %{promotion: promotion, order: order, products: products, total_cost: cost} = context
       product_ids = Enum.map(products, fn p -> p.id end)
 
-      insert(:item_total_rule,
+      insert(:order_total_rule,
         promotion: promotion,
         preferences: %{lower_range: Decimal.add(cost.amount, 1), upper_range: 0.0}
       )
@@ -97,7 +105,7 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblityTest do
         preferences: %{match_policy: "all", product_list: product_ids}
       )
 
-      assert {false, message} = OrderEligiblity.rules_check(order, promotion)
+      assert {false, message} = OrderEligibility.rules_check(order, promotion)
       assert message == "order doesn't falls under the item total condition"
     end
   end
@@ -127,7 +135,7 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblityTest do
       product_ids = Enum.map(products, fn p -> p.id end)
 
       # item total rule will fail as lower_range is more than total
-      insert(:item_total_rule,
+      insert(:order_total_rule,
         promotion: promotion,
         preferences: %{lower_range: Decimal.add(cost.amount, 1), upper_range: 0.0}
       )
@@ -137,7 +145,7 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblityTest do
         preferences: %{match_policy: "all", product_list: product_ids}
       )
 
-      assert true == OrderEligiblity.rules_check(order, promotion)
+      assert {true, _message} = OrderEligibility.rules_check(order, promotion)
     end
 
     test "return false as none of the rules satisfy", context do
@@ -145,7 +153,7 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblityTest do
       new_product = insert(:product)
 
       # item total rule will fail as lower_range is more than total
-      insert(:item_total_rule,
+      insert(:order_total_rule,
         promotion: promotion,
         preferences: %{lower_range: Decimal.add(cost.amount, 1), upper_range: 0.0}
       )
@@ -156,7 +164,7 @@ defmodule Snitch.Data.Model.Promotion.OrderEligiblityTest do
         preferences: %{match_policy: "all", product_list: [new_product.id]}
       )
 
-      assert {false, _message} = OrderEligiblity.rules_check(order, promotion)
+      assert {false, _message} = OrderEligibility.rules_check(order, promotion)
     end
   end
 end

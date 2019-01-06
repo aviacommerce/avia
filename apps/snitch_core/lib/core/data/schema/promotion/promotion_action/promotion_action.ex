@@ -67,39 +67,39 @@ defmodule Snitch.Data.Schema.PromotionAction do
     changeset
     |> unique_constraint(:name)
     |> foreign_key_constraint(:promotion_id)
-    |> validate_preference_with_target()
+    |> validate_embedded_preferences(:module, :preferences)
   end
 
-  defp validate_preference_with_target(%Ecto.Changeset{valid?: true} = changeset) do
-    with {:ok, preferences} <- fetch_change(changeset, :preferences),
-         {:ok, module} <- fetch_change(changeset, :module) do
-      preference_changeset = module.changeset(struct(module), preferences)
-      add_preferences_change(preference_changeset, changeset)
+  defp validate_embedded_preferences(%Ecto.Changeset{valid?: true} = changeset, module_key, key) do
+    with {:ok, preferences} <- fetch_change(changeset, key),
+         {:ok, module_key} <- fetch_change(changeset, module_key) do
+      preference_changeset = module_key.changeset(struct(module_key), preferences)
+      add_preferences_change(preference_changeset, changeset, key)
     else
       :error ->
         changeset
 
       {:error, message} ->
-        add_error(changeset, :module, message)
+        add_error(changeset, module_key, message)
     end
   end
 
-  defp validate_preference_with_target(changeset), do: changeset
+  defp validate_embedded_preferences(changeset, _module_key, _key), do: changeset
 
-  defp add_preferences_change(%Ecto.Changeset{valid?: true} = pref_changeset, changeset) do
-    data = pref_changeset.changes
-    put_change(changeset, :preferences, data)
+  defp add_preferences_change(%Ecto.Changeset{valid?: true} = embed_changeset, changeset, key) do
+    data = embed_changeset.changes
+    put_change(changeset, key, data)
   end
 
-  defp add_preferences_change(pref_changeset, changeset) do
+  defp add_preferences_change(embed_changeset, changeset, key) do
     additional_info =
-      pref_changeset
+      embed_changeset
       |> traverse_errors(fn {_msg, opts} ->
         Enum.reduce(opts, %{}, fn {key, value}, acc ->
           Map.put(acc, key, value)
         end)
       end)
 
-    add_error(changeset, :preferences, "invalid_preferences", additional_info)
+    add_error(changeset, key, "invalid_preferences", additional_info)
   end
 end

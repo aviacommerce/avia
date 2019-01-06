@@ -17,7 +17,7 @@ defmodule Snitch.Data.Model.PromotionTest do
   @rule_params [
     %{
       name: "Order Item Total",
-      module: "Elixir.Snitch.Data.Schema.PromotionRule.ItemTotal",
+      module: "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal",
       preferences: %{lower_range: Decimal.new(10), upper_range: Decimal.new(100)}
     },
     %{
@@ -119,7 +119,7 @@ defmodule Snitch.Data.Model.PromotionTest do
   describe "update/2" do
     test "updates successfully" do
       promotion = insert(:promotion)
-      insert(:item_total_rule, promotion: promotion)
+      insert(:order_total_rule, promotion: promotion)
       insert(:promotion_order_action, promotion: promotion)
 
       params = %{
@@ -139,7 +139,7 @@ defmodule Snitch.Data.Model.PromotionTest do
           archived_at: DateTime.to_unix(DateTime.utc_now())
         )
 
-      insert(:item_total_rule, promotion: promotion)
+      insert(:order_total_rule, promotion: promotion)
       insert(:promotion_order_action, promotion: promotion)
 
       params = %{
@@ -204,7 +204,7 @@ defmodule Snitch.Data.Model.PromotionTest do
       %{order: order, products: products, cost: cost} = context
       promotion = insert(:promotion, match_policy: "all")
 
-      insert(:item_total_rule,
+      insert(:order_total_rule,
         promotion: promotion,
         preferences: %{lower_range: cost.amount, upper_range: 0.0}
       )
@@ -236,7 +236,7 @@ defmodule Snitch.Data.Model.PromotionTest do
       %{order: order, products: products, cost: cost} = context
       promotion = insert(:promotion, match_policy: "all")
 
-      insert(:item_total_rule,
+      insert(:order_total_rule,
         promotion: promotion,
         preferences: %{lower_range: cost.amount, upper_range: 0.0}
       )
@@ -258,7 +258,7 @@ defmodule Snitch.Data.Model.PromotionTest do
       %{order: order, products: products, cost: cost} = context
       promotion = insert(:promotion, match_policy: "any")
 
-      insert(:item_total_rule,
+      insert(:order_total_rule,
         promotion: promotion,
         preferences: %{lower_range: cost.amount, upper_range: 0.0}
       )
@@ -448,7 +448,7 @@ defmodule Snitch.Data.Model.PromotionTest do
     %{item_total_cost: cost, product_ids: product_ids} = rule_manifest
     %{order_action: order_action_data, line_item_action: line_item_action_data} = action_manifest
 
-    insert(:item_total_rule,
+    insert(:order_total_rule,
       promotion: promotion,
       preferences: %{lower_range: cost, upper_range: Decimal.new(0)}
     )

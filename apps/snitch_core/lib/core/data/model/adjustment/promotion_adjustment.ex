@@ -10,6 +10,11 @@ defmodule Snitch.Data.Model.PromotionAdjustment do
   alias Snitch.Data.Schema.PromotionAdjustment
   alias Snitch.Data.Schema.Adjustment, as: AdjustmentSchema
 
+  @messages %{
+    adjustments_failed: "promotion adjustment update failed",
+    better_coupon_present: "better promotion already exists"
+  }
+
   @doc """
   Creates a promotion adjustment.
 
@@ -48,14 +53,7 @@ defmodule Snitch.Data.Model.PromotionAdjustment do
         join: p_adj in PromotionAdjustment,
         on: adj.id == p_adj.adjustment_id,
         where: p_adj.order_id == ^order.id,
-        select: %AdjustmentSchema{
-          amount: adj.amount,
-          eligible: adj.eligible,
-          id: adj.id,
-          label: adj.label,
-          adjustable_type: adj.adjustable_type,
-          adjustable_id: adj.adjustable_id
-        }
+        select: adj
       )
 
     Repo.all(query)
@@ -67,14 +65,7 @@ defmodule Snitch.Data.Model.PromotionAdjustment do
         join: p_adj in PromotionAdjustment,
         on: adj.id == p_adj.adjustment_id,
         where: p_adj.order_id == ^order.id and p_adj.promotion_id == ^promotion.id,
-        select: %AdjustmentSchema{
-          amount: adj.amount,
-          eligible: adj.eligible,
-          id: adj.id,
-          label: adj.label,
-          adjustable_type: adj.adjustable_type,
-          adjustable_id: adj.adjustable_id
-        }
+        select: adj
       )
 
     Repo.all(query)
@@ -86,14 +77,7 @@ defmodule Snitch.Data.Model.PromotionAdjustment do
         join: p_adj in PromotionAdjustment,
         on: adj.id == p_adj.adjustment_id,
         where: p_adj.order_id == ^order.id and adj.eligible == true,
-        select: %AdjustmentSchema{
-          amount: adj.amount,
-          eligible: adj.eligible,
-          id: adj.id,
-          label: adj.label,
-          adjustable_type: adj.adjustable_type,
-          adjustable_id: adj.adjustable_id
-        }
+        select: adj
       )
 
     Repo.all(query)
@@ -105,20 +89,56 @@ defmodule Snitch.Data.Model.PromotionAdjustment do
         join: p_adj in PromotionAdjustment,
         on: adj.id == p_adj.adjustment_id,
         where: p_adj.promotion_id == ^promotion.id,
-        select: %AdjustmentSchema{
-          amount: adj.amount,
-          eligible: adj.eligible,
-          id: adj.id,
-          label: adj.label,
-          adjustable_type: adj.adjustable_type,
-          adjustable_id: adj.adjustable_id
-        }
+        select: adj
       )
 
     Repo.all(query)
   end
 
-  def activate_adjustments(prev_eligible_ids, current_adjustment_ids) do
+  @doc """
+  Processes adjustments for the supplied `order` and `promotion`.
+
+  Adjustments are created due for all the `actions` of a `promotion`
+  for an order. However, these adjustments are created in an ineligible state,
+  handled by the `eligible` field in `Adjustments` which is initially false.
+
+  The `eligible` field is marked true subject to condition that a better promotion
+  doesn't exist already for the order.
+  In case a better promotion exists `{:error, message}` tuple is returned.
+  Otherwise, the adjustments due to previous promotion are marked as ineligible
+  by updating `eligible` field to false. And the `eligible` for adjustments
+  due to present promotion are marked as true.
+
+  A better promotion is one which provides more discount to the customer.
+  """
+
+  def process_adjustments(order, promotion) do
+    %{
+      current_discount: current_discount,
+      previous_discount: previous_discount,
+      previous_eligible_adjustment_ids: prev_eligible_ids,
+      current_adjustment_ids: current_adjustment_ids
+    } = get_adjustment_manifest(order, promotion)
+
+    if current_discount > previous_discount do
+      case activate_adjustments(
+             prev_eligible_ids,
+             current_adjustment_ids
+           ) do
+        {:ok, _data} = result ->
+          result
+
+        {:error, _data} ->
+          {:error, @messages.adjustments_failed}
+      end
+    else
+      {:error, @messages.better_coupon_present}
+    end
+  end
+
+  ################## private functions ################
+
+  defp activate_adjustments(prev_eligible_ids, current_adjustment_ids) do
     Multi.new()
     |> Multi.run(:remove_eligible_adjustments, fn _ ->
       {:ok, update_adjustments(prev_eligible_ids, false)}
@@ -135,8 +155,6 @@ defmodule Snitch.Data.Model.PromotionAdjustment do
         {:error, data}
     end
   end
-
-  ################## private functions ################
 
   defp update_adjustments(ids, eligible) do
     Repo.update_all(
@@ -163,6 +181,35 @@ defmodule Snitch.Data.Model.PromotionAdjustment do
       amount: params.amount,
       label: params.promotion.code <> "(#{params.amount})"
     }
+  end
+
+  defp get_adjustment_manifest(order, promotion) do
+    current_adjustments = order_adjustments_for_promotion(order, promotion)
+
+    current_discount =
+      Enum.reduce(current_adjustments, Decimal.new(0), fn adjustment, acc ->
+        adjustment.amount |> Decimal.mult(-1) |> Decimal.add(acc)
+      end)
+
+    previous_eligible_adjustments = eligible_order_adjustments(order)
+
+    previous_discount =
+      Enum.reduce(previous_eligible_adjustments, 0, fn adjustment, acc ->
+        adjustment.amount |> Decimal.mult(-1) |> Decimal.add(acc)
+      end)
+
+    %{
+      current_discount: current_discount,
+      previous_discount: previous_discount,
+      previous_eligible_adjustment_ids: get_adjustment_ids(previous_eligible_adjustments),
+      current_adjustment_ids: get_adjustment_ids(current_adjustments)
+    }
+  end
+
+  defp get_adjustment_ids(adjustments) do
+    Enum.map(adjustments, fn adjustment ->
+      adjustment.id
+    end)
   end
 
   # Run the accumulated multi struct

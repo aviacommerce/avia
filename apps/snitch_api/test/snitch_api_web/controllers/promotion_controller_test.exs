@@ -149,7 +149,7 @@ defmodule SnitchApiWeb.PromotiontControllerTest do
     %{item_total_cost: cost, product_ids: product_ids} = rule_manifest
     %{order_action: order_action_data, line_item_action: line_item_action_data} = action_manifest
 
-    insert(:item_total_rule,
+    insert(:order_total_rule,
       promotion: promotion,
       preferences: %{lower_range: cost, upper_range: Decimal.new(0)}
     )

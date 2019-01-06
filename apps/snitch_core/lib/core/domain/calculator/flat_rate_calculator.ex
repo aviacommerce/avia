@@ -21,6 +21,13 @@ defmodule Snitch.Domain.Calculator.FlatRate do
     |> validate_required([:amount])
   end
 
+  @doc """
+  Computes and returns result for the supplied params.
+
+  The result would be minimum of the flat rate set by the admin
+  and the supplied struct total. This has been done to ensure an `order`
+  or `line_item` can not have higher adjustment than it's own total price.
+  """
   def compute(%Order{} = order, params) do
     order_total = OrderDomain.total_amount(order)
 

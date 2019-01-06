@@ -120,6 +120,7 @@ defmodule AdminAppWeb.Router do
     post("/promo-rule-prefs", PromotionController, :rule_preferences, as: :promo_rule_prefs)
     post("/promo-action-prefs", PromotionController, :action_preferences, as: :promo_action_prefs)
     post("/promo-calc-prefs", PromotionController, :calc_preferences, as: :promo_calc_prefs)
+    put("/promo/:id/archive", PromotionController, :archive)
   end
 
   scope "/", AdminAppWeb do

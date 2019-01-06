@@ -131,7 +131,7 @@ defmodule Snitch.Data.Schema.PromotionActionTest do
       assert {:ok, _data} = Repo.insert(cs)
     end
 
-    test "fails for invalid match policy" do
+    test "fails for invalid calculator preferences" do
       promotion = insert(:promotion)
 
       params = %{

@@ -73,6 +73,22 @@ defmodule Snitch.Data.Schema.PromotionTest do
       assert updated_promo.id == promo.id
       assert updated_promo.name != promo.name
     end
+
+    test "fails if error starts_at after expires_at" do
+      promotion = insert(:promotion)
+
+      params = %{starts_at: Timex.shift(promotion.expires_at, days: 1)}
+      changeset = Promotion.update_changeset(promotion, params)
+      assert %{starts_at: ["starts_at should be before expires_at"]} == errors_on(changeset)
+    end
+
+    test "fails if error expires_at before starts_at" do
+      promotion = insert(:promotion)
+
+      params = %{expires_at: Timex.shift(promotion.starts_at, days: -1)}
+      changeset = Promotion.update_changeset(promotion, params)
+      assert %{expires_at: ["date should be in future"]} == errors_on(changeset)
+    end
   end
 
   describe "rule_update_changeset/2" do
@@ -83,7 +99,7 @@ defmodule Snitch.Data.Schema.PromotionTest do
         rules: [
           %{
             name: "Order Item Total",
-            module: "Elixir.Snitch.Data.Schema.PromotionRule.ItemTotal",
+            module: "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal",
             preferences: %{lower_range: 10, upper_range: 100}
           },
           %{
@@ -109,7 +125,7 @@ defmodule Snitch.Data.Schema.PromotionTest do
         rules: [
           %{
             name: "Order Item Total",
-            module: "Elixir.Snitch.Data.Schema.PromotionRule.ItemTotal",
+            module: "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal",
             # let's male lower_range string instead of decimal
             preferences: %{lower_range: "abc", upper_range: 100}
           },

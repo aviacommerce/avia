@@ -34,7 +34,7 @@ defmodule Snitch.Data.Schema.PromotionRuleTest do
   test "fails if promotion does not exist" do
     params = %{
       name: "Order Item Total",
-      module: "Elixir.Snitch.Data.Schema.PromotionRule.ItemTotal",
+      module: "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal",
       preferences: %{lower_range: 10, upper_range: 100},
       promotion_id: -1
     }
@@ -51,7 +51,7 @@ defmodule Snitch.Data.Schema.PromotionRuleTest do
 
       params = %{
         name: "Order Item Total",
-        module: "Elixir.Snitch.Data.Schema.PromotionRule.ItemTotal",
+        module: "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal",
         preferences: %{lower_range: 10, upper_range: 100},
         promotion_id: promotion.id
       }
@@ -66,7 +66,7 @@ defmodule Snitch.Data.Schema.PromotionRuleTest do
 
       params = %{
         name: "Order Item Total",
-        module: "Elixir.Snitch.Data.Schema.PromotionRule.ItemTotal",
+        module: "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal",
         # upper and lower range need to be decimal values.
         preferences: %{lower_range: "abc", upper_range: "abc"},
         promotion_id: promotion.id
