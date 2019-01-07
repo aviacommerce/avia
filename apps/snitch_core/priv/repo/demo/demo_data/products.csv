@@ -1,11 +1,11 @@
-name,width,height,depth,selling_price,weight,maximum_retail_price,taxon,image
-Men Checked Round Neck T-shirt,50,70,0,480,0.5,1069,Shirts,blue_shirt.jpeg
-Women White & Black Top,45,65,0,1369,0.4,2490,Western Wear,polkadot.jpg
-Cocoa Powder,0,0,0,600,0.3,809,Diet & Nutrition,neotia.jpg
-Stylish Pure Leather Brown Watch,0,0,0,134,0.4,499,SmartWatches,analogwatch.jpeg
-Prestige Minecraft Kids Armor Costume,19,29,0,34,0.4,50,Kids Costumes,armor_costume.jpg
-Kids Deluxe RavenClaw Student Costume,19,29,0,37,0.4,60,Kids Costumes,student_costume.jpg
-Marvel Infinity War Boys Teen Groot Costume,19,29,0,24,0.4,55,Kids Costumes,groot_costume.jpg
-MARVEL Avenger's Infinity War Thanos Men's Latex Mask,19,29,0,24,0.4,55,Toys,latex_mask.jpg
-Marvel Infinity War Child Infinity Gauntlet,19,29,0,24,0.4,35,Toys,gauntlet.jpg
-Kids Superhero Boots,3,4,3,24,0.4,35,Kids Footwear,kids_boots.jpg
+name,width,height,depth,selling_price,weight,maximum_retail_price,taxon,image,inventory_tracking
+Men Checked Round Neck T-shirt,50,70,0,480,0.5,1069,Shirts,blue_shirt.jpeg,variant
+Women White & Black Top,45,65,0,1369,0.4,2490,Western Wear,polkadot.jpg,variant
+Cocoa Powder,0,0,0,600,0.3,809,Diet & Nutrition,neotia.jpg,variant
+Stylish Pure Leather Brown Watch,0,0,0,134,0.4,499,SmartWatches,analogwatch.jpeg,product
+Prestige Minecraft Kids Armor Costume,19,29,0,34,0.4,50,Kids Costumes,armor_costume.jpg,product
+Kids Deluxe RavenClaw Student Costume,19,29,0,37,0.4,60,Kids Costumes,student_costume.jpg,product
+Marvel Infinity War Boys Teen Groot Costume,19,29,0,24,0.4,55,Kids Costumes,groot_costume.jpg,product
+MARVEL Avenger's Infinity War Thanos Men's Latex Mask,19,29,0,24,0.4,55,Toys,latex_mask.jpg,product
+Marvel Infinity War Child Infinity Gauntlet,19,29,0,24,0.4,35,Toys,gauntlet.jpg,product
+Kids Superhero Boots,3,4,3,24,0.4,35,Kids Footwear,kids_boots.jpg,product

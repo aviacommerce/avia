@@ -151,9 +151,26 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
     }
   end
 
-  defp suggest_keywords(%{name: name, meta_keywords: meta_keywords}) do
-    keywords = String.split(name, ~r(\s+)) ++ String.split(meta_keywords || "", ~r(\s*\,\s*))
-    Enum.filter(keywords, &("" != &1))
+  defp suggest_keywords(%{name: name, meta_keywords: meta_keywords, tenant: tenant}) do
+    keywords =
+      "#{name} #{meta_keywords}"
+      |> String.trim()
+      |> String.downcase()
+      |> String.split(~r(\s+|\s*\,\s*))
+
+    %{
+      "input" => format_suggest_input(keywords),
+      "contexts" => %{
+        "tenant" => tenant
+      }
+    }
+  end
+
+  defp format_suggest_input([]), do: []
+
+  defp format_suggest_input(keywords) do
+    [h | t] = keywords
+    [h <> " " <> Enum.join(t, " ") | format_suggest_input(t)]
   end
 
   defp format_money(money) do

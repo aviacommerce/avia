@@ -122,7 +122,7 @@ defmodule SnitchApiWeb.OrderController do
       data: order,
       opts: [
         include:
-          "line_items,line_items.product,line_items.product.options,line_items.product.options.option_type,packages,packages.items"
+          "line_items,line_items.product,line_items.product.options,line_items.product.options.option_type,packages,packages.items,promotion_adjustments"
       ]
     )
   end

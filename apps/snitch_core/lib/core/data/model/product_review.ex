@@ -6,7 +6,7 @@ defmodule Snitch.Data.Model.ProductReview do
   alias Ecto.Multi
   use Snitch.Data.Model
   alias Snitch.Data.Schema.{ProductReview, RatingOption, Review, Product}
-  alias Snitch.Tools.ElasticSearch.ProductStore, as: ESProductStore
+  alias Snitch.Tools.ElasticSearch.Product.Store, as: ESProductStore
 
   @review_detail %{
     average_rating: 0,

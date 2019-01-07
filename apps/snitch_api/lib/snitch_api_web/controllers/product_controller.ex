@@ -4,7 +4,8 @@ defmodule SnitchApiWeb.ProductController do
   alias Snitch.Data.Model.{Product, ProductReview}
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias SnitchApi.ProductsContext, as: Context
-  alias SnitchApiWeb.Elasticsearch.ProductView, as: ESPView
+  alias SnitchApiWeb.Elasticsearch.Product.ListView, as: ESPListView
+  alias SnitchApiWeb.Elasticsearch.Product.SuggestView, as: ESPSuggestView
 
   plug(SnitchApiWeb.Plug.DataToAttributes)
   action_fallback(SnitchApiWeb.FallbackController)
@@ -42,7 +43,7 @@ defmodule SnitchApiWeb.ProductController do
 
     json(
       conn,
-      JaSerializer.format(ESPView, products, conn,
+      JaSerializer.format(ESPListView, products, conn,
         page: page,
         meta: %{
           "aggregations" => aggregations,
@@ -69,4 +70,15 @@ defmodule SnitchApiWeb.ProductController do
         )
     end
   end
+
+  def suggest(conn, %{"q" => term}) do
+    suggestions = Context.suggest(term)
+
+    json(
+      conn,
+      JaSerializer.format(ESPSuggestView, suggestions, conn)
+    )
+  end
+
+  def suggest(conn, _), do: suggest(conn, %{"q" => ""})
 end
