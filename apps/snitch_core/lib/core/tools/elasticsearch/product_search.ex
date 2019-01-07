@@ -172,10 +172,10 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
             "filter" => filter_query(params),
             "aggs" => %{
               "category" => category_aggs_query(),
-              "filters" => filters_aggs_query(),
-              "range_filters" => range_filters_aggs_query()
+              "filters" => filters_aggs_query()
             }
-          }
+          },
+          "range_filters" => range_filters_aggs_query(params)
         },
         generate_string_facet_aggs_query(params)
       )
@@ -296,20 +296,25 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
     }
   end
 
-  defp range_filters_aggs_query() do
+  defp range_filters_aggs_query(%{"rf" => _} = params) do
     %{
-      "nested" => %{
-        "path" => "number_facet"
-      },
+      "filter" => filter_query(%{params | "rf" => ""}),
       "aggs" => %{
-        "aggregations" => %{
-          "terms" => %{
-            "field" => "number_facet.id"
+        "range_filters" => %{
+          "nested" => %{
+            "path" => "number_facet"
           },
           "aggs" => %{
-            "facet_value" => %{
-              "stats" => %{
-                "field" => "number_facet.value"
+            "aggregations" => %{
+              "terms" => %{
+                "field" => "number_facet.id"
+              },
+              "aggs" => %{
+                "facet_value" => %{
+                  "stats" => %{
+                    "field" => "number_facet.value"
+                  }
+                }
               }
             }
           }
@@ -317,6 +322,9 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
       }
     }
   end
+
+  defp range_filters_aggs_query(params),
+    do: params |> Map.put("rf", "") |> range_filters_aggs_query()
 
   defp tenant_query() do
     [
@@ -420,13 +428,14 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
     %{
       "full_filter_aggs" => %{
         "category" => %{"aggregations" => %{"buckets" => category_buckets}},
-        "filters" => %{"aggregations" => %{"buckets" => filter_buckets}},
-        "range_filters" => %{"aggregations" => %{"buckets" => range_filters}}
-      }
+        "filters" => %{"aggregations" => %{"buckets" => filter_buckets}}
+      },
+      "range_filters" => %{"range_filters" => %{"aggregations" => %{"buckets" => range_filters}}}
     } = aggregations
 
     filter_buckets =
-      (category_buckets ++ filter_buckets) ++ Enum.flat_map(aggregations, &format_special_agg/1)
+      (category_buckets ++ filter_buckets) ++
+        Enum.flat_map(aggregations, &format_special_string_facet_agg/1)
 
     %{
       "filters" => format_id_value_key_aggs(filter_buckets),
@@ -489,7 +498,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
     |> Map.values()
   end
 
-  defp format_special_agg({"special_agg_Category", aggs}) do
+  defp format_special_string_facet_agg({"special_agg_Category", aggs}) do
     %{
       "special_agg_Category" => %{
         "aggregations" => %{"buckets" => buckets}
@@ -499,7 +508,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
     buckets
   end
 
-  defp format_special_agg({key, aggs}) do
+  defp format_special_string_facet_agg({key, aggs}) do
     with "special_agg_" <> _ <- key do
       %{
         "aggregation" => %{
