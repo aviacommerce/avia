@@ -122,4 +122,116 @@ defmodule Snitch.Domain.PackageItemTest do
              ]
     end
   end
+
+  describe "reduce_stock/3" do
+    test "stock not reduced for product with no inventory tracking" do
+      category = insert(:taxon)
+      stock_location = insert(:stock_location)
+      product = insert(:product, inventory_tracking: :none, taxon: category)
+
+      stock_item =
+        insert(:stock_item, count_on_hand: 5, product: product, stock_location: stock_location)
+
+      {:ok, stock} = Inventory.reduce_stock(product.id, stock_location.id, 2)
+
+      assert stock.count_on_hand == stock_item.count_on_hand
+    end
+
+    test "stock not reduced for product with variant and no inventory tracking" do
+      attrs = %{products: [build(:variant)], inventory_tracking: :none}
+      parent_product = insert(:product, attrs)
+      stock_location = insert(:stock_location)
+
+      stock_item =
+        insert(:stock_item,
+          count_on_hand: 5,
+          product: parent_product,
+          stock_location: stock_location
+        )
+
+      {:ok, stock} = Inventory.reduce_stock(parent_product.id, stock_location.id, 2)
+
+      assert stock.count_on_hand == stock_item.count_on_hand
+    end
+
+    test "stock reduced for product with product tracking" do
+      category = insert(:taxon)
+      stock_location = insert(:stock_location)
+      product = insert(:product, inventory_tracking: :product, taxon: category)
+
+      stock_item =
+        insert(:stock_item, count_on_hand: 5, product: product, stock_location: stock_location)
+
+      {:ok, stock} = Inventory.reduce_stock(product.id, stock_location.id, 2)
+
+      assert stock.count_on_hand == 3
+    end
+
+    test "stock reduced for product with variant and product tracking" do
+      attrs = %{products: [build(:variant)], inventory_tracking: :product}
+      parent_product = insert(:product, attrs)
+      variant = parent_product.products |> List.first()
+      stock_location = insert(:stock_location)
+
+      stock_item =
+        insert(:stock_item,
+          count_on_hand: 10,
+          product: parent_product,
+          stock_location: stock_location
+        )
+
+      # Reduce stock by passing the actual product
+      {:ok, stock} = Inventory.reduce_stock(parent_product.id, stock_location.id, 2)
+
+      assert stock.count_on_hand == 8
+
+      # Reduce stock by passing any variant
+      {:ok, stock} = Inventory.reduce_stock(variant.id, stock_location.id, 2)
+
+      assert stock.count_on_hand == 6
+
+      # Reduce stock beyond the stock
+      {:error, changeset} = Inventory.reduce_stock(parent_product.id, stock_location.id, 7)
+
+      refute changeset.valid?
+
+      assert changeset.errors == [
+               count_on_hand:
+                 {"must be greater than %{number}", [validation: :number, number: -1]}
+             ]
+    end
+
+    test "stock reduce for product with variant and variant tracking" do
+      attrs = %{products: [build(:variant)], inventory_tracking: :variant}
+      parent_product = insert(:product, attrs)
+      variant = parent_product.products |> List.first()
+      stock_location = insert(:stock_location)
+
+      stock_item =
+        insert(:stock_item,
+          count_on_hand: 10,
+          product: variant,
+          stock_location: stock_location
+        )
+
+      # Reduce stock using variant product
+      {:ok, stock} = Inventory.reduce_stock(variant.id, stock_location.id, 2)
+
+      assert stock.count_on_hand == 8
+
+      # Reduce stock using parent product
+      {:error, :variant_not_found} =
+        Inventory.reduce_stock(parent_product.id, stock_location.id, 2)
+
+      # Reduce stock beyond the stock
+      {:error, changeset} = Inventory.reduce_stock(variant.id, stock_location.id, 10)
+
+      refute changeset.valid?
+
+      assert changeset.errors == [
+               count_on_hand:
+                 {"must be greater than %{number}", [validation: :number, number: -1]}
+             ]
+    end
+  end
 end
