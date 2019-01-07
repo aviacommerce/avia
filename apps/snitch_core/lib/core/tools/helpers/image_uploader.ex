@@ -6,8 +6,10 @@ defmodule Snitch.Tools.Helper.ImageUploader do
   """
   use Arc.Definition
   alias Snitch.Core.Tools.MultiTenancy.Repo
+  alias Snitch.Data.Model.Image
 
   @versions [:thumb, :large, :small]
+  @cwd File.cwd!()
 
   # function override to store images locally.
   def __storage do
@@ -36,7 +38,17 @@ defmodule Snitch.Tools.Helper.ImageUploader do
 
   def storage_dir(version, {_file, scope}) do
     scope_dir = get_scope_name(scope)
-    "uploads/#{scope.tenant}/images/#{scope_dir}/#{scope.id}/images/#{version}"
+    dir = "uploads/#{scope.tenant}/images/#{scope_dir}/#{scope.id}/images/#{version}"
+
+    case Image.check_arc_config() do
+      true ->
+        base_path = String.replace(@cwd, "snitch_core", "admin_app")
+
+        "#{base_path}/#{dir}"
+
+      false ->
+        dir
+    end
   end
 
   defp get_scope_name(scope) do
