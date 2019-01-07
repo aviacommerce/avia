@@ -36,7 +36,8 @@ defmodule Snitch.Demo.Product do
                       weight,
                       maximum_retail_price,
                       taxon,
-                      image
+                      image,
+                      inventory_tracking
                     ] ->
       width = Decimal.new(width)
       height = Decimal.new(height)
@@ -61,7 +62,8 @@ defmodule Snitch.Demo.Product do
           weight,
           maximum_retail_price,
           updated_taxon,
-          image
+          image,
+          inventory_tracking
         )
 
       associate_theme(product, variation_theme.id)
@@ -126,7 +128,8 @@ defmodule Snitch.Demo.Product do
           weight,
           maximum_retail_price,
           taxon,
-          image
+          image,
+          "none"
         )
 
       create_product_option_value(variant, product)
@@ -143,7 +146,8 @@ defmodule Snitch.Demo.Product do
          weight,
          maximum_retail_price,
          taxon,
-         image_name
+         image_name,
+         inventory_tracking
        ) do
     light = Repo.get_by(ShippingCategory, name: "light")
     image = [create_image(image_name)]
@@ -157,7 +161,8 @@ defmodule Snitch.Demo.Product do
       weight: weight,
       shipping_category_id: light.id,
       max_retail_price: maximum_retail_price,
-      taxon_id: taxon.id
+      taxon_id: taxon.id,
+      inventory_tracking: inventory_tracking
     }
 
     product = %Product{} |> Product.create_changeset(params) |> Repo.insert!()
