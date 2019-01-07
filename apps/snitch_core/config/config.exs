@@ -40,7 +40,7 @@ config :snitch_core, Snitch.Tools.ElasticsearchCluster,
   indexes: %{
     products: %{
       settings: "priv/elasticsearch/products.json",
-      store: Snitch.Tools.ElasticSearch.ProductStore,
+      store: Snitch.Tools.ElasticSearch.Product.Store,
       sources: [Snitch.Data.Schema.Product],
       bulk_page_size: 5000,
       bulk_wait_interval: 15_000

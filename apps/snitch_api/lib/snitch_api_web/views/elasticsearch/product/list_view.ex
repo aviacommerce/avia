@@ -1,4 +1,4 @@
-defmodule SnitchApiWeb.Elasticsearch.ProductView do
+defmodule SnitchApiWeb.Elasticsearch.Product.ListView do
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
 
