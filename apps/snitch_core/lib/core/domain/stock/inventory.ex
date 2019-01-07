@@ -45,7 +45,7 @@ defmodule Snitch.Domain.Inventory do
   `variant`
 
   When we track product by variant, the variant product stock is decreased.
-  > Note: Always pass the variant id to reduce the stock.
+  > Note: Always pass product id of the variant(product) to reduce the stock.
   """
   @spec reduce_stock(integer, integer, integer) ::
           {:ok, StockSchema.t()} | {:error, Ecto.Changeset.t() | :variant_not_found}
