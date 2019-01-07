@@ -124,13 +124,25 @@ defmodule Snitch.Data.Model.Image do
     Application.get_env(:arc, :storage) == Arc.Storage.Local
   end
 
+  def image_url(name, struct, version \\ :thumb) do
+    base_url = System.get_env("BACKEND_URL")
+
+    case Mix.env() do
+      :dev ->
+        base_url <> get_image(name, struct, version)
+
+      _ ->
+        get_image(name, struct, version)
+    end
+  end
+
   @doc """
   Returns the url of the location where image is stored.
 
   Takes as input `name` of the `image` and the corresponding
   struct.
   """
-  def image_url(name, struct, version \\ :thumb) do
+  def get_image(name, struct, version) do
     struct = %{struct | tenant: Repo.get_prefix()}
     image_url = ImageUploader.url({name, struct}, version)
 
