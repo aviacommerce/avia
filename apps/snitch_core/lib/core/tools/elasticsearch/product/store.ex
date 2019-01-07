@@ -1,4 +1,4 @@
-defmodule Snitch.Tools.ElasticSearch.ProductStore do
+defmodule Snitch.Tools.ElasticSearch.Product.Store do
   @moduledoc """
   Fetches data from product table to be used in product index
   """

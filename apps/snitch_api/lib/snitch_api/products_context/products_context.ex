@@ -4,7 +4,8 @@ defmodule SnitchApi.ProductsContext do
   """
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.{Product, Review}
-  alias Snitch.Tools.ElasticSearch.ProductSearch
+  alias Snitch.Tools.ElasticSearch.Product.Search, as: ProductSearch
+  alias Snitch.Tools.ElasticSearch.Product.Suggestor, as: ProductSuggestor
 
   import Ecto.Query
   # @filter_allowables ~w(taxon_id brand_id)a
@@ -41,5 +42,9 @@ defmodule SnitchApi.ProductsContext do
 
         {:ok, product}
     end
+  end
+
+  def suggest(query) do
+    ProductSuggestor.perform(query)
   end
 end

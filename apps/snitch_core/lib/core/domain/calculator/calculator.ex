@@ -19,7 +19,7 @@ defmodule Snitch.Domain.Calculator do
   @doc """
   Returns a list of calculators.
 
-  The list includes the calculators defined in the `core` app as well as, 
+  The list includes the calculators defined in the `core` app as well as,
   those defined by the `user` under `snitch_core` config.
   """
   @spec list :: [atom]

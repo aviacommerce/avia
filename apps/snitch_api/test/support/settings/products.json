@@ -85,10 +85,12 @@
         },
         "suggest_keywords": {
           "type": "completion",
-          "analyzer": "simple",
-          "preserve_separators": false,
-          "preserve_position_increments": true,
-          "max_input_length": 50
+          "contexts": [
+            { 
+                "name": "tenant",
+                "type": "category"
+            }
+          ]
         },
         "name": {
           "type": "text"

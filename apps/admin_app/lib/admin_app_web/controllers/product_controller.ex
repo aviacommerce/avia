@@ -8,7 +8,7 @@ defmodule AdminAppWeb.ProductController do
   alias Snitch.Domain.Taxonomy
   alias Snitch.Tools.Helper.Rummage, as: RummageHelper
   alias Snitch.Domain.Inventory
-  alias Snitch.Tools.ElasticSearch.ProductStore, as: ESProductStore
+  alias Snitch.Tools.ElasticSearch.Product.Store, as: ESProductStore
 
   alias Snitch.Data.Schema.{
     ProductBrand,
@@ -19,8 +19,6 @@ defmodule AdminAppWeb.ProductController do
   }
 
   alias Snitch.Tools.Helper.Query
-  alias Snitch.Data.Model.StockItem, as: StockModel
-  alias Snitch.Data.Schema.StockItem, as: StockSchema
   alias Snitch.Data.Model.Image, as: ImageModel
   alias AdminAppWeb.ProductView
 

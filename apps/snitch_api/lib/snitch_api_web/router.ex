@@ -21,6 +21,7 @@ defmodule SnitchApiWeb.Router do
     post("/login", UserController, :login)
     post("/orders/blank", OrderController, :guest_order)
     get("/variants/favorites", VariantController, :favorite_variants)
+    get("/products/suggest", ProductController, :suggest)
     resources("/products", ProductController, except: [:new, :edit], param: "product_slug")
     get("/orders/:order_number", OrderController, :fetch_guest_order)
     post("/hosted-payment/:payment_source/success", HostedPaymentController, :payment_success)
@@ -57,6 +58,7 @@ defmodule SnitchApiWeb.Router do
     resources("/addresses", AddressController, only: [:index, :show, :create, :update, :delete])
     get("/payment/payment-methods", PaymentController, :payment_methods)
     post("/payment/cod_payment", PaymentController, :cod_payment)
+    post("/promotion/apply", PromotionController, :apply)
 
     # TODO: https://github.com/aviacommerce/avia/issues/283
     # We have fixed the routes as per the payment providers for now.

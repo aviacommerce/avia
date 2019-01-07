@@ -11,7 +11,7 @@ defmodule Snitch.Data.Model.Product do
   alias Snitch.Data.Schema.{Image, Product, Variation, Taxon}
   alias Snitch.Tools.Helper.ImageUploader
   alias Snitch.Core.Tools.MultiTenancy.Repo
-  alias Snitch.Tools.ElasticSearch.ProductStore, as: ESProductStore
+  alias Snitch.Tools.ElasticSearch.Product.Store, as: ESProductStore
 
   @product_states [:active, :in_active, :draft]
 
@@ -392,6 +392,21 @@ defmodule Snitch.Data.Model.Product do
     |> Enum.reduce(%{}, fn {v_id, sp}, acc ->
       Map.put(acc, v_id, sp)
     end)
+  end
+
+  @doc """
+  Returns the product that has the inventory tracking set on it.
+  """
+  @spec product_with_inventory_tracking(Product.t()) :: Product.t()
+  def product_with_inventory_tracking(product) do
+    case is_child_product(product) do
+      true ->
+        product = Repo.preload(product, parent_variation: :parent_product)
+        product.parent_variation.parent_product
+
+      false ->
+        product
+    end
   end
 
   @doc """
