@@ -142,7 +142,7 @@ defmodule Snitch.Data.Model.Image do
   Takes as input `name` of the `image` and the corresponding
   struct.
   """
-  def get_image(name, struct, version) do
+  defp get_image(name, struct, version) do
     struct = %{struct | tenant: Repo.get_prefix()}
     image_url = ImageUploader.url({name, struct}, version)
 
