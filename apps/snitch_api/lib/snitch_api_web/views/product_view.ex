@@ -1,7 +1,6 @@
 defmodule SnitchApiWeb.ProductView do
   use SnitchApiWeb, :view
   use JaSerializer.PhoenixView
-  alias AdminAppWeb.Endpoint
   alias Snitch.Data.Schema.Image
   alias Snitch.Data.Schema.Variation
   alias Snitch.Data.Schema.Product, as: ProductSchema
