@@ -27,8 +27,28 @@ defmodule Snitch.Domain.Inventory do
   end
 
   @doc """
-  Reduces stock for a product at particular stock location by the amount passed.
+  Decreases stock count for a product at particular stock location by the amount passed.
+
+  This method takes into consideration the inventory tracking level that is
+  applied on the product to reduce the stock.
+
+  `none`
+
+  When the inventory tracking for the product is `none`, we dont reduce the stock
+  for the product.
+
+  `product`
+
+  When we track inventory by product, we always reduce the stock of the product.
+  > Note: You can pass both variant or product id to reduce the stock.
+
+  `variant`
+
+  When we track product by variant, the variant product stock is decreased.
+  > Note: Always pass the variant id to reduce the stock.
   """
+  @spec reduce_stock(integer, integer, integer) ::
+          {:ok, StockSchema.t()} | {:error, Ecto.Changeset.t() | :variant_not_found}
   def reduce_stock(product_id, stock_location_id, reduce_count) do
     with product <- ProductModel.get(product_id),
          product_with_inventory <- ProductModel.product_with_inventory_tracking(product),
