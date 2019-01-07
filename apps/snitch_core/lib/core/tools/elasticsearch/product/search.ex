@@ -1,4 +1,4 @@
-defmodule Snitch.Tools.ElasticSearch.ProductSearch do
+defmodule Snitch.Tools.ElasticSearch.Product.Search do
   @moduledoc """
   Product Search using elasticsearch
 
@@ -11,7 +11,7 @@ defmodule Snitch.Tools.ElasticSearch.ProductSearch do
   """
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
-  import Snitch.Tools.ElasticSearch.ProductStore, only: [search_products: 1]
+  import Snitch.Tools.ElasticSearch.Product.Store, only: [search_products: 1]
 
   def run(conn, params) do
     %{

@@ -7,7 +7,7 @@ defmodule SnitchApiWeb.ProductControllerTest do
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Tools.ElasticsearchCluster, as: ESCluster
   alias Elasticsearch.{Index, Cluster}
-  alias Snitch.Tools.ElasticSearch.ProductStore
+  alias Snitch.Tools.ElasticSearch.Product.Store, as: ProductStore
 
   setup %{conn: conn} do
     Elasticsearch.delete(ESCluster, "products_test")

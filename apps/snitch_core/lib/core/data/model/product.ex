@@ -11,7 +11,7 @@ defmodule Snitch.Data.Model.Product do
   alias Snitch.Data.Schema.{Image, Product, Variation, Taxon}
   alias Snitch.Tools.Helper.ImageUploader
   alias Snitch.Core.Tools.MultiTenancy.Repo
-  alias Snitch.Tools.ElasticSearch.ProductStore, as: ESProductStore
+  alias Snitch.Tools.ElasticSearch.Product.Store, as: ESProductStore
 
   @product_states [:active, :in_active, :draft]
 
