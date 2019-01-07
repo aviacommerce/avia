@@ -124,6 +124,7 @@ defmodule Snitch.Domain.Order do
     Enum.reduce(package_items, Money.new(currency, 0), fn %{shipping_tax: shipping_tax, tax: tax},
                                                           acc ->
       shipping_tax = shipping_tax || Money.new!(currency, 0)
+      tax = tax || Money.new!(currency, 0)
 
       acc
       |> Money.add!(shipping_tax)

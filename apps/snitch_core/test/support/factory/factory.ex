@@ -13,7 +13,8 @@ defmodule Snitch.Factory do
     Zone,
     Rating,
     VariationTheme,
-    ShippingCategory
+    ShippingCategory,
+    Promotion
   }
 
   alias Snitch.Data.Schema.{
