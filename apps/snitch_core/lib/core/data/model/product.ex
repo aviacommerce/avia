@@ -397,8 +397,8 @@ defmodule Snitch.Data.Model.Product do
   def product_with_inventory_tracking(product) do
     case is_child_product(product) do
       true ->
-        parent_product = Repo.preload(product, parent_variation: :parent_product)
-        parent_product.parent_variation.parent_product
+        product = Repo.preload(product, parent_variation: :parent_product)
+        product.parent_variation.parent_product
 
       false ->
         product
