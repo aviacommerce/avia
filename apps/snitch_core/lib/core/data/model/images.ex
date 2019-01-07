@@ -9,6 +9,8 @@ defmodule Snitch.Data.Model.Image do
   alias Snitch.Tools.Helper.ImageUploader
   alias Ecto.Multi
 
+  @cwd File.cwd!()
+
   def create(module, %{"image" => image} = params, association) do
     multi =
       Multi.new()
@@ -65,7 +67,9 @@ defmodule Snitch.Data.Model.Image do
   def delete_image_multi(multi, image, struct) do
     multi
     |> Multi.run(:remove_from_upload, fn _ ->
-      case ImageUploader.delete({image.name, struct}) do
+      struct = %{struct | tenant: Repo.get_prefix()}
+
+      case delete_image(image.name, struct) do
         :ok ->
           {:ok, "success"}
 
@@ -78,9 +82,20 @@ defmodule Snitch.Data.Model.Image do
     end)
   end
 
+  def store(image, struct) do
+    struct = %{struct | tenant: Repo.get_prefix()}
+    ImageUploader.store({image, struct})
+  end
+
+  def delete_image(image, struct) do
+    struct = %{struct | tenant: Repo.get_prefix()}
+    ImageUploader.delete({image, struct})
+  end
+
   def upload_image_multi(multi, %{filename: name, path: path, type: type} = image) do
     Multi.run(multi, :image_upload, fn %{struct: struct} ->
       image = %Plug.Upload{filename: name, path: path, content_type: type}
+      struct = %{struct | tenant: Repo.get_prefix()}
 
       case ImageUploader.store({image, struct}) do
         {:ok, _} ->
@@ -105,14 +120,40 @@ defmodule Snitch.Data.Model.Image do
     end
   end
 
+  def check_arc_config do
+    Application.get_env(:arc, :storage) == Arc.Storage.Local
+  end
+
+  def image_url(name, struct, version \\ :thumb) do
+    base_url = System.get_env("BACKEND_URL")
+
+    case Mix.env() do
+      :dev ->
+        base_url <> get_image(name, struct, version)
+
+      _ ->
+        get_image(name, struct, version)
+    end
+  end
+
   @doc """
   Returns the url of the location where image is stored.
 
   Takes as input `name` of the `image` and the corresponding
   struct.
   """
-  def image_url(name, struct, version \\ :thumb) do
-    ImageUploader.url({name, struct}, version)
+  defp get_image(name, struct, version) do
+    struct = %{struct | tenant: Repo.get_prefix()}
+    image_url = ImageUploader.url({name, struct}, version)
+
+    case check_arc_config do
+      true ->
+        base_path = String.replace(@cwd, "snitch_core", "admin_app")
+        Path.join(["/"], Path.relative_to(image_url, base_path))
+
+      false ->
+        image_url
+    end
   end
 
   def handle_image_value(%Plug.Upload{} = file) do

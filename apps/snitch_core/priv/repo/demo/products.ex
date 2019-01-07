@@ -16,6 +16,7 @@ defmodule Snitch.Demo.Product do
 
   alias Snitch.Domain.Taxonomy
   alias Snitch.Tools.Helper.ImageUploader
+  alias Snitch.Data.Model.Image, as: ImageModel
 
   @base_path Application.app_dir(:snitch_core, "priv/repo/demo/demo_data")
 
@@ -203,7 +204,7 @@ defmodule Snitch.Demo.Product do
   end
 
   defp upload_image(%Plug.Upload{} = image, product) do
-    case ImageUploader.store({image, product}) do
+    case ImageModel.store(image, product) do
       {:ok, _} ->
         {:ok, product}
 

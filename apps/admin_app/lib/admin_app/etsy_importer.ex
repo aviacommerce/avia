@@ -14,6 +14,7 @@ defmodule Avia.Etsy.Importer do
   @store_consumer_secret "ETSY_CONSUMER_SECRET"
 
   alias Snitch.Data.Model.StoreProps
+  alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Tools.Helper.Taxonomy, as: TaxonomyHelper
   alias Snitch.Repo
   alias Snitch.Data.Schema.{Product, Taxon, Image}
@@ -157,7 +158,7 @@ defmodule Avia.Etsy.Importer do
       path: file_path
     }
 
-    {:ok, filename} = ImageUploader.store({upload, product})
+    {:ok, filename} = ImageModel.store(upload, product)
     filename
   end
 
