@@ -9,7 +9,7 @@ defmodule Snitch.Domain.Package do
   alias Ecto.Multi
   alias Snitch.Core.Tools.MultiTenancy.MultiQuery
   alias Snitch.Data.Schema.Package
-  alias Snitch.Domain.ShippingCalculator
+  alias Snitch.Domain.{ShippingCalculator, Inventory}
   alias Snitch.Tools.Money, as: MoneyTools
   alias Snitch.Data.Model.StockItem
   alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
@@ -72,11 +72,7 @@ defmodule Snitch.Domain.Package do
     stock_location_id = package.origin_id
 
     Stream.map(package.items, fn item ->
-      stock_item =
-        StockItem.get(%{product_id: item.product_id, stock_location_id: stock_location_id})
-
-      count_on_hand = stock_item.count_on_hand - item.quantity
-      StockItem.update(%{count_on_hand: count_on_hand}, stock_item)
+      Inventory.reduce_stock(item.product_id, stock_location_id, item.quantity)
     end)
   end
 end

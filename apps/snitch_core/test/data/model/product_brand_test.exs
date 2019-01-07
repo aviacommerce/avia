@@ -41,8 +41,7 @@ defmodule Snitch.Data.Model.ProductBrandTest do
     test "successfully along with image", %{image_params: ip, valid_params: vp} do
       vp = vp |> Map.put("image", ip)
       assert {:ok, product_brand} = PBModel.create(vp)
-      path = Path.wildcard("uploads/**/images/**/#{product_brand.id}") |> List.first()
-      cleanup(path)
+      ImageModel.delete_image(ip.filename, product_brand)
     end
 
     test "successfully without image", %{valid_params: vp} do
@@ -65,8 +64,7 @@ defmodule Snitch.Data.Model.ProductBrandTest do
       pb = pb |> Repo.preload(:image)
       params = %{} |> Map.put("image", new_image)
       assert {:ok, product_brand} = PBModel.update(pb, params)
-      path = Path.wildcard("uploads/**/images/**/#{product_brand.id}") |> List.first()
-      cleanup(path)
+      ImageModel.delete_image(new_image.filename, product_brand)
     end
 
     test "successfully without image", %{product_brand: pb} do
@@ -85,16 +83,11 @@ defmodule Snitch.Data.Model.ProductBrandTest do
       vp = vp |> Map.put("image", ip)
       {:ok, product_brand} = PBModel.create(vp)
       assert {:ok, "success"} = PBModel.delete(product_brand.id)
-      path = Path.wildcard("uploads/**/images/**/#{product_brand.id}") |> List.first()
-      cleanup(path)
+      ImageModel.delete_image(ip.filename, product_brand)
     end
 
     test "without image", %{product_brand: pb} do
       assert {:ok, product_brand} = PBModel.delete(pb.id)
     end
-  end
-
-  defp cleanup(path) do
-    File.rm_rf(path)
   end
 end
