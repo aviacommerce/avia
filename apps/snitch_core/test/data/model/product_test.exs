@@ -289,7 +289,7 @@ defmodule Snitch.Data.Model.ProductTest do
     end
   end
 
-  describe "is orderable?/1" do
+  describe "is_orderable?/1" do
     test "simple product and no product tracking" do
       product = insert(:product, inventory_tracking: :none)
 
