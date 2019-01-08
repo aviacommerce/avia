@@ -6,7 +6,8 @@ defmodule SnitchApiWeb.Elasticsearch.Product.SuggestView do
     :id,
     :name,
     :brand,
-    :category
+    :category,
+    :term
   ])
 
   defp source(product), do: product["_source"]
@@ -31,7 +32,7 @@ defmodule SnitchApiWeb.Elasticsearch.Product.SuggestView do
   #       "Toys"
   #     ]
   #   }
-  defp category(product) do
-    List.first(source(product)["category"]["all_parents"] || [])
-  end
+  defp category(product), do: List.first(source(product)["category"]["all_parents"] || [])
+
+  defp term(product), do: product["text"] |> String.split(" ") |> List.first()
 end
