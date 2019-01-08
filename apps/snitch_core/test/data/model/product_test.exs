@@ -369,7 +369,6 @@ defmodule Snitch.Data.Model.ProductTest do
 
       refute Product.is_orderable?(parent_product)
 
-      # variant product does not have stock
       assert Product.is_orderable?(variant)
     end
   end
