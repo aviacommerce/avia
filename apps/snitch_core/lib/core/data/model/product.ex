@@ -415,7 +415,24 @@ defmodule Snitch.Data.Model.Product do
   """
   @spec is_orderable?(Product.t()) :: true | false
   def is_orderable?(product) do
-    has_stock?(product)
+    with product_with_tracking <- product_with_inventory_tracking(product) do
+      case product_with_tracking.inventory_tracking do
+        :none ->
+          true
+
+        :product ->
+          case is_child_product(product) do
+            true ->
+              has_stock?(product_with_tracking)
+
+            false ->
+              has_stock?(product)
+          end
+
+        :variant ->
+          has_stock?(product)
+      end
+    end
   end
 
   defp has_stock?(product) do
