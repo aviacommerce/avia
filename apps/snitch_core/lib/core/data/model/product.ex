@@ -411,7 +411,23 @@ defmodule Snitch.Data.Model.Product do
 
   @doc """
   Ordering of product depends on many things, for now we just check
-  sufficient stock is available.
+  sufficient stock is available based on the inventory tracking set on the product.
+
+  Following is the behaviour based on inventory tracking:
+
+  `none`
+
+  When we don't track product, it is always orderable
+
+  `product`
+
+  When tracking inventory by product, we only check the stock for product itself
+  without consideration of variant products.
+
+  `variant`
+
+  When tracking inventory by variant, parent product is not orderable. Variant
+  product are orderable if sufficient stock is available.
   """
   @spec is_orderable?(Product.t()) :: true | false
   def is_orderable?(product) do
