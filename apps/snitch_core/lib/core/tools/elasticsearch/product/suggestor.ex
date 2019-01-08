@@ -24,18 +24,21 @@ defmodule Snitch.Tools.ElasticSearch.Product.Suggestor do
       |> search_products
 
     collection
+    |> Enum.uniq_by(&List.first(&1["_source"]["category"]["all_parents"]))
   end
 
   defp convert_to_elastic_query(term) do
     %{
-      "_source" => ["name", "brands", "category.direct_parent"],
+      "_source" => ["name", "brands", "category.all_parents"],
       "suggest" => %{
         "product-suggest" => %{
           "prefix" => term,
           "completion" => %{
             "field" => "suggest_keywords",
             "size" => "10",
-            "fuzzy" => true,
+            "fuzzy" => %{
+              "min_length" => 3
+            },
             "skip_duplicates" => "true",
             "contexts" => %{
               "tenant" => Repo.get_prefix()
