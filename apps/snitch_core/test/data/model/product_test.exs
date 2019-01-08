@@ -289,15 +289,87 @@ defmodule Snitch.Data.Model.ProductTest do
     end
   end
 
-  describe "is orderable" do
-    test "when product with no stock items" do
-      product = insert(:product)
-      refute Product.is_orderable?(product)
+  describe "is_orderable?/1" do
+    test "simple product and no product tracking" do
+      product = insert(:product, inventory_tracking: :none)
+
+      assert Product.is_orderable?(product)
     end
 
-    test "when product with stock items" do
-      stock_movement = insert(:stock_movement) |> Repo.preload(stock_item: :product)
-      assert Product.is_orderable?(stock_movement.stock_item.product)
+    test "product with variant and no product tracking" do
+      attrs = %{products: [build(:variant)], inventory_tracking: :none}
+      parent_product = insert(:product, attrs)
+      variant = parent_product.products |> List.first()
+
+      assert Product.is_orderable?(parent_product)
+      assert Product.is_orderable?(variant)
+    end
+
+    test "simple product with inventory tracking by product" do
+      product = insert(:product, inventory_tracking: :product)
+
+      # Product has no stock
+      refute Product.is_orderable?(product)
+
+      stock_location = insert(:stock_location)
+
+      stock_item =
+        insert(:stock_item,
+          count_on_hand: 10,
+          product: product,
+          stock_location: stock_location
+        )
+
+      # product has stock
+      assert Product.is_orderable?(product)
+    end
+
+    test "product with variants and inventory tracking by product" do
+      attrs = %{products: [build(:variant)], inventory_tracking: :product}
+      parent_product = insert(:product, attrs)
+      variant = parent_product.products |> List.first()
+
+      refute Product.is_orderable?(parent_product)
+
+      stock_location = insert(:stock_location)
+
+      stock_item =
+        insert(:stock_item,
+          count_on_hand: 10,
+          product: parent_product,
+          stock_location: stock_location
+        )
+
+      # product has stock
+      assert Product.is_orderable?(parent_product)
+
+      # variant product will also be orderable as inventory is tracked by parent
+      # product
+      assert Product.is_orderable?(variant)
+    end
+
+    test "product with variants and inventory tracking by variant" do
+      attrs = %{products: [build(:variant)], inventory_tracking: :variant}
+      parent_product = insert(:product, attrs)
+      variant = parent_product.products |> List.first()
+
+      refute Product.is_orderable?(parent_product)
+
+      # variant product does not have stock
+      refute Product.is_orderable?(variant)
+
+      stock_location = insert(:stock_location)
+
+      stock_item =
+        insert(:stock_item,
+          count_on_hand: 10,
+          product: variant,
+          stock_location: stock_location
+        )
+
+      refute Product.is_orderable?(parent_product)
+
+      assert Product.is_orderable?(variant)
     end
   end
 
