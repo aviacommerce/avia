@@ -35,7 +35,7 @@ defmodule Snitch.Tools.ElasticSearch.Product.Suggestor do
           "completion" => %{
             "field" => "suggest_keywords",
             "size" => "10",
-            "fuzzy" =>  true,
+            "fuzzy" => true,
             "skip_duplicates" => "true",
             "contexts" => %{
               "tenant" => Repo.get_prefix()
