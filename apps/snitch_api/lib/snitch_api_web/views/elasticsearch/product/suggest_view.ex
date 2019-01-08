@@ -20,5 +20,18 @@ defmodule SnitchApiWeb.Elasticsearch.Product.SuggestView do
 
   defp brand(product), do: source(product)["brand"]
 
-  defp category(product), do: source(product)["category"]["direct_parent"]
+  # A category is stored like this :
+  #
+  #   "category" : {
+  #     "paths" : "Category:Kids:Toys",
+  #     "direct_parent" : "Toys",
+  #     "all_parents" : [
+  #       "Category",
+  #       "Kids",
+  #       "Toys"
+  #     ]
+  #   }
+  defp category(product) do
+    List.first(source(product)["category"]["all_parents"] || [])
+  end
 end

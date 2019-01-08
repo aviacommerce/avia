@@ -83,10 +83,11 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
   end
 
   defp gen_taxon_path(nil), do: []
+  defp gen_taxon_path(%{parent: nil}), do: []
 
-  defp gen_taxon_path(taxon) do
-    taxon = Repo.preload(taxon, parent: :parent)
-    gen_taxon_path(taxon.parent) ++ [taxon.name]
+  defp gen_taxon_path(%{parent: parent, name: name}) do
+    parent = Repo.preload(parent, :parent)
+    gen_taxon_path(parent) ++ [name]
   end
 
   defp option_map(option) do
@@ -151,12 +152,13 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
     }
   end
 
-  defp suggest_keywords(%{name: name, meta_keywords: meta_keywords, tenant: tenant}) do
+  defp suggest_keywords(%{name: name, meta_keywords: meta_keywords, tenant: tenant, taxon: taxon}) do
     keywords =
-      "#{name} #{meta_keywords}"
-      |> String.trim()
-      |> String.downcase()
-      |> String.split(~r(\s+|\s*\,\s*))
+      gen_taxon_path(taxon) ++
+        ("#{name} #{meta_keywords}"
+         |> String.trim()
+         |> String.downcase()
+         |> String.split(~r(\s+|\s*\,\s*)))
 
     %{
       "input" => format_suggest_input(keywords),
