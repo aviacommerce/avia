@@ -10,7 +10,11 @@
             </div>
             <div class="media-body">
                <div class="name">
-                  <%= @order.user.first_name <>" "<>@order.user.last_name %>
+                  <%= if is_nil(@order.user) do %>
+                     Guest user
+                  <% else %> 
+                     <%= @order.user.first_name <>" "<>@order.user.last_name %>
+                  <% end %>
                </div>
                <div class="order-datail">
                   <span><a href="/orders/<%= @order.number %>/detail" rel="nofollow"><%= @order.number %></a></span> <span><%= order_total(@order) %></span>  
