@@ -117,7 +117,8 @@ export function handleStockForProductTracking() {
   let stockLocationId = $("#product_tracking #stock_stock_location_id").val();
   let productId = $("#product_tracking #stock_product_id").val();
 
-  getStockForProductLevel(productId, stockLocationId);
+  if(stockLocationId && productId)
+    getStockForProductLevel(productId, stockLocationId);
 
   $("#product_tracking #stock_stock_location_id").on("change", function() {
     let stockLocationId = this.value;
