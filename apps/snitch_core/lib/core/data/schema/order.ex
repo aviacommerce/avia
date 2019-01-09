@@ -6,13 +6,12 @@ defmodule Snitch.Data.Schema.Order do
   use Rummage.Ecto
   use Snitch.Data.Schema
 
-  alias Ecto.Nanoid
   alias Snitch.Data.Schema.{LineItem, OrderAddress, Package, Payment, User}
 
   @type t :: %__MODULE__{}
 
   schema "snitch_orders" do
-    field(:number, Nanoid, autogenerate: true)
+    field(:number, Ecto.Nanoid, autogenerate: {Nanoid, :generate, [17, "-0123456789"]})
     field(:state, OrderStateEnum, default: :cart)
     field(:special_instructions, :string)
 

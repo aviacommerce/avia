@@ -10,7 +10,7 @@
             </div>
             <div class="media-body">
                <div class="name">
-                  <%= @order.user.first_name <>" "<>@order.user.last_name %>
+                  <%= order_user_name(@order) %>
                </div>
                <div class="order-datail">
                   <span><a href="/orders/<%= @order.number %>/detail" rel="nofollow"><%= @order.number %></a></span> <span><%= order_total(@order) %></span>  

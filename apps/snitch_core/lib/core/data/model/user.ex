@@ -28,4 +28,9 @@ defmodule Snitch.Data.Model.User do
 
   @spec get_all() :: [UserSchema.t()]
   def get_all, do: Repo.all(UserSchema)
+
+  @spec get_username(UserSchema.t()) :: String.t()
+  def get_username(user) do
+    if is_nil(user), do: nil, else: user.first_name <> " " <> user.last_name
+  end
 end
