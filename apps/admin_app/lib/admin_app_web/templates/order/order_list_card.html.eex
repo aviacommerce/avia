@@ -11,7 +11,7 @@
             <div class="media-body">
                <div class="name">
                   <%= if is_nil(@order.user) do %>
-                     Guest user
+                     N.A.
                   <% else %> 
                      <%= @order.user.first_name <>" "<>@order.user.last_name %>
                   <% end %>
