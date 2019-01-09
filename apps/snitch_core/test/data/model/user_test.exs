@@ -70,4 +70,17 @@ defmodule Snitch.Data.Model.UserTest do
       assert received_id == uid
     end
   end
+
+  describe "get username" do
+    test "if user has name firstname and lastname set" do
+      user = insert(:user)
+      user_name = User.get_username(user)
+      assert user_name == user.first_name <> " " <> user.last_name
+    end
+
+    test "if user is nil" do
+      user_name = User.get_username(nil)
+      assert user_name == nil
+    end
+  end
 end
