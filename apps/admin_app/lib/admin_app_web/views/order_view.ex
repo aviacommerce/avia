@@ -1,6 +1,6 @@
 defmodule AdminAppWeb.OrderView do
   use AdminAppWeb, :view
-  alias Snitch.Data.Model.{Country, State}
+  alias Snitch.Data.Model.{Country, State, User}
   alias Snitch.Domain.Order, as: OrderDomain
   alias AdminAppWeb.Helpers
   alias SnitchPayments.PaymentMethodCode
@@ -18,7 +18,13 @@ defmodule AdminAppWeb.OrderView do
   }
 
   def order_user_name(order) do
-    order.user.first_name <> order.user.last_name
+    case User.get_username(order.user) do
+      nil ->
+        "N.A."
+
+      name ->
+        name
+    end
   end
 
   def order_item_count(order) do

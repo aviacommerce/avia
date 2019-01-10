@@ -189,7 +189,7 @@ defmodule Snitch.Demo.Order do
     digest
     |> Stream.with_index()
     |> Enum.map(fn {manifest, index} ->
-      number = "#{Nanoid.generate()}-#{index}"
+      number = "#{Nanoid.generate(17, "-0123456789")}-#{index}"
       line_items = line_items_with_price(variants, manifest.quantity)
 
       line_items =
