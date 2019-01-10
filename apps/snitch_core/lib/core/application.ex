@@ -14,7 +14,7 @@ defmodule Snitch.Application do
         [
           supervisor(Snitch.Repo, []),
           supervisor(Snitch.Tools.ElasticsearchCluster, []),
-          worker(Cachex, [:snitch_cache, []])
+          worker(Cachex, [:avia_cache, [limit: 1000]])
         ],
         strategy: :one_for_one,
         name: Snitch.Supervisor

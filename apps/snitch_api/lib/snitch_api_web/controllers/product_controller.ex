@@ -6,6 +6,7 @@ defmodule SnitchApiWeb.ProductController do
   alias SnitchApi.ProductsContext, as: Context
   alias SnitchApiWeb.Elasticsearch.Product.ListView, as: ESPListView
   alias SnitchApiWeb.Elasticsearch.Product.SuggestView, as: ESPSuggestView
+  alias Snitch.Tools.Cache
 
   plug(SnitchApiWeb.Plug.DataToAttributes)
   action_fallback(SnitchApiWeb.FallbackController)
@@ -39,7 +40,15 @@ defmodule SnitchApiWeb.ProductController do
   variants.options,variants.options.option_type,options,options.option_type,
   theme,theme.option_types,reviews.rating_option_vote.rating_option)
   def index(conn, params) do
-    {products, page, aggregations, total} = Context.list_products(conn, params)
+    {products, page, aggregations, total} =
+      Cache.get(
+        current_url(conn),
+        {
+          fn conn, params -> Context.list_products(conn, params) end,
+          [conn, params]
+        },
+        :timer.minutes(15)
+      )
 
     json(
       conn,
@@ -72,7 +81,15 @@ defmodule SnitchApiWeb.ProductController do
   end
 
   def suggest(conn, %{"q" => term}) do
-    suggestions = Context.suggest(term)
+    suggestions =
+      Cache.get(
+        current_url(conn),
+        {
+          fn term -> Context.suggest(term) end,
+          [term]
+        },
+        :timer.minutes(15)
+      )
 
     json(
       conn,
