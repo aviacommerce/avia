@@ -105,6 +105,8 @@ defmodule AdminAppWeb.Router do
       :delete_property
     )
 
+    delete("/variant_delete/:id", ProductController, :delete_variant)
+
     get("/shipping-policy/new", ShippingPolicyController, :new)
     get("/shipping-policy/:id/edit", ShippingPolicyController, :edit)
     put("/shipping-policy/:id", ShippingPolicyController, :update)
