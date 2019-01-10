@@ -81,7 +81,15 @@ defmodule SnitchApiWeb.ProductController do
   end
 
   def suggest(conn, %{"q" => term}) do
-    suggestions = Context.suggest(term)
+    suggestions =
+      Cache.get(
+        current_url(conn),
+        {
+          fn term -> Context.suggest(term) end,
+          [term]
+        },
+        :timer.minutes(15)
+      )
 
     json(
       conn,
