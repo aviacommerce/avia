@@ -5,13 +5,22 @@ defmodule SnitchApiWeb.TaxonomyController do
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
   alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
+  alias Snitch.Tools.Cache
 
   action_fallback(SnitchApiWeb.FallbackController)
   plug(SnitchApiWeb.Plug.DataToAttributes)
   plug(SnitchApiWeb.Plug.LoadUser)
 
   def index(conn, _params) do
-    taxonomy = TaxonomyDomain.get_all_taxonomy()
+    taxonomy =
+      Cache.get(
+        current_url(conn),
+        {
+          fn -> TaxonomyDomain.get_all_taxonomy() end,
+          []
+        }
+      )
+
     json(conn, %{taxonomies: taxonomy})
   end
 
