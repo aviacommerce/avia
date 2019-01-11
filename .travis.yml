@@ -1,51 +1,45 @@
 language: elixir
-
 otp_release:
-  - 20.2
+- 20.2
 before_install:
-  # Use sed to replace the SSH URL with the public URL, then initialize submodules
-  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
-  - git submodule update --init --recursive
-  - mix local.hex --force
-  - mix local.rebar --force
-  - mix deps.get
-  - wget https://downloads.wkhtmltopdf.org/0.12/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz
-  - tar xf wkhtmltox-0.12.4_linux-generic-amd64.tar.xz
-  - sudo mv wkhtmltox/bin/wkhtmltopdf /usr/bin
-  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.5.4.deb
-  - sudo dpkg -i --force-confnew elasticsearch-6.5.4.deb
-  - sudo /etc/init.d/elasticsearch start
-  - until curl --silent -XGET --fail http://localhost:9200; do printf '.'; sleep 1; done
+- sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+- git submodule update --init --recursive
+- mix local.hex --force
+- mix local.rebar --force
+- mix deps.get
+- wget https://downloads.wkhtmltopdf.org/0.12/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz
+- tar xf wkhtmltox-0.12.4_linux-generic-amd64.tar.xz
+- sudo mv wkhtmltox/bin/wkhtmltopdf /usr/bin
+- curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.5.4.deb
+- sudo dpkg -i --force-confnew elasticsearch-6.5.4.deb
+- sudo /etc/init.d/elasticsearch start
+- until curl --silent -XGET --fail http://localhost:9200; do printf '.'; sleep 1;
+  done
 script:
-  - set -e
-  - MIX_ENV=test mix format --check-formatted
-  - set +e
-  - mix coveralls.json --umbrella
+- set -e
+- MIX_ENV=test mix format --check-formatted
+- set +e
+- mix coveralls.json --umbrella
 after_script:
-  - bash <(curl -s https://codecov.io/bash)
-  - bash .scripts/inch_report.sh
-
+- bash <(curl -s https://codecov.io/bash)
+- bash .scripts/inch_report.sh
 matrix:
   include:
-  - elixir: "1.7.2"
+  - elixir: 1.7.2
     script:
-      - mix coveralls.json --umbrella
-
+    - mix coveralls.json --umbrella
 addons:
-  postgresql: "9.5"
-
+  postgresql: '9.5'
 env:
   global:
-    - FRONTEND_CHECKOUT_URL=http://localhost:4200/checkout/
-    - HOSTED_PAYMENT_URL=http://localhost:3000/api/v1/hosted-payment/
-    - ELASTIC_HOST=http://localhost:9200/
-
+  - FRONTEND_CHECKOUT_URL=http://localhost:4200/checkout/
+  - HOSTED_PAYMENT_URL=http://localhost:3000/api/v1/hosted-payment/
+  - ELASTIC_HOST=http://localhost:9200/
 notifications:
   email:
     recipients:
-      - developers@aviabird.com
-
-# Handle git submodules yourself
+    - developers@aviabird.com
+  slack:
+    secure: FsVolqAknkpYKp7tE5FkiKk/pHiTNNazTGfJLVfsVreVdjH/h+6TLGpMZwibFcQ8sr2WmYKNzvbn3zwZ9yBMb7xPmRvcBuMcwTgRpRrySNmAmGY/Hcl9FHou156Mv/taOnfvHY0YYCTiDeWaMHKNN4OpIgKtuwL0Tgig2NcceWLNLkGnuowYsnEfui2wBmnlhyPvPhBoLKdk2rwk7zG9k1K6iq51oIYbJcS+5E0lH+YJ2QmF4rSSO8cZ+bO6yBcFpxNHeeW7vFT6FqVkS916+tPnrGlIoBGV17Cx3dGuFj8iiwhwI1WNgB8D6scXOSiACt6T8Kqr6aRYTVAsHR3AUvPBpDNoKkCwVATdaUyzIiId/qb9a+qYDqOQEisc7ge4gIcG2ItFnLkPBBqFEdsoi8h7JQvZGh3ewPXQDYlqVFkuBIf6AymYKSU2uB5bdGvh17CsyMB/I4ms/V9jCQUvkTQacX5Nzq6htN95PxmWPTru9B3ueMAc1G3RQ4kqOxuDkS+avVlhnJDac7++95F1mdCLk0BxomBLU0L5d9ShvH5/DrmSaC0EvImdfatFzm0J1KzmMn41vMGmt/WN+8lXQv0XPNJGBBWtdzHnTyrMPjBNZd9M6XoQzx7lS788OU1F5dpAjmTSX9phUPZDYib75YD4ypzewoCEnIFxEoGsN/w=
 git:
   submodules: false
-  
