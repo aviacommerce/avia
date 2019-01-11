@@ -37,7 +37,7 @@ RUN apt-get clean \
   && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
   && curl -sL https://deb.nodesource.com/setup_8.x | bash \
   && apt-get install -y nodejs yarn
-  
+
 # Umbrella
 COPY mix.exs mix.lock ./
 COPY config config
@@ -70,9 +70,8 @@ RUN apt-get clean \
 
 
 RUN cd apps/admin_app/assets \
-    && yarn install
+  && yarn install
 
 RUN ["chmod", "+x", "./config/docker/dev/docker-dev-provision.sh"]
 
 CMD ["./config/docker/dev/docker-dev-provision.sh"]
-
