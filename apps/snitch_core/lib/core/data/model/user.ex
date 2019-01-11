@@ -15,10 +15,15 @@ defmodule Snitch.Data.Model.User do
     QH.update(UserSchema, query_fields, instance, Repo)
   end
 
-  @spec delete(non_neg_integer | UserSchema.t()) ::
-          {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
-  def delete(id_or_instance) do
-    QH.delete(UserSchema, id_or_instance, Repo)
+  @spec delete(non_neg_integer) :: {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
+  def delete(id) do
+    with %UserSchema{} = user <- get(id) |> Repo.preload(:orders),
+         {:ok, _} = delete_response <- UserSchema.delete_changeset(user, %{}) |> Repo.delete() do
+      delete_response
+    else
+      _ ->
+        {:error, "error deleting user"}
+    end
   end
 
   @spec get(map | non_neg_integer) :: UserSchema.t() | nil
