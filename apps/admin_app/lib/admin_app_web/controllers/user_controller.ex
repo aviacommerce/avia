@@ -75,9 +75,9 @@ defmodule AdminAppWeb.UserController do
         |> put_flash(:info, "User deleted successfully!")
         |> redirect(to: user_path(conn, :index))
 
-      {:error, _} ->
+      {:error, msg} ->
         conn
-        |> put_flash(:error, "user not found")
+        |> put_flash(:error, msg)
         |> redirect(to: user_path(conn, :index))
     end
   end

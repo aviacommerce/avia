@@ -62,7 +62,7 @@ defmodule Snitch.Data.Model.UserTest do
     end
 
     test "FAILS to delete for invalid id" do
-      assert {:error, :not_found} = User.delete(-1)
+      assert {:error, _} = User.delete(-1)
     end
 
     test "deletes for valid id", %{user_id: uid} do
