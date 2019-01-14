@@ -90,13 +90,19 @@ defmodule Snitch.Domain.Order do
   def line_item_total(order) do
     currency = GCModel.fetch_currency()
 
-    order.line_items
-    |> Enum.reduce(Money.new(currency, 0), fn line_item, acc ->
-      {:ok, total} = Money.mult(line_item.unit_price, line_item.quantity)
-      {:ok, acc} = Money.add(acc, total)
-      acc
-    end)
-    |> Money.round(currency_digits: :cash)
+    case order do
+      nil ->
+        Money.new(currency, 0)
+
+      _ ->
+        order.line_items
+        |> Enum.reduce(Money.new(currency, 0), fn line_item, acc ->
+          {:ok, total} = Money.mult(line_item.unit_price, line_item.quantity)
+          {:ok, acc} = Money.add(acc, total)
+          acc
+        end)
+        |> Money.round(currency_digits: :cash)
+    end
   end
 
   defp packages_total_cost(packages, currency) do

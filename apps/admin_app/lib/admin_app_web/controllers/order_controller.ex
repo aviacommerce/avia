@@ -43,14 +43,23 @@ defmodule AdminAppWeb.OrderController do
 
   def show(conn, %{"number" => _number} = params) do
     order = OrderContext.get_order(params)
-    order_total = OrderContext.get_total(order)
 
-    render(
-      conn,
-      "show.html",
-      order: order,
-      order_total: order_total
-    )
+    case order do
+      nil ->
+        conn
+        |> put_flash(:error, "No such order exists with given number")
+        |> redirect(to: dashboard_path(conn, :index))
+
+      _ ->
+        order_total = OrderContext.get_total(order)
+
+        render(
+          conn,
+          "show.html",
+          order: order,
+          order_total: order_total
+        )
+    end
   end
 
   def update_package(conn, %{"id" => id, "state" => state}) do
