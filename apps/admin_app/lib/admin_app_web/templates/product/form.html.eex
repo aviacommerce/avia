@@ -275,35 +275,38 @@
                     </thead>
                     <tbody>
                       <%= for variant <- @parent_product.variants do %>
-                      <tr  class="product_variants">
-                        <%= for option <- variant.options do %>
-                        <td class="option-value" contenteditable="true" data-option_value_id="<%= option.id %>"><%= option.value %></td>
+                        <%= if variant.state != :deleted do %>
+                          <tr  class="product_variants">
+                            <%= for option <- variant.options do %>
+                            <td class="option-value" contenteditable="true" data-option_value_id="<%= option.id %>"><%= option.value %></td>
+                            <% end %>
+                            <td class="variant_state"><%= variant.state %></td>
+                            <td class="variant_activate">
+                              <input type="hidden" value="<%= variant.id %>" class="variant_id">
+                              <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                <label class="btn btn-sm btn-info">
+                                  <input type="radio" class="switch-input" id="active" autocomplete="off">Active
+                                </label>
+                                <label class="btn btn-sm btn-info">
+                                  <input type="radio" class="switch-input" id="draft" autocomplete="off">Draft
+                                </label>
+                                <label class="btn btn-sm btn-info">
+                                  <input type="radio" class="switch-input" id="inactive" autocomplete="off">Inactive
+                                </label>
+                              </div>
+                            </td>
+                            <%= if is_variant_tracking_enabled(@parent_product) do %>
+                              <td><%= get_total_stock(variant) %></td>
+                            <% end %>
+                            <td>
+                              <%= link("Edit", to: product_path(@conn, :edit, variant.id), class: "btn btn-primary") %>
+                              <%= if is_variant_tracking_enabled(@parent_product) do %>
+                                <button name="variant_stock_add" type="button" class="btn btn-primary" data-prdouct-id="<%= variant.id %>">Add stock</button>
+                              <% end %>
+                              <%= link("Delete", to: product_path(@conn, :delete_variant, variant.id), class: "btn btn-danger", method: "delete") %>
+                            </td>
+                          </tr>
                         <% end %>
-                        <td class="variant_state"><%= variant.state %></td>
-                        <td class="variant_activate">
-                          <input type="hidden" value="<%= variant.id %>" class="variant_id">
-                          <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                            <label class="btn btn-sm btn-info">
-                              <input type="radio" class="switch-input" id="active" autocomplete="off">Active
-                            </label>
-                            <label class="btn btn-sm btn-info">
-                              <input type="radio" class="switch-input" id="draft" autocomplete="off">Draft
-                            </label>
-                            <label class="btn btn-sm btn-info">
-                              <input type="radio" class="switch-input" id="inactive" autocomplete="off">Inactive
-                            </label>
-                          </div>
-                        </td>
-                        <%= if is_variant_tracking_enabled(@parent_product) do %>
-                          <td><%= get_total_stock(variant) %></td>
-                        <% end %>
-                        <td>
-                          <%= link("Edit", to: product_path(@conn, :edit, variant.id), class: "btn btn-primary") %>
-                          <%= if is_variant_tracking_enabled(@parent_product) do %>
-                            <button name="variant_stock_add" type="button" class="btn btn-primary" data-prdouct-id="<%= variant.id %>">Add stock</button>
-                          <% end %>
-                        </td>
-                      </tr>
                       <% end %>
                     </tbody>
                   </table>

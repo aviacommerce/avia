@@ -41,6 +41,7 @@ defmodule AdminAppWeb.ProductController do
     if params["rummage"] do
       products =
         ProductModel.get_rummage_product_list(params["rummage"])
+        |> Enum.map(fn product -> ProductModel.get_product_with_present_variants(product) end)
         |> Repo.preload([:images, [variants: :images]])
 
       render(conn, "index.html", products: products)
@@ -259,8 +260,8 @@ defmodule AdminAppWeb.ProductController do
            ProductSchema.variant_create_changeset(parent_product, %{
              "variations" => variant_params,
              "theme_id" => params["theme_id"]
-           }) do
-      {:ok, _product} = Repo.update(changeset)
+           }),
+         {:ok, _product} = updated_product <- Repo.update(changeset) do
       ESProductStore.update_product_to_es(parent_product)
       redirect(conn, to: product_path(conn, :edit, params["product_id"]))
     else
@@ -268,6 +269,19 @@ defmodule AdminAppWeb.ProductController do
         conn
         |> put_flash(:error, "Failed to create variant")
         |> redirect(to: product_path(conn, :edit, params["product_id"]))
+    end
+  end
+
+  def delete_variant(conn, %{"id" => id} = params) do
+    with {:ok, _product} = deleted_variant <- ProductModel.delete(id) do
+      conn
+      |> put_flash(:info, "Variant deleted successfully")
+      |> redirect(to: product_path(conn, :edit, id))
+    else
+      _ ->
+        conn
+        |> put_flash(:error, "Failed to delete variant")
+        |> redirect(to: product_path(conn, :edit, id))
     end
   end
 
