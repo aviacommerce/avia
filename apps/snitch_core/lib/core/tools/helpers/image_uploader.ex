@@ -5,10 +5,9 @@ defmodule Snitch.Tools.Helper.ImageUploader do
   Contains utilties to store and transform the image.
   """
   use Arc.Definition
-  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Model.Image
 
-  @versions [:thumb, :large, :small]
+  @versions [:thumb, :large, :small, :thumb_webp, :large_webp, :small_webp]
   @cwd File.cwd!()
 
   # function override to store images locally.
@@ -24,21 +23,26 @@ defmodule Snitch.Tools.Helper.ImageUploader do
     ~w(.jpg .jpeg .gif .png) |> Enum.member?(file_extension)
   end
 
-  def transform(:large, _) do
-    {:convert, &image_formatter(&1, &2, "600x800"), :jpg}
-  end
+  def transform(:large, _), do: {:convert, &image_formatter(&1, &2, "600x800"), :jpg}
+  def transform(:small, _), do: {:convert, &image_formatter(&1, &2, "90x120"), :jpg}
+  def transform(:thumb, _), do: {:convert, &image_formatter(&1, &2, "210x280"), :jpg}
+  def transform(:large_webp, _), do: {:convert, &image_formatter(&1, &2, "600x800", :webp), :webp}
+  def transform(:small_webp, _), do: {:convert, &image_formatter(&1, &2, "90x120", :webp), :webp}
+  def transform(:thumb_webp, _), do: {:convert, &image_formatter(&1, &2, "210x280", :webp), :webp}
 
-  def transform(:small, _) do
-    {:convert, &image_formatter(&1, &2, "90x120"), :jpg}
-  end
+  @doc """
+  provides image storage path.
+  `version_dir` allows a multiple format images like (jpg, webp, png) to be present
+  under main version name.
 
-  def transform(:thumb, _) do
-    {:convert, &image_formatter(&1, &2, "210x280"), :jpg}
-  end
-
+  like: thumb/xyz.jpg
+        thumb/xyz.webp
+        thumb/xyz.png
+  """
   def storage_dir(version, {_file, scope}) do
     scope_dir = get_scope_name(scope)
-    dir = "uploads/#{scope.tenant}/images/#{scope_dir}/#{scope.id}/images/#{version}"
+    [version_dir | _] = String.split("#{version}", "_")
+    dir = "uploads/#{scope.tenant}/images/#{scope_dir}/#{scope.id}/images/#{version_dir}"
 
     case Image.check_arc_config() do
       true ->
@@ -60,7 +64,7 @@ defmodule Snitch.Tools.Helper.ImageUploader do
     |> String.downcase()
   end
 
-  defp image_formatter(input, output, size) do
+  defp image_formatter(input, output, size, format \\ :jpg) do
     """
     #{input}
     -filter Triangle
@@ -80,7 +84,7 @@ defmodule Snitch.Tools.Helper.ImageUploader do
     -background white
     -alpha remove
     -strip
-    -format jpg jpg:#{output}
+    -format #{format} #{format}:#{output}
     """
   end
 end
