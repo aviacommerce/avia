@@ -6,7 +6,7 @@ config :snitch_core, Snitch.Repo,
   username: "postgres",
   password: "postgres",
   database: "snitch_dev",
-  hostname: "localhost",
+  hostname: System.get_env("DB_HOST"),
   pool_size: 10
 
 config :snitch_core, :defaults_module, Snitch.Tools.Defaults

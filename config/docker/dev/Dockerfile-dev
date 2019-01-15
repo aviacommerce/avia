@@ -19,6 +19,7 @@ ENV HOSTED_PAYMENT_URL http://localhost:3000/api/v1/hosted-payment/
 ENV SUPPORT_URL https://admin.aviacommerce.org
 ENV WKHTML_PATH /usr/bin/wkhtmltopdf
 ENV ELASTIC_HOST http://localhost:9200/
+ENV DB_HOST db
 
 RUN mkdir $APP_HOME
 WORKDIR $APP_HOME
@@ -68,7 +69,10 @@ RUN apt-get clean \
   && apt-get -y autoremove \
   && apt-get -y clean
 
+
+RUN cd apps/admin_app/assets \
+  && yarn install
+
 RUN ["chmod", "+x", "./config/docker/dev/docker-dev-provision.sh"]
 
 CMD ["./config/docker/dev/docker-dev-provision.sh"]
-
