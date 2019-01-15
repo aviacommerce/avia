@@ -513,6 +513,19 @@ defmodule Snitch.Data.Model.Product do
   end
 
   def upn_generate() do
-    "A" <> Nanoid.generate(10, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ") <> "C"
+    upn = "A" <> Nanoid.generate(10, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ") <> "C"
+
+    case is_upn_unique(upn) do
+      true ->
+        upn
+
+      false ->
+        upn_generate()
+    end
+  end
+
+  defp is_upn_unique(upn) do
+    is_present = from(p in "snitch_products", select: p.upn, where: p.upn == ^upn) |> Repo.one()
+    if is_present == nil, do: true, else: false
   end
 end

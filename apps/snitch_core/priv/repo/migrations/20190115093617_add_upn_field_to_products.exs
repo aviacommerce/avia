@@ -6,7 +6,6 @@ defmodule Snitch.Repo.Migrations.AddUpnFieldToProducts do
       add(:upn, :string)
     end
 
-    drop unique_index("snitch_products", [:slug])
     create unique_index("snitch_products", [:upn])
   end
 end

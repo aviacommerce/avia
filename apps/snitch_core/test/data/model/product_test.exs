@@ -152,6 +152,24 @@ defmodule Snitch.Data.Model.ProductTest do
     end
   end
 
+  describe "upn generation for a product" do
+    setup do
+      product = insert(:product)
+      [product: product]
+    end
+
+    test "if no matching upn exists", %{product: product, valid_params: vp} do
+      {:ok, %ProductSchema{} = new_product} = Product.create(vp)
+      assert product.upn != new_product.upn
+    end
+
+    test "if a duplicate upn exists", %{product: product} do
+      assert_raise Ecto.ConstraintError, fn ->
+        insert(:product, %{upn: product.upn})
+      end
+    end
+  end
+
   describe "sellable products list" do
     test "if product has no variants" do
       assert [%ProductSchema{}] = Product.sellable_products_query() |> Repo.all()
