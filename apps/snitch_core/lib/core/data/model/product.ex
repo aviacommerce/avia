@@ -511,4 +511,8 @@ defmodule Snitch.Data.Model.Product do
   def is_variant_tracking_enabled?(product) do
     Product.is_variant_tracking_enabled?(product)
   end
+
+  def upn_generate() do
+    "A" <> Nanoid.generate(10, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ") <> "C"
+  end
 end

@@ -19,6 +19,7 @@ defmodule SnitchApiWeb.ProductView do
     :deleted_at,
     :discontinue_on,
     :slug,
+    :upn,
     :meta_description,
     :meta_keywords,
     :meta_title,

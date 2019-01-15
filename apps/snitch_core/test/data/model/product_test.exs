@@ -150,11 +150,6 @@ defmodule Snitch.Data.Model.ProductTest do
     test "successfully", %{valid_params: vp} do
       assert {:ok, %ProductSchema{}} = Product.create(vp)
     end
-
-    test "creation fails for duplicate product", %{valid_params: vp} do
-      Product.create(vp)
-      assert {:error, _} = Product.create(vp)
-    end
   end
 
   describe "sellable products list" do
