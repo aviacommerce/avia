@@ -5,6 +5,7 @@ defmodule AdminAppWeb.OrderController do
   import Phoenix.View, only: [render_to_string: 3]
 
   alias Snitch.Data.Model.Order
+  alias Snitch.Data.Schema.Order, as: OrderSchema
   alias BeepBop.Context
   alias Snitch.Domain.Order.DefaultMachine
   alias Snitch.Data.Schema.{Address, Product}
@@ -42,15 +43,20 @@ defmodule AdminAppWeb.OrderController do
   end
 
   def show(conn, %{"number" => _number} = params) do
-    order = OrderContext.get_order(params)
-    order_total = OrderContext.get_total(order)
-
-    render(
-      conn,
-      "show.html",
-      order: order,
-      order_total: order_total
-    )
+    with %OrderSchema{} = order <- OrderContext.get_order(params),
+         order_total = OrderContext.get_total(order) do
+      render(
+        conn,
+        "show.html",
+        order: order,
+        order_total: order_total
+      )
+    else
+      nil ->
+        conn
+        |> put_flash(:error, "No such order exists with given number")
+        |> redirect(to: dashboard_path(conn, :index))
+    end
   end
 
   def update_package(conn, %{"id" => id, "state" => state}) do
