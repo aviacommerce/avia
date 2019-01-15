@@ -13,6 +13,7 @@ defmodule Snitch.Demo.Order do
     PackageItem,
     Product,
     ShippingCategory,
+    ShippingMethod,
     StockLocation,
     Taxon,
     User
@@ -128,6 +129,7 @@ defmodule Snitch.Demo.Order do
         shipping_tax: Money.new(currency, 0),
         origin_id: Enum.random(Repo.all(StockLocation)).id,
         shipping_category_id: Enum.random(Repo.all(ShippingCategory)).id,
+        shipping_method_id: Enum.random(Repo.all(ShippingMethod)).id,
         inserted_at: start_time,
         updated_at: start_time
       }
