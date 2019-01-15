@@ -19,6 +19,7 @@ ENV HOSTED_PAYMENT_URL http://localhost:3000/api/v1/hosted-payment/
 ENV SUPPORT_URL https://admin.aviacommerce.org
 ENV WKHTML_PATH /usr/bin/wkhtmltopdf
 ENV ELASTIC_HOST http://localhost:9200/
+ENV DB_HOST db
 
 RUN mkdir $APP_HOME
 WORKDIR $APP_HOME

@@ -1,4 +1,4 @@
-version: '3' 
+version: '3'
 services:
   webapp:
     build:
@@ -30,7 +30,7 @@ services:
         hard: -1
       nofile:
         soft: 65536
-        hard: 65536 
+        hard: 65536
     ports:
       - "9200:9200"
   kibana:
@@ -38,4 +38,3 @@ services:
     ports:
       - "5601:5601"
     container_name: kibana
-
