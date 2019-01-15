@@ -4,7 +4,7 @@ defmodule Snitch.Data.Schema.User do
   """
   use Snitch.Data.Schema
   alias Comeonin.Argon2
-  alias Snitch.Data.Schema.{Role, WishListItem}
+  alias Snitch.Data.Schema.{Order, Role, WishListItem}
 
   @password_min_length 8
   @type t :: %__MODULE__{}
@@ -12,6 +12,7 @@ defmodule Snitch.Data.Schema.User do
   schema "snitch_users" do
     # associations
     belongs_to(:role, Role)
+    has_many(:orders, Order)
     has_many(:wishlist_items, WishListItem)
 
     field(:first_name, :string)
@@ -82,6 +83,12 @@ defmodule Snitch.Data.Schema.User do
     |> cast(params, @update_fields)
     |> validate_required([:first_name, :last_name, :email])
     |> common_changeset()
+  end
+
+  def delete_changeset(user, params) do
+    user
+    |> cast(params, @required_fields)
+    |> no_assoc_constraint(:orders, message: "Cannot delete as orders are associated")
   end
 
   @spec common_changeset(Ecto.Changeset.t()) :: Ecto.Changeset.t()

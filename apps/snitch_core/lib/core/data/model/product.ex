@@ -73,6 +73,18 @@ defmodule Snitch.Data.Model.Product do
     |> where([p], p.state == "active" and p.id not in ^child_product_ids)
   end
 
+  def get_product_with_present_variants(product) do
+    query =
+      Product
+      |> join(:left, [p], v in Variation, v.parent_product_id == ^product.id)
+      |> where(
+        [p, v],
+        p.state != "deleted" and p.id == v.child_product_id
+      )
+
+    Repo.one(from(p in Product, where: p.id == ^product.id, preload: [variants: ^query]))
+  end
+
   @doc """
   Get listtable product
   Return following product
@@ -488,7 +500,7 @@ defmodule Snitch.Data.Model.Product do
   """
   @spec has_variants?(Product.t()) :: true | false
   def has_variants?(product) do
-    product = Repo.preload(product, :variants)
+    product = get_product_with_present_variants(product)
     length(product.variants) > 0
   end
 

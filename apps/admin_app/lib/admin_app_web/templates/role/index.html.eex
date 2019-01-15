@@ -24,18 +24,20 @@
                </div>
             </div>
          </div>
-         <div class="col-1">
-            <div class="dropdown col-12 p-0 float-right options-container">
-               <a class="p-2 dropdown-toggle options" href="#" role="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-               <i class="fa fa-cog"></i>
-               </a>
-               <div class="dropdown-menu dropdown-menu-right" >
-                  <%= link("Edit", to: role_path(@conn, :edit, role.id), class: "dropdown-item") %>
-                  <%= link("Delete", to: role_path(@conn, :delete, role.id),
-                     method: :delete, data: [confirm: "Are you sure you want to delete?"], class: "dropdown-item") %> 
+         <%= unless is_default_role(role.name) do %>
+            <div class="col-1">
+               <div class="dropdown col-12 p-0 float-right options-container">
+                  <a class="p-2 dropdown-toggle options" href="#" role="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="fa fa-cog"></i>
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-right" >
+                     <%= link("Edit", to: role_path(@conn, :edit, role.id), class: "dropdown-item") %>
+                     <%= link("Delete", to: role_path(@conn, :delete, role.id),
+                        method: :delete, data: [confirm: "Are you sure you want to delete?"], class: "dropdown-item") %> 
+                  </div>
                </div>
             </div>
-         </div>
+         <% end %>
       </div>
    </div>
    <% end %>
