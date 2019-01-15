@@ -162,8 +162,6 @@ defmodule Snitch.Data.Schema.Product do
     |> validate_amount(:selling_price)
     |> NameSlug.maybe_generate_slug()
     |> unique_constraint(:upn)
-
-    # |> NameSlug.unique_constraint()
   end
 
   def product_by_category_query(taxon_id) do
