@@ -1,4 +1,4 @@
-defmodule Snitch.Data.Schema.RationOptionTest do
+defmodule Snitch.Data.Schema.RatingOptionTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
 
