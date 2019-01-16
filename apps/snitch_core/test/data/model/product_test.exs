@@ -169,14 +169,6 @@ defmodule Snitch.Data.Model.ProductTest do
         insert(:product, %{upn: product.upn})
       end
     end
-
-    test "if a upn has already been taken", %{valid_params: vp} do
-      with_mock Product, upn_generate: fn -> Enum.random(["AB07BWBCJXKC", "AB074P14F76C"]) end do
-        upn1 = Product.upn_generate()
-        upn2 = Product.upn_generate()
-        refute upn1 == upn2
-      end
-    end
   end
 
   describe "sellable products list" do

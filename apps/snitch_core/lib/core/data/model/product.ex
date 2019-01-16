@@ -513,8 +513,14 @@ defmodule Snitch.Data.Model.Product do
     Product.is_variant_tracking_enabled?(product)
   end
 
+  # to be mocked
+  def gen_nano_id() do
+    Nanoid.generate(10, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+  end
+
+  # TODO: write test case for this
   def upn_generate() do
-    upn = "A" <> Nanoid.generate(10, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ") <> "C"
+    upn = "A" <> gen_nano_id() <> "C"
 
     case get_product_with_upn(upn) do
       nil ->
