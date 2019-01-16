@@ -15,6 +15,7 @@ defmodule Snitch.Data.Model.Product do
 
   @product_states [:active, :in_active, :draft]
 
+  @callback generate_upn() :: string()
   @doc """
   Returns all Products
   """
@@ -515,17 +516,16 @@ defmodule Snitch.Data.Model.Product do
   def upn_generate() do
     upn = "A" <> Nanoid.generate(10, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ") <> "C"
 
-    case is_upn_unique(upn) do
-      true ->
+    case get_product_with_upn(upn) do
+      nil ->
         upn
 
-      false ->
+      _ ->
         upn_generate()
     end
   end
 
-  defp is_upn_unique(upn) do
-    is_present = from(p in "snitch_products", select: p.upn, where: p.upn == ^upn) |> Repo.one()
-    if is_present == nil, do: true, else: false
+  defp get_product_with_upn(upn) do
+    from(p in "snitch_products", select: p.upn, where: p.upn == ^upn) |> Repo.one()
   end
 end

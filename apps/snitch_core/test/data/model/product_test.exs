@@ -2,6 +2,7 @@ defmodule Snitch.Data.Model.ProductTest do
   use ExUnit.Case
   use Snitch.DataCase
   import Snitch.Factory
+  import Mock
   alias Snitch.Data.Model.Product
   alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Data.Schema.{Variation, Image}
@@ -163,9 +164,17 @@ defmodule Snitch.Data.Model.ProductTest do
       assert product.upn != new_product.upn
     end
 
-    test "if a duplicate upn exists", %{product: product} do
+    test "if a product with generated upn exists", %{product: product} do
       assert_raise Ecto.ConstraintError, fn ->
         insert(:product, %{upn: product.upn})
+      end
+    end
+
+    test "if a upn has already been taken", %{valid_params: vp} do
+      with_mock Product, upn_generate: fn -> Enum.random(["AB07BWBCJXKC", "AB074P14F76C"]) end do
+        upn1 = Product.upn_generate()
+        upn2 = Product.upn_generate()
+        refute upn1 == upn2
       end
     end
   end
