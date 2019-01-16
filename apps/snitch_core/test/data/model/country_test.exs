@@ -6,8 +6,8 @@ defmodule Snitch.Data.Model.CountryTest do
 
   setup :countries
 
-  describe "Country formatting" do
-    test "for a single country ", %{countries: countries} do
+  describe "formatted_list/0" do
+    test "succeeds ", %{countries: countries} do
       country = countries |> List.first()
       country_list = Country.formatted_list()
       assert country_list == [{country.name, country.id}]
