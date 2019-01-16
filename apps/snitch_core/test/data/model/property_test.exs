@@ -12,11 +12,11 @@ defmodule Snitch.Data.Model.PropertyTest do
   }
 
   describe "create/2" do
-    test "create sucessfully" do
+    test "with valid attributes" do
       assert {:ok, _} = Property.create(@params)
     end
 
-    test "creation fails for duplicate name" do
+    test "fails for duplicate name" do
       property = insert(:property)
       params = %{name: property.name, display_name: "AC Input"}
       assert {:error, changeset} = Property.create(params)
@@ -25,7 +25,7 @@ defmodule Snitch.Data.Model.PropertyTest do
   end
 
   describe "update/2" do
-    test "update with " do
+    test "with valid parameters " do
       property = insert(:property)
       %{id: expected_id} = property
       updates = %{name: "Amazon TV"}
@@ -48,13 +48,13 @@ defmodule Snitch.Data.Model.PropertyTest do
     end
 
   describe "delete/1" do
-    test "delete a property" do
+    test "a property" do
       property = insert(:property)
       assert {:ok, _} = Property.delete(property)
       assert Repo.get(PropertySchema, property.id) == nil
     end
 
-    test "deletion failed not found" do
+    test "failed because no such property is present" do
       assert {:error, :not_found} = Property.delete(-1)
     end
   end
