@@ -8,6 +8,7 @@ defmodule Snitch.Data.Schema.Product do
 
   import Ecto.Query
 
+  alias Snitch.Data.Model.Product, as: ProductModel
   alias Snitch.Data.Schema.Product.NameSlug
   alias Snitch.Domain.Taxonomy
 
@@ -34,6 +35,12 @@ defmodule Snitch.Data.Schema.Product do
     field(:deleted_at, :utc_datetime)
     field(:discontinue_on, :utc_datetime)
     field(:slug, :string)
+
+    # unique product number(upn) to indentify a product uniquely
+    # just like amazon uses asin (Amazon Standard Identification Number)
+    # for unique identification of products.
+    field(:upn, :string, autogenerate: {ProductModel, :upn_generate, []})
+
     field(:meta_description, :string)
     field(:meta_keywords, :string)
     field(:meta_title, :string)
@@ -154,7 +161,7 @@ defmodule Snitch.Data.Schema.Product do
     |> validate_required(@required_fields)
     |> validate_amount(:selling_price)
     |> NameSlug.maybe_generate_slug()
-    |> NameSlug.unique_constraint()
+    |> unique_constraint(:upn, message: "Ooops, another product already has that name!")
   end
 
   def product_by_category_query(taxon_id) do

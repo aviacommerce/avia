@@ -15,6 +15,7 @@ defmodule Snitch.Data.Model.Product do
 
   @product_states [:active, :in_active, :draft]
 
+  @callback generate_upn() :: string()
   @doc """
   Returns all Products
   """
@@ -510,5 +511,27 @@ defmodule Snitch.Data.Model.Product do
   @spec is_variant_tracking_enabled?(Product.t()) :: true | false
   def is_variant_tracking_enabled?(product) do
     Product.is_variant_tracking_enabled?(product)
+  end
+
+  # to be mocked
+  def gen_nano_id() do
+    Nanoid.generate(10, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+  end
+
+  # TODO: write test case for this
+  def upn_generate() do
+    upn = "A" <> gen_nano_id() <> "C"
+
+    case get_product_with_upn(upn) do
+      nil ->
+        upn
+
+      _ ->
+        upn_generate()
+    end
+  end
+
+  defp get_product_with_upn(upn) do
+    from(p in "snitch_products", select: p.upn, where: p.upn == ^upn) |> Repo.one()
   end
 end
