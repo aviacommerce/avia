@@ -17,7 +17,6 @@ defmodule Snitch.Data.Model.CountryTest do
   describe "get/1" do
     test "succeeds", %{countries: countries} do
       country = countries |> List.first()
-
       country_list = Country.get(%{numcode: country.numcode})
       assert country_list == country
     end
