@@ -8,13 +8,13 @@ defmodule Snitch.Data.Schema.PropertyTest do
 
   @valid_attrs %{name: "Sapphire Radeon", display_name: "processors"}
 
-  describe "Create property" do
-    test "changeset with valid attributes" do
+  describe "create_changeset/2" do
+    test "with valid attributes" do
       %{valid?: validity} =  Property.create_changeset(%Property{}, @valid_attrs)
       assert validity
     end
 
-    test "name and display_name cannot be blank" do
+    test "where name and display_name cannot be blank" do
       params = Map.delete(@valid_attrs, :name)
       cs = %{valid?: validity} = Property.create_changeset(%Property{}, params)
       refute validity
@@ -26,7 +26,7 @@ defmodule Snitch.Data.Schema.PropertyTest do
       assert %{display_name: ["can't be blank"]} = errors_on(cs)
     end
 
-    test "name must be unique" do
+    test "where name must be unique" do
       changeset = Property.create_changeset(%Property{}, @valid_attrs)
       assert {:ok, _} = Repo.insert(changeset)
 
@@ -36,7 +36,7 @@ defmodule Snitch.Data.Schema.PropertyTest do
     end
   end
 
-  describe "Update property" do
+  describe "update_changeset/2" do
     setup do
       [
         property:
@@ -46,13 +46,13 @@ defmodule Snitch.Data.Schema.PropertyTest do
       ]
     end
 
-    test "valid attributes", %{property: property} do
+    test "with valid attributes", %{property: property} do
       params = %{name: "Corsair Power Supply", display_name: "AC input"}
       %{valid?: validity} = Property.update_changeset(property, params)
       assert validity
     end
 
-    test "name and display_name cannot be blank", %{property: property} do
+    test "where name and display_name cannot be blank", %{property: property} do
       params = %{name: "", display_name: "AC input"}
       cs = %{valid?: validity} = Property.update_changeset(property, params)
       refute validity
@@ -64,7 +64,7 @@ defmodule Snitch.Data.Schema.PropertyTest do
       assert %{display_name: ["can't be blank"]} = errors_on(cs)
     end
 
-    test "name must be unique", %{property: property} do
+    test "where name must be unique", %{property: property} do
       params = %{name: "Corsair Power Supply", display_name: "AC input"}
       changeset = Property.update_changeset(property, params)
       assert {:ok, _} = Repo.insert(changeset)
