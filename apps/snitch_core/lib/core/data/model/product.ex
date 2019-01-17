@@ -520,7 +520,7 @@ defmodule Snitch.Data.Model.Product do
   def generate_upi() do
     upi = "A" <> gen_nano_id() <> "C"
 
-    case upi_generate(upi) do
+    case get_upi_if_unique(upi) do
       {:error, _} ->
         generate_upi()
 
@@ -530,7 +530,7 @@ defmodule Snitch.Data.Model.Product do
   end
 
   # TODO: write test case for this
-  def upi_generate(upi) do
+  def get_upi_if_unique(upi) do
     case get_product_with_upi(upi) do
       nil ->
         {:ok, upi}
