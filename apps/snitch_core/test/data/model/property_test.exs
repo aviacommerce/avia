@@ -7,8 +7,8 @@ defmodule Snitch.Data.Model.PropertyTest do
   alias Snitch.Data.Schema.Property, as: PropertySchema
 
   @params %{
-    name: "Sapphire Radeon",
-    display_name: "processors"
+    name: "processor count",
+    display_name: "Processors count"
   }
 
   describe "create/2" do
@@ -34,21 +34,25 @@ defmodule Snitch.Data.Model.PropertyTest do
     end
   end
 
-    test "get property" do
+  describe "get/1" do
+    test "with id" do
       property = insert(:property)
       assert property_returned = Property.get(property.id)
       assert property_returned = property
       assert {:ok, _} = Property.delete(property.id)
       assert Property.get(property.id) == nil
     end
+  end
 
-    test "get all properties" do
+  describe "get_all/0" do
+    test "properties" do
       insert(:property)
       assert Property.get_all() != []
     end
+  end
 
   describe "delete/1" do
-    test "a property" do
+    test "successfully delete a property" do
       property = insert(:property)
       assert {:ok, _} = Property.delete(property)
       assert Repo.get(PropertySchema, property.id) == nil
