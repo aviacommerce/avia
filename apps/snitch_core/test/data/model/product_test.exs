@@ -160,7 +160,7 @@ defmodule Snitch.Data.Model.ProductTest do
 
     test "if no matching upi exists", %{product: product, valid_params: vp} do
       {:ok, %ProductSchema{} = new_product} = Product.create(vp)
-      assert product.upi != new_product.upi
+      refute product.upi == new_product.upi
     end
 
     test "if a product with generated upi exists", %{product: product} do
@@ -170,20 +170,20 @@ defmodule Snitch.Data.Model.ProductTest do
     end
   end
 
-  describe "test upi generate function" do
+  describe "test return upi function" do
     setup do
       product = insert(:product)
       [product: product]
     end
 
-    test "if a upi has already been assigned to a product", %{product: product} do
+    test "if the upi has already been assigned to a product", %{product: product} do
       upi = product.upi
-      assert Product.upi_generate(upi) == {:error, "not_unique"}
+      assert Product.get_upi_if_unique(upi) == {:error, "not_unique"}
     end
 
-    test "if an existing product upi is passed as an argument", %{product: product} do
+    test "if a non existing product upi is passed as an argument", %{product: product} do
       upi = "AMDQMQRZ59OC"
-      assert Product.upi_generate(upi) == {:ok, upi}
+      assert Product.get_upi_if_unique(upi) == {:ok, upi}
     end
   end
 
