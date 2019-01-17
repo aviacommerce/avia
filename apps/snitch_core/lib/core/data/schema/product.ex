@@ -36,10 +36,10 @@ defmodule Snitch.Data.Schema.Product do
     field(:discontinue_on, :utc_datetime)
     field(:slug, :string)
 
-    # unique product number(upn) to indentify a product uniquely
+    # unique product identifier(upi) to indentify a product uniquely
     # just like amazon uses asin (Amazon Standard Identification Number)
     # for unique identification of products.
-    field(:upn, :string, autogenerate: {ProductModel, :upn_generate, []})
+    field(:upi, :string, autogenerate: {ProductModel, :generate_upi, []})
 
     field(:meta_description, :string)
     field(:meta_keywords, :string)
@@ -161,7 +161,7 @@ defmodule Snitch.Data.Schema.Product do
     |> validate_required(@required_fields)
     |> validate_amount(:selling_price)
     |> NameSlug.maybe_generate_slug()
-    |> unique_constraint(:upn, message: "Ooops, another product already has that name!")
+    |> unique_constraint(:upi, message: "Ooops, another product already has that name!")
   end
 
   def product_by_category_query(taxon_id) do

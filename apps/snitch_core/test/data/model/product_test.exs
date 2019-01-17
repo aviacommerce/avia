@@ -2,7 +2,6 @@ defmodule Snitch.Data.Model.ProductTest do
   use ExUnit.Case
   use Snitch.DataCase
   import Snitch.Factory
-  import Mock
   alias Snitch.Data.Model.Product
   alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Data.Schema.{Variation, Image}
@@ -153,21 +152,38 @@ defmodule Snitch.Data.Model.ProductTest do
     end
   end
 
-  describe "upn generation for a product" do
+  describe "upi generation for a product" do
     setup do
       product = insert(:product)
       [product: product]
     end
 
-    test "if no matching upn exists", %{product: product, valid_params: vp} do
+    test "if no matching upi exists", %{product: product, valid_params: vp} do
       {:ok, %ProductSchema{} = new_product} = Product.create(vp)
-      assert product.upn != new_product.upn
+      refute product.upi == new_product.upi
     end
 
-    test "if a product with generated upn exists", %{product: product} do
+    test "if a product with generated upi exists", %{product: product} do
       assert_raise Ecto.ConstraintError, fn ->
-        insert(:product, %{upn: product.upn})
+        insert(:product, %{upi: product.upi})
       end
+    end
+  end
+
+  describe "test return upi function" do
+    setup do
+      product = insert(:product)
+      [product: product]
+    end
+
+    test "if the upi has already been assigned to a product", %{product: product} do
+      upi = product.upi
+      assert Product.get_upi_if_unique(upi) == {:error, "not_unique"}
+    end
+
+    test "if a non existing product upi is passed as an argument", %{product: product} do
+      upi = "AMDQMQRZ59OC"
+      assert Product.get_upi_if_unique(upi) == {:ok, upi}
     end
   end
 
