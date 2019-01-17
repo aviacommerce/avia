@@ -1,14 +1,15 @@
 defmodule Snitch.Data.Schema.RatingOptionTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
-
+  import Snitch.Factory
+  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.RatingOption
 
   @valid_attrs %{
     code: "1",
     value: 1,
     position: 1,
-    rating_id: 105
+    rating_id: 147
   }
   describe "create_changeset/2 " do
     test "succeeds" do
@@ -16,64 +17,32 @@ defmodule Snitch.Data.Schema.RatingOptionTest do
       assert validity
     end
 
-    test "fails? with missing code" do
-      param = Map.delete(@valid_attrs, :code)
-      c = %{valid?: validity} = RatingOption.create_changeset(%RatingOption{}, param)
-      refute validity
-      assert %{code: ["can't be blank"]} = errors_on(c)
-    end
-
-    test "fails? with missing value" do
-      param = Map.delete(@valid_attrs, :value)
-      c = %{valid?: validity} = RatingOption.create_changeset(%RatingOption{}, param)
-      refute validity
-      assert %{value: ["can't be blank"]} = errors_on(c)
-    end
-
-    test "fails? with missing position" do
-      param = Map.delete(@valid_attrs, :position)
-      c = %{valid?: validity} = RatingOption.create_changeset(%RatingOption{}, param)
-      refute validity
-      assert %{position: ["can't be blank"]} = errors_on(c)
-    end
-
-    test "fails? with missing rating_id" do
-      param = Map.delete(@valid_attrs, :rating_id)
-      c = %{valid?: validity} = RatingOption.create_changeset(%RatingOption{}, param)
-      refute validity
-      assert %{rating_id: ["can't be blank"]} = errors_on(c)
-    end
-
     test "fails? with all empty" do
-      %{valid?: validity} = RatingOption.create_changeset(%RatingOption{}, %{})
+      c = %{valid?: validity} = RatingOption.create_changeset(%RatingOption{}, %{})
       refute validity
+      require IEx
     end
   end
 
   describe "update_changeset/2 " do
     test "succeeds" do
-      param = Map.put(@valid_attrs, :position, 2)
-      %{valid?: validity} = RatingOption.update_changeset(%RatingOption{}, param)
-      assert validity
+      rating_opt = insert(:rating_option)
+      c = RatingOption.update_changeset(rating_opt, %{position: 2})
+      assert {:ok, new} = Repo.update(c)
+      assert new.position != rating_opt.position
     end
 
-    test "fails? without position" do
-      param = Map.delete(@valid_attrs, :position)
-      c = %{valid?: validity} = RatingOption.update_changeset(%RatingOption{}, param)
-      refute validity
-      assert %{position: ["can't be blank"]} = errors_on(c)
+    test "fails? with required param nil" do
+      rating_opt = insert(:rating_option)
+      c = RatingOption.update_changeset(rating_opt, %{position: nil, code: nil})
+      refute c.valid?
+      assert %{position: ["can't be blank"], code: ["can't be blank"]} == errors_on(c)
     end
 
-    test "fails? without code" do
-      param = Map.delete(@valid_attrs, :code)
-      c = %{valid?: validity} = RatingOption.update_changeset(%RatingOption{}, param)
-      refute validity
-      assert %{code: ["can't be blank"]} = errors_on(c)
-    end
-
-    test "fails? with all empty" do
-      %{valid?: validity} = RatingOption.update_changeset(%RatingOption{}, %{})
-      refute validity
+    test "fails? with invalid parameters" do
+      rating_opt = insert(:rating_option)
+      c = RatingOption.update_changeset(rating_opt, %{value: 2})
+      assert c.changes == %{}
     end
   end
 end
