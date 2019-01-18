@@ -48,13 +48,13 @@ defmodule AdminAppWeb.PrototypeController do
       prototypes = PrototypeModel.get_all()
       render(conn, "index.html", prototypes: prototypes)
     else
-      {:error, changeset} ->
-        render(conn, "edit.html", changeset: %{changeset | action: :edit})
-
-      nil ->
+      {:error, :product_prototype_not_found} ->
         conn
         |> put_flash(:info, "Prototype not found")
         |> redirect(to: prototype_path(conn, :index))
+
+      {:error, changeset} ->
+        render(conn, "edit.html", changeset: %{changeset | action: :edit})
     end
   end
 
