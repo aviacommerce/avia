@@ -434,7 +434,7 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def update_property(conn, params) do
-    with %ProductProperty{} = product_property <-
+    with {:ok, %ProductProperty{} = product_property} <-
            Model.ProductProperty.get_by(%{
              product_id: params["product_property"]["product_id"],
              property_id: params["product_property"]["property_id"]
@@ -448,7 +448,7 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def delete_property(conn, params) do
-    with %ProductProperty{} = product_property <-
+    with {:ok, %ProductProperty{} = product_property} <-
            Model.ProductProperty.get_by(%{
              product_id: params["product_id"],
              property_id: params["property_id"]
