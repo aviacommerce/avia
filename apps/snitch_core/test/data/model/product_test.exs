@@ -150,10 +150,40 @@ defmodule Snitch.Data.Model.ProductTest do
     test "successfully", %{valid_params: vp} do
       assert {:ok, %ProductSchema{}} = Product.create(vp)
     end
+  end
 
-    test "creation fails for duplicate product", %{valid_params: vp} do
-      Product.create(vp)
-      assert {:error, _} = Product.create(vp)
+  describe "upi generation for a product" do
+    setup do
+      product = insert(:product)
+      [product: product]
+    end
+
+    test "if no matching upi exists", %{product: product, valid_params: vp} do
+      {:ok, %ProductSchema{} = new_product} = Product.create(vp)
+      refute product.upi == new_product.upi
+    end
+
+    test "if a product with generated upi exists", %{product: product} do
+      assert_raise Ecto.ConstraintError, fn ->
+        insert(:product, %{upi: product.upi})
+      end
+    end
+  end
+
+  describe "test return upi function" do
+    setup do
+      product = insert(:product)
+      [product: product]
+    end
+
+    test "if the upi has already been assigned to a product", %{product: product} do
+      upi = product.upi
+      assert Product.get_upi_if_unique(upi) == {:error, "not_unique"}
+    end
+
+    test "if a non existing product upi is passed as an argument", %{product: product} do
+      upi = "AMDQMQRZ59OC"
+      assert Product.get_upi_if_unique(upi) == {:ok, upi}
     end
   end
 

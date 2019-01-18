@@ -511,4 +511,36 @@ defmodule Snitch.Data.Model.Product do
   def is_variant_tracking_enabled?(product) do
     Product.is_variant_tracking_enabled?(product)
   end
+
+  # to be mocked
+  def gen_nano_id() do
+    Nanoid.generate(10, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+  end
+
+  def generate_upi() do
+    upi = "A" <> gen_nano_id() <> "C"
+
+    case get_upi_if_unique(upi) do
+      {:error, _} ->
+        generate_upi()
+
+      {:ok, upi} ->
+        upi
+    end
+  end
+
+  # TODO: write test case for this
+  def get_upi_if_unique(upi) do
+    case get_product_with_upi(upi) do
+      nil ->
+        {:ok, upi}
+
+      _ ->
+        {:error, "not_unique"}
+    end
+  end
+
+  defp get_product_with_upi(upi) do
+    from(p in "snitch_products", select: p.upi, where: p.upi == ^upi) |> Repo.one()
+  end
 end
