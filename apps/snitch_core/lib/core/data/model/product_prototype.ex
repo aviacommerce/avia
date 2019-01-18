@@ -27,7 +27,7 @@ defmodule Snitch.Data.Model.ProductPrototype do
 
   Takes Product Prototype id as input
   """
-  @spec get(integer) :: ProductPrototype.t() | nil
+  @spec get(integer) :: {:ok, ProductPrototype.t()} | {:error, atom}
   def get(id) do
     QH.get(ProductPrototype, id, Repo)
   end

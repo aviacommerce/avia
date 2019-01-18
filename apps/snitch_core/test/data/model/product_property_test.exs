@@ -73,10 +73,10 @@ defmodule Snitch.Data.Model.ProductPropertyTest do
   describe "get" do
     test "get product property" do
       product_property = insert(:product_property)
-      assert product_property_returned = ProductProperty.get(product_property.id)
+      assert {:ok, product_property_returned} = ProductProperty.get(product_property.id)
       assert product_property_returned.id == product_property.id
       assert {:ok, _} = ProductProperty.delete(product_property)
-      assert ProductProperty.get(product_property.id) == nil
+      assert ProductProperty.get(product_property.id) == {:error, :product_property_not_found}
     end
 
     test "get all product properties" do
@@ -89,7 +89,7 @@ defmodule Snitch.Data.Model.ProductPropertyTest do
     test "get product property" do
       product_property = insert(:product_property)
 
-      assert product_property_returned =
+      assert {:ok, product_property_returned} =
                ProductProperty.get_by(%{
                  product_id: product_property.product_id,
                  property_id: product_property.property_id

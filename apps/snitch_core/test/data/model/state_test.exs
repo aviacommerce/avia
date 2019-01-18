@@ -9,13 +9,13 @@ defmodule Snitch.Data.Model.StateTest do
   describe "get/1 " do
     test "succeeds", %{states: states} do
       states = states |> List.first()
-      state = State.get(%{name: "California"})
+      {:ok, state} = State.get(%{name: "California"})
       assert state.name == states.name
     end
 
     test "Fails " do
-      state = State.get(%{name: "Japan"})
-      assert state == nil
+      {:error, msg} = State.get(%{name: "Japan"})
+      assert msg == :state_not_found
     end
   end
 

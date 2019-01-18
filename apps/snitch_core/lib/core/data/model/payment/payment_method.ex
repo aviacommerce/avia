@@ -39,19 +39,31 @@ defmodule Snitch.Data.Model.PaymentMethod do
     QH.delete(PaymentMethod, id_or_instance, Repo)
   end
 
-  @spec get(map | non_neg_integer) :: PaymentMethod.t() | nil
+  @spec get(map | non_neg_integer) :: {:ok, PaymentMethod.t()} | {:error, atom}
   def get(query_fields_or_primary_key) do
     QH.get(PaymentMethod, query_fields_or_primary_key, Repo)
   end
 
   @spec get_card() :: PaymentMethod.t() | nil
   def get_card do
-    get(%{code: "ccd"})
+    case get(%{code: "ccd"}) do
+      {:ok, card} ->
+        card
+
+      {:error, _} ->
+        nil
+    end
   end
 
   @spec get_check() :: PaymentMethod.t() | nil
   def get_check do
-    get(%{code: "chk"})
+    case get(%{code: "chk"}) do
+      {:ok, check} ->
+        check
+
+      {:error, _} ->
+        nil
+    end
   end
 
   @spec get_all() :: [PaymentMethod.t()]

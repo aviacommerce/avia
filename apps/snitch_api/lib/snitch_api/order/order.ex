@@ -7,7 +7,7 @@ defmodule SnitchApi.Order do
 
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Model.LineItem, as: LineItemModel
-  alias Snitch.Data.Model.Order, as: OrderModel
+  alias Snitch.Data.Schema.Order, as: OrderSchema
   alias BeepBop.Context
   alias Snitch.Data.Model.{Order, PaymentMethod}
   alias Snitch.Data.Schema.LineItem
@@ -21,7 +21,8 @@ defmodule SnitchApi.Order do
   """
 
   def attach_address(order_id, shipping_address, billing_address) do
-    order = Order.get(order_id) |> Repo.preload([:payments, :packages])
+    {:ok, order} = Order.get(order_id)
+    order = order |> Repo.preload([:payments, :packages])
 
     context =
       order
@@ -37,16 +38,17 @@ defmodule SnitchApi.Order do
   end
 
   def load_order(order_id) do
+    {:ok, order} = Order.get(order_id)
     line_item_query = from(LineItem, order_by: [desc: :inserted_at], preload: [product: :theme])
-    Repo.preload(OrderModel.get(order_id), line_items: line_item_query)
+    Repo.preload(order, line_items: line_item_query)
   end
 
   def delete_line_item(line_item_id) do
-    with %LineItem{} = line_item <- LineItemModel.get(line_item_id),
+    with {:ok, %LineItem{} = line_item} <- LineItemModel.get(line_item_id),
          {:ok, _} <- LineItemModel.delete(line_item) do
       {:ok, line_item}
     else
-      nil -> {:error, :not_found}
+      {:error, _} -> {:error, :not_found}
     end
   end
 
@@ -58,8 +60,8 @@ defmodule SnitchApi.Order do
   end
 
   def add_payment(order_id, payment_method_id) do
-    with order when not is_nil(order) <- Order.get(order_id),
-         payment_method when not is_nil(payment_method) <- PaymentMethod.get(payment_method_id) do
+    with {:ok, order} <- Order.get(order_id),
+         {:ok, payment_method} <- PaymentMethod.get(payment_method_id) do
       amount = OrderDomain.total_amount(order)
 
       context =
@@ -79,13 +81,13 @@ defmodule SnitchApi.Order do
       transition = DefaultMachine.add_payment(context)
       transition_response(transition, order_id)
     else
-      nil ->
-        {:error, :not_found}
+      {:error, msg} ->
+        {:error, msg}
     end
   end
 
   def add_shipments(order_id, []) do
-    with order when not is_nil(order) <- Order.get(order_id) do
+    with {:ok, order} <- Order.get(order_id) do
       order = Repo.preload(order, packages: :items)
       shipping_preferences = package_manifest(order.packages)
 
@@ -100,22 +102,20 @@ defmodule SnitchApi.Order do
       transition = DefaultMachine.add_shipments(context)
       transition_response(transition, order.id)
     else
-      nil ->
-        {:error, :not_found}
+      {:error, msg} ->
+        {:error, msg}
     end
   end
 
   def add_shipments(order_id, packages) do
-    with order when not is_nil(order) <-
-           order_id
-           |> Order.get()
-           |> Repo.preload(packages: :items),
-         true <- length(packages) == length(order.packages) do
+    with {:ok, %OrderSchema{} = order} <- Order.get(order_id),
+         preloaded_order <- order |> Repo.preload(packages: :items),
+         true <- length(packages) == length(preloaded_order.packages) do
       shipping_preferences = parse_package_params(packages)
 
       context =
         Context.new(
-          order,
+          preloaded_order,
           state: %{
             shipping_preferences: shipping_preferences
           }
@@ -124,8 +124,8 @@ defmodule SnitchApi.Order do
       transition = DefaultMachine.add_shipments(context)
       transition_response(transition, order.id)
     else
-      nil ->
-        {:error, :not_found}
+      {:error, msg} ->
+        {:error, msg}
 
       _ ->
         {:error, "package list does not equal all order packages"}
@@ -144,9 +144,8 @@ defmodule SnitchApi.Order do
   end
 
   defp transition_response(%Context{errors: nil}, order_id) do
-    order =
-      Order.get(order_id)
-      |> Repo.preload(line_items: [product: [:theme, [options: :option_type]]])
+    {:ok, order} = Order.get(order_id)
+    order = order |> Repo.preload(line_items: [product: [:theme, [options: :option_type]]])
 
     {:ok, order}
   end

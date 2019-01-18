@@ -34,14 +34,14 @@ defmodule Snitch.Data.Model.StockMovementTest do
   describe "get/1" do
     test "Fails with invalid id" do
       stock_item = StockMovementModel.get(1)
-      assert nil == stock_item
+      assert {:error, :stock_movement_not_found} == stock_item
     end
 
     test "gets with valid id", context do
       %{stock_item: stock_item} = context
       insert_stock_movement = insert(:stock_movement, stock_item: stock_item)
 
-      get_stock_movement = StockMovementModel.get(insert_stock_movement.id)
+      {:ok, get_stock_movement} = StockMovementModel.get(insert_stock_movement.id)
       assert insert_stock_movement.id == get_stock_movement.id
       assert insert_stock_movement.stock_item_id == stock_item.id
       assert insert_stock_movement.quantity == get_stock_movement.quantity
@@ -50,7 +50,7 @@ defmodule Snitch.Data.Model.StockMovementTest do
       assert insert_stock_movement.originator_id == get_stock_movement.originator_id
 
       # with stock item map
-      get_stock_movement_with_map = StockMovementModel.get(%{id: insert_stock_movement.id})
+      {:ok, get_stock_movement_with_map} = StockMovementModel.get(%{id: insert_stock_movement.id})
       assert insert_stock_movement.id == get_stock_movement_with_map.id
       assert insert_stock_movement.stock_item_id == stock_item.id
       assert insert_stock_movement.quantity == get_stock_movement_with_map.quantity

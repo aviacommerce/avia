@@ -62,15 +62,15 @@ defmodule AdminAppWeb.ZoneController do
       |> put_flash(:info, "Zone updated!!")
       |> redirect(to: zone_path(conn, :index))
     else
-      {:error, _, changeset, _} ->
-        conn
-        |> put_flash(:error, "Sorry there were some errors !!")
-        |> render("edit.html", changeset: changeset, id: params["id"])
-
       nil ->
         conn
         |> put_flash(:info, "Zone not found")
         |> redirect(to: zone_path(conn, :index))
+
+      {:error, _, changeset, _} ->
+        conn
+        |> put_flash(:error, "Sorry there were some errors !!")
+        |> render("edit.html", changeset: changeset, id: params["id"])
     end
   end
 

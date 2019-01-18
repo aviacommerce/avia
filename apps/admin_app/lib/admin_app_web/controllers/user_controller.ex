@@ -33,12 +33,12 @@ defmodule AdminAppWeb.UserController do
 
   def edit(conn, %{"id" => id}) do
     case UserModel.get(String.to_integer(id)) do
-      nil ->
+      {:error, _} ->
         conn
         |> put_flash(:error, "Sorry user not found")
         |> render("index.html")
 
-      user ->
+      {:ok, user} ->
         changeset = User.update_changeset(user, %{})
         render(conn, "edit.html", changeset: changeset, user: user)
     end
@@ -48,10 +48,8 @@ defmodule AdminAppWeb.UserController do
     id = String.to_integer(id)
     params = parse_user_params(user)
 
-    user =
-      id
-      |> UserModel.get()
-      |> Repo.preload(:role)
+    {:ok, user} = UserModel.get(id)
+    user = user |> Repo.preload(:role)
 
     case UserModel.update(params, user) do
       {:ok, _} ->

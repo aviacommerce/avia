@@ -124,10 +124,10 @@ defmodule Snitch.Data.Model.LineItemTest do
       [line_item] = order.line_items
 
       {:ok, _} = LineItem.delete(line_item)
+      {:ok, order} = Order.get(order.id)
 
       assert [] =
-               order.id
-               |> Order.get()
+               order
                |> Repo.preload(:line_items)
                |> Map.fetch!(:line_items)
     end

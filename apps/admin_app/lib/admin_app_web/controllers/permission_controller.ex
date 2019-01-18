@@ -32,12 +32,12 @@ defmodule AdminAppWeb.PermissionController do
 
   def edit(conn, %{"id" => id}) do
     case Permission.get(String.to_integer(id)) do
-      nil ->
+      {:error, msg} ->
         conn
         |> put_flash(:error, "Sorry not found")
         |> redirect(to: permission_path(conn, :index))
 
-      permission ->
+      {:ok, permission} ->
         changeset = PermissionSchema.update_changeset(permission, %{})
         render(conn, "edit.html", changeset: changeset, permission: permission)
     end
@@ -46,7 +46,7 @@ defmodule AdminAppWeb.PermissionController do
   def update(conn, %{"id" => id, "permission" => permission}) do
     id = String.to_integer(id)
     params = parse_permission_params(permission)
-    permission = Permission.get(id)
+    {:ok, permission} = Permission.get(id)
 
     case Permission.update(params, permission) do
       {:ok, _} ->

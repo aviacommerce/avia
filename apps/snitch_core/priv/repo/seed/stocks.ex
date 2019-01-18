@@ -31,7 +31,25 @@ defmodule Snitch.Seed.Stocks do
     end)
   end
 
+  defp get_id({:ok, struct}) do
+    struct.id
+  end
+
   def seed_stock_locations! do
+    states = %{
+      state1: State.get(%{code: "US-NY"}) |> get_id,
+      state2: State.get(%{code: "IN-UP"}) |> get_id,
+      state3: State.get(%{code: "IT-RM"}) |> get_id,
+      state4: State.get(%{code: "IN-MH"}) |> get_id
+    }
+
+    countries = %{
+      country1: Country.get(%{iso: "US"}) |> get_id,
+      country2: Country.get(%{iso: "IN"}) |> get_id,
+      country3: Country.get(%{iso: "IT"}) |> get_id,
+      country4: Country.get(%{iso: "IN"}) |> get_id
+    }
+
     locations =
       [
         %{
@@ -44,8 +62,8 @@ defmodule Snitch.Seed.Stocks do
           phone: "(212) 363-3200",
           propagate_all_variants: false,
           active: true,
-          state_id: State.get(%{code: "US-NY"}).id,
-          country_id: Country.get(%{iso: "US"}).id
+          state_id: states.state1,
+          country_id: countries.country1
         },
         %{
           name: "Taj Mahal",
@@ -56,8 +74,8 @@ defmodule Snitch.Seed.Stocks do
           phone: "+91-562-2227261",
           propagate_all_variants: false,
           active: true,
-          state_id: State.get(%{code: "IN-UP"}).id,
-          country_id: Country.get(%{iso: "IN"}).id
+          state_id: states.state2,
+          country_id: countries.country2
         },
         %{
           name: "Colosseum",
@@ -68,8 +86,8 @@ defmodule Snitch.Seed.Stocks do
           phone: "+39 06 3996 7700",
           propagate_all_variants: false,
           active: true,
-          state_id: State.get(%{code: "IT-RM"}).id,
-          country_id: Country.get(%{iso: "IT"}).id
+          state_id: states.state3,
+          country_id: countries.country3
         },
         %{
           name: "Sinhagadh Fort",
@@ -80,8 +98,8 @@ defmodule Snitch.Seed.Stocks do
           phone: "020 2612 8169",
           propagate_all_variants: false,
           active: true,
-          state_id: State.get(%{code: "IN-MH"}).id,
-          country_id: Country.get(%{iso: "IN"}).id
+          state_id: states.state4,
+          country_id: countries.country4
         }
       ]
       |> Stream.map(&Map.put(&1, :inserted_at, Ecto.DateTime.utc()))

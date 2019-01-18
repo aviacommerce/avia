@@ -31,7 +31,7 @@ defmodule Snitch.Data.Model.HostedPayment do
           | {:error, Ecto.Changeset.t()}
   def create(slug, order_id, payment_params, hosted_method_params, payment_method_id) do
     payment = struct(Payment, payment_params)
-    hosted_method = PaymentMethodModel.get(payment_method_id)
+    {:ok, hosted_method} = PaymentMethodModel.get(payment_method_id)
 
     more_payment_params = %{
       order_id: order_id,
@@ -94,7 +94,7 @@ defmodule Snitch.Data.Model.HostedPayment do
   @doc """
   Fetches the struct but does not preload `:payment` association.
   """
-  @spec get(map | non_neg_integer) :: HostedPayment.t() | nil
+  @spec get(map | non_neg_integer) :: {:ok, HostedPayment.t()} | {:error, atom}
   def get(query_fields_or_primary_key) do
     QH.get(HostedPayment, query_fields_or_primary_key, Repo)
   end
@@ -109,6 +109,7 @@ defmodule Snitch.Data.Model.HostedPayment do
   """
   @spec from_payment(non_neg_integer) :: HostedPayment.t()
   def from_payment(payment_id) do
-    get(%{payment_id: payment_id})
+    {:ok, hosted_payment} = get(%{payment_id: payment_id})
+    hosted_payment
   end
 end

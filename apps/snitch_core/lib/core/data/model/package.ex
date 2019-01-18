@@ -31,7 +31,7 @@ defmodule Snitch.Data.Model.Package do
     QH.update(Package, params, package, Repo)
   end
 
-  @spec get(non_neg_integer | map) :: Package.t()
+  @spec get(non_neg_integer | map) :: {:ok, Package.t()} | {:error, atom}
   def get(query_fields) do
     QH.get(Package, query_fields, Repo)
   end

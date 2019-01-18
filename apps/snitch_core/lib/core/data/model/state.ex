@@ -7,7 +7,7 @@ defmodule Snitch.Data.Model.State do
 
   alias Snitch.Data.Schema.State
 
-  @spec get(map | non_neg_integer) :: State.t() | nil
+  @spec get(map | non_neg_integer) :: {:ok, State.t()} | {:error, atom}
   def get(query_fields_or_primary_key) do
     QH.get(State, query_fields_or_primary_key, Repo)
   end

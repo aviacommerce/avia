@@ -15,8 +15,7 @@ defmodule AdminAppWeb.StockLocationController do
 
   def show(conn, %{"id" => id}) do
     with {id, _} <- Integer.parse(id),
-         stock_location <- SLModel.get(id),
-         false <- is_nil(stock_location) do
+         {:ok, stock_location} <- SLModel.get(id) do
       render(conn, "show.html", stock_location: stock_location)
     else
       _ ->
@@ -73,8 +72,7 @@ defmodule AdminAppWeb.StockLocationController do
 
   def edit(conn, %{"id" => id}) do
     with {id, _} <- Integer.parse(id),
-         stock_location <- SLModel.get(id),
-         false <- is_nil(stock_location) do
+         {:ok, stock_location} <- SLModel.get(id) do
       changeset = SLSchema.update_changeset(stock_location, %{})
       render(conn, "edit.html", changeset: changeset, stock_location: stock_location)
     else
@@ -87,7 +85,7 @@ defmodule AdminAppWeb.StockLocationController do
 
   def update(conn, %{"id" => id, "stock_location" => stock_location_params}) do
     {id, _} = Integer.parse(id)
-    stock_location = SLModel.get(id)
+    {:ok, stock_location} = SLModel.get(id)
 
     with {:ok, _} <- SLModel.update(stock_location_params, stock_location) do
       conn

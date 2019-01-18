@@ -26,7 +26,7 @@ defmodule Snitch.Data.Model.OptionType do
 
   Takes OptionType id as input
   """
-  @spec get(integer) :: OptionType.t() | nil
+  @spec get(integer) :: {:ok, OptionType.t()} | {:error, atom}
   def get(id) do
     QH.get(OptionType, id, Repo)
   end

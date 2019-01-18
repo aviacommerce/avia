@@ -192,7 +192,7 @@ defmodule Snitch.Data.Model.Order do
     QH.delete(Order, id_or_instance, Repo)
   end
 
-  @spec get(map | non_neg_integer) :: Order.t() | nil
+  @spec get(map | non_neg_integer) :: {:ok, Order.t()} | {:error, atom}
   def get(query_fields_or_primary_key) do
     QH.get(Order, query_fields_or_primary_key, Repo)
   end

@@ -24,7 +24,7 @@ defmodule Snitch.Data.Model.VariationTheme do
   @doc """
   Takes Variation theme id as input
   """
-  @spec get(integer) :: VariationTheme.t() | nil
+  @spec get(integer) :: {:ok, VariationTheme.t()} | {:error, atom}
   def get(id) do
     QH.get(VariationTheme, id, Repo)
   end

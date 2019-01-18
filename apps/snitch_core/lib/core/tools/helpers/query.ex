@@ -7,17 +7,28 @@ defmodule Snitch.Tools.Helper.Query do
   """
 
   @spec get(module, map | non_neg_integer | binary, Ecto.Repo.t()) ::
-          Ecto.Schema.t() | nil | no_return
+          {:OK, Ecto.Schema.t()} | {:error, atom}
   def get(schema, id, repo) when is_integer(id) do
-    repo.get(schema, id)
+    repo.get(schema, id) |> handle_get(schema)
   end
 
   def get(schema, id, repo) when is_binary(id) do
-    repo.get(schema, id)
+    repo.get(schema, id) |> handle_get(schema)
   end
 
   def get(schema, query_fields, repo) when is_map(query_fields) do
-    repo.get_by(schema, query_fields)
+    repo.get_by(schema, query_fields) |> handle_get(schema)
+  end
+
+  defp handle_get(nil, schema) do
+    schema =
+      Macro.to_string(schema) |> String.replace("Snitch.Data.Schema.", "") |> Macro.underscore()
+
+    {:error, "#{schema}_not_found" |> String.to_atom()}
+  end
+
+  defp handle_get(response, schema) do
+    {:ok, response}
   end
 
   @spec create(module, map, Ecto.Repo.t()) ::
@@ -33,8 +44,9 @@ defmodule Snitch.Tools.Helper.Query do
   def update(schema, query_fields, instance \\ nil, repo)
 
   def update(schema, query_fields, nil, repo) when is_map(query_fields) do
-    schema
-    |> get(query_fields.id, repo)
+    {:ok, struct} = schema |> get(query_fields.id, repo)
+
+    struct
     |> schema.update_changeset(query_fields)
     |> commit_if_valid(:update, repo)
   end

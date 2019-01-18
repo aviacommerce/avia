@@ -27,13 +27,13 @@ defmodule AdminAppWeb.Guardian do
       user_id
       |> String.to_integer()
       |> User.get()
-      |> Repo.preload(role: [:permissions])
 
     case current_user do
-      nil ->
+      {:error, _} ->
         {:error, "user not found"}
 
-      user ->
+      {:ok, user} ->
+        user = user |> Repo.preload(role: [:permissions])
         {:ok, user}
     end
   end

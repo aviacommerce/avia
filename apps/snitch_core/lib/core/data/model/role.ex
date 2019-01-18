@@ -87,7 +87,7 @@ defmodule Snitch.Data.Model.Role do
 
   Takes as input `id` of the role to be retrieved.
   """
-  @spec get(integer) :: Role.t() | nil
+  @spec get(integer) :: {:ok, Role.t()} | {:error, atom}
   def get(id) do
     QH.get(Role, id, Repo)
   end
