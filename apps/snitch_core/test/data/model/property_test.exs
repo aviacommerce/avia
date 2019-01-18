@@ -27,10 +27,10 @@ defmodule Snitch.Data.Model.PropertyTest do
   describe "update/2" do
     test "with valid parameters " do
       property = insert(:property)
-      %{id: expected_id} = property
-      updates = %{name: "Amazon TV"}
-      assert {:ok, %{id: received_id}} = Property.update(property, updates)
-      assert expected_id == received_id
+      updates = %{name: "display"}
+      {:ok, updated_property} = Property.update(property, updates)
+      assert updated_property.id == property.id
+      assert updated_property.name != property.name
     end
   end
 
