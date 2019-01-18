@@ -32,7 +32,7 @@ defmodule AdminAppWeb.SessionController do
   end
 
   def update(conn, %{"id" => id, "new_password" => password_params}) do
-    user = UserModel.get(%{id: id})
+    {:ok, user} = UserModel.get(%{id: id})
     update_user = UserModel.update(password_params, user)
     update_password_result(update_user, conn)
   end
@@ -49,7 +49,7 @@ defmodule AdminAppWeb.SessionController do
 
   def check_email(conn, %{"password_reset" => params}) do
     email = params["email"]
-    user = UserModel.get(%{email: email})
+    {:ok, user} = UserModel.get(%{email: email})
     mail_verified_user(user, conn)
   end
 

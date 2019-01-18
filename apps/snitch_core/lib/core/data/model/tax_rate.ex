@@ -60,7 +60,7 @@ defmodule Snitch.Data.Model.TaxRate do
   > Note, By default tax rate which is present in the table
   and is __not soft deleted__ is returned.
   """
-  @spec get(integer, boolean) :: TaxRate.t() | nil
+  @spec get(integer, boolean) :: {:ok, TaxRate.t()} | {:error, atom}
   def get(id, active \\ true) do
     if active do
       query = from(tc in TaxRate, where: is_nil(tc.deleted_at) and tc.id == ^id)

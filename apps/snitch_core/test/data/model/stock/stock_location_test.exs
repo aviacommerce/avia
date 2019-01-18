@@ -60,18 +60,18 @@ defmodule Snitch.Data.Model.StockLocationTest do
   describe "get/1" do
     test "Fails with invalid id" do
       stock_location = StockLocationModel.get(-1)
-      assert nil == stock_location
+      assert {:error, :stock_location_not_found} == stock_location
     end
 
     test "gets with valid id" do
       insert_stock_location = insert(:stock_location)
 
-      get_stock_location = StockLocationModel.get(insert_stock_location.id)
+      {:ok, get_stock_location} = StockLocationModel.get(insert_stock_location.id)
       assert insert_stock_location.id == get_stock_location.id
       assert insert_stock_location.name == get_stock_location.name
 
       # with stock location map
-      get_stock_location_with_map = StockLocationModel.get(%{id: insert_stock_location.id})
+      {:ok, get_stock_location_with_map} = StockLocationModel.get(%{id: insert_stock_location.id})
       assert insert_stock_location.id == get_stock_location_with_map.id
       assert insert_stock_location.name == get_stock_location_with_map.name
     end

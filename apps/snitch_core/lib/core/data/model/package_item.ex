@@ -33,7 +33,7 @@ defmodule Snitch.Data.Model.PackageItem do
     QH.delete(PackageItem, package_item, Repo)
   end
 
-  @spec get(non_neg_integer | map) :: PackageItem.t()
+  @spec get(non_neg_integer | map) :: {:ok, PackageItem.t()} | {:error, atom}
   def get(query_fields) do
     QH.get(PackageItem, query_fields, Repo)
   end

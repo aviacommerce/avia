@@ -36,8 +36,24 @@ defmodule Snitch.Seed.Users do
     }
   end
 
+  defp get_id({:ok, struct}) do
+    struct.id
+  end
+
   def seed_address! do
     Repo.delete_all(Address)
+
+    states = %{
+      state1: State.get(%{code: "US-CA"}) |> get_id,
+      state2: State.get(%{code: "IN-MH"}) |> get_id,
+      state3: State.get(%{code: "IN-BR"}) |> get_id
+    }
+
+    countries = %{
+      country1: Country.get(%{iso: "US"}) |> get_id,
+      country2: Country.get(%{iso: "IN"}) |> get_id,
+      country3: Country.get(%{iso: "IN"}) |> get_id
+    }
 
     Enum.map(
       [
@@ -48,8 +64,8 @@ defmodule Snitch.Seed.Users do
           zip_code: "90265",
           city: "Malibu",
           phone: "1234567890",
-          state_id: State.get(%{code: "US-CA"}).id,
-          country_id: Country.get(%{iso: "US"}).id
+          state_id: states.state1,
+          country_id: countries.country1
         },
         %Address{
           first_name: "noname",
@@ -59,8 +75,8 @@ defmodule Snitch.Seed.Users do
           zip_code: "00000",
           city: "Pune",
           phone: "1234567890",
-          state_id: State.get(%{code: "IN-MH"}).id,
-          country_id: Country.get(%{iso: "IN"}).id
+          state_id: states.state2,
+          country_id: countries.country2
         },
         %Address{
           first_name: "noname",
@@ -70,8 +86,8 @@ defmodule Snitch.Seed.Users do
           zip_code: "11111",
           city: "Patna",
           phone: "1234567890",
-          state_id: State.get(%{code: "IN-BR"}).id,
-          country_id: Country.get(%{iso: "IN"}).id
+          state_id: states.state3,
+          country_id: countries.country3
         }
       ],
       &Repo.insert!/1

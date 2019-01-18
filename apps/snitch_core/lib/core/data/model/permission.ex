@@ -40,10 +40,10 @@ defmodule Snitch.Data.Model.Permission do
           | {:error, :not_found}
   def delete(id) do
     case QH.get(Permission, id, Repo) do
-      nil ->
-        {:error, :not_found}
+      {:error, msg} ->
+        {:error, msg}
 
-      permission ->
+      {:ok, permission} ->
         permission
         |> Permission.changeset()
         |> Repo.delete()
@@ -55,7 +55,7 @@ defmodule Snitch.Data.Model.Permission do
 
   Takes as input `id` of the Permission  to be retrieved.
   """
-  @spec get(integer) :: Permission.t() | nil
+  @spec get(integer) :: {:ok, Permission.t()} | {:error, atom}
   def get(id) do
     QH.get(Permission, id, Repo)
   end

@@ -115,7 +115,7 @@ defmodule Snitch.Data.Model.TaxCategory do
   > Note, By default tax category which is present in the table
   and is __not soft deleted__ is returned.
   """
-  @spec get(integer, boolean) :: TaxCategory.t() | nil
+  @spec get(integer, boolean) :: {:ok, TaxCategory.t()} | {:error, atom}
   def get(id, active \\ true) do
     if active do
       query = from(tc in TaxCategory, where: is_nil(tc.deleted_at) and tc.id == ^id)

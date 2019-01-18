@@ -14,7 +14,7 @@ defmodule AdminAppWeb.PromotionController do
 
   def create(conn, %{"data" => data}) do
     with {:ok, promotion} <- Promotion.create(data) do
-      promotion = Promotion.get(%{id: promotion.id})
+      {:ok, promotion} = Promotion.get(%{id: promotion.id})
       render(conn, "promotion.json", promotion: promotion)
     else
       {:error, changeset} ->
@@ -27,9 +27,9 @@ defmodule AdminAppWeb.PromotionController do
   def update(conn, %{"data" => data, "id" => id}) do
     id = String.to_integer(id)
 
-    with promotion when not is_nil(promotion) <- Promotion.get(%{id: id}),
+    with {:ok, promotion} <- Promotion.get(%{id: id}),
          {:ok, promotion} <- Promotion.update(promotion, data) do
-      promotion = Promotion.get(%{id: promotion.id})
+      {:ok, promotion} = Promotion.get(%{id: promotion.id})
       render(conn, "promotion.json", promotion: promotion)
     else
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -42,20 +42,20 @@ defmodule AdminAppWeb.PromotionController do
         |> put_status(422)
         |> render("error_message.json", message: message)
 
-      nil ->
-        conn
-        |> put_status(401)
-        |> render(AdminAppWeb.ErrorView, "401.json")
+        # nil ->
+        #   conn
+        #   |> put_status(401)
+        #   |> render(AdminAppWeb.ErrorView, "401.json")
     end
   end
 
   def edit(conn, %{"id" => id}) do
     id = String.to_integer(id)
 
-    with promotion when not is_nil(promotion) <- Promotion.get(%{id: id}) do
+    with {:ok, promotion} <- Promotion.get(%{id: id}) do
       render(conn, "promotion.json", promotion: promotion)
     else
-      nil ->
+      {:error, _} ->
         conn
         |> put_status(401)
         |> render(AdminAppWeb.ErrorView, "401.json")
@@ -65,11 +65,11 @@ defmodule AdminAppWeb.PromotionController do
   def archive(conn, %{"id" => id}) do
     id = String.to_integer(id)
 
-    with promotion when not is_nil(promotion) <- Promotion.get(%{id: id}),
+    with {:ok, promotion} <- Promotion.get(%{id: id}),
          {:ok, _promotion} <- Promotion.archive(promotion) do
       conn |> put_status(200) |> json(%{message: "promotion archived"})
     else
-      nil ->
+      {:error, _} ->
         conn
         |> put_status(401)
         |> render(AdminAppWeb.ErrorView, "401.json")

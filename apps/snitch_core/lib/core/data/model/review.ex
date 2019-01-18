@@ -44,7 +44,7 @@ defmodule Snitch.Data.Model.Review do
   @doc """
   Returns a review for the supplied `id`
   """
-  @spec get(non_neg_integer) :: Review.t() :: nil
+  @spec get(non_neg_integer) :: {:ok, Review.t()} | {:error, atom}
   def get(id) do
     QH.get(Review, id, Repo)
   end

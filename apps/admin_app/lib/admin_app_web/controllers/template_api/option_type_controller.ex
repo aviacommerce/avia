@@ -7,9 +7,8 @@ defmodule AdminAppWeb.TemplateApi.OptionTypeController do
   import Phoenix.View, only: [render_to_string: 3]
 
   def index(conn, %{"theme_id" => theme_id} = params) do
-    theme =
-      VariationTheme.get(theme_id)
-      |> Repo.preload(:option_types)
+    {:ok, theme} = VariationTheme.get(theme_id)
+    theme = theme |> Repo.preload(:option_types)
 
     product_id = params["product_id"]
 
@@ -21,7 +20,7 @@ defmodule AdminAppWeb.TemplateApi.OptionTypeController do
   end
 
   def update(conn, %{"id" => id} = params) do
-    with option_value <- ProductOptionValue.get(id),
+    with {:ok, option_value} <- ProductOptionValue.get(id),
          {:ok, option_value} <- ProductOptionValue.update(option_value, params) do
       render(conn, "option_value.json", option_value: option_value)
     end

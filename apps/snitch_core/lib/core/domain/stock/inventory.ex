@@ -50,9 +50,9 @@ defmodule Snitch.Domain.Inventory do
   @spec reduce_stock(integer, integer, integer) ::
           {:ok, StockSchema.t()} | {:error, Ecto.Changeset.t() | :variant_not_found}
   def reduce_stock(product_id, stock_location_id, reduce_count) do
-    with product <- ProductModel.get(product_id),
+    with {:ok, product} <- ProductModel.get(product_id),
          product_with_inventory <- ProductModel.product_with_inventory_tracking(product),
-         stock_location <- SLModel.get(stock_location_id) do
+         {:ok, stock_location} <- SLModel.get(stock_location_id) do
       perform_stock_reduce(product, product_with_inventory, stock_location, reduce_count)
     end
   end
@@ -110,8 +110,8 @@ defmodule Snitch.Domain.Inventory do
     query_fields = %{product_id: product_id, stock_location_id: location_id}
 
     case StockModel.get(query_fields) do
-      %StockSchema{} = stock_item -> {:ok, stock_item}
-      nil -> StockModel.create(product_id, location_id, 0, false)
+      {:ok, %StockSchema{} = stock_item} -> {:ok, stock_item}
+      {:error, _} -> StockModel.create(product_id, location_id, 0, false)
     end
   end
 end

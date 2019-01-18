@@ -17,12 +17,12 @@ defmodule Snitch.Data.Model.Rating do
   @doc """
   Returns a `rating` by the supplied `id`.
   """
-  @spec get(non_neg_integer) :: Rating.t() | nil
+  @spec get(non_neg_integer) :: {:ok, Rating.t()} | {:error, atom}
   def get(id) do
     QH.get(Rating, id, Repo)
   end
 
-  @spec get_rating_option(non_neg_integer) :: RatingOption.t() | nil
+  @spec get_rating_option(non_neg_integer) :: {:ok, RatingOption.t()} | {:error, atom}
   def get_rating_option(id) do
     QH.get(RatingOption, id, Repo)
   end

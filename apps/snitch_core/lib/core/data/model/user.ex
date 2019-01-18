@@ -17,7 +17,8 @@ defmodule Snitch.Data.Model.User do
 
   @spec delete(non_neg_integer) :: {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
   def delete(id) do
-    with %UserSchema{} = user <- get(id) |> Repo.preload(:orders),
+    with {:ok, %UserSchema{} = user_struct} <- get(id),
+         user <- user_struct |> Repo.preload(:orders),
          {:ok, _} = delete_response <- UserSchema.delete_changeset(user, %{}) |> Repo.delete() do
       delete_response
     else
@@ -26,7 +27,7 @@ defmodule Snitch.Data.Model.User do
     end
   end
 
-  @spec get(map | non_neg_integer) :: UserSchema.t() | nil
+  @spec get(map | non_neg_integer) :: {:ok, UserSchema.t()} | {:error, atom}
   def get(query_fields_or_primary_key) do
     QH.get(UserSchema, query_fields_or_primary_key, Repo)
   end

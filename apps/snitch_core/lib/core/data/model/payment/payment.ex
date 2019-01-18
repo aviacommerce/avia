@@ -27,7 +27,7 @@ defmodule Snitch.Data.Model.Payment do
     QH.update(Payment, params, id_or_instance, Repo)
   end
 
-  @spec get(map | non_neg_integer) :: Payment.t() | nil
+  @spec get(map | non_neg_integer) :: {:ok, Payment.t()} | {:error, atom}
   def get(query_fields_or_primary_key) do
     QH.get(Payment, query_fields_or_primary_key, Repo)
   end
@@ -52,8 +52,9 @@ defmodule Snitch.Data.Model.Payment do
   def to_subtype(id_or_instance)
 
   def to_subtype(payment_id) when is_integer(payment_id) do
-    %{id: payment_id}
-    |> get()
+    {:ok, payment} = get(%{id: payment_id})
+
+    payment
     |> to_subtype()
   end
 

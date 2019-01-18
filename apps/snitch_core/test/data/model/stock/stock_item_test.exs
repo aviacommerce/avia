@@ -39,20 +39,20 @@ defmodule Snitch.Data.Model.StockItemTest do
   describe "get/1" do
     test "Fails with invalid id" do
       stock_item = StockItemModel.get(-1)
-      assert nil == stock_item
+      assert {:error, :stock_item_not_found} == stock_item
     end
 
     test "gets with valid id" do
       insert_stock_item = insert(:stock_item)
 
-      get_stock_item = StockItemModel.get(insert_stock_item.id)
+      {:ok, get_stock_item} = StockItemModel.get(insert_stock_item.id)
       assert insert_stock_item.id == get_stock_item.id
       assert insert_stock_item.stock_location_id == get_stock_item.stock_location_id
       assert insert_stock_item.product_id == get_stock_item.product_id
       assert insert_stock_item.count_on_hand == get_stock_item.count_on_hand
 
       # with stock item map
-      get_stock_item_with_map = StockItemModel.get(%{id: insert_stock_item.id})
+      {:ok, get_stock_item_with_map} = StockItemModel.get(%{id: insert_stock_item.id})
       assert insert_stock_item.id == get_stock_item_with_map.id
       assert insert_stock_item.stock_location_id == get_stock_item_with_map.stock_location_id
       assert insert_stock_item.product_id == get_stock_item_with_map.product_id

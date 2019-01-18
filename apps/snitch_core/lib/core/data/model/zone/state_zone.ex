@@ -37,7 +37,7 @@ defmodule Snitch.Data.Model.StateZone do
     QH.delete(Zone, id_or_instance, Repo)
   end
 
-  @spec get(map | non_neg_integer) :: Zone.t() | nil
+  @spec get(map | non_neg_integer) :: {:ok, Zone.t()} | {:error, atom}
   def get(query_fields_or_primary_key) do
     QH.get(Zone, query_fields_or_primary_key, Repo)
   end

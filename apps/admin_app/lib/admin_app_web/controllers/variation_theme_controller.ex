@@ -30,11 +30,11 @@ defmodule AdminAppWeb.VariationThemeController do
 
   def edit(conn, %{"id" => id}) do
     case VTModel.get(id) do
-      %VTSchema{} = theme ->
+      {:ok, %VTSchema{} = theme} ->
         changeset = VTSchema.update_changeset(theme, %{})
         render(conn, "edit.html", changeset: changeset)
 
-      nil ->
+      {:error, _} ->
         conn
         |> put_flash(:info, "Variation theme not found")
         |> redirect(to: variation_theme_path(conn, :index))
@@ -42,18 +42,18 @@ defmodule AdminAppWeb.VariationThemeController do
   end
 
   def update(conn, %{"id" => id, "variation_theme" => params}) do
-    with %VTSchema{} = theme <- VTModel.get(id),
+    with {:ok, %VTSchema{} = theme} <- VTModel.get(id),
          {:ok, _} <- VTModel.update(theme, params) do
       themes = VTModel.get_all()
       render(conn, "index.html", themes: themes)
     else
-      {:error, changeset} ->
-        render(conn, "edit.html", changeset: %{changeset | action: :edit})
-
-      nil ->
+      {:error, :variation_theme_not_found} ->
         conn
         |> put_flash(:info, "Variation theme not found")
         |> redirect(to: variation_theme_path(conn, :index))
+
+      {:error, changeset} ->
+        render(conn, "edit.html", changeset: %{changeset | action: :edit})
     end
   end
 

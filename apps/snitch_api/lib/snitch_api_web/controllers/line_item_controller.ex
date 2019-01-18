@@ -102,12 +102,12 @@ defmodule SnitchApiWeb.LineItemController do
 
   def show(conn, %{"id" => id}) do
     case LineItemModel.get(id) do
-      nil ->
+      {:error, :line_item_not_found} ->
         conn
         |> put_status(204)
         |> render("show.json-api", data: [])
 
-      line_item ->
+      {:ok, line_item} ->
         conn
         |> put_status(200)
         |> render("show.json-api", data: line_item)

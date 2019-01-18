@@ -326,8 +326,9 @@ defmodule AdminAppWeb.OrderController do
   end
 
   defp load_order(order) do
+    {:ok, order} = order |> Order.get()
+
     order
-    |> Order.get()
     |> Repo.preload([
       [line_items: :product],
       [packages: [:items, :shipping_method]],

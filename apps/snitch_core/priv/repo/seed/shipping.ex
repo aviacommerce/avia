@@ -39,26 +39,31 @@ defmodule Snitch.Seed.Shipping do
     Repo.all(ShippingCategory)
   end
 
+  defp get_state(code_params) do
+    {:ok, state} = State.get(code_params)
+    state
+  end
+
   def seed_zones! do
     Repo.delete_all(Zone)
     Repo.delete_all(ShippingMethodSchema)
     all_zones = [apac, india, north_india] = zones_with_manifest(@zone_manifest)
 
-    ind = Country.get(%{iso: "IN"})
-    ch = Country.get(%{iso: "CH"})
-    jp = Country.get(%{iso: "JP"})
+    {:ok, ind} = Country.get(%{iso: "IN"})
+    {:ok, ch} = Country.get(%{iso: "CH"})
+    {:ok, jp} = Country.get(%{iso: "JP"})
 
     states = Repo.all(from(s in StateSchema, where: s.country_id == ^ind.id))
 
     northern = [
-      State.get(%{code: "IN-UP"}),
-      State.get(%{code: "IN-BR"}),
-      State.get(%{code: "IN-CH"}),
-      State.get(%{code: "IN-CT"}),
-      State.get(%{code: "IN-DL"}),
-      State.get(%{code: "IN-RJ"}),
-      State.get(%{code: "IN-UT"}),
-      State.get(%{code: "IN-PB"})
+      get_state(%{code: "IN-UP"}),
+      get_state(%{code: "IN-BR"}),
+      get_state(%{code: "IN-CH"}),
+      get_state(%{code: "IN-CT"}),
+      get_state(%{code: "IN-DL"}),
+      get_state(%{code: "IN-RJ"}),
+      get_state(%{code: "IN-UT"}),
+      get_state(%{code: "IN-PB"})
     ]
 
     zone_members([

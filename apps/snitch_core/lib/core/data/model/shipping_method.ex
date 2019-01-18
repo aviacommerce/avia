@@ -77,7 +77,7 @@ defmodule Snitch.Data.Model.ShippingMethod do
     QH.delete(SM, id_or_instance, Repo)
   end
 
-  @spec get(map | non_neg_integer) :: SM.t() | nil
+  @spec get(map | non_neg_integer) :: {:ok, SM.t()} | {:error, atom}
   def get(query_fields_or_primary_key) do
     QH.get(SM, query_fields_or_primary_key, Repo)
   end

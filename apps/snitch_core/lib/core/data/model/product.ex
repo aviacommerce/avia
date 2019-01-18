@@ -38,7 +38,7 @@ defmodule Snitch.Data.Model.Product do
   @doc """
   Returns all Products with the given parameters.
   """
-  @spec get(map | non_neg_integer) :: Product.t() | nil
+  @spec get(map | non_neg_integer) :: {:ok, Product.t()} | {:error, atom}
   def get(query_params) do
     QH.get(Product, query_params, Repo)
   end
@@ -184,7 +184,7 @@ defmodule Snitch.Data.Model.Product do
   """
   @spec get(integer) :: {:ok, Product.t()} | {:error, Ecto.Changeset.t()} | nil
   def delete(id) do
-    with %Product{} = product <- get(id),
+    with {:ok, %Product{} = product} <- get(id),
          _ <- ESProductStore.update_product_to_es(product, :delete),
          changeset <- Product.delete_changeset(product) do
       product = product |> Repo.preload(:images)
@@ -327,10 +327,10 @@ defmodule Snitch.Data.Model.Product do
   defp get_image(multi, image_id) do
     Multi.run(multi, :image, fn _ ->
       case QH.get(Image, image_id, Repo) do
-        nil ->
+        {:error, _} ->
           {:error, "image not found"}
 
-        image ->
+        {:ok, image} ->
           {:ok, image}
       end
     end)
@@ -339,10 +339,10 @@ defmodule Snitch.Data.Model.Product do
   defp get_product(multi, product_id) do
     Multi.run(multi, :product, fn _ ->
       case get(product_id) do
-        nil ->
-          {:error, "prodcut not found"}
+        {:error, _} ->
+          {:error, "product not found"}
 
-        product ->
+        {:ok, product} ->
           {:ok, product}
       end
     end)

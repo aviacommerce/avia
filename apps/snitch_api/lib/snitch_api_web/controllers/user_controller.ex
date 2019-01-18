@@ -29,7 +29,7 @@ defmodule SnitchApiWeb.UserController do
   def login(conn, %{"email" => email, "password" => password}) do
     case Accounts.token_sign_in(email, password) do
       {:ok, token, _claims} ->
-        user = UserModel.get(%{email: email})
+        {:ok, user} = UserModel.get(%{email: email})
         render(conn, "token.json-api", data: token, user: user)
 
       _ ->
