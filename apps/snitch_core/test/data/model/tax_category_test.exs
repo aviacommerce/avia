@@ -111,6 +111,12 @@ defmodule Snitch.Data.Model.TaxCategoryTest do
       tc_deleted = Repo.get(TaxCategory, tc.id)
       refute is_nil(tc_deleted)
     end
+
+    test "fails if category is default" do
+      tc = insert(:tax_category, is_default?: true)
+      assert {:error, message} = Model.TaxCategory.delete(tc.id)
+      assert message == "default tax category can not be deleted"
+    end
   end
 
   describe "get_all" do

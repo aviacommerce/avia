@@ -19,8 +19,8 @@ defmodule Snitch.Data.Schema.TaxCategory do
     timestamps()
   end
 
-  @required_fields ~w(name)a
-  @optional_fields ~w(description tax_code is_default? deleted_at)a
+  @required_fields ~w(name tax_code)a
+  @optional_fields ~w(description is_default? deleted_at)a
   @create_fields @optional_fields ++ @required_fields
   @update_fields @optional_fields ++ @required_fields
 
@@ -58,5 +58,7 @@ defmodule Snitch.Data.Schema.TaxCategory do
     changeset
     |> validate_required(@required_fields)
     |> unique_constraint(:name)
+    |> unique_constraint(:code)
+    |> unique_constraint(:is_default?, message: "default category exists")
   end
 end

@@ -92,8 +92,7 @@ defmodule Snitch.Data.Model.TaxCategory do
           {:ok, TaxCategory.t()}
           | {:error, Ecto.Changeset.t()}
   def update(params, instance \\ nil) do
-    with true <- Map.has_key?(params, :is_default?),
-         true <- params.is_default? do
+    with true <- contains_is_default?(params) do
       clear_default_multi()
       |> Multi.run(:tax_category, fn _ ->
         QH.update(TaxCategory, params, instance, Repo)
@@ -150,19 +149,33 @@ defmodule Snitch.Data.Model.TaxCategory do
   @doc """
   Soft deletes a TaxCategory passed to the function.
 
-  Takes as input the `instance` of the TaxCategory to be deleted.
+  Takes as input the `instance` or `id` of the TaxCategory to be deleted.
+
+  ### Note
+  If a TaxCategory is default, `is_default?` is set to `true` then, it can not
+  be deleted.
   """
-  @spec delete(TaxCategory.t() | integer) ::
+  @spec delete(TaxCategory.t() | non_neg_integer) ::
           {:ok, TaxCategory.t()}
           | {:error, Ecto.Changeset.t()}
+          | {:error, String.t()}
   def delete(id) when is_integer(id) do
-    params = %{deleted_at: DateTime.utc_now(), id: id}
-    QH.update(TaxCategory, params, Repo)
+    id |> get() |> delete()
   end
 
   def delete(instance) do
     params = %{deleted_at: DateTime.utc_now()}
-    QH.update(TaxCategory, params, instance, Repo)
+
+    with false <- instance.is_default?,
+         {:ok, categroy} <- QH.update(TaxCategory, params, instance, Repo) do
+      {:ok, categroy}
+    else
+      true ->
+        {:error, "default tax category can not be deleted"}
+
+      {:error, _changeset} = error ->
+        error
+    end
   end
 
   defp clear_default_multi do
@@ -179,4 +192,8 @@ defmodule Snitch.Data.Model.TaxCategory do
         error
     end
   end
+
+  defp contains_is_default?(%{is_default?: true}), do: true
+  defp contains_is_default?(%{"is_default?" => "true"}), do: true
+  defp contains_is_default?(_params), do: false
 end

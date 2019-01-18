@@ -1,32 +1,52 @@
-<div class="row">
-  <div class="col-5">
-    <h2> TaxCategory</h2>
+<div class="list-container">
+  <div class="row m-0 list-header">
+   <div class="col-10 p-0">
+       <h2> Tax Categories</h2>
+   </div>
+   <div class="col-2 p-0 float-right text-right">
+      <%= link(raw("<i class='fas fa-plus'></i> New Category"), to: tax_category_path(@conn, :new), class: "btn btn-primary float-right")%>
+   </div>
   </div>
-  <div class="col-6" align="right">
-    <%= link("Create New", to: tax_category_path(@conn, :new), class: "btn btn-primary")%>
-  </div>
-  <div class="col-1"></div>
-</div>
 
-<div class="row">
-  <div class=col-12>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col"> Name</th>
-          <th scope="col"> Description</th>
-          <th scope="col"> Default</th>
-          <th scope="col"> Tax Code</th>
-        </tr>
-      </thead>
-      <%= for item <- @tax_categories do %>
-        <tr>
-          <td><%= item.name%></td>
-          <td><%= item.description%></td>
-          <td><%= item.is_default?%></td>
-          <td><%= item.tax_code%></td>
-        </tr>
-      <% end %>
-    </table>
+  <div class="row m-0 list">
+    <%= for category <- @tax_categories do %>
+      <div class="table-contaner col-12 p-3 mb-2">
+        <div class="row">
+          <div class="col-11 pl-0">
+            <div class="media">
+              <div class="checkbox mx-3">
+                <label>
+                <input type="checkbox" value="">
+                <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+                </label>
+              </div>
+              <div class="media-body">
+                <div class="row">
+                  <div class="col"> <%= category.name %> </div>
+                  <div class="col"> <%= category.tax_code %> </div>
+                  <%= if category.is_default? do %>
+                    <div class="col"><kbd>Default</kbd></div>
+                  <% else %>
+                    <div class="col"></div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-1">
+            <div class="dropdown col-12 p-0 float-right options-container">
+              <a class="p-2 dropdown-toggle options" href="#" role="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fa fa-cog"></i>
+              </a>
+              <div class="dropdown-menu dropdown-menu-right" >
+                  <%= link("Edit", to: tax_category_path(@conn, :edit, category.id), class: "dropdown-item") %>
+                  <%= link("Delete", to: tax_category_path(@conn, :delete, category.id),
+                    method: :delete, data: [confirm: "Are you sure to delete"], class: "dropdown-item") %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
   </div>
 </div>

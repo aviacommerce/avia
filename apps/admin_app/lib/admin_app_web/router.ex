@@ -55,7 +55,7 @@ defmodule AdminAppWeb.Router do
       post("/address/add", OrderController, :address_add, as: :cart)
     end
 
-    resources("/tax_categories", TaxCategoryController, only: [:index, :new, :create])
+    resources("/tax_categories", TaxCategoryController, except: [:show])
     resources("/stock_locations", StockLocationController)
     resources("/option_types", OptionTypeController)
     resources("/properties", PropertyController, except: [:show])

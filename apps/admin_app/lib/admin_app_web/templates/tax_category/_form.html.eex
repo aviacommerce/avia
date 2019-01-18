@@ -1,0 +1,26 @@
+<%= form_for @changeset, @action, fn f -> %>
+  <div class="form-group row">
+      <%= input f, :name, nil, description: "Name to identify tax category",
+         is_horizontal: true %>
+  </div>
+  <div class="form-group row">
+    <%= input f, :tax_code, nil, description: "A unique code for the category",
+         is_horizontal: true%>
+  </div>
+  <div class="form-group row">
+    <%= textarea_input f, :description, nil, description: "Add a description about the tax category",
+      is_horizontal: true%>
+  </div>
+  <div class="form-group row">
+    <%= checkbox_input f, :is_default?, nil,
+      description: "Checking the default will mark the tax category as the default",
+      is_horizontal: true %>
+  </div>
+  <div class="form-group row stickformbutton">
+  <div class="col-sm-10">
+    <%= button("Cancel", to: tax_category_path(@conn, :index), method: "get",
+            class: "btn btn-secondary btn-outline-secondary submit-btn float-left", type: "button") %>
+    <%= submit "Submit", class: "btn btn-primary submit-btn float-right" %>
+  </div>
+  </div>
+<% end %>
