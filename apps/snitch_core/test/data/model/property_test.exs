@@ -37,10 +37,10 @@ defmodule Snitch.Data.Model.PropertyTest do
   describe "get/1" do
     test "with id" do
       property = insert(:property)
-      assert property_returned = Property.get(property.id)
+      assert {:ok, property_returned} = Property.get(property.id)
       assert property_returned = property
       assert {:ok, _} = Property.delete(property.id)
-      assert Property.get(property.id) == nil
+      assert Property.get(property.id) == {:error, :property_not_found}
     end
   end
 
