@@ -144,7 +144,7 @@ defmodule Snitch.Data.Model.TaxCategoryTest do
   describe "get/2" do
     test "tax category" do
       tc = insert(:tax_category)
-      tc_ret = Model.TaxCategory.get(tc.id)
+      {:ok, tc_ret} = Model.TaxCategory.get(tc.id)
       assert tc.id == tc_ret.id
     end
 
@@ -152,15 +152,15 @@ defmodule Snitch.Data.Model.TaxCategoryTest do
       tc = insert(:tax_category)
       assert {:ok, tc} = Model.TaxCategory.delete(tc)
       refute is_nil(tc.deleted_at)
-      tc_ret = Model.TaxCategory.get(tc.id)
-      assert is_nil(tc_ret)
+      {:error, tc_ret} = Model.TaxCategory.get(tc.id)
+      assert tc_ret == :tax_category_not_found
     end
 
     test "tax category, is deleted" do
       tc = insert(:tax_category)
       {:ok, tc} = Model.TaxCategory.delete(tc)
       refute is_nil(tc.deleted_at)
-      tc_ret = Model.TaxCategory.get(tc.id, false)
+      {:ok, tc_ret} = Model.TaxCategory.get(tc.id, false)
       refute is_nil(tc_ret)
     end
   end

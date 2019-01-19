@@ -74,7 +74,7 @@ defmodule Snitch.Data.Model.TaxRateTest do
 
     test "tax rate", context do
       %{tax_rate: tr} = context
-      tr_ret = TaxRateModel.get(tr.id)
+      {:ok, tr_ret} = TaxRateModel.get(tr.id)
       assert tr.id == tr_ret.id
     end
 
@@ -82,15 +82,15 @@ defmodule Snitch.Data.Model.TaxRateTest do
       %{tax_rate: tr} = context
       assert {:ok, tr} = TaxRateModel.delete(tr)
       refute is_nil(tr.deleted_at)
-      tr_ret = TaxRateModel.get(tr.id)
-      assert is_nil(tr_ret)
+      {:error, tr_ret} = TaxRateModel.get(tr.id)
+      assert tr_ret = :tax_rate_not_found
     end
 
-    test "tax category is deleted", context do
+    test "tax rate is deleted", context do
       %{tax_rate: tr} = context
       {:ok, tr} = TaxRateModel.delete(tr)
       refute is_nil(tr.deleted_at)
-      tr_ret = TaxRateModel.get(tr.id, false)
+      {:ok, tr_ret} = TaxRateModel.get(tr.id, false)
       refute is_nil(tr_ret)
     end
   end
