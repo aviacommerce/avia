@@ -55,13 +55,13 @@ defmodule AdminAppWeb.ProductBrandController do
       |> put_flash(:info, "Product Brand update successfully")
       |> redirect(to: product_brand_path(conn, :index))
     else
-      {:error, changeset} ->
-        render(conn, "edit.html", changeset: %{changeset | action: :edit})
-
-      nil ->
+      {:error, :product_brand_not_found} ->
         conn
         |> put_flash(:info, "Product Brand not found")
         |> redirect(to: product_brand_path(conn, :index))
+
+      {:error, changeset} ->
+        render(conn, "edit.html", changeset: %{changeset | action: :edit})
     end
   end
 

@@ -64,9 +64,19 @@ defmodule Snitch.Data.Model.TaxRate do
   def get(id, active \\ true) do
     if active do
       query = from(tc in TaxRate, where: is_nil(tc.deleted_at) and tc.id == ^id)
-      Repo.one(query)
+      Repo.one(query) |> format_response
     else
       QH.get(TaxRate, id, Repo)
+    end
+  end
+
+  defp format_response(response) do
+    case response do
+      nil ->
+        {:error, :tax_rate_not_found}
+
+      tax_rate ->
+        {:ok, tax_rate}
     end
   end
 

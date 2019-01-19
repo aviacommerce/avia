@@ -11,27 +11,43 @@ defmodule AdminApp.OrderContext do
   alias Snitch.Data.Model.Payment
 
   def get_order(%{"number" => number}) do
-    {:ok, order} = OrderModel.get(%{number: number})
+    case OrderModel.get(%{number: number}) do
+      {:ok, order} ->
+        order =
+          order
+          |> Repo.preload([
+            [line_items: :product],
+            [packages: [:items, :shipping_method]],
+            [payments: :payment_method],
+            :user
+          ])
 
-    order
-    |> Repo.preload([
-      [line_items: :product],
-      [packages: [:items, :shipping_method]],
-      [payments: :payment_method],
-      :user
-    ])
+        {:ok, order}
+
+      {:error, msg} ->
+        {:error, msg}
+    end
   end
 
   def get_order(%{"id" => id}) do
     {:ok, order} = id |> String.to_integer() |> OrderModel.get()
 
-    order
-    |> Repo.preload([
-      [line_items: :product],
-      [packages: [:items, :shipping_method]],
-      [payments: :payment_method],
-      :user
-    ])
+    case String.to_integer(id) |> OrderModel.get() do
+      {:ok, order} ->
+        order =
+          order
+          |> Repo.preload([
+            [line_items: :product],
+            [packages: [:items, :shipping_method]],
+            [payments: :payment_method],
+            :user
+          ])
+
+        {:ok, order}
+
+      {:error, msg} ->
+        {:error, msg}
+    end
   end
 
   def get_total(order) do

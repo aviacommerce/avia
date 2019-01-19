@@ -41,11 +41,6 @@ defmodule AdminAppWeb.PromotionController do
         conn
         |> put_status(422)
         |> render("error_message.json", message: message)
-
-        # nil ->
-        #   conn
-        #   |> put_status(401)
-        #   |> render(AdminAppWeb.ErrorView, "401.json")
     end
   end
 

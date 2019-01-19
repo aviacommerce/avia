@@ -119,9 +119,19 @@ defmodule Snitch.Data.Model.TaxCategory do
   def get(id, active \\ true) do
     if active do
       query = from(tc in TaxCategory, where: is_nil(tc.deleted_at) and tc.id == ^id)
-      Repo.one(query)
+      Repo.one(query) |> format_response
     else
       QH.get(TaxCategory, id, Repo)
+    end
+  end
+
+  defp format_response(response) do
+    case response do
+      nil ->
+        {:error, :tax_category_not_found}
+
+      tax_category ->
+        {:ok, tax_category}
     end
   end
 
