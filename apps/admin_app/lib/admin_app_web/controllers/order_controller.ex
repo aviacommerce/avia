@@ -60,7 +60,7 @@ defmodule AdminAppWeb.OrderController do
   end
 
   def update_package(conn, %{"id" => id, "state" => state}) do
-    order = OrderContext.get_order(%{"id" => id})
+    {:ok, order} = OrderContext.get_order(%{"id" => id})
 
     case PackageContext.update_packages(state, String.to_integer(id)) do
       {:ok, _} ->
@@ -77,7 +77,7 @@ defmodule AdminAppWeb.OrderController do
   end
 
   def update_state(conn, %{"id" => id, "state" => state}) do
-    order = OrderContext.get_order(%{"id" => id})
+    {:ok, order} = OrderContext.get_order(%{"id" => id})
 
     case OrderContext.state_transition(state, order) do
       {:ok, message} ->
@@ -93,7 +93,7 @@ defmodule AdminAppWeb.OrderController do
   end
 
   def cod_payment_update(conn, %{"id" => id, "state" => state}) do
-    order = OrderContext.get_order(%{"id" => id})
+    {:ok, order} = OrderContext.get_order(%{"id" => id})
 
     case OrderContext.update_cod_payment(order, state) do
       {:ok, _} ->
