@@ -161,7 +161,6 @@ defmodule Snitch.Data.Schema.Product do
     |> validate_required(@required_fields)
     |> validate_amount(:selling_price)
     |> NameSlug.maybe_generate_slug()
-    |> unique_constraint(:upi, message: "Ooops, another product already has that name!")
   end
 
   def product_by_category_query(taxon_id) do
