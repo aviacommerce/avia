@@ -7,7 +7,7 @@ defmodule Snitch.Data.Model.Product do
 
   import Ecto.Query
   alias Ecto.Multi
-  alias GenNanoid
+  alias Snitch.Tools.GenNanoid
   alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Data.Schema.{Image, Product, Variation, Taxon}
   alias Snitch.Tools.Helper.ImageUploader
@@ -518,7 +518,6 @@ defmodule Snitch.Data.Model.Product do
 
     case get_upi_if_unique(upi) do
       {:error, _} ->
-        IO.puts("Duplicated UPI #{upi}. Retrying.")
         generate_upi()
 
       {:ok, upi} ->
@@ -542,9 +541,3 @@ defmodule Snitch.Data.Model.Product do
   end
 end
 
-defmodule GenNanoid do
-  # to be mocked
-  def gen_nano_id() do
-    Nanoid.generate(10, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-  end
-end
