@@ -40,7 +40,14 @@ defmodule Snitch.Data.Model.Product do
   """
   @spec get(map | non_neg_integer) :: {:ok, Product.t()} | {:error, atom}
   def get(query_params) do
-    QH.get(Product, query_params, Repo)
+    case QH.get(Product, query_params, Repo) do
+      {:error, msg} ->
+        {:error, msg}
+
+      {:ok, product} ->
+        product = get_product_with_required_variants(product)
+        {:ok, product}
+    end
   end
 
   @spec get_product_list() :: [Product.t()]
@@ -73,13 +80,13 @@ defmodule Snitch.Data.Model.Product do
     |> where([p], p.state == "active" and p.id not in ^child_product_ids)
   end
 
-  def get_product_with_present_variants(product) do
+  def get_product_with_required_variants(product, states \\ [0, 1, 2]) do
     query =
       Product
       |> join(:left, [p], v in Variation, v.parent_product_id == ^product.id)
       |> where(
         [p, v],
-        p.state != "deleted" and p.id == v.child_product_id
+        p.state in ^states and p.id == v.child_product_id
       )
 
     Repo.one(from(p in Product, where: p.id == ^product.id, preload: [variants: ^query]))
@@ -500,7 +507,7 @@ defmodule Snitch.Data.Model.Product do
   """
   @spec has_variants?(Product.t()) :: true | false
   def has_variants?(product) do
-    product = get_product_with_present_variants(product)
+    product = get_product_with_required_variants(product)
     length(product.variants) > 0
   end
 
