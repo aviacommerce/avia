@@ -81,13 +81,9 @@ defmodule Snitch.Data.Model.Product do
   end
 
   def get_product_with_required_variants(product, states \\ [0, 1, 2]) do
-    query =
-      Product
-      |> join(:left, [p], v in Variation, v.parent_product_id == ^product.id)
-      |> where(
-        [p, v],
-        p.state in ^states and p.id == v.child_product_id
-      )
+    product = product |> Repo.preload(:variants)
+    variant_ids = Enum.map(product.variants, & &1.id)
+    query = from(p in Product, where: p.id in ^variant_ids and p.state in ^states)
 
     Repo.one(from(p in Product, where: p.id == ^product.id, preload: [variants: ^query]))
   end
