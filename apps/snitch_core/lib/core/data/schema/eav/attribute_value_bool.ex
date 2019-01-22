@@ -1,16 +1,13 @@
-defmodule Snitch.Data.Schema.EAV.String do
+defmodule Snitch.Data.Schema.EAV.Boolean do
   @moduledoc """
-  Models the String type for EAV structure.
-
-  The table related to this schema stores data for all the
-  attributes which have data type as string.
+  Models the boolean type for EAV structure.
   """
 
   use Snitch.Data.Schema
   alias Snitch.Data.Schema.EAV.Attribute
 
-  schema "snitch_eav_type_string" do
-    field(:value, :string)
+  schema "snitch_eav_type_boolean" do
+    field(:value, :boolean)
 
     belongs_to(:attribute, Attribute, on_replace: :delete)
 
