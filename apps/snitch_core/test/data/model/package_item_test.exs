@@ -29,18 +29,18 @@ defmodule Snitch.Data.Model.PackageItemTest do
          shipping_category_count: 1,
          shipping_method_count: 1,
          state_zone_count: 1
-    test "successful with valid attributes", context do
-      %{package_item: package_item} = new_package(context)
+    test "successful with valid params", context do
+      %{line_item: line_item, package: package, product: product} = new_package(context)
       assert {:ok, _} =
                PackageItem.create(%{
                  @params
-                 | line_item_id: package_item.line_item_id,
-                   product_id: package_item.product_id,
-                   package_id: package_item.package_id
+                 | line_item_id: line_item.id,
+                   product_id: product.id,
+                   package_id: package.id
                })
     end
 
-    test "with invalid attributes" do
+    test "failed for invalid params" do
       {:error, cs} =
         PackageItem.create(%{
           @params
@@ -59,7 +59,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
            shipping_method_count: 1,
            state_zone_count: 1
     test "successful with valid params", context do
-      %{package_item: package_item} = new_package(context)
+      %{package_item: package_item} = make_package_item(context)
       params = %{quantity: 95}
       {:ok, updated_package_item} = PackageItem.update(params, package_item)
       assert updated_package_item.id == package_item.id
@@ -67,8 +67,8 @@ defmodule Snitch.Data.Model.PackageItemTest do
       refute updated_package_item.backordered?
     end
 
-    test "with invalid params", context do
-      %{package_item: package_item} = new_package(context)
+    test "failed for invalid params", context do
+      %{package_item: package_item} = make_package_item(context)
       money = Money.new(-1, :USD)
       updates = %{tax: money }
       {:error, updated} = PackageItem.update(updates, package_item)
@@ -78,7 +78,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
 
   describe "delete/1" do
     test "a package_item", context do
-      %{package_item: package_item} = new_package(context)
+      %{package_item: package_item} = make_package_item(context)
       {:ok, _} = PackageItem.delete(package_item)
       assert {:error, :package_item_not_found} == PackageItem.get(package_item.id)
     end
@@ -86,14 +86,14 @@ defmodule Snitch.Data.Model.PackageItemTest do
 
   describe "get/1" do
     test "with non-negative integer", context do
-      %{package_item: package_item} = new_package(context)
+      %{package_item: package_item} = make_package_item(context)
       {:ok, new_package_item} = PackageItem.get(package_item.id)
       assert new_package_item.id == package_item.id
     end
 
     test "with a map", context do
-      %{package_item: package_item} = new_package(context)
-      map = %{quantity: package_item.quantity, delta: package_item.delta}
+      %{package_item: package_item} = make_package_item(context)
+      map = %{number: package_item.number}
       {:ok, new_package_item} = PackageItem.get(map)
       assert new_package_item.id == package_item.id
     end
@@ -101,7 +101,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
 
   describe "get_all/0" do
     test "package_items", context do
-      %{package_item: package_item} = new_package(context)
+      %{package_item: package_item} = make_package_item(context)
       assert PackageItem.get_all() != []
     end
   end
@@ -127,7 +127,12 @@ defmodule Snitch.Data.Model.PackageItemTest do
         origin: stock_item.stock_location,
         shipping_category: shipping_category
       )
+      %{line_item: line_item, package: package, product: product}
 
+  end
+
+  defp make_package_item(context) do
+    %{line_item: line_item, package: package, product: product} = new_package(context)
     package_item =
       insert(:package_item,
         quantity: 3,
@@ -135,7 +140,6 @@ defmodule Snitch.Data.Model.PackageItemTest do
         line_item: line_item,
         package: package
       )
-
     %{package_item: package_item}
   end
 end
