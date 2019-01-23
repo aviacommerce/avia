@@ -18,4 +18,21 @@ defmodule Snitch.Data.Model.TaxConfigtest do
       assert {:ok, _data} = TaxConfig.update(tax_config, params)
     end
   end
+
+  describe "get/1" do
+    test "success" do
+      tax_config = insert(:tax_config)
+
+      assert {:ok, config} = TaxConfig.get(tax_config.id)
+      assert config.id == tax_config.id
+      assert config.label == tax_config.label
+    end
+
+    test "fails" do
+      insert(:tax_config)
+
+      assert {:error, message} = TaxConfig.get(-1)
+      assert message == :tax_config_not_found
+    end
+  end
 end
