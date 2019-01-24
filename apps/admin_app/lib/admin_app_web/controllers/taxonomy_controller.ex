@@ -36,7 +36,8 @@ defmodule AdminAppWeb.TaxonomyController do
     taxon_params = %{name: name, themes: themes, image: Image.handle_image_value(image)}
     parent_taxon = Taxonomy.get_taxon(id)
 
-    with {:ok, taxon} <- Taxonomy.create_taxon(parent_taxon, taxon_params) do
+    with %Taxon{} = parent_taxon <- Taxonomy.get_taxon(id),
+         {:ok, taxon} <- Taxonomy.create_taxon(parent_taxon, taxon_params) do
       html =
         render_to_string(
           TaxonomyView,
@@ -48,6 +49,11 @@ defmodule AdminAppWeb.TaxonomyController do
       |> put_status(200)
       |> json(%{html: html})
     else
+      nil ->
+        conn
+        |> put_status(:bad_request)
+        |> json(%{"error" => "parent taxon does not exist"})
+
       {:error, _changeset} ->
         conn
         |> put_status(:bad_request)
