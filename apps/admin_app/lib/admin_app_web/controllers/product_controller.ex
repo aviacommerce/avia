@@ -88,6 +88,11 @@ defmodule AdminAppWeb.ProductController do
         parent_product: product,
         rummage_params: rummage_params
       )
+    else
+      {:error, :product_not_found} ->
+        conn
+        |> put_flash(:error, "Product not found")
+        |> redirect(to: "/")
     end
   end
 
