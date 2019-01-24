@@ -70,6 +70,14 @@ defmodule Snitch.Data.Model.TaxClasstest do
       assert {:error, message} = TaxClass.delete(tax_class)
       assert message == "can not delete default tax class"
     end
+
+    test "fails if associated with another entity" do
+      tax_config = insert(:tax_config)
+      tax_class_id = tax_config.shipping_tax.id
+
+      assert {:error, message} = TaxClass.delete(tax_class_id)
+      assert message == "tax class associaed with some entity"
+    end
   end
 
   describe "get/1" do

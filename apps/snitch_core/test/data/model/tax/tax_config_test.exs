@@ -35,4 +35,14 @@ defmodule Snitch.Data.Model.TaxConfigtest do
       assert message == :tax_config_not_found
     end
   end
+
+  test "get all tax_address_types" do
+    addresses = TaxConfig.tax_address_types()
+
+    assert [
+             shipping_address: "shipping_address",
+             billing_address: "billing_address",
+             store_address: "store_address"
+           ] = addresses
+  end
 end

@@ -75,6 +75,9 @@
       <li>
         <a class="nav-link" href="/stock_locations">Stock Locations</a>
       </li>
+       <li>
+        <a class="nav-link" href="/tax">Tax</a>
+      </li>
       <li>
         <a class="nav-link" href="/roles">Roles</a>
       </li>
