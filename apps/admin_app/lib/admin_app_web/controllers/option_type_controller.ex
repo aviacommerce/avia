@@ -57,11 +57,17 @@ defmodule AdminAppWeb.OptionTypeController do
 
   def delete(conn, %{"id" => id}) do
     with {id, _} <- Integer.parse(id),
+         false <- OTModel.is_theme_associated(id),
          {:ok, option_type} <- OTModel.delete(id) do
       conn
       |> put_flash(:info, "Option type #{option_type.name} deleted successfully")
       |> redirect(to: option_type_path(conn, :index))
     else
+      true ->
+        conn
+        |> put_flash(:error, "Option type associated to variation theme. Deletion not allowed")
+        |> redirect(to: option_type_path(conn, :index))
+
       {:error, _} ->
         conn
         |> put_flash(:error, "Failed to delete option type")
