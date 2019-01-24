@@ -18,9 +18,6 @@
                 <%= input f, :seo_title, nil, is_horizontal: true, description: "SEO title for the store. It will override what you had set for the “Name” field."  %>
             </div>
             <div class="form-group row ">
-                <%= input f, :hosted_payment_url, nil, is_horizontal: true, description: "Payment URL for the store."  %>
-            </div>
-            <div class="form-group row ">
               <label  class="col-sm-3 col-form-label">
                   <div class="label">
                       Currency

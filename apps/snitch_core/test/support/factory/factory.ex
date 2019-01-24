@@ -200,8 +200,7 @@ defmodule Snitch.Factory do
       frontend_url: "https://abc.com",
       backend_url: "https://abc.com",
       seo_title: "store",
-      currency: "USD",
-      hosted_payment_url: "https://abc.com"
+      currency: "USD"
     }
   end
 

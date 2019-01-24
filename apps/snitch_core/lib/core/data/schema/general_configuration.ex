@@ -18,7 +18,6 @@ defmodule Snitch.Data.Schema.GeneralConfiguration do
     field(:frontend_url, :string)
     field(:backend_url, :string)
     field(:currency, :string)
-    field(:hosted_payment_url, :string)
     field(:tenant, :string, virtual: true)
 
     has_one(:store_image, StoreLogo, on_replace: :delete)
@@ -27,14 +26,15 @@ defmodule Snitch.Data.Schema.GeneralConfiguration do
     timestamps()
   end
 
-  @required_fields ~w(name sender_mail seo_title frontend_url backend_url currency hosted_payment_url)a
-  @option_fields ~w(image)
+  @required_fields ~w(name sender_mail currency)a
+  @optional_fields ~w(seo_title frontend_url backend_url)a
+  @fields @required_fields ++ @optional_fields
 
   @spec create_changeset(t, map) :: Ecto.Changeset.t()
   def create_changeset(%__MODULE__{} = general_configuration, params) do
     general_configuration
     |> Repo.preload([:image])
-    |> cast(params, @required_fields)
+    |> cast(params, @fields)
     |> validate_required(@required_fields)
     |> cast_assoc(:store_image, with: &StoreLogo.changeset/2)
   end
@@ -43,7 +43,7 @@ defmodule Snitch.Data.Schema.GeneralConfiguration do
   def update_changeset(%__MODULE__{} = general_configuration, params) do
     general_configuration
     |> Repo.preload([:store_image])
-    |> cast(params, @required_fields)
+    |> cast(params, @fields)
     |> validate_required(@required_fields)
     |> cast_assoc(:store_image, with: &StoreLogo.changeset/2)
   end
