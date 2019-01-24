@@ -55,7 +55,7 @@ defmodule Snitch.Data.Model.TaxClasstest do
       assert {:ok, _data} = TaxClass.delete(tax_class.id)
     end
 
-    test "successful with in" do
+    test "successful with instance" do
       tax_class = insert(:tax_class)
       assert {:ok, _data} = TaxClass.delete(tax_class)
     end

@@ -34,7 +34,7 @@ defmodule Snitch.Data.Schema.TaxConfig do
 
   schema "snitch_tax_configuration" do
     field(:label, :string)
-    field(:included_in_price?, :boolean, default: false)
+    field(:included_in_price?, :boolean, default: true)
     field(:calculation_address_type, AddressTypes, default: :shipping_address)
     field(:preferences, :map)
 

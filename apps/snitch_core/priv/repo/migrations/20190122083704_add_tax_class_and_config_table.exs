@@ -15,7 +15,7 @@ defmodule Snitch.Repo.Migrations.AddTaxClassAndConfigTable do
 
     create table(:snitch_tax_configuration) do
       add(:label, :string)
-      add(:included_in_price?, :boolean)
+      add(:included_in_price?, :boolean, default: true)
       add(:calculation_address_type, AddressTypes.type())
       add(:preferences, :map)
 
