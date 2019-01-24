@@ -23,10 +23,6 @@
         </td>
       </tr>
       <tr>
-        <td><b> HOSTED PAYMENT URL </b></td>
-        <td><%= @general_configuration.hosted_payment_url %></td>
-      </tr> 
-      <tr>
         <td><b> SEO TITLE </b></td>
         <td><%= @general_configuration.seo_title %></td>
       </tr> 

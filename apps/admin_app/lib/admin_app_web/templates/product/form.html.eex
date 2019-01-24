@@ -303,7 +303,7 @@
                               <%= if is_variant_tracking_enabled(@parent_product) do %>
                                 <button name="variant_stock_add" type="button" class="btn btn-primary" data-prdouct-id="<%= variant.id %>">Add stock</button>
                               <% end %>
-                              <%= link("Delete", to: product_path(@conn, :delete_variant, variant.id), class: "btn btn-danger", method: "delete") %>
+                              <%= link("Delete", to: product_path(@conn, :delete_variant, variant.id, %{parent_id: @parent_product.id}), class: "btn btn-danger", method: "delete") %>
                             </td>
                           </tr>
                         <% end %>
