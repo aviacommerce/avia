@@ -21,7 +21,6 @@ defmodule Snitch.Tools.OrderEmailTest do
       "backend_url" => "https://abc.com",
       "seo_title" => "store",
       "currency" => "USD",
-      "hosted_payment_url" => "https://abc.com",
       "image" => %{
         type: "image/png",
         filename: "3Lu6PTMFSHz8eQfoGCP3F.png",

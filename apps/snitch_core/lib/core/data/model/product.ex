@@ -7,6 +7,7 @@ defmodule Snitch.Data.Model.Product do
 
   import Ecto.Query
   alias Ecto.Multi
+  alias Snitch.Tools.GenNanoid
   alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Data.Schema.{Image, Product, Variation, Taxon}
   alias Snitch.Tools.Helper.ImageUploader
@@ -512,13 +513,8 @@ defmodule Snitch.Data.Model.Product do
     Product.is_variant_tracking_enabled?(product)
   end
 
-  # to be mocked
-  def gen_nano_id() do
-    Nanoid.generate(10, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-  end
-
   def generate_upi() do
-    upi = "A" <> gen_nano_id() <> "C"
+    upi = "A#{GenNanoid.gen_nano_id()}C"
 
     case get_upi_if_unique(upi) do
       {:error, _} ->
@@ -544,3 +540,4 @@ defmodule Snitch.Data.Model.Product do
     from(p in "snitch_products", select: p.upi, where: p.upi == ^upi) |> Repo.one()
   end
 end
+

@@ -31,3 +31,9 @@ defenum(InventoryTrackingEnum,
   product: 1,
   variant: 2
 )
+
+defenum(AddressTypes,
+  shipping_address: 0,
+  billing_address: 1,
+  store_address: 2
+)

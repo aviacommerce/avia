@@ -19,8 +19,7 @@ defmodule Snitch.Data.Model.GeneralConfigurationTest do
       "frontend_url" => "https://abc.com",
       "backend_url" => "https://abc.com",
       "seo_title" => "store",
-      "currency" => "USD",
-      "hosted_payment_url" => "https://abc.com"
+      "currency" => "USD"
     }
 
     general_config = insert(:general_config)
