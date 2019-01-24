@@ -21,6 +21,11 @@ defenum(PackageStateEnum,
   complete: 6
 )
 
+defenum(UserStateEnum,
+  active: 0,
+  deleted: 1
+)
+
 defenum(InventoryTrackingEnum,
   none: 0,
   product: 1,

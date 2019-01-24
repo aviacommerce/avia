@@ -22,6 +22,8 @@ defmodule Snitch.Data.Schema.User do
     field(:password_confirmation, :string, virtual: true)
     field(:password_hash, :string)
     field(:is_admin, :boolean, default: false)
+    field(:state, UserStateEnum, default: :active)
+    field(:deleted_at, :utc_datetime)
 
     field(:sign_in_count, :integer, default: 0)
     field(:failed_attempts, :integer, default: 0)
@@ -85,10 +87,13 @@ defmodule Snitch.Data.Schema.User do
     |> common_changeset()
   end
 
-  def delete_changeset(user, params) do
+  def delete_changeset(user, _params \\ %{}) do
+    params = %{
+      "state" => "deleted",
+      "deleted_at" => NaiveDateTime.utc_now()
+    }
     user
-    |> cast(params, @required_fields)
-    |> no_assoc_constraint(:orders, message: "Cannot delete as orders are associated")
+    |> cast(params, [:state, :deleted_at])
   end
 
   @spec common_changeset(Ecto.Changeset.t()) :: Ecto.Changeset.t()

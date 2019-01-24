@@ -20,7 +20,7 @@ defmodule Snitch.Domain.Account do
   @spec authenticate(String.t(), String.t()) :: {:ok, UserSchema.t()} | {:error, :not_found}
   def authenticate(email, password) do
     user =
-      case User.get(%{email: email}) do
+      case User.get(%{email: email, state: :active}) do
         {:ok, user} ->
           user |> Repo.preload(:role)
 
