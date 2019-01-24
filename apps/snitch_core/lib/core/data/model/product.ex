@@ -81,7 +81,7 @@ defmodule Snitch.Data.Model.Product do
     |> where([p], p.state == "active" and p.id not in ^child_product_ids)
   end
 
-  def get_product_with_required_variants(product, states \\ [^:active, ^:in_active, ^:draft]) do
+  def get_product_with_required_variants(product, states \\ [:active, :in_active, :draft]) do
     product = product |> Repo.preload(:variants)
     variant_ids = Enum.map(product.variants, & &1.id)
     query = from(p in Product, where: p.id in ^variant_ids and p.state in ^states)
