@@ -276,16 +276,16 @@ defmodule AdminAppWeb.ProductController do
     end
   end
 
-  def delete_variant(conn, %{"id" => id} = params) do
+  def delete_variant(conn, %{"id" => id, "parent_id" => parent_id} = params) do
     with {:ok, _product} = deleted_variant <- ProductModel.delete(id) do
       conn
       |> put_flash(:info, "Variant deleted successfully")
-      |> redirect(to: product_path(conn, :edit, id))
+      |> redirect(to: product_path(conn, :edit, parent_id))
     else
       _ ->
         conn
         |> put_flash(:error, "Failed to delete variant")
-        |> redirect(to: product_path(conn, :edit, id))
+        |> redirect(to: product_path(conn, :edit, parent_id))
     end
   end
 
