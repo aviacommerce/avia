@@ -22,6 +22,7 @@ export default class View extends MainView {
         cache: false,
         success: function(data){
           target_div.empty().append(data.html);
+          $('span#modal-header').empty().append("Create Tax Class")
           modal.modal('show');
         }
       });
@@ -40,6 +41,7 @@ export default class View extends MainView {
         cache: false,
         success: function(data){
           target_div.empty().append(data.html);
+          $('span#modal-header').empty().append("Edit Tax Class")
           modal.modal('show');
         }
       });
@@ -73,8 +75,7 @@ export default class View extends MainView {
           else {
             let id = $(data.html).filter("li").attr('id')
             let list_id = `li#${id}`
-            $(list_id).remove()
-            list_div.append(data.html)
+            $(list_id).replaceWith(data.html)
             modal.modal('hide')
           }
         },

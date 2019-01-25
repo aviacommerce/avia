@@ -51,7 +51,7 @@ defmodule Snitch.Data.Model.TaxClass do
         QH.delete(TaxClass, instance, Repo)
       rescue
         Ecto.ConstraintError ->
-          {:error, "tax class associaed with some entity"}
+          {:error, "Tax class associated with some entity, consider removing the association"}
       end
     else
       true ->

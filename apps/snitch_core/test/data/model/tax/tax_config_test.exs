@@ -36,6 +36,23 @@ defmodule Snitch.Data.Model.TaxConfigtest do
     end
   end
 
+  describe "get_default/0" do
+    test "gets successfully" do
+      tax_config = insert(:tax_config)
+      data = TaxConfig.get_default()
+      assert data.id == tax_config.id
+    end
+
+    test "raises if more than one record are present" do
+      insert(:tax_config)
+      insert(:tax_config)
+
+      assert_raise Ecto.MultipleResultsError, fn ->
+        TaxConfig.get_default()
+      end
+    end
+  end
+
   test "get all tax_address_types" do
     addresses = TaxConfig.tax_address_types()
 

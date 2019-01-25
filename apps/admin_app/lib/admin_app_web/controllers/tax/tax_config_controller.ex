@@ -13,7 +13,7 @@ defmodule AdminAppWeb.Tax.TaxConfigController do
   end
 
   def update(conn, %{"id" => id, "tax_config" => params}) do
-    config = id |> String.to_integer() |> TaxConfig.get() |> get(conn)
+    config = id |> TaxConfig.get() |> get(conn)
 
     with {:ok, _config} <- TaxConfig.update(config, params) do
       redirect(conn, to: tax_config_path(conn, :index))

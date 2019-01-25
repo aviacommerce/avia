@@ -29,9 +29,9 @@ defmodule Snitch.Data.Model.TaxConfig do
   Gets the tax config set for the store. Since a single row
   is set, it always returns the same config.
   """
+  @spec get_default() :: TaxConfig.t() | nil
   def get_default() do
-    [config] = Repo.all(TaxConfig)
-    config
+    Repo.one(TaxConfig)
   end
 
   @doc """
@@ -41,7 +41,7 @@ defmodule Snitch.Data.Model.TaxConfig do
     values = AddressTypes.__valid_values__()
 
     values
-    |> Stream.filter(fn value -> is_atom(value) end)
+    |> Stream.filter(&is_atom/1)
     |> Enum.map(fn type ->
       {type, to_string(type)}
     end)

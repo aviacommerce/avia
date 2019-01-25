@@ -76,7 +76,7 @@ defmodule Snitch.Data.Model.TaxClasstest do
       tax_class_id = tax_config.shipping_tax.id
 
       assert {:error, message} = TaxClass.delete(tax_class_id)
-      assert message == "tax class associaed with some entity"
+      assert message == "Tax class associated with some entity, consider removing the association"
     end
   end
 
@@ -94,5 +94,12 @@ defmodule Snitch.Data.Model.TaxClasstest do
       tax_classes = TaxClass.get_all()
       assert length(tax_classes) == 2
     end
+  end
+
+  test "formatted_list/0 returns in format [{tax_class_name, id}]" do
+    insert(:tax_class, name: "Shipping Tax")
+    insert(:tax_class, name: "Product Tax")
+    data = TaxClass.formatted_list()
+    assert [{"Product Tax", _}, {"Shipping Tax", _}] = data
   end
 end
