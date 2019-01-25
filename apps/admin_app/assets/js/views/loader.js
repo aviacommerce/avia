@@ -13,6 +13,9 @@ import ShippingPolicyIndexView from './shipping_policy/index'
 import ShippingPolicyEditView from './shipping_policy/edit'
 import StockLocationNewView from './stock_location/new'
 import StockLocationEditView from './stock_location/edit'
+import TaxConfigEditView from './tax/tax_config_index'
+import TaxClassIndexView from './tax/tax_class_index'
+
 // Collection of specific view modules
 const views = {
   TaxonomyIndexView,
@@ -28,7 +31,9 @@ const views = {
   StockLocationNewView,
   StockLocationEditView,
   ShippingPolicyIndexView,
-  ShippingPolicyEditView
+  ShippingPolicyEditView,
+  TaxConfigEditView,
+  TaxClassIndexView
 };
 
 export default function loadView(viewName) {

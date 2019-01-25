@@ -47,7 +47,12 @@ defmodule Snitch.Data.Model.TaxClass do
 
   def delete(instance) do
     with false <- instance.is_default do
-      QH.delete(TaxClass, instance, Repo)
+      try do
+        QH.delete(TaxClass, instance, Repo)
+      rescue
+        Ecto.ConstraintError ->
+          {:error, "Tax class associated with some entity, consider removing the association"}
+      end
     else
       true ->
         {:error, "can not delete default tax class"}
@@ -61,4 +66,12 @@ defmodule Snitch.Data.Model.TaxClass do
 
   @spec get_all :: [TaxClass.t()]
   def get_all, do: Repo.all(TaxClass)
+
+  @spec formatted_list() :: [{String.t(), non_neg_integer}]
+  def formatted_list do
+    TaxClass
+    |> order_by([s], asc: s.name)
+    |> select([s], {s.name, s.id})
+    |> Repo.all()
+  end
 end

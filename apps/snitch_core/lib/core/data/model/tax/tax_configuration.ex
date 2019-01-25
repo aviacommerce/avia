@@ -24,4 +24,26 @@ defmodule Snitch.Data.Model.TaxConfig do
   def get(id) do
     QH.get(TaxConfig, id, Repo)
   end
+
+  @doc """
+  Gets the tax config set for the store. Since a single row
+  is set, it always returns the same config.
+  """
+  @spec get_default() :: TaxConfig.t() | nil
+  def get_default() do
+    Repo.one(TaxConfig)
+  end
+
+  @doc """
+  Returns a list of tax addresses.
+  """
+  def tax_address_types() do
+    values = AddressTypes.__valid_values__()
+
+    values
+    |> Stream.filter(&is_atom/1)
+    |> Enum.map(fn type ->
+      {type, to_string(type)}
+    end)
+  end
 end
