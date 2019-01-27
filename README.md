@@ -81,12 +81,12 @@ We are also welcoming to the developers who want to contribute in the developmen
       <td align="center" width="80" valign="top">
         <img height="80" width="80" src="https://github.com/sagarkarwande.png?s=128">
         <br>
-        <a href="https://github.com/sagarkarwande">@sagarkarwande</a>
+        <a href="https://github.com/sagarkarwande">@sagark</a>
       </td>
       <td align="center" width="80" valign="top">
         <img height="80" width="80" src="https://github.com/oyeb.png?s=128">
         <br>
-        <a href="https://github.com/oyeb">@oyeb</a>
+        <a href="https://github.com/oyeb">@oyeb   </a>
       </td>
       <td align="center" width="80" valign="top">
         <img height="80" width="80" src="https://github.com/ramansah.png?s=128">
