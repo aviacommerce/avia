@@ -1,0 +1,42 @@
+<%= form_for @changeset, tax_config_path(@conn, :update, @tax_config), fn f -> %>
+  <h6>Tax Configuration</h6>
+  <div class="card">
+    <div class="card-body">
+      <div class="form-group row ">
+        <%= input f, :label, nil, is_horizontal: true, description: "Tax label" %>
+      </div>
+      <div class="form-group row ">
+        <%= select_input f, :calculation_address_type, address_types(), nil, 
+          description: "Address to be used for tax calculation.", is_horizontal: true %>
+      </div>
+      <div class="form-group row ">
+        <%= checkbox_input f, :included_in_price?, nil, 
+          description: "Set it if tax is already included in the product price across store.", 
+          is_horizontal: true %>
+      </div>
+      <div class="form-group row ">
+        <%= select_input f, :shipping_tax_id, formatted_list(:tax_class), nil, 
+          description: "Set the tax class to be used for shipping tax.", is_horizontal: true %>
+      </div>
+    </div>
+  </div>
+  <br>
+  <h6 >Default Address</h6>
+  <div class="card">
+    <div class="card-body">
+      <div class="form-group row ">
+        <%= select_input f, :default_country_id, formatted_list(:country), nil, 
+          description: "Set the country to be used for calculating tax if tax is inclusive", 
+          is_horizontal: true %>
+      </div>
+      <div class="form-group row ">
+        <%= select_input f, :default_state_id, formatted_list(:state), nil, description: "Eg. Maharashtra.", is_horizontal: true %>
+      </div>
+    </div>
+  </div>
+  <div class="form-group row stickformbutton">
+  <div class="col-sm-10">
+    <%= submit "Submit", class: "btn btn-primary submit-btn float-right" %>
+  </div>
+  </div>
+<% end %>

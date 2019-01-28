@@ -31,6 +31,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
          state_zone_count: 1
     test "successful with valid params", context do
       %{line_item: line_item, package: package, product: product} = new_package(context)
+
       assert {:ok, _} =
                PackageItem.create(%{
                  @params
@@ -55,9 +56,9 @@ defmodule Snitch.Data.Model.PackageItemTest do
 
   describe "update/2" do
     @tag variant_count: 1,
-           shipping_category_count: 1,
-           shipping_method_count: 1,
-           state_zone_count: 1
+         shipping_category_count: 1,
+         shipping_method_count: 1,
+         state_zone_count: 1
     test "successful with valid params", context do
       %{package_item: package_item} = make_package_item(context)
       params = %{quantity: 95}
@@ -70,7 +71,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
     test "failed for invalid params", context do
       %{package_item: package_item} = make_package_item(context)
       money = Money.new(-1, :USD)
-      updates = %{tax: money }
+      updates = %{tax: money}
       {:error, updated} = PackageItem.update(updates, package_item)
       assert %{tax: ["must be equal or greater than 0"]} == errors_on(updated)
     end
@@ -106,7 +107,6 @@ defmodule Snitch.Data.Model.PackageItemTest do
     end
   end
 
-
   defp new_package(context) do
     %{embedded_shipping_methods: embedded_shipping_methods} = context
 
@@ -127,12 +127,13 @@ defmodule Snitch.Data.Model.PackageItemTest do
         origin: stock_item.stock_location,
         shipping_category: shipping_category
       )
-      %{line_item: line_item, package: package, product: product}
 
+    %{line_item: line_item, package: package, product: product}
   end
 
   defp make_package_item(context) do
     %{line_item: line_item, package: package, product: product} = new_package(context)
+
     package_item =
       insert(:package_item,
         quantity: 3,
@@ -140,6 +141,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
         line_item: line_item,
         package: package
       )
+
     %{package_item: package_item}
   end
 end

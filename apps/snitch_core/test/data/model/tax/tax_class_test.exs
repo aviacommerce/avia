@@ -70,6 +70,14 @@ defmodule Snitch.Data.Model.TaxClasstest do
       assert {:error, message} = TaxClass.delete(tax_class)
       assert message == "can not delete default tax class"
     end
+
+    test "fails if associated with another entity" do
+      tax_config = insert(:tax_config)
+      tax_class_id = tax_config.shipping_tax.id
+
+      assert {:error, message} = TaxClass.delete(tax_class_id)
+      assert message == "Tax class associated with some entity, consider removing the association"
+    end
   end
 
   describe "get/1" do
@@ -86,5 +94,12 @@ defmodule Snitch.Data.Model.TaxClasstest do
       tax_classes = TaxClass.get_all()
       assert length(tax_classes) == 2
     end
+  end
+
+  test "formatted_list/0 returns in format [{tax_class_name, id}]" do
+    insert(:tax_class, name: "Shipping Tax")
+    insert(:tax_class, name: "Product Tax")
+    data = TaxClass.formatted_list()
+    assert [{"Product Tax", _}, {"Shipping Tax", _}] = data
   end
 end
