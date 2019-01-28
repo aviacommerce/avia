@@ -540,4 +540,3 @@ defmodule Snitch.Data.Model.Product do
     from(p in "snitch_products", select: p.upi, where: p.upi == ^upi) |> Repo.one()
   end
 end
-

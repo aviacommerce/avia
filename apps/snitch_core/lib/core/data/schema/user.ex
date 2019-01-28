@@ -5,6 +5,7 @@ defmodule Snitch.Data.Schema.User do
   use Snitch.Data.Schema
   alias Comeonin.Argon2
   alias Snitch.Data.Schema.{Order, Role, WishListItem}
+  import Ecto.Query
 
   @password_min_length 8
   @type t :: %__MODULE__{}
@@ -92,6 +93,7 @@ defmodule Snitch.Data.Schema.User do
       "state" => "deleted",
       "deleted_at" => NaiveDateTime.utc_now()
     }
+
     user
     |> cast(params, [:state, :deleted_at])
   end
@@ -99,12 +101,36 @@ defmodule Snitch.Data.Schema.User do
   @spec common_changeset(Ecto.Changeset.t()) :: Ecto.Changeset.t()
   defp common_changeset(user_changeset) do
     user_changeset
-    |> unique_constraint(:email, message: "This email is already registered")
+    |> unique_constraint(:email, name: :unique_email)
+    |> unique_email_validation()
     |> foreign_key_constraint(:role_id)
     |> validate_confirmation(:password)
     |> validate_length(:password, min: @password_min_length)
     |> validate_format(:email, ~r/@/)
     |> put_pass_hash()
+  end
+
+  defp unique_email_validation(%Ecto.Changeset{} = changeset) do
+    case fetch_change(changeset, :email) do
+      {:ok, email} ->
+        email_user_exists(email, changeset)
+
+      :error ->
+        changeset
+    end
+  end
+
+  defp email_user_exists(email, changeset) do
+    user = from(u in __MODULE__, where: u.state == "active" and u.email == ^email) |> Repo.one()
+
+    case user do
+      nil ->
+        changeset
+
+      user ->
+        changeset
+        |> add_error(:email, "email has already been taken")
+    end
   end
 
   @spec put_pass_hash(Ecto.Changeset.t()) :: Ecto.Changeset.t()

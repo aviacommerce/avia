@@ -19,8 +19,8 @@ defmodule Snitch.Data.Model.User do
   @spec delete(non_neg_integer) :: {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
   def delete(id) do
     with {:ok, %UserSchema{} = user} <- get(id),
-        changeset <- UserSchema.delete_changeset(user) do
-        Repo.update(changeset)
+         changeset <- UserSchema.delete_changeset(user) do
+      Repo.update(changeset)
     else
       _ ->
         {:error, "error deleting user"}
@@ -33,7 +33,7 @@ defmodule Snitch.Data.Model.User do
   end
 
   @spec get_all() :: [UserSchema.t()]
-  def get_all, do: from(u in UserSchema, where: is_nil(u.deleted_at)) |> Repo.all
+  def get_all, do: from(u in UserSchema, where: is_nil(u.deleted_at)) |> Repo.all()
 
   @spec get_username(UserSchema.t()) :: String.t()
   def get_username(user) do
