@@ -34,7 +34,7 @@ defmodule SnitchApi.ProductsContext do
 
         product =
           product
-          |> ProductModel.get_product_with_required_variants([1])
+          |> ProductModel.preload_with_variants_in_state([:active])
           |> Repo.preload(
             reviews: review_query,
             variants: [:images, options: :option_type, theme: [:option_types]],
