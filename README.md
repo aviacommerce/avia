@@ -56,3 +56,48 @@ We are also welcoming to the developers who want to contribute in the developmen
 [gitter]: https://gitter.im/avia-commerce/Lobby
 [aviacommerce]: https://aviacommerce.org
 [contribute]: https://www.aviacommerce.org/docs/how-to-contribute.html
+
+
+### Core Team
+
+<table>
+  <tbody>
+    <tr>
+      <td align="center" width="80" valign="top">
+        <img height="80" width="80" src="https://github.com/ashish173.png?s=128">
+        <br>
+        <a href="https://github.com/ashish173">@ashish173</a>
+      </td>
+      <td align="center" width="80" valign="top">
+        <img height="80" width="80" src="https://github.com/pkrawat1.png?s=128">
+        <br>
+        <a href="https://github.com/pkrawat1">@pkrawat1</a>
+      </td>
+      <td align="center" width="80" valign="top">
+        <img height="80" width="80" src="https://github.com/arjun289.png?s=128">
+        <br>
+        <a href="https://github.com/arjun289">@arjun289</a>
+      </td>
+      <td align="center" width="80" valign="top">
+        <img height="80" width="80" src="https://github.com/sagarkarwande.png?s=128">
+        <br>
+        <a href="https://github.com/sagarkarwande">@sagark</a>
+      </td>
+      <td align="center" width="80" valign="top">
+        <img height="80" width="80" src="https://github.com/oyeb.png?s=128">
+        <br>
+        <a href="https://github.com/oyeb">@oyeb   </a>
+      </td>
+      <td align="center" width="80" valign="top">
+        <img height="80" width="80" src="https://github.com/ramansah.png?s=128">
+        <br>
+        <a href="https://github.com/ramansah">@ramansah</a>
+      </td>
+      <td align="center" width="80" valign="top">
+        <img height="80" width="80" src="https://github.com/jyotigautam.png?s=128">
+        <br>
+        <a href="https://github.com/jyotigautam">@jyotigautam</a>
+      </td>
+     </tr>
+  </tbody>
+</table>
