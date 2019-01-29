@@ -14,7 +14,7 @@ defmodule AdminAppWeb.ShippingPolicyController do
       |> Repo.all()
       |> List.first()
 
-    shipping_category = ScModel.get_with_rules(shipping_category.id)
+    {:ok, shipping_category} = ScModel.get_with_rules(shipping_category.id)
 
     render(conn, "index.html",
       shipping_rules: shipping_category.shipping_rules,
@@ -24,12 +24,12 @@ defmodule AdminAppWeb.ShippingPolicyController do
 
   def edit(conn, %{"id" => id}) do
     case ScModel.get_with_rules(id) do
-      nil ->
+      {:error, _} ->
         conn
         |> put_flash(:error, "Not found")
         |> redirect(to: shipping_policy_path(conn, :new))
 
-      category ->
+      {:ok, category} ->
         render(conn, "edit.html",
           shipping_rules: category.shipping_rules,
           shipping_category: category
@@ -39,7 +39,7 @@ defmodule AdminAppWeb.ShippingPolicyController do
 
   def update(conn, %{"id" => id, "shipping_policy" => shipping_policy}) do
     update_params = shipping_category_params(id, shipping_policy)
-    category = ScModel.get_with_rules(update_params.id)
+    {:ok, category} = ScModel.get_with_rules(update_params.id)
 
     case ScModel.update(update_params, category) do
       {:ok, category} ->

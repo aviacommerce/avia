@@ -12,7 +12,7 @@ defmodule AdminAppWeb.Api.StockController do
   end
 
   def update_stock(conn, params) do
-    with %Product{} = product <- ProductModel.get(params["stock"]["product_id"]),
+    with {:ok, %Product{} = product} <- ProductModel.get(params["stock"]["product_id"]),
          {:ok, stock} <- Inventory.add_stock(product, params["stock"]) do
       render(conn, "stocks.json", %{stocks: [stock]})
     else

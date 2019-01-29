@@ -52,12 +52,12 @@ defmodule AdminAppWeb.PaymentMethodController do
     payment = PaymentMethod.get(String.to_integer(id))
 
     case payment do
-      nil ->
+      {:error, msg} ->
         conn
         |> put_flash(:error, "Sorry method not found")
         |> redirect(to: payment_method_path(conn, :index))
 
-      payment_method ->
+      {:ok, payment_method} ->
         changeset = PaymentMethodSchema.update_changeset(payment_method, %{})
         render(conn, "edit.html", changeset: changeset, payment_method: payment_method)
     end
@@ -65,7 +65,7 @@ defmodule AdminAppWeb.PaymentMethodController do
 
   def update(conn, %{"id" => id, "payment_method" => params}) do
     update_params = handle_payment_code(params)
-    payment_method = PaymentMethod.get(String.to_integer(id))
+    {:ok, payment_method} = PaymentMethod.get(String.to_integer(id))
 
     case PaymentMethod.update(update_params, payment_method) do
       {:ok, _} ->

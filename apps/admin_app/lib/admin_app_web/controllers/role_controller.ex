@@ -38,15 +38,15 @@ defmodule AdminAppWeb.RoleController do
       id
       |> String.to_integer()
       |> Role.get()
-      |> Repo.preload(:permissions)
 
     case role do
-      nil ->
+      {:error, _} ->
         conn
         |> put_flash(:error, "Sorry role not found")
         |> redirect(to: role_path(conn, :index))
 
-      role ->
+      {:ok, role} ->
+        role = role |> Repo.preload(:permissions)
         changeset = RoleSchema.update_changeset(role, %{})
         render(conn, "edit.html", changeset: changeset, role: role)
     end
@@ -56,10 +56,8 @@ defmodule AdminAppWeb.RoleController do
     id = String.to_integer(id)
     params = parse_role_params(role)
 
-    role =
-      id
-      |> Role.get()
-      |> Repo.preload(:permissions)
+    {:ok, role} = Role.get(id)
+    role = role |> Repo.preload(:permissions)
 
     case Role.update(params, role) do
       {:ok, _} ->

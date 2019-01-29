@@ -41,6 +41,9 @@ defmodule Snitch.Demo.Order do
     variants = Product |> Repo.all() |> Enum.take_random(5)
     user = Repo.all(User) |> Enum.random()
 
+    {:ok, state} = State.get(%{code: "US-CA"})
+    {:ok, country} = Country.get(%{iso: "US"})
+
     address = %OrderAddress{
       first_name: user.first_name,
       last_name: user.last_name,
@@ -48,8 +51,8 @@ defmodule Snitch.Demo.Order do
       zip_code: "90265",
       city: "Malibu",
       phone: "1234567890",
-      state_id: State.get(%{code: "US-CA"}).id,
-      country_id: Country.get(%{iso: "US"}).id
+      state_id: state.id,
+      country_id: country.id
     }
 
     digest = [

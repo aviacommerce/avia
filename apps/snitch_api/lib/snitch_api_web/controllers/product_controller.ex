@@ -12,7 +12,7 @@ defmodule SnitchApiWeb.ProductController do
   action_fallback(SnitchApiWeb.FallbackController)
 
   def reviews(conn, %{"id" => id}) do
-    with product when not is_nil(product) <- Product.get(id) do
+    with {:ok, product} <- Product.get(id) do
       reviews =
         product
         |> Repo.preload(reviews: [rating_option_vote: :rating_option])
@@ -30,7 +30,7 @@ defmodule SnitchApiWeb.ProductController do
   def rating_summary(conn, %{"id" => id}) do
     id = String.to_integer(id)
 
-    with product when not is_nil(product) <- Product.get(id) do
+    with {:ok, product} <- Product.get(id) do
       rating_data = ProductReview.review_aggregate(product)
       render(conn, "rating_summary.json-api", data: rating_data, id: id)
     end

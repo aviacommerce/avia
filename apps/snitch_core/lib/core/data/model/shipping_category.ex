@@ -34,10 +34,17 @@ defmodule Snitch.Data.Model.ShippingCategory do
 
   Takes as input `id` of the `shipping_category` to be retrieved.
   """
-  @spec get_with_rules(non_neg_integer) :: ShippingCategory.t() | nil
+  @spec get_with_rules(non_neg_integer) :: {:ok, ShippingCategory.t()} | {:error, atom}
   def get_with_rules(id) do
-    ShippingCategory
-    |> QH.get(id, Repo)
-    |> Repo.preload(shipping_rules: :shipping_rule_identifier)
+    case QH.get(ShippingCategory, id, Repo) do
+      {:ok, shipping_category} ->
+        shipping_category =
+          shipping_category |> Repo.preload(shipping_rules: :shipping_rule_identifier)
+
+        {:ok, shipping_category}
+
+      {:error, msg} ->
+        {:error, msg}
+    end
   end
 end

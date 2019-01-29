@@ -60,10 +60,10 @@ defmodule Snitch.Data.Model.RoleTest do
 
   test "get role" do
     role = insert(:role)
-    assert role_returned = Role.get(role.id)
+    assert {:ok, role_returned} = Role.get(role.id)
     assert role_returned.id == role.id
     assert {:ok, _} = Role.delete(role)
-    assert Role.get(role.id) == nil
+    assert Role.get(role.id) == {:error, :role_not_found}
   end
 
   test "get all roles" do

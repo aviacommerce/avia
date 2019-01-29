@@ -71,7 +71,7 @@ defmodule Snitch.Data.Model.ProductBrand do
 
   Takes Product Brand id as input.
   """
-  @spec get(integer) :: ProductBrand.t() | nil
+  @spec get(integer) :: {:ok, ProductBrand.t()} | {:error, atom}
   def get(id) do
     QH.get(ProductBrand, id, Repo)
   end
@@ -87,11 +87,12 @@ defmodule Snitch.Data.Model.ProductBrand do
   @spec delete(non_neg_integer() | ProductBrand.t()) ::
           {:ok, ProductBrand.t()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
   def delete(id) do
-    with %ProductBrand{} = brand <- get(id) |> Repo.preload(:image),
+    with {:ok, %ProductBrand{} = brand_struct} <- get(id),
+         brand <- brand_struct |> Repo.preload(:image),
          changeset <- ProductBrand.delete_changeset(brand, %{}) do
       delete_product_brand(brand, brand.image, changeset)
     else
-      nil -> {:error, :not_found}
+      {:error, msg} -> {:error, msg}
     end
   end
 

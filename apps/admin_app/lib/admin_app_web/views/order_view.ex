@@ -247,11 +247,15 @@ defmodule AdminAppWeb.OrderView do
   end
 
   def get_country(country_id) do
-    Country.get(country_id)
+    Country.get(country_id) |> get_response
   end
 
   def get_state(state_id) do
-    State.get(state_id)
+    State.get(state_id) |> get_response
+  end
+
+  defp get_response({:ok, struct}) do
+    struct
   end
 
   defp get_state_name(state_id) do

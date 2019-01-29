@@ -23,7 +23,7 @@ defmodule Snitch.Data.Model.StockLocation do
     QH.delete(StockLocationSchema, id_or_instance, Repo)
   end
 
-  @spec get(integer() | map) :: StockLocationSchema.t()
+  @spec get(integer() | map) :: {:ok, StockLocationSchema.t()} | {:error, atom}
   def get(query_fields) do
     QH.get(StockLocationSchema, query_fields, Repo)
   end

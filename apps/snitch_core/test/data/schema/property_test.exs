@@ -10,17 +10,18 @@ defmodule Snitch.Data.Schema.PropertyTest do
 
   describe "create_changeset/2" do
     test "with valid attributes" do
-      %{valid?: validity} =  Property.create_changeset(%Property{}, @valid_attrs)
+      %{valid?: validity} = Property.create_changeset(%Property{}, @valid_attrs)
       assert validity
     end
 
     test "where name and display_name cannot be blank" do
       cs = %{valid?: validity} = Property.create_changeset(%Property{}, %{})
       refute validity
+
       assert %{
-        display_name: ["can't be blank"],
-        name: ["can't be blank"]
-      } == errors_on(cs)
+               display_name: ["can't be blank"],
+               name: ["can't be blank"]
+             } == errors_on(cs)
     end
 
     test "where name must be unique" do
@@ -38,8 +39,8 @@ defmodule Snitch.Data.Schema.PropertyTest do
       [
         property:
           %Property{}
-            |> Property.create_changeset(@valid_attrs)
-            |> apply_changes()
+          |> Property.create_changeset(@valid_attrs)
+          |> apply_changes()
       ]
     end
 
@@ -53,10 +54,11 @@ defmodule Snitch.Data.Schema.PropertyTest do
       params = %{name: "", display_name: ""}
       cs = %{valid?: validity} = Property.update_changeset(property, params)
       refute validity
+
       assert %{
-                name: ["can't be blank"],
-                display_name: ["can't be blank"]
-      } == errors_on(cs)
+               name: ["can't be blank"],
+               display_name: ["can't be blank"]
+             } == errors_on(cs)
     end
 
     test "where name must be unique", %{property: property} do
@@ -65,7 +67,7 @@ defmodule Snitch.Data.Schema.PropertyTest do
       assert {:ok, _} = Repo.insert(changeset)
 
       params = %{name: "material", display_name: "Material"}
-      changeset =  Property.update_changeset(property, params)
+      changeset = Property.update_changeset(property, params)
       assert {:error, cs} = Repo.insert(changeset)
       assert %{name: ["has already been taken"]} = errors_on(cs)
     end

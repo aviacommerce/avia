@@ -35,7 +35,7 @@ defmodule Snitch.Data.Model.Property do
 
   Takes Property id as input
   """
-  @spec get(integer) :: Property.t() | nil
+  @spec get(integer) :: {:ok, Property.t()} | {:error, atom}
   def get(id) do
     QH.get(Property, id, Repo)
   end

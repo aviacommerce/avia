@@ -27,7 +27,7 @@ defmodule AdminAppWeb.PropertyController do
 
   def edit(conn, %{"id" => id}) do
     with {id, _} <- Integer.parse(id),
-         %PropertySchema{} = property <- PropertyModel.get(id) do
+         {:ok, %PropertySchema{} = property} <- PropertyModel.get(id) do
       changeset = PropertySchema.update_changeset(property, %{})
       render(conn, "edit.html", changeset: changeset)
     else
@@ -40,7 +40,7 @@ defmodule AdminAppWeb.PropertyController do
 
   def update(conn, %{"id" => id, "property" => params}) do
     with {id, _} <- Integer.parse(id),
-         property <- PropertyModel.get(id),
+         {:ok, property} <- PropertyModel.get(id),
          {:ok, _} <- PropertyModel.update(property, params) do
       properties = PropertyModel.get_all()
       render(conn, "index.html", %{properties: properties})

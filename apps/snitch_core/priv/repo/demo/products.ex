@@ -17,6 +17,7 @@ defmodule Snitch.Demo.Product do
   alias Snitch.Domain.Taxonomy
   alias Snitch.Tools.Helper.ImageUploader
   alias Snitch.Data.Model.Image, as: ImageModel
+  alias Snitch.Data.Model.Product, as: ProductModel
 
   @base_path Application.app_dir(:snitch_core, "priv/repo/demo/demo_data")
 
@@ -166,6 +167,7 @@ defmodule Snitch.Demo.Product do
     }
 
     product = %Product{} |> Product.create_changeset(params) |> Repo.insert!()
+    {:ok, product} = ProductModel.update(product, %{state: :active})
     associate_image(product, image, image_name)
   end
 

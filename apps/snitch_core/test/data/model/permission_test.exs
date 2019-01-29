@@ -37,10 +37,10 @@ defmodule Snitch.Data.Model.PermissionTest do
 
   test "get permission" do
     permission = insert(:permission)
-    assert permission_returned = Permission.get(permission.id)
+    assert {:ok, permission_returned} = Permission.get(permission.id)
     assert permission_returned == permission
     assert {:ok, _} = Permission.delete(permission.id)
-    assert Permission.get(permission.id) == nil
+    assert Permission.get(permission.id) == {:error, :permission_not_found}
   end
 
   test "get all permissions" do

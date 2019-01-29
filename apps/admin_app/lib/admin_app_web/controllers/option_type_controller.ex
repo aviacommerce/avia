@@ -26,7 +26,7 @@ defmodule AdminAppWeb.OptionTypeController do
 
   def edit(conn, %{"id" => id}) do
     with {id, _} <- Integer.parse(id),
-         %OTSchema{} = option_type <- OTModel.get(id) do
+         {:ok, %OTSchema{} = option_type} <- OTModel.get(id) do
       changeset = OTSchema.update_changeset(option_type, %{})
       render(conn, "edit.html", changeset: changeset)
     else
@@ -39,7 +39,7 @@ defmodule AdminAppWeb.OptionTypeController do
 
   def update(conn, %{"id" => id, "option_type" => params}) do
     with {id, _} <- Integer.parse(id),
-         option_type <- OTModel.get(id),
+         {:ok, option_type} <- OTModel.get(id),
          {:ok, _} <- OTModel.update(option_type, params) do
       option_types = OTModel.get_all()
       render(conn, "index.html", %{option_types: option_types})
@@ -57,11 +57,17 @@ defmodule AdminAppWeb.OptionTypeController do
 
   def delete(conn, %{"id" => id}) do
     with {id, _} <- Integer.parse(id),
+         false <- OTModel.is_theme_associated(id),
          {:ok, option_type} <- OTModel.delete(id) do
       conn
       |> put_flash(:info, "Option type #{option_type.name} deleted successfully")
       |> redirect(to: option_type_path(conn, :index))
     else
+      true ->
+        conn
+        |> put_flash(:error, "Option type associated to variation theme. Deletion not allowed")
+        |> redirect(to: option_type_path(conn, :index))
+
       {:error, _} ->
         conn
         |> put_flash(:error, "Failed to delete option type")

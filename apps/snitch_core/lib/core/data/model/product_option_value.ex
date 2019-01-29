@@ -21,7 +21,7 @@ defmodule Snitch.Data.Model.ProductOptionValue do
 
   Takes Product Option Value id as input
   """
-  @spec get(integer) :: ProductOptionValue.t() | nil
+  @spec get(integer) :: {:ok, ProductOptionValue.t()} | {:error, atom}
   def get(id) do
     QH.get(ProductOptionValue, id, Repo)
   end

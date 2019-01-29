@@ -72,12 +72,12 @@ defmodule SnitchApiWeb.AddressController do
 
   def country_states(conn, %{"id" => country_id}) do
     case Country.get(country_id) do
-      nil ->
+      {:error, msg} ->
         conn
-        |> put_status(:not_found)
+        |> put_status(msg)
         |> render(SnitchApiWeb.ErrorView, :"404")
 
-      country ->
+      {:ok, country} ->
         country_with_states = Repo.preload(country, :states)
 
         render(

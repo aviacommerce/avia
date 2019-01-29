@@ -1,0 +1,18 @@
+<li class="list-group-item d-flex justify-content-between align-items-center" id='<%= "tax_class_#{@tax_class.id}"%>'>
+<%= @tax_class.name %>
+  <%= unless @tax_class.is_default do %>
+    <div class="col-1">
+      <div class="dropdown col-12 p-0 float-right options-container">
+        <a class="p-2 dropdown-toggle options" href="#" role="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-cog"></i>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right" >
+          <%= link("Edit", to: tax_class_path(@conn, :edit, @tax_class.id), 
+            class: "dropdown-item", id: "edit-class-button") %>
+          <%= link("Delete", to: tax_class_path(@conn, :delete, @tax_class.id),
+              method: :delete, data: [confirm: "Are you sure to delete"], class: "dropdown-item") %>
+        </div>
+      </div>
+    </div>
+<% end %>
+</li>

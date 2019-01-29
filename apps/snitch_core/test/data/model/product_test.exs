@@ -2,10 +2,13 @@ defmodule Snitch.Data.Model.ProductTest do
   use ExUnit.Case
   use Snitch.DataCase
   import Snitch.Factory
+  import Mock
   alias Snitch.Data.Model.Product
+  alias Snitch.Tools.GenNanoid
   alias Snitch.Data.Schema.Product, as: ProductSchema
   alias Snitch.Data.Schema.{Variation, Image}
   alias Snitch.Tools.Helper.Taxonomy
+  alias NanoidMock
   alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
   alias Snitch.Repo
 
@@ -85,10 +88,10 @@ defmodule Snitch.Data.Model.ProductTest do
 
   describe "get" do
     test "product", %{valid_attrs: va} do
-      assert product_returned = Product.get(va.product_id)
+      assert {:ok, product_returned} = Product.get(va.product_id)
       assert product_returned.id == va.product_id
       assert {:ok, _} = Product.delete(va.product_id)
-      product_deleted = Product.get(va.product_id)
+      {:ok, product_deleted} = Product.get(va.product_id)
       assert product_deleted.state == :deleted
     end
 
@@ -135,7 +138,7 @@ defmodule Snitch.Data.Model.ProductTest do
     test "products with name, state, slug" do
       product = insert(:product)
 
-      assert product_returned =
+      assert {:ok, product_returned} =
                Product.get(%{
                  state: product.state,
                  name: product.name,
@@ -152,21 +155,18 @@ defmodule Snitch.Data.Model.ProductTest do
     end
   end
 
-  describe "upi generation for a product" do
-    setup do
-      product = insert(:product)
-      [product: product]
-    end
+  test "upi generation for a product", %{valid_params: vp} do
+    with_mock GenNanoid, gen_nano_id: fn -> NanoidMock.gen_nano_id() end do
+      NanoidMock.start_link(0)
 
-    test "if no matching upi exists", %{product: product, valid_params: vp} do
-      {:ok, %ProductSchema{} = new_product} = Product.create(vp)
-      refute product.upi == new_product.upi
-    end
+      {:ok, product1} = Product.create(vp)
+      vp = %{vp | name: "latest test product"}
+      {:ok, product2} = Product.create(vp)
 
-    test "if a product with generated upi exists", %{product: product} do
-      assert_raise Ecto.ConstraintError, fn ->
-        insert(:product, %{upi: product.upi})
-      end
+      assert product1.upi == "A0C"
+      refute product1.upi == product2.upi
+
+      NanoidMock.stop()
     end
   end
 
@@ -301,12 +301,12 @@ defmodule Snitch.Data.Model.ProductTest do
       assert {:ok, _} = Product.delete(product.id)
 
       product_returned = Repo.get(ProductSchema, product.id)
-      assert product_returned != nil
+      refute product_returned == nil
       assert product_returned.state == :deleted
     end
 
     test "fails product not found" do
-      assert Product.delete(-1) == nil
+      assert Product.delete(-1) == {:error, :product_not_found}
     end
   end
 
@@ -449,7 +449,7 @@ defmodule Snitch.Data.Model.ProductTest do
       {:ok, _} = Product.delete_by_category(casual_shirt)
 
       products_by_category = Product.get_products_by_category(casual_shirt.id)
-      deleted_products = products_ids |> Enum.map(&Product.get/1)
+      deleted_products = products_ids |> Enum.map(&get_product(Product.get(&1)))
 
       assert length(products_by_category) == 0
 
@@ -459,6 +459,10 @@ defmodule Snitch.Data.Model.ProductTest do
         assert product.taxon_id == nil
       end)
     end
+  end
+
+  defp get_product({:ok, product}) do
+    product
   end
 
   describe "has_variants?/1" do

@@ -38,7 +38,7 @@ defmodule SnitchApi.Payment.HostedPayment do
   end
 
   def get_payment_preferences(payment_method_id) do
-    payment_method = PaymentMethod.get(payment_method_id)
+    {:ok, payment_method} = PaymentMethod.get(payment_method_id)
     credentials = payment_method.preferences()
     live_mode = payment_method.live_mode?
     %{credentials: credentials, live_mode: live_mode}
@@ -62,11 +62,12 @@ defmodule SnitchApi.Payment.HostedPayment do
 
     with {:ok, %{hosted_payment: hosted_payment}} <-
            HostedPayment.update(hosted_payment, hosted_params, payment_params),
-         order <- Order.get(order_id) |> Repo.preload(:user) do
-      payment = Payment.get(hosted_payment.payment_id)
+         {:ok, order} <- Order.get(order_id) do
+      order = order |> Repo.preload(:user)
+      {:ok, payment} = Payment.get(hosted_payment.payment_id)
       {:ok, order, payment}
     else
-      nil -> {:error, "Order not found"}
+      {:error, :order_not_found} -> {:error, "Order not found"}
       {:error, _} -> {:error, "some error occured"}
     end
   end

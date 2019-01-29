@@ -123,6 +123,16 @@ defmodule AdminAppWeb.Router do
     post("/promo-action-prefs", PromotionController, :action_preferences, as: :promo_action_prefs)
     post("/promo-calc-prefs", PromotionController, :calc_preferences, as: :promo_calc_prefs)
     put("/promo/:id/archive", PromotionController, :archive)
+
+    ### tax
+    get("/tax", Tax.TaxConfigController, :index)
+    put("/tax/:id", Tax.TaxConfigController, :update)
+    get("/tax/tax-classes", Tax.TaxClassController, :index)
+    get("/tax/tax-classes/new", Tax.TaxClassController, :new)
+    get("/tax/tax-classes/:id/edit", Tax.TaxClassController, :edit)
+    post("/tax/tax-classes/new", Tax.TaxClassController, :create)
+    put("/tax/tax-classes/:id", Tax.TaxClassController, :update)
+    delete("/tax/tax-classes/:id", Tax.TaxClassController, :delete)
   end
 
   scope "/", AdminAppWeb do

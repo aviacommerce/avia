@@ -99,9 +99,16 @@ defmodule Snitch.Data.Model.Promotion do
     QH.update(Promotion, params, promotion, Repo)
   end
 
-  @spec get(map) :: Promotion.t() | nil
+  @spec get(map) :: {:ok, Promotion.t()} | {:error, atom}
   def get(query_fields) do
-    Promotion |> QH.get(query_fields, Repo) |> Repo.preload([:actions, :rules])
+    case Promotion |> QH.get(query_fields, Repo) do
+      {:ok, promotion} ->
+        promotion = promotion |> Repo.preload([:actions, :rules])
+        {:ok, promotion}
+
+      {:error, msg} ->
+        {:error, msg}
+    end
   end
 
   @doc """

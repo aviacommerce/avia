@@ -43,7 +43,7 @@ defmodule AdminAppWeb.OrderController do
   end
 
   def show(conn, %{"number" => _number} = params) do
-    with %OrderSchema{} = order <- OrderContext.get_order(params),
+    with {:ok, %OrderSchema{} = order} <- OrderContext.get_order(params),
          order_total = OrderContext.get_total(order) do
       render(
         conn,
@@ -52,7 +52,7 @@ defmodule AdminAppWeb.OrderController do
         order_total: order_total
       )
     else
-      nil ->
+      {:error, _} ->
         conn
         |> put_flash(:error, "No such order exists with given number")
         |> redirect(to: dashboard_path(conn, :index))
@@ -60,7 +60,7 @@ defmodule AdminAppWeb.OrderController do
   end
 
   def update_package(conn, %{"id" => id, "state" => state}) do
-    order = OrderContext.get_order(%{"id" => id})
+    {:ok, order} = OrderContext.get_order(%{"id" => id})
 
     case PackageContext.update_packages(state, String.to_integer(id)) do
       {:ok, _} ->
@@ -77,7 +77,7 @@ defmodule AdminAppWeb.OrderController do
   end
 
   def update_state(conn, %{"id" => id, "state" => state}) do
-    order = OrderContext.get_order(%{"id" => id})
+    {:ok, order} = OrderContext.get_order(%{"id" => id})
 
     case OrderContext.state_transition(state, order) do
       {:ok, message} ->
@@ -93,7 +93,7 @@ defmodule AdminAppWeb.OrderController do
   end
 
   def cod_payment_update(conn, %{"id" => id, "state" => state}) do
-    order = OrderContext.get_order(%{"id" => id})
+    {:ok, order} = OrderContext.get_order(%{"id" => id})
 
     case OrderContext.update_cod_payment(order, state) do
       {:ok, _} ->
@@ -326,8 +326,9 @@ defmodule AdminAppWeb.OrderController do
   end
 
   defp load_order(order) do
+    {:ok, order} = order |> Order.get()
+
     order
-    |> Order.get()
     |> Repo.preload([
       [line_items: :product],
       [packages: [:items, :shipping_method]],

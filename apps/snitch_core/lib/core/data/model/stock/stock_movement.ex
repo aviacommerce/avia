@@ -18,7 +18,7 @@ defmodule Snitch.Data.Model.StockMovement do
     )
   end
 
-  @spec get(non_neg_integer | map) :: StockMovementSchema.t()
+  @spec get(non_neg_integer | map) :: {:ok, StockMovementSchema.t()} | {:error, atom}
   def get(query_fields) do
     QH.get(StockMovementSchema, query_fields, Repo)
   end
