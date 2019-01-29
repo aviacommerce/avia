@@ -90,8 +90,8 @@ defmodule Snitch.Data.Schema.User do
 
   def delete_changeset(user, _params \\ %{}) do
     params = %{
-      "state" => "deleted",
-      "deleted_at" => NaiveDateTime.utc_now()
+      state: :deleted,
+      deleted_at: NaiveDateTime.utc_now()
     }
 
     user
@@ -121,7 +121,7 @@ defmodule Snitch.Data.Schema.User do
   end
 
   defp email_user_exists(email, changeset) do
-    user = from(u in __MODULE__, where: u.state == "active" and u.email == ^email) |> Repo.one()
+    user = from(u in __MODULE__, where: u.state == ^:active and u.email == ^email) |> Repo.one()
 
     case user do
       nil ->
@@ -129,7 +129,7 @@ defmodule Snitch.Data.Schema.User do
 
       user ->
         changeset
-        |> add_error(:email, "email has already been taken")
+        |> add_error(:email, "Email already in use")
     end
   end
 
