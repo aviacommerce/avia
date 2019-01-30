@@ -5,7 +5,9 @@ defmodule Snitch.Factory.Tax do
     quote do
       alias Snitch.Data.Schema.{
         TaxClass,
-        TaxConfig
+        TaxConfig,
+        TaxZone,
+        TaxRate
       }
 
       def tax_class_factory() do
@@ -25,6 +27,23 @@ defmodule Snitch.Factory.Tax do
           gift_tax: build(:tax_class),
           default_country: build(:country),
           default_state: build(:state)
+        }
+      end
+
+      def tax_zone_factory() do
+        %TaxZone{
+          name: sequence(:tax_zone_name, fn id -> "taxzone_#{id}" end),
+          is_active?: false,
+          zone: build(:zone)
+        }
+      end
+
+      def tax_rate_factory() do
+        %TaxRate{
+          name: sequence(:tax_rate_name, fn id -> "taxrate_#{id}" end),
+          tax_zone: build(:tax_zone),
+          is_active?: true,
+          priority: 0
         }
       end
     end
