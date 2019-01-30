@@ -3,11 +3,15 @@ defmodule Snitch.Data.Model.StateZoneTest do
   use Snitch.DataCase
 
   import Snitch.Factory
+  import Ecto.Query
 
+  alias Ecto.Query
   alias Snitch.Data.Model.StateZone
   alias Snitch.Data.Schema.{StateZoneMember, Zone}
 
   setup :states
+  setup :state_zone
+  setup :zones
 
   @tag state_count: 3
   describe "create/3 and member_ids" do
@@ -81,6 +85,69 @@ defmodule Snitch.Data.Model.StateZoneTest do
 
       assert errors == [state_id: {"does not exist", []}]
       assert old_state_ids == StateZone.member_ids(updated_zone)
+    end
+  end
+
+  describe "get/1" do
+    test "zone with id", %{zone: zone} do
+      {:ok, new_zone} = StateZone.get(zone.id)
+      assert new_zone.id == zone.id
+    end
+  end
+
+  describe "get_all/0" do
+    @tag state_zone_count: 3,
+         country_zone_count: 3
+    test "zones  successfully", %{zones: zone} do
+      state_zones = StateZone.get_all()
+      sz = Enum.drop_while(state_zones, fn x -> x.zone_type == "S" end)
+      assert sz == []
+    end
+  end
+
+  describe "member_changesets/2" do
+    test "successfully returns a CountryZoneMember changeset", %{zone: zone, states: states} do
+      state_ids = Enum.map(states, &Map.get(&1, :id))
+      stream = StateZone.member_changesets(state_ids, zone)
+      changeset = Enum.find_value(stream, fn x -> x end)
+      assert changeset.valid?
+    end
+  end
+
+  describe "remove_members_query/2" do
+    @tag state_zone_count: 3
+    test "returns a query successfully", %{zone: zone, states: states} do
+      state_ids = Enum.map(states, &Map.get(&1, :id))
+
+      expected =
+        Query.from(c in StateZoneMember,
+          where: c.state_id in ^state_ids and c.zone_id == ^zone.id
+        )
+
+      result = StateZone.remove_members_query(state_ids, zone)
+
+      assert inspect(result) == inspect(expected)
+    end
+  end
+
+  describe "common_zone_query/2" do
+    @tag state_count: 2
+    test "returns a query successfully", %{states: states} do
+      [state_a_id, state_b_id] = Enum.map(states, fn x -> x.id end)
+
+      expected =
+        Query.from(c0 in StateZoneMember,
+          join: c1 in StateZoneMember,
+          on: true,
+          join: z in Zone,
+          on: c0.zone_id == c1.zone_id and c0.zone_id == z.id,
+          where: c0.state_id == ^state_a_id and c1.state_id == ^state_b_id,
+          select: z
+        )
+
+      result = StateZone.common_zone_query(state_a_id, state_b_id)
+
+      assert inspect(result) == inspect(expected)
     end
   end
 
