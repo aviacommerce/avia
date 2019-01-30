@@ -19,7 +19,7 @@ defmodule Snitch.Seed.Users do
       user("Harry", "Potter", "admin@aviacommerce.com", @admin_passwd, true, admin_role.id)
     ]
 
-    Repo.insert_all(User, users, on_conflict: :nothing, conflict_target: [:email])
+    Repo.insert_all(User, users, on_conflict: :nothing, conflict_target: [:email, :deleted_at])
     Logger.info("Inserted #{length(users)} users.")
   end
 

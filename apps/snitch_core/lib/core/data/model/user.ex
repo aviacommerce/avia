@@ -4,6 +4,7 @@ defmodule Snitch.Data.Model.User do
   """
   use Snitch.Data.Model
   alias Snitch.Data.Schema.User, as: UserSchema
+  import Ecto.Query
 
   @spec create(map) :: {:ok, UserSchema.t()} | {:error, Ecto.Changeset.t()}
   def create(query_fields) do
@@ -17,10 +18,9 @@ defmodule Snitch.Data.Model.User do
 
   @spec delete(non_neg_integer) :: {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
   def delete(id) do
-    with {:ok, %UserSchema{} = user_struct} <- get(id),
-         user <- user_struct |> Repo.preload(:orders),
-         {:ok, _} = delete_response <- UserSchema.delete_changeset(user, %{}) |> Repo.delete() do
-      delete_response
+    with {:ok, %UserSchema{} = user} <- get(id),
+         changeset <- UserSchema.delete_changeset(user) do
+      Repo.update(changeset)
     else
       _ ->
         {:error, "error deleting user"}
@@ -33,7 +33,7 @@ defmodule Snitch.Data.Model.User do
   end
 
   @spec get_all() :: [UserSchema.t()]
-  def get_all, do: Repo.all(UserSchema)
+  def get_all, do: from(u in UserSchema, where: is_nil(u.deleted_at)) |> Repo.all()
 
   @spec get_username(UserSchema.t()) :: String.t()
   def get_username(user) do
