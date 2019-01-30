@@ -2,6 +2,7 @@ defmodule SnitchApi.ProductsContext do
   @moduledoc """
   The JSON-API context.
   """
+  alias Snitch.Data.Model.Product, as: ProductModel
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.{Product, Review}
   alias Snitch.Tools.ElasticSearch.Product.Search, as: ProductSearch
@@ -24,15 +25,16 @@ defmodule SnitchApi.ProductsContext do
   """
   @spec product_by_slug(String.t()) :: map
   def product_by_slug(slug) do
-    case Repo.get_by(Product, slug: slug) do
-      nil ->
+    case ProductModel.get(%{slug: slug}) do
+      {:error, _} ->
         {:error, :not_found}
 
-      product ->
+      {:ok, product} ->
         review_query = from(c in Review, limit: 5, preload: [rating_option_vote: :rating_option])
 
         product =
           product
+          |> ProductModel.preload_with_variants_in_state([:active])
           |> Repo.preload(
             reviews: review_query,
             variants: [:images, options: :option_type, theme: [:option_types]],

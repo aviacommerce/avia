@@ -1,56 +1,84 @@
 defmodule Snitch.Data.Schema.ProductPropertyTest do
   use ExUnit.Case, async: true
-  import Snitch.Factory
   use Snitch.DataCase
+
+  import Snitch.Factory
+
   alias Snitch.Data.Schema.ProductProperty
 
   setup do
-    product = insert(:product)
-    property = insert(:property)
+    product_property = insert(:product_property)
 
-    valid_attrs = %{
-      product_id: product.id,
-      property_id: property.id,
-      value: "val"
+    params = %{
+      product_id: product_property.product_id,
+      property_id: product_property.property_id,
+      value: product_property.value
     }
 
-    invalid_attrs = %{
-      product_id: "",
-      property_id: "",
-      val: ""
-    }
-
-    [valid_attrs: valid_attrs, invalid_attrs: invalid_attrs]
+    [params: params, product_property: product_property]
   end
 
-  test "create successfully", %{valid_attrs: va} do
-    %{valid?: validity} = ProductProperty.create_changeset(%ProductProperty{}, va)
-    assert validity
+  describe "create_changeset/2" do
+    test "successfully with valid params", %{params: params} do
+      cs = ProductProperty.create_changeset(%ProductProperty{}, params)
+      assert cs.valid?
+    end
+
+    test "fails with invalid params" do
+      cs = ProductProperty.create_changeset(%ProductProperty{}, %{})
+      refute cs.valid?
+
+      assert %{
+               product_id: ["can't be blank"],
+               property_id: ["can't be blank"],
+               value: ["can't be blank"]
+             } == errors_on(cs)
+    end
+
+    test "fails for duplicate product_id", %{params: params} do
+      cs = ProductProperty.create_changeset(%ProductProperty{}, params)
+      {:error, changeset} = Repo.insert(cs)
+      assert %{property_id: ["has already been taken"]} == errors_on(changeset)
+    end
+
+    test "fails for non-existent product_id" do
+      params = %{
+        product_id: -1,
+        property_id: 1,
+        value: "val"
+      }
+
+      cs = ProductProperty.create_changeset(%ProductProperty{}, params)
+      {:error, changeset} = Repo.insert(cs)
+      assert %{product_id: ["does not exist"]} == errors_on(changeset)
+    end
+
+    test "fails for non-existent property_id", %{params: params} do
+      params = %{
+        product_id: params.product_id,
+        property_id: -1,
+        value: "val"
+      }
+
+      cs = ProductProperty.create_changeset(%ProductProperty{}, params)
+      {:error, changeset} = Repo.insert(cs)
+      assert %{property_id: ["does not exist"]} == errors_on(changeset)
+    end
   end
 
-  test "create unsuccessful if name empty", %{invalid_attrs: iva} do
-    %{valid?: validity} = ProductProperty.create_changeset(%ProductProperty{}, iva)
-    refute validity
-  end
+  describe "update_changeset/2" do
+    test "successfully with valid params", %{product_property: product_property} do
+      params = %{value: "val"}
+      updated_changeset = ProductProperty.update_changeset(product_property, params)
+      assert updated_changeset.valid?
+    end
 
-  test "update successfully", %{valid_attrs: va} do
-    cset = %{valid?: validity} = ProductProperty.create_changeset(%ProductProperty{}, va)
-    assert validity
-    assert {:ok, product_property} = Repo.insert(cset)
+    test "fails for invalid params", %{product_property: product_property} do
+      params = %{property_id: nil, value: ""}
+      updated_changeset = ProductProperty.update_changeset(product_property, params)
 
-    params = %{value: "new value"}
-    cset = ProductProperty.update_changeset(product_property, params)
-    assert {:ok, new_product_property} = Repo.update(cset)
-    assert new_product_property.value != product_property.value
-  end
-
-  test "update unsuccessful", %{valid_attrs: va, invalid_attrs: iva} do
-    cset = %{valid?: validity} = ProductProperty.create_changeset(%ProductProperty{}, va)
-    assert validity
-    assert {:ok, product_property} = Repo.insert(cset)
-
-    cset = %{valid?: update_validity} = ProductProperty.update_changeset(product_property, iva)
-    refute update_validity
-    assert {:error, _} = Repo.update(cset)
+      assert %{property_id: ["can't be blank"], value: ["can't be blank"]} ==
+               errors_on(updated_changeset)
+    end
   end
 end

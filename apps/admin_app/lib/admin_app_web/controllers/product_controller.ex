@@ -41,7 +41,7 @@ defmodule AdminAppWeb.ProductController do
     if params["rummage"] do
       products =
         ProductModel.get_rummage_product_list(params["rummage"])
-        |> Enum.map(fn product -> ProductModel.get_product_with_present_variants(product) end)
+        |> Enum.map(fn product -> ProductModel.preload_with_variants_in_state(product) end)
         |> Repo.preload([:images, [variants: :images]])
 
       render(conn, "index.html", products: products)

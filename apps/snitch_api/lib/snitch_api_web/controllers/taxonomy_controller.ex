@@ -14,7 +14,7 @@ defmodule SnitchApiWeb.TaxonomyController do
   def index(conn, _params) do
     taxonomy =
       Cache.get(
-        current_url(conn),
+        conn.host <> conn.request_path,
         {
           fn -> TaxonomyDomain.get_all_taxonomy() end,
           []
