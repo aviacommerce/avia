@@ -42,7 +42,7 @@ defmodule SnitchApiWeb.ProductController do
   def index(conn, params) do
     {products, page, aggregations, total} =
       Cache.get(
-        current_url(conn),
+        conn.host <> conn.request_path <> conn.query_string,
         {
           fn conn, params -> Context.list_products(conn, params) end,
           [conn, params]
@@ -83,7 +83,7 @@ defmodule SnitchApiWeb.ProductController do
   def suggest(conn, %{"q" => term}) do
     suggestions =
       Cache.get(
-        current_url(conn),
+        conn.host <> conn.request_path <> conn.query_string,
         {
           fn term -> Context.suggest(term) end,
           [term]
