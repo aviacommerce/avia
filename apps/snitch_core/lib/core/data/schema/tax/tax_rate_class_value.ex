@@ -8,6 +8,7 @@ defmodule Snitch.Data.Schema.TaxRateClassValue do
 
   use Snitch.Data.Schema
   alias Snitch.Data.Schema.{TaxRate, TaxClass}
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   schema "snitch_tax_rate_class_values" do
     field(:percent_amount, :integer, default: 0)
@@ -28,5 +29,21 @@ defmodule Snitch.Data.Schema.TaxRateClassValue do
     |> foreign_key_constraint(:tax_rate_id)
     |> foreign_key_constraint(:tax_class_id)
     |> unique_constraint(:tax_rate_id, name: :unique_tax_rate_class_value)
+    |> add_tax_class_data()
+  end
+
+  defp add_tax_class_data(changeset) do
+    with {:ok, tax_class_id} <- fetch_change(changeset, :tax_class_id) do
+      data = %{
+        changeset.data
+        | tax_class: Repo.get(TaxClass, tax_class_id),
+          tax_class_id: tax_class_id
+      }
+
+      %{changeset | data: data}
+    else
+      _ ->
+        changeset
+    end
   end
 end

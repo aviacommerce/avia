@@ -27,7 +27,8 @@ alias Snitch.Seed.{
   Product,
   StockLocation,
   ProductRating,
-  ShippingRules
+  ShippingRules,
+  Tax
 }
 
 alias Snitch.Tools.Helper.Taxonomy, as: TaxonomyHelper
@@ -77,3 +78,4 @@ StockLocation.seed!()
 ProductRating.seed()
 
 TaxonomyHelper.create_taxonomy({"Category", []})
+Tax.seed()

@@ -2,14 +2,18 @@ defmodule Snitch.Data.Schema.TaxZone do
   @moduledoc """
   Models a Tax Zone.
 
-  Tax zone plays an important role in tax calculation.
+  Tax tax_zone plays an important role in tax calculation.
   The `address` for which tax needs to be calculated is evaluated against the
   tax zone which best encompasses the address.
+  A tax zone can be of the type country or state depending on the zone it is
+  associated with.
+  ### See
+    `Snitch.Data.Schema.Zone`
 
   > The address depends on the type of address set under `calculation_address_type`
   in tax_configuration table. See `Snitch.Data.Schema.TaxConfig`
 
-  A zone has multiple tax rates which are then used to calculate the tax for the
+  A tax zone has multiple tax rates which are then used to calculate the tax for the
   order.
   """
 
@@ -75,8 +79,8 @@ defmodule Snitch.Data.Schema.TaxZone do
     |> tax_zone_exclusivity()
   end
 
-  # Runs a check for mutual exclusivity with other tax zones so that, no two tax zone have common
-  # members(country, state depending on the zone type).
+  # Runs a check for mutual exclusivity with other tax zones so that, no two
+  # tax zones can have common members(country, state depending on the zone type).
   defp tax_zone_exclusivity(%Ecto.Changeset{valid?: true} = changeset) do
     with {:ok, zone_id} <- fetch_change(changeset, :zone_id),
          zone when not is_nil(zone) <- ZoneModel.get(zone_id),
@@ -96,6 +100,12 @@ defmodule Snitch.Data.Schema.TaxZone do
 
   defp tax_zone_exclusivity(%Ecto.Changeset{valid?: false} = changeset), do: changeset
 
+  # Runs an exclusivity check for a tax zone of type state identified by "S".
+  # A tax zone of type state can only be associated with a zone which does
+  # not have states common with another zone which is already associated with
+  # a different tax zone.
+  # The tax_zone type would be inferred from the type of zone it is being associated
+  # with.
   defp verify_exclusivity(zone, "S") do
     zone_members_set = zone_members_set(zone)
     tax_zone_state_set = tax_zone_set(:state)
@@ -109,6 +119,10 @@ defmodule Snitch.Data.Schema.TaxZone do
     end
   end
 
+  # Runs an exclusivity check for a tax zone of type country identified by "C".
+  # A tax zone of type country can only be associated with a zone which does
+  # not have countries common with another zone which is already associated with
+  # a different tax zone.
   defp verify_exclusivity(zone, "C") do
     zone_members_set = zone_members_set(zone)
     tax_zone_country_set = tax_zone_set(:country)
