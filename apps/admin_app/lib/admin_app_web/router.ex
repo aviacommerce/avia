@@ -10,6 +10,15 @@ defmodule AdminAppWeb.Router do
     plug(:put_secure_browser_headers)
   end
 
+  defp put_user_token(conn, _) do
+    if current_user = conn.assigns[:current_user] do
+      token = Phoenix.Token.sign(conn, "user socket", current_user.id)
+      assign(conn, :user_token, token)
+    else
+      conn
+    end
+  end
+
   # This pipeline is just to avoid CSRF token.
   # TODO: This needs to be remove when the token issue gets fixed in custom form
   pipeline :avoid_csrf do
@@ -25,6 +34,8 @@ defmodule AdminAppWeb.Router do
 
   pipeline :authentication do
     plug(AdminAppWeb.AuthenticationPipe)
+    plug(Auth.CurrentUser)
+    plug(:put_user_token)
   end
 
   scope "/", AdminAppWeb do

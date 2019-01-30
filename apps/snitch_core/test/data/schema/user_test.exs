@@ -2,6 +2,7 @@ defmodule Snitch.Data.Schema.UserTest do
   use ExUnit.Case
   use Snitch.DataCase
 
+  import Snitch.Factory
   import Ecto.Changeset, only: [apply_changes: 1]
 
   alias Snitch.Data.Schema.User
@@ -33,6 +34,15 @@ defmodule Snitch.Data.Schema.UserTest do
       cs = %{valid?: validity} = User.create_changeset(%User{}, params)
       refute validity
       assert %{email: ["has invalid format"]} = errors_on(cs)
+    end
+
+    test "if an email is already taken" do
+      user = insert(:user)
+      params = Map.update!(@valid_attrs, :email, fn _ -> user.email end)
+
+      cs = %{valid?: validity} = User.create_changeset(%User{}, params)
+      refute validity
+      assert %{email: ["Email already in use"]} = errors_on(cs)
     end
 
     test "password is stored as hash" do
