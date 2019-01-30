@@ -164,6 +164,18 @@ defmodule Snitch.Data.Model.TaxZoneTest do
     end
   end
 
+  @tag country_count: 3
+  test "delete a tax zone", context do
+    zone = insert(:zone, zone_type: "C")
+    %{countries: countries} = context
+    setup_country_zone_members(zone, countries)
+    tax_zone = insert(:tax_zone, zone: zone)
+
+    assert {:ok, _data} = TaxZone.delete(tax_zone.id)
+    assert {:error, message} = TaxZone.get(tax_zone.id)
+    assert message == :tax_zone_not_found
+  end
+
   defp setup_state_zone_members(zone, states) do
     Enum.each(states, fn state ->
       insert(:state_zone_member, zone: zone, state: state)
