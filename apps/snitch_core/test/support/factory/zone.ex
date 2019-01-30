@@ -3,12 +3,26 @@ defmodule Snitch.Factory.Zone do
 
   defmacro __using__(_opts) do
     quote do
-      alias Snitch.Data.Schema.{CountryZone, StateZone, Zone}
+      alias Snitch.Data.Schema.{CountryZone, StateZone, Zone, StateZoneMember, CountryZoneMember}
 
       def zone_factory do
         %Zone{
           name: sequence(:area, fn area_code -> "area-#{area_code + 51}" end),
           description: "Does area-51 exist?"
+        }
+      end
+
+      def state_zone_member_factory do
+        %StateZoneMember{
+          zone: build(:zone, zone_type: "S"),
+          state: build(:state)
+        }
+      end
+
+      def country_zone_member_factory do
+        %CountryZoneMember{
+          zone: build(:zone, zone_type: "S"),
+          country: build(:country)
         }
       end
 
