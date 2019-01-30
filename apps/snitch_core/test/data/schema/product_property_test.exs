@@ -41,7 +41,7 @@ defmodule Snitch.Data.Schema.ProductPropertyTest do
       assert %{property_id: ["has already been taken"]} == errors_on(changeset)
     end
 
-    test "fails for non-existent product_id, property_id" do
+    test "fails for non-existent product_id" do
       params = %{
         product_id: -1,
         property_id: 1,
