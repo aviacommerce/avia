@@ -97,8 +97,10 @@ defmodule Snitch.Data.Model.UserTest do
     test "if a user is soft deleted", %{valid_attrs: va, users: users} do
       {:ok, user} = User.create(va)
       assert length(User.get_all()) == length(users) + 1
+
       {:ok, deleted_user} = User.delete(user.id)
       assert deleted_user.state == :deleted
+
       {:ok, recreated_user} = User.create(va)
       assert recreated_user.state == :active
       assert deleted_user.email == recreated_user.email

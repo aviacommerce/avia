@@ -39,6 +39,7 @@ defmodule Snitch.Data.Schema.UserTest do
     test "if an email is already taken" do
       user = insert(:user)
       params = Map.update!(@valid_attrs, :email, fn _ -> user.email end)
+
       cs = %{valid?: validity} = User.create_changeset(%User{}, params)
       refute validity
       assert %{email: ["Email already in use"]} = errors_on(cs)
