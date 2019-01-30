@@ -144,6 +144,10 @@ defmodule AdminAppWeb.Router do
     post("/tax/tax-classes/new", Tax.TaxClassController, :create)
     put("/tax/tax-classes/:id", Tax.TaxClassController, :update)
     delete("/tax/tax-classes/:id", Tax.TaxClassController, :delete)
+
+    resources("/tax/tax-zones", Tax.TaxZoneController, except: [:show]) do
+      resources("/tax-rates", Tax.TaxRateController, except: [:show])
+    end
   end
 
   scope "/", AdminAppWeb do

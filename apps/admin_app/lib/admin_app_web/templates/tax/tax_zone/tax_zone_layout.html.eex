@@ -1,0 +1,23 @@
+
+<%= render_layout "app.html", assigns do %>
+<div class="list-container">
+  <h4 class="p-3 m-0">Tax Zone</h4>
+  <div class="col-12">
+    <div class="card col-12">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <% route=("/tax/tax-zones/#{tax_zone_id(@conn)}/edit") %>
+          <a class="nav-link <%= active_link(@conn, route) %>" href="<%= route %>">Tax Zone Settings</a>   
+        </li>
+        <li class="nav-item">
+          <% route=("/tax/tax-zones/#{tax_zone_id(@conn)}/tax-rates")  %>
+          <a class="nav-link <%= active_link(@conn, route) %>" href="<%= route %>">Tax Rates</a>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <%= render @view_module, @view_template, assigns %>
+      </div>
+    </div>
+  <div>
+</div>
+<% end %>

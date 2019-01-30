@@ -15,7 +15,7 @@
         </li>
         <li class="nav-item">
           <% route=("/tax/tax-zones") %>
-          <a class="nav-link <%= active_link(@conn, route) %>" href="/tax-zones">Tax Zones & Rates</a>
+          <a class="nav-link <%= active_link(@conn, route) %>" href="/tax/tax-zones">Tax Zones & Rates</a>
         </li>
       </ul>
       <div class="tab-content">

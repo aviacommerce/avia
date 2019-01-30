@@ -124,11 +124,26 @@ defmodule Snitch.Data.Model.TaxRateTest do
 
   test "get_all returns a list of tax rates" do
     tax_zone = setup_tax_zone()
-    tax_rate_1 = insert(:tax_rate, tax_zone: tax_zone)
-    tax_rate_2 = insert(:tax_rate, tax_zone: tax_zone)
+    insert(:tax_rate, tax_zone: tax_zone)
+    insert(:tax_rate, tax_zone: tax_zone)
 
     tax_rates = TaxRate.get_all()
     assert length(tax_rates) == 2
+  end
+
+  describe "get_all_by_tax_zone/1" do
+    test "returns tax rates for given tax zone id" do
+      tax_zone_1 = setup_tax_zone()
+      insert(:tax_rate, tax_zone: tax_zone_1)
+
+      tax_zone_2 = setup_tax_zone()
+
+      assert data_1 = TaxRate.get_all_by_tax_zone(tax_zone_1.id)
+      assert length(data_1) == 1
+
+      assert data_2 = TaxRate.get_all_by_tax_zone(tax_zone_2.id)
+      assert data_2 == []
+    end
   end
 
   def setup_tax_zone() do

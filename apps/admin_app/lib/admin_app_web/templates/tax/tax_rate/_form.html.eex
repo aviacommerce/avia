@@ -1,0 +1,32 @@
+<%= form_for @changeset, @action, fn f -> %>
+  <div class="form-group row ">
+    <%= input f, :name, nil, description: "Name of the Tax Rate. E.g. GST", is_horizontal: true %>
+  </div>
+  <div class="form-group row ">
+    <%= checkbox_input f, :is_active?, nil, 
+      description: "Toggle to change the status of tax rate as active or inactive.", is_horizontal: true %>
+  </div>
+  <%= hidden_input(f, :tax_zone_id, value: @tax_zone_id) %>
+  
+  <h5 class="m-1">Rates for Classes</h5>
+  <div class="container">
+    <%= inputs_for f, :tax_rate_class_values, fn p -> %>
+    <div class="form-group row">
+      <%= label p, :percent_amount, "#{p.data.tax_class.name} Percent Amount %", class: "col-sm-4 col-form-label" %>
+      <div class="col-md-1">
+        <%= text_input p, :percent_amount, class: "form-control" %>
+      </div>
+      <%= error_tag p, :percent_amount %>
+      <%= hidden_input(p, :tax_class_id, value: p.data.tax_class.id) %>
+    </div>
+    <% end %>
+  </div>
+
+  <div class="form-group row stickformbutton">
+    <div class="col-sm-10">
+      <%= button("Cancel", to: tax_zone_tax_rate_path(@conn, :index, @tax_zone_id), method: "get",
+              class: "btn submit-btn float-left", type: "button") %>
+      <%= submit "Submit", class: "btn btn-primary submit-btn float-right" %>
+    </div>
+  </div>
+<% end %>

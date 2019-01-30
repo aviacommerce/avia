@@ -46,7 +46,7 @@ defmodule Snitch.Data.Model.TaxRate do
   """
   @spec update(TaxRate.t(), map) :: {:ok, TaxRate.t()} | {:error, Ecto.Changeset.t()}
   def update(tax_rate, params) do
-    tax_rate = tax_rate |> Repo.preload(:tax_rate_class_values)
+    tax_rate = tax_rate |> Repo.preload(tax_rate_class_values: :tax_class)
     QH.update(TaxRate, params, tax_rate, Repo)
   end
 
@@ -66,7 +66,7 @@ defmodule Snitch.Data.Model.TaxRate do
     |> QH.get(id, Repo)
     |> case do
       {:ok, tax_rate} ->
-        {:ok, Repo.preload(tax_rate, :tax_rate_class_values)}
+        {:ok, Repo.preload(tax_rate, tax_rate_class_values: :tax_class)}
 
       {:error, _} = error ->
         error
@@ -80,5 +80,25 @@ defmodule Snitch.Data.Model.TaxRate do
   @spec get_all() :: [TaxRate.t()]
   def get_all() do
     TaxRate |> Repo.all() |> Repo.preload(:tax_rate_class_values)
+  end
+
+  @doc """
+  Returns all the tax rates for a `tax_zone`.
+  """
+  @spec get_all_by_tax_zone(non_neg_integer) :: [TaxRate.t()]
+  def get_all_by_tax_zone(tax_zone_id) do
+    query =
+      from(
+        tax_rate in TaxRate,
+        where: tax_rate.tax_zone_id == ^tax_zone_id,
+        select: %TaxRate{
+          name: tax_rate.name,
+          is_active?: tax_rate.is_active?,
+          priority: tax_rate.priority,
+          id: tax_rate.id
+        }
+      )
+
+    query |> Repo.all() |> Repo.preload(tax_rate_class_values: :tax_class)
   end
 end
