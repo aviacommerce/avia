@@ -4,7 +4,7 @@ defmodule AdminAppWeb.Tax.TaxZoneController do
   alias Snitch.Data.Model.TaxZone
   alias Snitch.Data.Schema.TaxZone, as: TaxZoneSchema
 
-  @default_layout_actions ~w(index new)a
+  @default_layout_actions ~w(index new create)a
 
   plug(
     :put_layout,
