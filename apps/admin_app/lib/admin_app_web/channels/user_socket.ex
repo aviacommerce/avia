@@ -1,5 +1,6 @@
 defmodule AdminAppWeb.UserSocket do
   use Phoenix.Socket
+  @secret_key_base Application.get_env(:admin_app, AdminAppWeb.Endpoint)[:secret_key_base]
 
   ## Channels
   # channel "room:*", AdminAppWeb.RoomChannel
@@ -26,10 +27,22 @@ defmodule AdminAppWeb.UserSocket do
 
   def connect(%{"token" => token}, socket) do
     # max_age: 1209600 is equivalent to two weeks in seconds
-    case Phoenix.Token.verify(socket, "user socket", token, max_age: 1_209_600) do
-      {:ok, user_id} ->
-        socket = assign(socket, :user_token, token)
-        {:ok, assign(socket, :current_user, user_id)}
+    case Phoenix.Token.verify(
+           socket,
+           @secret_key_base,
+           token,
+           max_age: 86_400
+         ) do
+      {:ok, tenant_user_id} ->
+        [tenant, user_id] = String.split(tenant_user_id, "_")
+
+        socket =
+          socket
+          |> assign(:user_token, token)
+          |> assign(:tenant, tenant)
+          |> assign(:current_user, user_id)
+
+        {:ok, socket}
 
       {:error, reason} ->
         :error
