@@ -5,7 +5,10 @@ defmodule AdminApp.Product.SearchContext do
 
   def search_products_by_name(term) do
     Product
-    |> where([p], ilike(p.name, ^"%#{term}%") and is_nil(p.deleted_at))
+    |> where(
+      [p],
+      (ilike(p.name, ^"%#{term}%") or ilike(p.sku, ^"%#{term}%")) and is_nil(p.deleted_at)
+    )
     |> preload(:variants)
     |> Repo.all()
   end

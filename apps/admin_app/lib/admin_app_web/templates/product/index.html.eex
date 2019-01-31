@@ -48,7 +48,7 @@
         </div>
         <div class="col p-0">
           <input type="text" id="search_box" placeholder="Search by name.."/>
-          <button type="submit"><i class="fa fa-search"></i></button>
+          <button id="search-button" type="submit"><i class="fa fa-search"></i></button>
         </div>
       </div>
       <div class="panel-group mt-3">
