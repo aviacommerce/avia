@@ -4,7 +4,9 @@ defmodule AdminApp.Product.SearchContext do
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def search_products_by_name(term) do
-    query = from(p in Product, where: ilike(p.name, ^"%#{term}%"))
-    products = query |> Repo.all() |> Repo.preload(:variants)
+    Product
+    |> where([p], ilike(p.name, ^"%#{term}%"))
+    |> preload(:variants)
+    |> Repo.all()
   end
 end
