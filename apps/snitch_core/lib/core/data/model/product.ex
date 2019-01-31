@@ -89,6 +89,7 @@ defmodule Snitch.Data.Model.Product do
       | variants: Enum.filter(product.variants, fn variant -> variant.state in states end)
     }
   end
+  defdelegate preload_non_deleted_variants(product), to: __MODULE__, as: :preload_with_variants_in_state
 
   @doc """
   Get listtable product
@@ -138,7 +139,7 @@ defmodule Snitch.Data.Model.Product do
     query
     |> Ecto.Queryable.to_query()
     |> Repo.all()
-    |> Enum.map(&preload_with_variants_in_state/1)
+    |> Enum.map(&preload_non_deleted_variants/1)
   end
 
   defp convert_to_atom_map(map), do: to_atom_map("", map)
