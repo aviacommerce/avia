@@ -88,8 +88,7 @@ defmodule Snitch.Data.Model.CountryZoneTest do
     end
 
     test "fails for invalid id", %{zone: zone} do
-      {:ok, _} = CountryZone.delete(zone)
-      assert CountryZone.get(zone.id) == {:error, :zone_not_found}
+      assert {:error, :zone_not_found} = CountryZone.get(-1)
     end
   end
 
