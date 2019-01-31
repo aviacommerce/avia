@@ -3,9 +3,8 @@ defmodule Snitch.Data.Model.CountryZoneTest do
   use Snitch.DataCase
 
   import Snitch.Factory
-  import Ecto.Query
-  alias Ecto.Query
 
+  alias Ecto.Query
   alias Snitch.Data.Model.CountryZone
   alias Snitch.Data.Schema.{CountryZoneMember, Zone}
 

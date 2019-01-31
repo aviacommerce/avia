@@ -3,7 +3,6 @@ defmodule Snitch.Data.Model.StateZoneTest do
   use Snitch.DataCase
 
   import Snitch.Factory
-  import Ecto.Query
 
   alias Ecto.Query
   alias Snitch.Data.Model.StateZone
