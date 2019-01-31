@@ -1,6 +1,7 @@
 defmodule AdminAppWeb.ProductChannel do
   use Phoenix.Channel
   alias AdminApp.Product.SearchContext
+  alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def join("product:search", _message, socket) do
     {:ok, socket}
@@ -11,6 +12,7 @@ defmodule AdminAppWeb.ProductChannel do
   end
 
   def handle_in("product:search", payload, socket) do
+    Repo.set_tenant(socket.assigns.tenant)
     products = SearchContext.search_products_by_name(payload["term"])
 
     conn = %Plug.Conn{

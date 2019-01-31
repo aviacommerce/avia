@@ -31,7 +31,8 @@ export default class View extends MainView {
     channel.join()
 
     $(document).on('change', '#search_box', function () {
-      if ($("#search_box").val.length > 0) { // don't sent empty msg.
+      if ($("#search_box").val.length > 0) { // don't send empty msg.
+        $("#search-button").text("loading....");
         channel.push('product:search', { // send the message to the server on "ping" channel
           term: $("#search_box").val()
         });
