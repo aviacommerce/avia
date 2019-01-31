@@ -30,8 +30,6 @@ defmodule AdminAppWeb.ProductChannel do
       }
     }
 
-    IO.inspect(socket)
-
     broadcast!(socket, "product:search:#{socket.assigns.user_token}", %{
       body:
         Phoenix.View.render_to_string(AdminAppWeb.ProductView, "index.html",
