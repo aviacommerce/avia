@@ -78,15 +78,16 @@ defmodule Snitch.Data.Model.Product do
       |> Repo.all()
 
     Product
-    |> where([p], p.state == "active" and p.id not in ^child_product_ids)
+    |> where([p], p.id not in ^child_product_ids)
   end
 
   def preload_with_variants_in_state(product, states \\ [:active, :in_active, :draft]) do
-    product = product |> Repo.preload(:variants)
-    variant_ids = Enum.map(product.variants, & &1.id)
-    query = from(p in Product, where: p.id in ^variant_ids and p.state in ^states)
+    product = Repo.preload(product, :variants)
 
-    Repo.one(from(p in Product, where: p.id == ^product.id, preload: [variants: ^query]))
+    %{
+      product
+      | variants: Enum.filter(product.variants, fn variant -> variant.state in states end)
+    }
   end
 
   @doc """
@@ -128,17 +129,16 @@ defmodule Snitch.Data.Model.Product do
       end
 
     {query, _rummage} =
-      from(p in Product)
+      from(p in admin_display_product_query())
       |> Map.put(:prefix, Repo.get_prefix())
       |> Rummage.Ecto.rummage(opts)
 
-    child_product_ids = from(c in Variation, select: c.child_product_id) |> Repo.all()
-
-    query = from(p in query, where: p.id not in ^child_product_ids)
+    query = from(p in query, preload: [:images, :variants])
 
     query
     |> Ecto.Queryable.to_query()
     |> Repo.all()
+    |> Enum.map(&preload_with_variants_in_state/1)
   end
 
   defp convert_to_atom_map(map), do: to_atom_map("", map)

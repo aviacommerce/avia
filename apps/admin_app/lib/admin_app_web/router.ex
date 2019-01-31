@@ -15,7 +15,7 @@ defmodule AdminAppWeb.Router do
 
   defp put_user_token(conn, _) do
     if current_user = conn.assigns[:current_user] do
-      token = Phoenix.Token.sign(conn, @secret_key_base, "#{get_prefix}_#{current_user.id}")
+      token = Phoenix.Token.sign(conn, @secret_key_base, "#{get_prefix()}_#{current_user.id}")
       assign(conn, :user_token, token)
     else
       conn

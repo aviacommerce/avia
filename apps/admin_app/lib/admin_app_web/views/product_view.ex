@@ -40,10 +40,6 @@ defmodule AdminAppWeb.ProductView do
     Product.is_child_product(product)
   end
 
-  defp is_parent_product(product_id) do
-    Product.is_parent_product(product_id)
-  end
-
   def has_themes(product) do
     length(product.taxon.variation_themes) > 0
   end
@@ -95,7 +91,7 @@ defmodule AdminAppWeb.ProductView do
   end
 
   def get_product_display_image(product) do
-    product = Product.get_product_with_default_image(product)
+    # product = Product.get_product_with_default_image(product)
 
     case product.images |> List.first() do
       nil ->
