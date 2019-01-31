@@ -73,7 +73,7 @@ defmodule Snitch.Data.Schema.StateZoneMemberTest do
       ]
     end
 
-    test "successfully for valid params", %{cs: cs} do
+    test "returns a valid changeset", %{cs: cs} do
       params = %{state_id: 200}
       changeset = StateZoneMember.update_changeset(cs, params)
       assert changeset.valid?

@@ -82,66 +82,82 @@ defmodule Snitch.Data.Model.CountryZoneTest do
   end
 
   describe "get/1" do
-    test "zone with id", %{zone: zone} do
+    test "returns a zone using a zone_id", %{zone: zone} do
       {:ok, new_zone} = CountryZone.get(zone.id)
       assert new_zone.id == zone.id
+    end
+
+    test "fails for invalid id", %{zone: zone} do
+      {:ok, _} = CountryZone.delete(zone)
+      assert CountryZone.get(zone.id) == {:error, :zone_not_found}
     end
   end
 
   describe "get_all/0" do
-    @tag state_zone_count: 3,
-         country_zone_count: 3
-    test "zones  successfully", %{zones: zone} do
+    @tag country_zone_count: 3
+    test "returns all zones", %{zones: zone} do
       country_zones = CountryZone.get_all()
-      cz = Enum.drop_while(country_zones, fn x -> x.zone_type == "C" end)
-      assert cz == []
+      country_zones = Enum.all?(country_zones, fn x -> x.zone_type == "C" end)
+      assert country_zones
+    end
+
+    @tag state_zone_count: 3
+    test "fails when no country_zone is present", %{zones: zone} do
+      country_zones = CountryZone.get_all()
+      cz_list = List.delete_at(country_zones, 0)
+      country_zones = Enum.any?(cz_list, fn x -> x.zone_type == "C" end)
+      refute country_zones
     end
   end
 
   describe "member_changesets/2" do
-    test "successfully returns a CountryZoneMember changeset", %{zone: zone, countries: countries} do
+    test "returns a valid changeset", %{zone: zone, countries: countries} do
       country_ids = Enum.map(countries, &Map.get(&1, :id))
       stream = CountryZone.member_changesets(country_ids, zone)
       changeset = Enum.find_value(stream, fn x -> x end)
       assert changeset.valid?
     end
-  end
 
-  describe "remove_members_query/2" do
-    @tag country_zone_count: 3
-    test "returns a query successfully", %{zone: zone, countries: countries} do
+    test "fails to return a valid changeset", %{zone: zone, countries: countries} do
       country_ids = Enum.map(countries, &Map.get(&1, :id))
-
-      expected =
-        Query.from(c in CountryZoneMember,
-          where: c.country_id in ^country_ids and c.zone_id == ^zone.id
-        )
-
-      result = CountryZone.remove_members_query(country_ids, zone)
-
-      assert inspect(result) == inspect(expected)
+      zone = Map.put(zone, :id, nil)
+      stream = CountryZone.member_changesets(country_ids, zone)
+      changeset = Enum.find_value(stream, fn x -> x end)
+      refute changeset.valid?
+      assert %{zone_id: ["can't be blank"]} == errors_on(changeset)
     end
   end
 
-  describe "common_zone_query/2" do
-    @tag country_count: 2
-    test "returns a query successfully", %{countries: countries} do
-      [country_a_id, country_b_id] = Enum.map(countries, fn x -> x.id end)
+  test "remove_members_query/2 returns a valid query", %{zone: zone, countries: countries} do
+    country_ids = Enum.map(countries, &Map.get(&1, :id))
 
-      expected =
-        Query.from(c0 in CountryZoneMember,
-          join: c1 in CountryZoneMember,
-          on: true,
-          join: z in Zone,
-          on: c0.zone_id == c1.zone_id and c0.zone_id == z.id,
-          where: c0.country_id == ^country_a_id and c1.country_id == ^country_b_id,
-          select: z
-        )
+    expected =
+      Query.from(c in CountryZoneMember,
+        where: c.country_id in ^country_ids and c.zone_id == ^zone.id
+      )
 
-      result = CountryZone.common_zone_query(country_a_id, country_b_id)
+    result = CountryZone.remove_members_query(country_ids, zone)
 
-      assert inspect(result) == inspect(expected)
-    end
+    assert inspect(result) == inspect(expected)
+  end
+
+  @tag country_count: 2
+  test "common_zone_query/2 returns a valid query", %{countries: countries} do
+    [country_a_id, country_b_id] = Enum.map(countries, fn x -> x.id end)
+
+    expected =
+      Query.from(c0 in CountryZoneMember,
+        join: c1 in CountryZoneMember,
+        on: true,
+        join: z in Zone,
+        on: c0.zone_id == c1.zone_id and c0.zone_id == z.id,
+        where: c0.country_id == ^country_a_id and c1.country_id == ^country_b_id,
+        select: z
+      )
+
+    result = CountryZone.common_zone_query(country_a_id, country_b_id)
+
+    assert inspect(result) == inspect(expected)
   end
 
   defp country_zone(%{countries: countries}) do
