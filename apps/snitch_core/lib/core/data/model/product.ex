@@ -89,7 +89,10 @@ defmodule Snitch.Data.Model.Product do
       | variants: Enum.filter(product.variants, fn variant -> variant.state in states end)
     }
   end
-  defdelegate preload_non_deleted_variants(product), to: __MODULE__, as: :preload_with_variants_in_state
+
+  defdelegate preload_non_deleted_variants(product),
+    to: __MODULE__,
+    as: :preload_with_variants_in_state
 
   @doc """
   Get listtable product
