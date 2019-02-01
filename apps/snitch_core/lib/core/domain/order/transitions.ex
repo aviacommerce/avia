@@ -210,7 +210,7 @@ defmodule Snitch.Domain.Order.Transitions do
   end
 
   @doc """
-  Marks all the `shipment` aka `packages` of an ordertransition from `pending`
+  Marks all the `shipment` aka `packages` of an order transition from `pending`
   to the `processing` state.
 
   This function is a side effect of the transition in which payment for an

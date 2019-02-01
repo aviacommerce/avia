@@ -21,7 +21,8 @@ defmodule Snitch.Data.Schema.Product do
     ProductBrand,
     StockItem,
     ShippingCategory,
-    Taxon
+    Taxon,
+    TaxClass
   }
 
   alias Money.Ecto.Composite.Type, as: MoneyType
@@ -90,19 +91,55 @@ defmodule Snitch.Data.Schema.Product do
     belongs_to(:brand, ProductBrand)
     belongs_to(:shipping_category, ShippingCategory)
     belongs_to(:taxon, Taxon)
+
+    # for relating to tax
+    belongs_to(:tax_class, TaxClass)
   end
 
   @required_fields ~w(name selling_price max_retail_price taxon_id shipping_category_id)a
-  @optional_fields ~w(description meta_description meta_keywords meta_title brand_id height width depth weight state inventory_tracking)a
+  @optional_fields ~w(description meta_description meta_keywords meta_title brand_id
+    height width depth weight state inventory_tracking)a
+
+  @parent_product_required ~w(tax_class_id)a ++ @required_fields
+  @parent_permitted @parent_product_required ++ @optional_fields
+
+  @child_product_permitted @required_fields ++ @optional_fields
 
   def create_changeset(model, params \\ %{}) do
-    common_changeset(model, params)
+    model
+    |> cast(params, @parent_permitted)
+    |> validate_required(@parent_product_required)
+    |> common_changeset()
   end
 
+  @doc """
+  Returns an update changeset.
+
+  Takes as input the `product` model and params to be updated with.
+  Checks if the product is parent product or a variant before casting.
+
+  #### TODO: Refactor once the states to verify a product as
+    variant or product is defined.
+  """
   def update_changeset(model, params \\ %{}) do
+    is_child = ProductModel.is_child_product(model)
+
     model
-    |> common_changeset(params)
+    |> conditional_update_casting(params, is_child)
+    |> common_changeset()
     |> cast_assoc(:images, with: &Image.changeset/2)
+  end
+
+  defp conditional_update_casting(model, params, _is_child = true) do
+    model
+    |> cast(params, @child_product_permitted)
+    |> validate_required(@required_fields)
+  end
+
+  defp conditional_update_casting(model, params, _is_child = false) do
+    model
+    |> cast(params, @parent_permitted)
+    |> validate_required(@parent_product_required)
   end
 
   def associate_image_changeset(product, images) do
@@ -151,14 +188,14 @@ defmodule Snitch.Data.Schema.Product do
 
   def child_product(model, params \\ %{}) do
     model
-    |> common_changeset(params)
+    |> cast(params, @child_product_permitted)
+    |> validate_required(@required_fields)
+    |> common_changeset()
     |> cast_assoc(:options)
   end
 
-  defp common_changeset(model, params) do
-    model
-    |> cast(params, @required_fields ++ @optional_fields)
-    |> validate_required(@required_fields)
+  defp common_changeset(changeset) do
+    changeset
     |> validate_amount(:selling_price)
     |> NameSlug.maybe_generate_slug()
   end

@@ -28,6 +28,10 @@ defmodule AdminAppWeb.ProductView do
     Enum.map(StockLocation.active(), &{&1.name, &1.id})
   end
 
+  def tax_class_id_check(changeset) do
+    :tax_class_id in changeset.required
+  end
+
   def themes_options(product) do
     Enum.map(product.taxon.variation_themes, &{&1.name, &1.id})
   end
