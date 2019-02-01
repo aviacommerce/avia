@@ -2,13 +2,13 @@ defmodule Snitch.Data.Schema.ProductOptionValue do
   @moduledoc false
 
   use Snitch.Data.Schema
-  alias Snitch.Data.Schema.{OptionType, Product}
+  alias Snitch.Data.Schema.{Option, Product}
 
   schema "snitch_product_option_values" do
     field(:value, :string)
     field(:display_name, :string)
 
-    belongs_to(:option, OptionType)
+    belongs_to(:option, Option)
     belongs_to(:product, Product)
 
     timestamps()

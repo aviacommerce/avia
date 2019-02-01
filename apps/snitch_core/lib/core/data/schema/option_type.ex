@@ -1,6 +1,6 @@
-defmodule Snitch.Data.Schema.OptionType do
+defmodule Snitch.Data.Schema.Option do
   @moduledoc """
-  Models an OptionType
+  Models an Option
   """
   use Snitch.Data.Schema
 
@@ -19,7 +19,7 @@ defmodule Snitch.Data.Schema.OptionType do
   @create_params ~w(name display_name)a
 
   @doc """
-  Returns a changeset to create new OptionType
+  Returns a changeset to create new Option
   """
   @spec create_changeset(t, map) :: Ecto.Changeset.t()
   def create_changeset(model, params) do
@@ -27,7 +27,7 @@ defmodule Snitch.Data.Schema.OptionType do
   end
 
   @doc """
-  Returns a changeset to update a OptionType
+  Returns a changeset to update a Option
   """
   @spec update_changeset(t, map) :: Ecto.Changeset.t()
   def update_changeset(model, params) do

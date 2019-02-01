@@ -7,7 +7,7 @@ defmodule Snitch.Data.Model.OptionTypeTest do
   alias Snitch.Data.Model.OptionType, as: OTModel
   alias Snitch.Data.Model.Product, as: ProductModel
   alias Snitch.Data.Model.VariationTheme, as: VTModel
-  alias Snitch.Data.Schema.{Product, OptionType, VariationTheme}
+  alias Snitch.Data.Schema.{Product, Option, VariationTheme}
   alias Snitch.Repo
 
   setup do

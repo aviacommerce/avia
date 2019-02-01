@@ -1,7 +1,7 @@
 defmodule AdminAppWeb.OptionTypeController do
   use AdminAppWeb, :controller
   alias Snitch.Data.Model.OptionType, as: OTModel
-  alias Snitch.Data.Schema.OptionType, as: OTSchema
+  alias Snitch.Data.Schema.Option, as: OptionSchema
 
   def index(conn, _params) do
     option_types = OTModel.get_all()
@@ -9,7 +9,7 @@ defmodule AdminAppWeb.OptionTypeController do
   end
 
   def new(conn, _params) do
-    changeset = OTSchema.create_changeset(%OTSchema{}, %{})
+    changeset = OptionSchema.create_changeset(%OptionSchema{}, %{})
     render(conn, "new.html", changeset: changeset)
   end
 
@@ -26,8 +26,8 @@ defmodule AdminAppWeb.OptionTypeController do
 
   def edit(conn, %{"id" => id}) do
     with {id, _} <- Integer.parse(id),
-         {:ok, %OTSchema{} = option_type} <- OTModel.get(id) do
-      changeset = OTSchema.update_changeset(option_type, %{})
+         {:ok, %OptionSchema{} = option_type} <- OTModel.get(id) do
+      changeset = OptionSchema.update_changeset(option_type, %{})
       render(conn, "edit.html", changeset: changeset)
     else
       err when err in [:error, nil] ->

@@ -4,7 +4,7 @@ defmodule Snitch.Demo.Product do
 
   alias Snitch.Data.Schema.{
     Image,
-    OptionType,
+    Option,
     Product,
     ProductOptionValue,
     ShippingCategory,
@@ -172,7 +172,7 @@ defmodule Snitch.Demo.Product do
   end
 
   def create_product_option_value(variant, product) do
-    option_type = Repo.get_by(OptionType, name: "size")
+    option_type = Repo.get_by(Option, name: "size")
 
     params = %{
       value: "medium",
