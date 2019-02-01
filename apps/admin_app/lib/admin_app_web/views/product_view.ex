@@ -91,7 +91,7 @@ defmodule AdminAppWeb.ProductView do
   end
 
   def get_product_display_image(product) do
-    # product = Product.get_product_with_default_image(product)
+    product = Product.get_product_with_default_image(product)
 
     case product.images |> List.first() do
       nil ->

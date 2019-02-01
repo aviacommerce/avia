@@ -118,9 +118,12 @@ defmodule Snitch.Data.Model.Product do
 
   @spec get_product_with_default_image(Product.t()) :: Product.t()
   def get_product_with_default_image(product) do
-    default_image = from(image in Image, where: image.is_default == true)
-    query = from(p in Product, where: p.id == ^product.id, preload: [images: ^default_image])
-    Repo.one(query)
+    product = Repo.preload(product, :images)
+
+    %{
+      product
+      | images: Enum.filter(product.images, & &1.is_default)
+    }
   end
 
   @spec get_rummage_product_list(any) :: Product.t()
