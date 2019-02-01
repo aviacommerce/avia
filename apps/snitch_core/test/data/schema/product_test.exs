@@ -50,8 +50,8 @@ defmodule Snitch.Data.Schema.ProductTest do
           "child_product" => %{
             "name" => "Child Product 1",
             "options" => [
-              %{"option_type_id" => ot1.id, "value" => "red"},
-              %{"option_type_id" => ot2.id, "value" => "S"}
+              %{"option_id" => ot1.id, "value" => "red"},
+              %{"option_id" => ot2.id, "value" => "S"}
             ],
             "selling_price" => Money.new("12.99", currency()),
             "max_retail_price" => Money.new("14.99", currency()),
@@ -63,8 +63,8 @@ defmodule Snitch.Data.Schema.ProductTest do
           "child_product" => %{
             "name" => "Child Product 2",
             "options" => [
-              %{"option_type_id" => ot1.id, "value" => "yellow"},
-              %{"option_type_id" => ot2.id, "value" => "S"}
+              %{"option_id" => ot1.id, "value" => "yellow"},
+              %{"option_id" => ot2.id, "value" => "S"}
             ],
             "selling_price" => Money.new("12.99", currency()),
             "max_retail_price" => Money.new("14.99", currency()),
@@ -95,8 +95,8 @@ defmodule Snitch.Data.Schema.ProductTest do
           "child_product" => %{
             "name" => "Child Product 1",
             "options" => [
-              %{"option_type_id" => ot1.id, "value" => "red"},
-              %{"option_type_id" => ot2.id, "value" => "S"}
+              %{"option_id" => ot1.id, "value" => "red"},
+              %{"option_id" => ot2.id, "value" => "S"}
             ],
             "selling_price" => Money.new("12.99", currency()),
             "max_retail_price" => Money.new("14.99", currency()),
@@ -108,8 +108,8 @@ defmodule Snitch.Data.Schema.ProductTest do
           "child_product" => %{
             "name" => "Child Product 2",
             "options" => [
-              %{"option_type_id" => ot1.id, "value" => "yellow"},
-              %{"option_type_id" => ot2.id, "value" => "S"}
+              %{"option_id" => ot1.id, "value" => "yellow"},
+              %{"option_id" => ot2.id, "value" => "S"}
             ],
             "selling_price" => Money.new("12.99", currency()),
             "max_retail_price" => Money.new("14.99", currency()),
@@ -130,8 +130,8 @@ defmodule Snitch.Data.Schema.ProductTest do
           "child_product" => %{
             "name" => "Child Product 3",
             "options" => [
-              %{"option_type_id" => ot1.id, "value" => "blue"},
-              %{"option_type_id" => ot2.id, "value" => "S"}
+              %{"option_id" => ot1.id, "value" => "blue"},
+              %{"option_id" => ot2.id, "value" => "S"}
             ],
             "selling_price" => Money.new("12.99", currency()),
             "max_retail_price" => Money.new("14.99", currency()),
@@ -162,8 +162,8 @@ defmodule Snitch.Data.Schema.ProductTest do
           "child_product" => %{
             "name" => "Child Product 1",
             "options" => [
-              %{"option_type_id" => ot1.id, "value" => "red"},
-              %{"option_type_id" => ot2.id, "value" => "S"}
+              %{"option_id" => ot1.id, "value" => "red"},
+              %{"option_id" => ot2.id, "value" => "S"}
             ],
             "selling_price" => Money.new("12.99", currency()),
             "max_retail_price" => Money.new("14.99", currency()),
@@ -175,8 +175,8 @@ defmodule Snitch.Data.Schema.ProductTest do
           "child_product" => %{
             "name" => "Child Product 2",
             "options" => [
-              %{"option_type_id" => ot1.id, "value" => "yellow"},
-              %{"option_type_id" => ot2.id, "value" => "S"}
+              %{"option_id" => ot1.id, "value" => "yellow"},
+              %{"option_id" => ot2.id, "value" => "S"}
             ],
             "selling_price" => Money.new("12.99", currency()),
             "max_retail_price" => Money.new("14.99", currency()),
@@ -200,8 +200,8 @@ defmodule Snitch.Data.Schema.ProductTest do
           "child_product" => %{
             "name" => "Child Product 3",
             "options" => [
-              %{"option_type_id" => ot1.id, "value" => "blue"},
-              %{"option_type_id" => ot2.id, "value" => "S"}
+              %{"option_id" => ot1.id, "value" => "blue"},
+              %{"option_id" => ot2.id, "value" => "S"}
             ],
             "selling_price" => Money.new("12.99", currency()),
             "max_retail_price" => Money.new("14.99", currency()),
