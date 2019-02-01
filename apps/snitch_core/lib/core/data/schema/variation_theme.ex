@@ -20,6 +20,7 @@ defmodule Snitch.Data.Schema.VariationTheme do
       :option_types,
       OptionType,
       join_through: "snitch_theme_option_types",
+      join_keys: [variation_theme_id: :id, option_id: :id],
       on_replace: :delete
     )
 

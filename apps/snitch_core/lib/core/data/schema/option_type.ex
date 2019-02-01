@@ -8,7 +8,7 @@ defmodule Snitch.Data.Schema.OptionType do
 
   @type t :: %__MODULE__{}
 
-  schema "snitch_option_types" do
+  schema "snitch_options" do
     field(:name, :string)
     field(:display_name, :string)
 
