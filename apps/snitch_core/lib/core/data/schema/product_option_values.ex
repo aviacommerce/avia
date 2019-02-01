@@ -8,7 +8,7 @@ defmodule Snitch.Data.Schema.ProductOptionValue do
     field(:value, :string)
     field(:display_name, :string)
 
-    belongs_to(:option_type, OptionType)
+    belongs_to(:option, OptionType)
     belongs_to(:product, Product)
 
     timestamps()
@@ -16,8 +16,8 @@ defmodule Snitch.Data.Schema.ProductOptionValue do
 
   def changeset(model, params) do
     model
-    |> cast(params, [:option_type_id, :product_id, :value])
-    |> validate_required([:option_type_id, :value])
+    |> cast(params, [:option_id, :product_id, :value])
+    |> validate_required([:option_id, :value])
   end
 
   def update_changeset(model, params) do
