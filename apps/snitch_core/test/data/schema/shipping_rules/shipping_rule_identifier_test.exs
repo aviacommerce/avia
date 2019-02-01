@@ -14,7 +14,7 @@ defmodule Snitch.Data.Schema.ShippingRuleIdentifierTest do
   end
 
   describe "changeset/2" do
-    test "successful for valid params", %{params: params} do
+    test "returns valid changeset", %{params: params} do
       cs = SRIdentifier.changeset(%SRIdentifier{}, params)
       assert cs.valid?
     end

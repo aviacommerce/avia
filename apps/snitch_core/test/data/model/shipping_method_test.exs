@@ -76,9 +76,6 @@ defmodule Snitch.Data.Model.ShippingMethodTest do
          state_zone_count: 1,
          country_zone_count: 1,
          shipping_category_count: 1
-
-    setup :shipping_methods
-
     test "returns the required shipping method with id", %{shipping_methods: [sm]} do
       {:ok, new_sm} = ShippingMethod.get(sm.id)
       assert new_sm.id == sm.id

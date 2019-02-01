@@ -42,6 +42,8 @@ defmodule Snitch.Data.Model.ShippingCategoryTest do
       id = shipping_rule.shipping_category_id
       {:ok, sc} = ShippingCategory.get_with_rules(id)
       assert sc.id == id
+      new_sc = sc.shipping_rules |> List.first()
+      assert new_sc.id == shipping_rule.id
     end
 
     test "fails for invalid id" do
