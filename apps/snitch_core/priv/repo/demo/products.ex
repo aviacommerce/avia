@@ -177,7 +177,7 @@ defmodule Snitch.Demo.Product do
     params = %{
       value: "medium",
       display_name: "MEDIUM",
-      option_type_id: option_type.id,
+      option_id: option_type.id,
       product_id: variant.id
     }
 
