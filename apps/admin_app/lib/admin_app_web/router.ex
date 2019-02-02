@@ -128,16 +128,6 @@ defmodule AdminAppWeb.Router do
     get("/product/import/etsy/callback", ProductImportController, :oauth_callback)
     get("/product/import/etsy/progress", ProductImportController, :import_progress)
 
-    ### promotions
-    resources("/promotions", PromotionController, except: [:show, :new])
-    get("/promo-rules", PromotionController, :rules, as: :promo_rules)
-    get("/promo-actions", PromotionController, :actions, as: :promo_actions)
-    post("/promo-calculators", PromotionController, :calculators, as: :promo_calc)
-    post("/promo-rule-prefs", PromotionController, :rule_preferences, as: :promo_rule_prefs)
-    post("/promo-action-prefs", PromotionController, :action_preferences, as: :promo_action_prefs)
-    post("/promo-calc-prefs", PromotionController, :calc_preferences, as: :promo_calc_prefs)
-    put("/promo/:id/archive", PromotionController, :archive)
-
     ### tax
     get("/tax", Tax.TaxConfigController, :index)
     put("/tax/:id", Tax.TaxConfigController, :update)
@@ -151,6 +141,18 @@ defmodule AdminAppWeb.Router do
     resources("/tax/tax-zones", Tax.TaxZoneController, except: [:show]) do
       resources("/tax-rates", Tax.TaxRateController, except: [:show])
     end
+  end
+
+  scope "api/", AdminAppWeb do
+    ### promotions
+    resources("/promotions", PromotionController, except: [:show, :new])
+    get("/promo-rules", PromotionController, :rules, as: :promo_rules)
+    get("/promo-actions", PromotionController, :actions, as: :promo_actions)
+    post("/promo-calculators", PromotionController, :calculators, as: :promo_calc)
+    post("/promo-rule-prefs", PromotionController, :rule_preferences, as: :promo_rule_prefs)
+    post("/promo-action-prefs", PromotionController, :action_preferences, as: :promo_action_prefs)
+    post("/promo-calc-prefs", PromotionController, :calc_preferences, as: :promo_calc_prefs)
+    put("/promo/:id/archive", PromotionController, :archive)
   end
 
   scope "/", AdminAppWeb do
