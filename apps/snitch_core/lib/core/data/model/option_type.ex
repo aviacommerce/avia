@@ -1,6 +1,6 @@
-defmodule Snitch.Data.Model.OptionType do
+defmodule Snitch.Data.Model.Option do
   @moduledoc """
-  OptionType API
+  Option API
   """
   use Snitch.Data.Model
   alias Snitch.Data.Schema.Option

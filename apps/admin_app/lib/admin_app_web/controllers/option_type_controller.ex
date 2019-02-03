@@ -1,10 +1,10 @@
 defmodule AdminAppWeb.OptionTypeController do
   use AdminAppWeb, :controller
-  alias Snitch.Data.Model.OptionType, as: OTModel
+  alias Snitch.Data.Model.Option, as: OptionModel
   alias Snitch.Data.Schema.Option, as: OptionSchema
 
   def index(conn, _params) do
-    option_types = OTModel.get_all()
+    option_types = OptionModel.get_all()
     render(conn, "index.html", %{option_types: option_types})
   end
 
@@ -14,9 +14,9 @@ defmodule AdminAppWeb.OptionTypeController do
   end
 
   def create(conn, %{"option_type" => params}) do
-    case OTModel.create(params) do
+    case OptionModel.create(params) do
       {:ok, _} ->
-        option_types = OTModel.get_all()
+        option_types = OptionModel.get_all()
         render(conn, "index.html", %{option_types: option_types})
 
       {:error, changeset} ->
@@ -26,7 +26,7 @@ defmodule AdminAppWeb.OptionTypeController do
 
   def edit(conn, %{"id" => id}) do
     with {id, _} <- Integer.parse(id),
-         {:ok, %OptionSchema{} = option_type} <- OTModel.get(id) do
+         {:ok, %OptionSchema{} = option_type} <- OptionModel.get(id) do
       changeset = OptionSchema.update_changeset(option_type, %{})
       render(conn, "edit.html", changeset: changeset)
     else
@@ -39,9 +39,9 @@ defmodule AdminAppWeb.OptionTypeController do
 
   def update(conn, %{"id" => id, "option_type" => params}) do
     with {id, _} <- Integer.parse(id),
-         {:ok, option_type} <- OTModel.get(id),
-         {:ok, _} <- OTModel.update(option_type, params) do
-      option_types = OTModel.get_all()
+         {:ok, option_type} <- OptionModel.get(id),
+         {:ok, _} <- OptionModel.update(option_type, params) do
+      option_types = OptionModel.get_all()
       render(conn, "index.html", %{option_types: option_types})
     else
       {:error, changeset} ->
@@ -57,8 +57,8 @@ defmodule AdminAppWeb.OptionTypeController do
 
   def delete(conn, %{"id" => id}) do
     with {id, _} <- Integer.parse(id),
-         false <- OTModel.is_theme_associated(id),
-         {:ok, option_type} <- OTModel.delete(id) do
+         false <- OptionModel.is_theme_associated(id),
+         {:ok, option_type} <- OptionModel.delete(id) do
       conn
       |> put_flash(:info, "Option type #{option_type.name} deleted successfully")
       |> redirect(to: option_type_path(conn, :index))
