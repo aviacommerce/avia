@@ -1,4 +1,4 @@
-defmodule Snitch.Data.Schema.ProductOptionValue do
+defmodule Snitch.Data.Schema.OptionValue do
   @moduledoc false
 
   use Snitch.Data.Schema

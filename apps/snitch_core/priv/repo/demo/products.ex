@@ -6,7 +6,7 @@ defmodule Snitch.Demo.Product do
     Image,
     Option,
     Product,
-    ProductOptionValue,
+    OptionValue,
     ShippingCategory,
     Taxon,
     Variant,
@@ -181,7 +181,7 @@ defmodule Snitch.Demo.Product do
       product_id: variant.id
     }
 
-    %ProductOptionValue{} |> ProductOptionValue.changeset(params) |> Repo.insert!()
+    %OptionValue{} |> OptionValue.changeset(params) |> Repo.insert!()
   end
 
   defp associate_product_variant(variant, product) do
