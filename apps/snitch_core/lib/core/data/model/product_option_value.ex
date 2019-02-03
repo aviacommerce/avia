@@ -1,6 +1,6 @@
-defmodule Snitch.Data.Model.ProductOptionValue do
+defmodule Snitch.Data.Model.OptionValue do
   @moduledoc """
-  Product Option Value API.
+  Option Value API.
   """
 
   use Snitch.Data.Model
@@ -10,14 +10,13 @@ defmodule Snitch.Data.Model.ProductOptionValue do
   @doc """
   Update the Option Value with supplied params and Option Value instance
   """
-  @spec update(OptionValue.t(), map) ::
-          {:ok, OptionValue.t()} | {:error, Ecto.Changeset.t()}
+  @spec update(OptionValue.t(), map) :: {:ok, OptionValue.t()} | {:error, Ecto.Changeset.t()}
   def update(model, params) do
     QH.update(OptionValue, params, model, Repo)
   end
 
   @doc """
-  Returns an Product Option Value
+  Returns an Option Value
 
   Takes Product Option Value id as input
   """
