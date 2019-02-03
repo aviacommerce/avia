@@ -6,6 +6,7 @@ defmodule Snitch.Data.Schema.OptionValue do
 
   schema "snitch_option_values" do
     field(:value, :string)
+    field(:value_data, :map)
     field(:display_name, :string)
 
     belongs_to(:option, Option)
