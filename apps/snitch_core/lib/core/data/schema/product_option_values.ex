@@ -4,7 +4,7 @@ defmodule Snitch.Data.Schema.ProductOptionValue do
   use Snitch.Data.Schema
   alias Snitch.Data.Schema.{Option, Product}
 
-  schema "snitch_product_option_values" do
+  schema "snitch_option_values" do
     field(:value, :string)
     field(:display_name, :string)
 
