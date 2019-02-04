@@ -10,9 +10,16 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 config :store_front, StoreFrontWeb.Endpoint,
-  http: [:inet6, port: System.get_env("PORT") || 4000],
-  url: [host: "example.com", port: 80],
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  load_from_system_env: true,
+  http: [:inet6, port: System.get_env("STORE_FRONT_PORT") || 4444],
+  server: true,
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  version: Application.spec(:store_front, :vsn),
+  secret_key_base: System.get_env("PHOENIX_SECRET_KEY_BASE"),
+  session_cookie_name: System.get_env("SESSION_COOKIE_NAME"),
+  session_cookie_signing_salt: System.get_env("SESSION_COOKIE_SIGNING_SALT"),
+  session_cookie_encryption_salt: System.get_env("SESSION_COOKIE_ENCRYPTION_SALT"),
+  check_origin: false
 
 # Do not print debug messages in production
 config :logger, level: :info
@@ -68,4 +75,4 @@ config :logger, level: :info
 
 # Finally import the config/prod.secret.exs which should be versioned
 # separately.
-import_config "prod.secret.exs"
+# import_config "prod.secret.exs"
