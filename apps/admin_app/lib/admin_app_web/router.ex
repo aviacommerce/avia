@@ -145,10 +145,11 @@ defmodule AdminAppWeb.Router do
 
   scope "api/", AdminAppWeb do
     ### promotions
+
     resources("/promotions", PromotionController, except: [:show, :new])
     get("/promo-rules", PromotionController, :rules, as: :promo_rules)
     get("/promo-actions", PromotionController, :actions, as: :promo_actions)
-    post("/promo-calculators", PromotionController, :calculators, as: :promo_calc)
+    get("/promo-calculators", PromotionController, :calculators, as: :promo_calc)
     post("/promo-rule-prefs", PromotionController, :rule_preferences, as: :promo_rule_prefs)
     post("/promo-action-prefs", PromotionController, :action_preferences, as: :promo_action_prefs)
     post("/promo-calc-prefs", PromotionController, :calc_preferences, as: :promo_calc_prefs)
