@@ -40,10 +40,6 @@ defmodule AdminAppWeb.ProductView do
     Product.is_child_product(product)
   end
 
-  defp is_parent_product(product_id) do
-    Product.is_parent_product(product_id)
-  end
-
   def has_themes(product) do
     length(product.taxon.variation_themes) > 0
   end
