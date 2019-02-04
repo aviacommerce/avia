@@ -33,7 +33,7 @@ defmodule AdminApp.Order.SearchContext do
     |> Repo.all()
   end
 
-  defp format_date(date) do
+  def format_date(date) do
     NaiveDateTime.from_iso8601!("#{date} 00:00:00")
   end
 
