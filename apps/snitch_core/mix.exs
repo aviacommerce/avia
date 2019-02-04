@@ -94,7 +94,7 @@ defmodule Snitch.Core.Mixfile do
       {:ex_aws_s3, "~> 2.0"},
       {:hackney, "~> 1.9"},
       {:sweet_xml, "~> 0.6"},
-      {:cowboy, "~> 1.0"},
+      {:plug_cowboy, "~> 2.0"},
       {:plug, "~> 1.0"},
 
       # unique id generator
