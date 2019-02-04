@@ -102,7 +102,7 @@ defmodule Snitch.Data.Model.PackageItemTest do
 
   describe "get_all/0" do
     test "package_items", context do
-      %{package_item: package_item} = make_package_item(context)
+      %{package_item: _package_item} = make_package_item(context)
       assert PackageItem.get_all() != []
     end
   end
