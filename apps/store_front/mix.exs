@@ -1,15 +1,15 @@
-defmodule SnitchApi.Mixfile do
+defmodule StoreFront.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :snitch_api,
-      version: "0.0.1",
+      app: :store_front,
+      version: "0.1.0",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.8.1",
+      elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
@@ -22,8 +22,8 @@ defmodule SnitchApi.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {SnitchApi.Application, []},
-      extra_applications: [:logger, :runtime_tools, :sentry]
+      mod: {StoreFront.Application, []},
+      extra_applications: [:logger, :runtime_tools]
     ]
   end
 
@@ -36,28 +36,13 @@ defmodule SnitchApi.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.3.0"},
-      {:phoenix_pubsub, "~> 1.0"},
+      {:phoenix, "~> 1.4.0"},
+      {:phoenix_pubsub, "~> 1.1"},
+      {:phoenix_html, "~> 2.11"},
+      {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:gettext, "~> 0.11"},
-      {:cowboy, "~> 1.0"},
-      {:snitch_core, "~> 0.0.1", in_umbrella: true},
-      {:plug, "~> 1.0"},
-      {:corsica, "~> 1.0"},
-      {:uuid, "~> 1.1"},
-      {:ja_serializer, "~> 0.13.0"},
-      {:recase, "~> 0.2"},
-
-      # Authentication
-      {:guardian, "~> 1.0"},
-      {:inflex, "~> 1.10.0"},
-
-      # http client
-      {:httpoison, "~> 0.13"},
-      {:snitch_payments, github: "aviacommerce/avia_payments", branch: "develop"},
-
-      # html parser
-      {:floki, "~> 0.20.0"},
-      {:jason, "~> 1.1"}
+      {:jason, "~> 1.0"},
+      {:plug_cowboy, "~> 2.0"}
     ]
   end
 end
