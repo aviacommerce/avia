@@ -1,4 +1,7 @@
 defmodule AdminApp.OrderContext do
+  @moduledoc """
+  Module for the order related helper functions
+  """
   import Ecto.Query
 
   alias AdminAppWeb.Helpers
@@ -16,8 +19,7 @@ defmodule AdminApp.OrderContext do
     case OrderModel.get(%{number: number}) do
       {:ok, order} ->
         order =
-          order
-          |> Repo.preload([
+          Repo.preload(order, [
             [line_items: :product],
             [packages: [:items, :shipping_method]],
             [payments: :payment_method],
@@ -34,11 +36,10 @@ defmodule AdminApp.OrderContext do
   def get_order(%{"id" => id}) do
     {:ok, order} = id |> String.to_integer() |> OrderModel.get()
 
-    case String.to_integer(id) |> OrderModel.get() do
+    case OrderModel.get(String.to_integer(id)) do
       {:ok, order} ->
         order =
-          order
-          |> Repo.preload([
+          Repo.preload(order, [
             [line_items: :product],
             [packages: [:items, :shipping_method]],
             [payments: :payment_method],
@@ -125,8 +126,13 @@ defmodule AdminApp.OrderContext do
 
   defp initial_date_range do
     %{
-      start_date: Helpers.date_days_before(30) |> Date.from_iso8601() |> elem(1) |> SearchContext.format_date,
-      end_date: Date.utc_today() |> SearchContext.format_date
+      start_date:
+        30
+        |> Helpers.date_days_before()
+        |> Date.from_iso8601()
+        |> elem(1)
+        |> SearchContext.format_date(),
+      end_date: SearchContext.format_date(Date.utc_today())
     }
   end
 
@@ -171,6 +177,8 @@ defmodule AdminApp.OrderContext do
   end
 
   defp load_orders(query) do
-    Repo.all(query) |> Repo.preload([:user, :packages, [line_items: :product]])
+    query
+    |> preload([:user, [packages: :items], [line_items: :product]])
+    |> Repo.all()
   end
 end

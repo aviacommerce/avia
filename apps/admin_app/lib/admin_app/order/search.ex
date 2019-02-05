@@ -1,4 +1,11 @@
 defmodule AdminApp.Order.SearchContext do
+  @moduledoc """
+  Helper functions for order search on the basis of:
+  - Customer first_name, last_name or email
+  - Order state
+  - Order number
+  - Date range for order placed
+  """
   import Ecto.Query
   alias Snitch.Data.Schema.{Order, User}
   alias Snitch.Core.Tools.MultiTenancy.Repo
@@ -7,12 +14,13 @@ defmodule AdminApp.Order.SearchContext do
     state = get_order_state(term)
 
     user_ids =
-      from(user in User,
-        where:
-          ilike(user.first_name, ^"%#{term}%") or ilike(user.last_name, ^"%#{term}%") or
-            ilike(user.email, ^"%#{term}%"),
-        select: user.id
+      User
+      |> where(
+        [user],
+        ilike(user.first_name, ^"%#{term}%") or ilike(user.last_name, ^"%#{term}%") or
+          ilike(user.email, ^"%#{term}%")
       )
+      |> select([user], user.id)
       |> Repo.all()
 
     query =
@@ -28,7 +36,8 @@ defmodule AdminApp.Order.SearchContext do
     start_date = format_date(start_date)
     end_date = format_date(end_date)
 
-    from(o in Order, where: o.inserted_at >= ^start_date and o.inserted_at <= ^end_date)
+    Order
+    |> where([o], o.inserted_at >= ^start_date and o.inserted_at <= ^end_date)
     |> preload([:user, [packages: [:shipping_method, :items]], [line_items: :product]])
     |> Repo.all()
   end
