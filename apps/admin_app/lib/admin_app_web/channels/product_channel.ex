@@ -1,4 +1,7 @@
 defmodule AdminAppWeb.ProductChannel do
+  @moduledoc """
+  Module to manage product searches.
+  """
   use Phoenix.Channel
   alias AdminApp.Product.SearchContext
   alias Snitch.Core.Tools.MultiTenancy.Repo

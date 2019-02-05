@@ -5,6 +5,7 @@ defmodule AdminAppWeb.UserSocket do
   ## Channels
   # channel "room:*", AdminAppWeb.RoomChannel
   channel("product:*", AdminAppWeb.ProductChannel)
+  channel("order:*", AdminAppWeb.OrderChannel)
 
   ## Transports
   transport(:websocket, Phoenix.Transports.WebSocket)

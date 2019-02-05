@@ -31,15 +31,24 @@ defmodule AdminAppWeb.OrderController do
       )
 
     conn
+    |> assign_initial_date_range
     |> put_status(200)
     |> json(%{html: html})
   end
 
   def index(conn, _params) do
+    conn = assign_initial_date_range(conn)
+
     render(conn, "index.html", %{
       orders: OrderContext.order_list("pending", nil),
       token: get_csrf_token()
     })
+  end
+
+  defp assign_initial_date_range(conn) do
+    conn
+    |> assign(:end_date, Date.utc_today())
+    |> assign(:start_date, Helpers.date_days_before(30) |> Date.from_iso8601() |> elem(1))
   end
 
   def show(conn, %{"number" => _number} = params) do

@@ -1,4 +1,5 @@
 import MainView from '../main';
+import socket from './../../socket';
 
 export default class View extends MainView {
     mount() {
@@ -29,7 +30,43 @@ export default class View extends MainView {
           }
         })
       });
+      let channel = socket.channel("order:search", {})
 
+      channel.on(`order:search:${window.userToken}`, payload => {
+        $(".main").html(payload.body);
+        this.mount();
+      })
+
+      channel.join()
+
+      $(document).on('change', '#order_search_box', function () {
+        if ($("#order_search_box").val.length > 0) { // don't send empty msg.
+          $("#order-search-button").text("loading....");
+          channel.push('order:search', { // send the message to the server on "ping" channel
+            term: $("#order_search_box").val(),
+            start_date: $("#selected_start_date").val(),
+            end_date: $("#selected_end_date").val()
+          });
+          $("#order_search_box").val = ''; // reset the message input field for next message.
+        }
+      });
+      $(document).on('change', '#selected_state', function () {    
+        $(".orders-list").html("");
+        $(".orders-list").addClass("loader");
+        channel.push('order:search', { // send the message to the server on "ping" channel
+          term: $("#selected_state").val(),
+          start_date: $("#selected_start_date").val(),
+          end_date: $("#selected_end_date").val()
+        });
+      });
+      $(document).on('change', '#selected_start_date, #selected_end_date', function () {
+        $(".orders-list").html("");
+        $(".orders-list").addClass("loader");
+        channel.push(`order:search`, { // send the message to the server on "ping" channel
+          start_date: $("#selected_start_date").val(),
+          end_date: $("#selected_end_date").val()
+        });
+      });
     }
 
     unmount() {
