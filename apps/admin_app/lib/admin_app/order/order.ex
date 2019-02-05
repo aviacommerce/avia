@@ -143,8 +143,8 @@ defmodule AdminApp.OrderContext do
     query =
       from(p in queryable,
         where:
-          p.state == "complete" and p.inserted_at >= ^initial_date_range.start_date and
-            p.inserted_at <= ^initial_date_range.end_date
+          p.state == "complete" and p.updated_at >= ^initial_date_range.start_date and
+            p.updated_at <= ^initial_date_range.end_date
       )
 
     load_orders(query)
@@ -156,8 +156,8 @@ defmodule AdminApp.OrderContext do
     query =
       from(p in queryable,
         where:
-          p.state == "confirmed" and p.inserted_at >= ^initial_date_range.start_date and
-            p.inserted_at <= ^initial_date_range.end_date,
+          p.state == "confirmed" and p.updated_at >= ^initial_date_range.start_date and
+            p.updated_at <= ^initial_date_range.end_date,
         select: p
       )
   end

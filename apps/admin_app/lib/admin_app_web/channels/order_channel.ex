@@ -1,8 +1,14 @@
 defmodule AdminAppWeb.OrderChannel do
+  @moduledoc """
+  Module to manage order searches.
+  """
   use Phoenix.Channel
   alias AdminApp.Order.SearchContext
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
+  @doc """
+  To authorize clients to join order search topic
+  """
   def join("order:search", _message, socket) do
     {:ok, socket}
   end
@@ -11,6 +17,10 @@ defmodule AdminAppWeb.OrderChannel do
     {:error, %{reason: "unauthorized"}}
   end
 
+  @doc """
+  To handle incoming order search events and grab the payload passed by
+  client over the channel.
+  """
   def handle_in("order:search", payload, socket) do
     Repo.set_tenant(socket.assigns.tenant)
     orders = SearchContext.search_orders(payload)

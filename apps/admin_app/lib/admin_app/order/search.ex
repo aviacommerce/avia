@@ -24,7 +24,8 @@ defmodule AdminApp.Order.SearchContext do
       |> Repo.all()
 
     query =
-      get_orders_with_state(user_ids, term, state)
+      user_ids
+      |> get_orders_with_state(term, state)
       |> preload([:user, [packages: [:shipping_method, :items]], [line_items: :product]])
       |> Repo.all()
   end
@@ -57,18 +58,14 @@ defmodule AdminApp.Order.SearchContext do
   end
 
   defp get_orders_with_state(user_ids, term, "invalid") do
-    Order
-    |> where(
-      [o],
-      o.user_id in ^user_ids or ilike(o.number, ^"%#{term}%")
+    from(o in Order,
+      where: o.user_id in ^user_ids or ilike(o.number, ^"%#{term}%")
     )
   end
 
   defp get_orders_with_state(user_ids, term, valid_state) do
-    Order
-    |> where(
-      [o],
-      o.user_id in ^user_ids or ilike(o.number, ^"%#{term}%") or o.state == ^valid_state
+    from(o in Order,
+      where: o.user_id in ^user_ids or ilike(o.number, ^"%#{term}%") or o.state == ^valid_state
     )
   end
 end
