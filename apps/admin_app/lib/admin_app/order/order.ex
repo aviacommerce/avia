@@ -14,6 +14,7 @@ defmodule AdminApp.OrderContext do
   alias SnitchPayments.PaymentMethodCode
   alias Snitch.Data.Model.Payment
   alias AdminApp.Order.SearchContext
+  alias Snitch.Pagination
 
   def get_order(%{"number" => number}) do
     case OrderModel.get(%{number: number}) do
@@ -57,11 +58,10 @@ defmodule AdminApp.OrderContext do
     OrderDomain.total_amount(order)
   end
 
-  def order_list("pending", sort_param) do
+  def order_list("pending", sort_param, page) do
     rummage = get_rummage(sort_param)
     query = query_confirmed_orders(rummage)
-    orders = load_orders(query)
-
+    orders = load_orders(query, page)
     Enum.filter(orders, fn order ->
       Enum.any?(order.packages, fn package ->
         package.state == :processing
@@ -69,10 +69,10 @@ defmodule AdminApp.OrderContext do
     end)
   end
 
-  def order_list("unshipped", sort_param) do
+  def order_list("unshipped", sort_param, page) do
     rummage = get_rummage(sort_param)
     query = query_confirmed_orders(rummage)
-    orders = load_orders(query)
+    orders = load_orders(query, page)
 
     Enum.filter(orders, fn order ->
       Enum.any?(order.packages, fn package ->
@@ -81,10 +81,10 @@ defmodule AdminApp.OrderContext do
     end)
   end
 
-  def order_list("shipped", sort_param) do
+  def order_list("shipped", sort_param, page) do
     rummage = get_rummage(sort_param)
     query = query_confirmed_orders(rummage)
-    orders = load_orders(query)
+    orders = load_orders(query, page)
 
     Enum.filter(orders, fn order ->
       Enum.any?(order.packages, fn package ->
@@ -136,7 +136,7 @@ defmodule AdminApp.OrderContext do
     }
   end
 
-  def order_list("complete", sort_param) do
+  def order_list("complete", sort_param, page) do
     rummage = get_rummage(sort_param)
     {queryable, _rummage} = Order.rummage(rummage)
 
@@ -147,7 +147,7 @@ defmodule AdminApp.OrderContext do
             p.updated_at <= ^initial_date_range.end_date
       )
 
-    load_orders(query)
+    load_orders(query, page)
   end
 
   defp query_confirmed_orders(rummage) do
@@ -176,7 +176,13 @@ defmodule AdminApp.OrderContext do
     end
   end
 
-  defp load_orders(query) do
+  defp load_orders(query, page, per_page \\ 2) do
+    # orders =
+    #   query
+    #   |> order_by(desc: :inserted_at)
+    #   |> Pagination.page(page, per_page: per_page)
+
+    # orders.list |> Repo.preload([:user, :packages, [line_items: :product]])
     query
     |> preload([:user, [packages: :items], [line_items: :product]])
     |> Repo.all()

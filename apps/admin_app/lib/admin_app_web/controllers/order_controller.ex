@@ -17,9 +17,13 @@ defmodule AdminAppWeb.OrderController do
 
   @root_path [File.cwd!(), "invoices"] |> Path.join()
 
-  def index(conn, %{"category" => category}) do
+  def index(conn, %{"category" => category} = params) do
+    page = params["page"] || 1
     sort_param = conn.query_params["sort"]
-    orders = OrderContext.order_list(category, sort_param)
+
+    orders =
+      OrderContext.order_list(category, sort_param, page)
+
     token = get_csrf_token()
 
     html =
@@ -36,11 +40,12 @@ defmodule AdminAppWeb.OrderController do
     |> json(%{html: html})
   end
 
-  def index(conn, _params) do
+  def index(conn, params) do
     conn = assign_initial_date_range(conn)
+    page = params["page"] || 0
 
     render(conn, "index.html", %{
-      orders: OrderContext.order_list("pending", nil),
+      orders: OrderContext.order_list("pending", nil, page),
       token: get_csrf_token()
     })
   end
