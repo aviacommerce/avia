@@ -551,10 +551,9 @@ defmodule Snitch.Data.Model.Product do
   end
 
   @doc """
-  Returns the parent product of the supplied variant.
+  Returns the `parent product` of the supplied `variant`.
 
-  In case supplied product is not a variant, an error tuple is
-  returned.
+  In case supplied product is not a variant, returns nil.
   """
   @spec get_parent_product(Product.t()) :: Product.t() | nil
   def get_parent_product(product) do
@@ -566,7 +565,7 @@ defmodule Snitch.Data.Model.Product do
   Returns `tax_class_id` of the product.
 
   Since tax class is set only for parent and not variants, if the
-  supplied product is variant, tax class for the parent product is
+  supplied product is a variant, tax class of the parent product is
   returned.
   """
   @spec get_tax_class_id(Product.t()) :: non_neg_integer

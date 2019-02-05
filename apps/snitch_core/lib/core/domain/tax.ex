@@ -25,9 +25,9 @@ defmodule Snitch.Domain.Tax do
 
   @spec calculate(atom, any, Order.t(), StockLocation.t()) :: map
   def calculate(:package_item, line_item, order, stock_location) do
-    line_item = line_item |> Repo.preload(:product)
+    line_item = Repo.preload(line_item, :product)
 
-    tax_class_id = line_item.product |> Product.get_tax_class_id()
+    tax_class_id = Product.get_tax_class_id(line_item.product)
     tax_config = TaxConfig.get_default()
     tax_address = get_tax_address(order, stock_location, tax_config)
     tax_zone = get_tax_zone!(tax_address)
