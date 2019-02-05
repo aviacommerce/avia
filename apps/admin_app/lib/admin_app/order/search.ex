@@ -37,7 +37,7 @@ defmodule AdminApp.Order.SearchContext do
     end_date = format_date(end_date)
 
     Order
-    |> where([o], o.inserted_at >= ^start_date and o.inserted_at <= ^end_date)
+    |> where([o], o.updated_at >= ^start_date and o.updated_at <= ^end_date)
     |> preload([:user, [packages: [:shipping_method, :items]], [line_items: :product]])
     |> Repo.all()
   end
