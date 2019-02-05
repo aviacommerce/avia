@@ -31,7 +31,6 @@ defmodule Snitch.Domain.Tax do
     tax_config = TaxConfig.get_default()
     tax_address = get_tax_address(order, stock_location, tax_config)
     tax_zone = get_tax_zone!(tax_address)
-
     calculate_item_tax(tax_zone, line_item, tax_config, tax_class_id)
   end
 
@@ -43,7 +42,11 @@ defmodule Snitch.Domain.Tax do
     calculate_shipping_tax(tax_zone, shipping_cost, tax_config)
   end
 
-  ################# tax calulation related helpers ##################
+  ################# package item tax calulation related helpers ###############
+
+  defp calculate_item_tax(nil, line_item, _tax_config, _tax_class_id) do
+    %{original_amount: line_item.unit_price, tax: Money.new!(line_item.unit_price.currency, 0)}
+  end
 
   defp calculate_item_tax(tax_zone, line_item, tax_config, tax_class_id) do
     tax_rates = tax_zone.tax_rates
@@ -65,7 +68,9 @@ defmodule Snitch.Domain.Tax do
     %{original_amount: amount_with_tax.amount, tax: total_tax}
   end
 
-  defp calculate_shipping_tax(_tax_zone, shipping_cost, %{shipping_tax_id: nil}) do
+  ######################## shipping tax helpers ###############################
+
+  defp calculate_shipping_tax(nil, shipping_cost, _tax_config) do
     %{original_amount: shipping_cost, tax: Money.new!(shipping_cost.currency, 0)}
   end
 
@@ -86,6 +91,8 @@ defmodule Snitch.Domain.Tax do
     %{original_amount: amount_with_tax.amount, tax: total_tax}
   end
 
+  ################# tax calculation helpers ###########################
+
   defp tax_by_rate_and_class(tax_rate, tax_class_id, price, tax_config) do
     tax_value =
       Enum.find(tax_rate.tax_rate_class_values, fn value ->
@@ -105,20 +112,22 @@ defmodule Snitch.Domain.Tax do
 
   ################### tax zone related helpers ######################
 
-  # Returns tax zone for the supplied state and country id.
+  # Returns tax zone for the supplied country id.
   defp get_tax_zone!(%{state_id: nil, country_id: country_id}) do
     query =
       from(tz in TaxZone,
         join: c_z_member in CountryZoneMember,
         on: tz.zone_id == c_z_member.zone_id,
-        where: c_z_member.state_id == ^country_id and tz.is_active? == true,
+        where: c_z_member.country_id == ^country_id and tz.is_active? == true,
         select: %TaxZone{id: tz.id, name: tz.name, zone_id: tz.zone_id}
       )
 
     tax_zone_query_result(query)
   end
 
-  defp get_tax_zone!(%{state_id: state_id, country_id: _country_id}) do
+  # Tries to find a tax zone by the state_id if none are found then tries
+  # to find using the country_id.
+  defp get_tax_zone!(%{state_id: state_id, country_id: country_id}) do
     query =
       from(tz in TaxZone,
         join: s_z_member in StateZoneMember,
@@ -127,15 +136,17 @@ defmodule Snitch.Domain.Tax do
         select: %TaxZone{id: tz.id, name: tz.name}
       )
 
-    tax_zone_query_result(query)
+    tax_zone_query_result(query) || get_tax_zone!(%{state_id: nil, country_id: country_id})
   end
 
   defp tax_zone_query_result(query) do
-    [tax_zone] =
-      query
-      |> Repo.all()
+    case Repo.all(query) do
+      [] ->
+        nil
 
-    Repo.preload(tax_zone, tax_rates: [tax_rate_class_values: :tax_class])
+      [tax_zone] ->
+        Repo.preload(tax_zone, tax_rates: [tax_rate_class_values: :tax_class])
+    end
   end
 
   ################ address related helpers #########################
@@ -153,7 +164,7 @@ defmodule Snitch.Domain.Tax do
   defp get_address(:shipping_address, order, _stock_location, tax_config) do
     {state_id, country_id} =
       if order.shipping_address do
-        {order.shipping_address.state_id, order.shipping_address.state_id}
+        {order.shipping_address.state_id, order.shipping_address.country_id}
       else
         {tax_config.default_state_id, tax_config.default_country_id}
       end
@@ -164,7 +175,7 @@ defmodule Snitch.Domain.Tax do
   defp get_address(:billing_address, order, _stock_location, tax_config) do
     {state_id, country_id} =
       if order.billing_address do
-        {order.billing_address.state_id, order.billing_address.state_id}
+        {order.billing_address.state_id, order.billing_address.country_id}
       else
         {tax_config.default_state_id, tax_config.default_country_id}
       end

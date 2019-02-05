@@ -79,6 +79,170 @@ defmodule Snitch.Domain.TaxTest do
       assert calculated_amount == tax_less_amount
       assert tax == tax_value
     end
+
+    @tag state_count: 3
+    test "tax address is shipping and, order does not has it set", context do
+      zone = insert(:zone, zone_type: "S")
+      %{tax_class: tax_class, product: product, states: states, stock_item: stock_item} = context
+      [state_1, _, _] = states
+      setup_state_zone_members(zone, states)
+
+      order_params = %{
+        product: product,
+        shipping_address: nil,
+        billing_address: nil,
+        quantity_li: 2
+      }
+
+      %{order: order, line_item: line_item} = order_manifest(order_params)
+
+      tax_params = %{zone: zone, address: :shipping_address, included: false, state: state_1}
+      %{tax_zone: tax_zone} = tax_manifest(tax_params)
+      tax_rate_params = %{tax_zone: tax_zone, value_manifest: [%{class: tax_class, percent: 5}]}
+      tax_rate_manifest(tax_rate_params)
+
+      assert %{original_amount: tax_less_amount, tax: tax} =
+               Tax.calculate(:package_item, line_item, order, stock_item.stock_location)
+
+      %{amount: calculated_amount, tax: tax_value} =
+        excluded_tax_calculation(line_item.unit_price, 5, line_item.quantity)
+
+      assert calculated_amount == tax_less_amount
+      assert tax == tax_value
+    end
+
+    @tag state_count: 3
+    test "tax address is billing and, order has it set", context do
+      zone = insert(:zone, zone_type: "S")
+      %{tax_class: tax_class, product: product, states: states, stock_item: stock_item} = context
+      [state_1, state_2, _] = states
+      setup_state_zone_members(zone, states)
+      billing_address = address_manifest(:billing, state_1)
+
+      order_params = %{
+        product: product,
+        shipping_address: nil,
+        billing_address: billing_address,
+        quantity_li: 2
+      }
+
+      %{order: order, line_item: line_item} = order_manifest(order_params)
+
+      tax_params = %{zone: zone, address: :shipping_address, included: false, state: state_2}
+      %{tax_zone: tax_zone} = tax_manifest(tax_params)
+      tax_rate_params = %{tax_zone: tax_zone, value_manifest: [%{class: tax_class, percent: 5}]}
+      tax_rate_manifest(tax_rate_params)
+
+      assert %{original_amount: tax_less_amount, tax: tax} =
+               Tax.calculate(:package_item, line_item, order, stock_item.stock_location)
+
+      %{amount: calculated_amount, tax: tax_value} =
+        excluded_tax_calculation(line_item.unit_price, 5, line_item.quantity)
+
+      assert calculated_amount == tax_less_amount
+      assert tax == tax_value
+    end
+
+    @tag state_count: 1
+    test "if no tax zone is found for the order address", context do
+      zone = insert(:zone, zone_type: "S")
+      %{tax_class: tax_class, product: product, states: states, stock_item: stock_item} = context
+      [state] = states
+      setup_state_zone_members(zone, states)
+      billing_address = address_manifest(:billing, insert(:state))
+
+      order_params = %{
+        product: product,
+        shipping_address: nil,
+        billing_address: billing_address,
+        quantity_li: 2
+      }
+
+      %{order: order, line_item: line_item} = order_manifest(order_params)
+
+      tax_params = %{zone: zone, address: :billing_address, included: false, state: state}
+      %{tax_zone: tax_zone} = tax_manifest(tax_params)
+      tax_rate_params = %{tax_zone: tax_zone, value_manifest: [%{class: tax_class, percent: 5}]}
+      tax_rate_manifest(tax_rate_params)
+
+      assert %{original_amount: tax_less_amount, tax: tax} =
+               Tax.calculate(:package_item, line_item, order, stock_item.stock_location)
+
+      assert tax_less_amount == line_item.unit_price
+      assert tax == Money.new!(currency(), 0)
+    end
+  end
+
+  describe "calculate/4 shipping" do
+    @tag state_count: 3
+    test "tax 0 if tax rate does not have shipping class value set", context do
+      zone = insert(:zone, zone_type: "S")
+      %{states: states} = context
+      [state_1, _, _] = states
+      setup_state_zone_members(zone, states)
+      shipping_address = address_manifest(:shipping, List.first(states))
+
+      order = insert(:order, shipping_address: shipping_address)
+
+      stock_location =
+        insert(:stock_location,
+          state: state_1,
+          country: state_1.country
+        )
+
+      tax_class = insert(:tax_class)
+      tax_params = %{zone: zone, address: :shipping_address, included: false, state: state_1}
+      %{tax_zone: tax_zone} = tax_manifest(tax_params)
+      tax_rate_params = %{tax_zone: tax_zone, value_manifest: [%{class: tax_class, percent: 5}]}
+      tax_rate_manifest(tax_rate_params)
+
+      shipping_cost = Money.new!(:USD, 10)
+
+      assert %{original_amount: amount, tax: tax} =
+               Tax.calculate(:shipping, shipping_cost, order, stock_location)
+
+      assert amount == shipping_cost
+      assert tax == Money.new!(:USD, 0)
+    end
+
+    @tag state_count: 3
+    test "tax 0 if tax zone not found for address", context do
+      zone = insert(:zone, zone_type: "S")
+      %{states: states} = context
+      [state_1, _, _] = states
+      setup_state_zone_members(zone, states)
+      shipping_address = address_manifest(:shipping, insert(:state))
+
+      order = insert(:order, shipping_address: shipping_address)
+
+      stock_location =
+        insert(:stock_location,
+          state: state_1,
+          country: state_1.country
+        )
+
+      tax_class = insert(:tax_class)
+
+      tax_params = %{
+        zone: zone,
+        address: :shipping_address,
+        included: false,
+        state: state_1,
+        shipping_tax_id: tax_class.id
+      }
+
+      %{tax_zone: tax_zone} = tax_manifest(tax_params)
+      tax_rate_params = %{tax_zone: tax_zone, value_manifest: [%{class: tax_class, percent: 5}]}
+      tax_rate_manifest(tax_rate_params)
+
+      shipping_cost = Money.new!(:USD, 10)
+
+      assert %{original_amount: amount, tax: tax} =
+               Tax.calculate(:shipping, shipping_cost, order, stock_location)
+
+      assert amount == shipping_cost
+      assert tax == Money.new!(:USD, 0)
+    end
   end
 
   defp order_manifest(params) do
@@ -95,16 +259,17 @@ defmodule Snitch.Domain.TaxTest do
   end
 
   defp tax_manifest(params) do
-    insert(:tax_config,
-      default_state: params.state,
-      default_country: params.state.country,
-      calculation_address_type: params.address,
-      included_in_price?: params.included
-    )
+    tax_config =
+      insert(:tax_config,
+        default_state: params.state,
+        default_country: params.state.country,
+        calculation_address_type: params.address,
+        included_in_price?: params.included
+      )
 
-    tax_zone = insert(:tax_zone, zone: params.zone)
+    tax_zone = insert(:tax_zone, zone: params.zone, zone_id: params.zone.id)
 
-    %{tax_zone: tax_zone}
+    %{tax_zone: tax_zone, tax_config: tax_config}
   end
 
   defp tax_rate_manifest(params) do
