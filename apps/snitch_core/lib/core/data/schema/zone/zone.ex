@@ -29,11 +29,13 @@ defmodule Snitch.Data.Schema.Zone do
     field(:description, :string)
     field(:zone_type, :string)
     field(:members, :any, virtual: true)
+    field(:is_default, :boolean, default: false)
+
     timestamps()
   end
 
   @required_fields ~w(name zone_type)a
-  @optional_fields ~w(description)a
+  @optional_fields ~w(description is_default)a
   @create_fields @required_fields ++ @optional_fields
   @doc """
   Returns a `Zone` changeset to create a new `zone`.

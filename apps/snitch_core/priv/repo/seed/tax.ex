@@ -6,7 +6,7 @@ defmodule Snitch.Seed.Tax do
   Country and states to be seeded first.
   """
   alias Snitch.Core.Tools.MultiTenancy.Repo
-  alias Snitch.Data.Schema.{TaxClass, TaxConfig}
+  alias Snitch.Data.Schema.{TaxClass, TaxConfig, Zone, TaxZone}
   alias Snitch.Data.Model.TaxClass, as: TaxClassModel
   alias Snitch.Data.Model.Country
 
@@ -24,9 +24,17 @@ defmodule Snitch.Seed.Tax do
     updated_at: DateTime.utc_now()
   }
 
+  @default_tax_zone_params %{
+    name: "Default Tax Zone",
+    is_active?: true,
+    zone_id: nil,
+    is_default: true
+  }
+
   def seed() do
     seed_tax_classes()
     seed_tax_config()
+    seed_default_tax_zone!()
   end
 
   def seed_tax_classes() do
@@ -56,5 +64,13 @@ defmodule Snitch.Seed.Tax do
 
     Repo.delete_all(TaxConfig)
     Repo.insert(changeset, returning: false)
+  end
+
+  def seed_default_tax_zone!() do
+    default_zone = Repo.get_by!(Zone, is_default: true)
+    params = %{@default_tax_zone_params | zone_id: default_zone.id}
+    changeset = TaxZone.create_changeset(%TaxZone{}, params)
+
+    Repo.insert(changeset, on_conflict: :nothing)
   end
 end
