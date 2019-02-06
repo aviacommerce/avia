@@ -8,85 +8,85 @@ defmodule Snitch.Data.Model.LineItemTest do
   alias Snitch.Data.Model.{LineItem, Order}
   alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
 
-  describe "with valid params" do
-    setup :variants
-    setup :good_line_items
+  # describe "with valid params" do
+  #   setup :variants
+  #   setup :good_line_items
 
-    test "update_unit_price/1", context do
-      %{line_items: line_items} = context
-      priced_items = LineItem.update_unit_price(line_items)
-      assert Enum.all?(priced_items, fn %{unit_price: price} -> not is_nil(price) end)
-    end
+  #   test "update_unit_price/1", context do
+  #     %{line_items: line_items} = context
+  #     priced_items = LineItem.update_unit_price(line_items)
+  #     assert Enum.all?(priced_items, fn %{unit_price: price} -> not is_nil(price) end)
+  #   end
 
-    test "compute_total/1", context do
-      %{line_items: line_items} = context
-      priced_items = LineItem.update_unit_price(line_items)
-      assert %Money{} = LineItem.compute_total(priced_items)
-    end
-  end
+  #   test "compute_total/1", context do
+  #     %{line_items: line_items} = context
+  #     priced_items = LineItem.update_unit_price(line_items)
+  #     assert %Money{} = LineItem.compute_total(priced_items)
+  #   end
+  # end
 
-  describe "with invalid params" do
-    setup :variants
-    setup :bad_line_items
+  # describe "with invalid params" do
+  #   setup :variants
+  #   setup :bad_line_items
 
-    test "update_unit_price/1", %{line_items: line_items} do
-      priced_items = LineItem.update_unit_price(line_items)
+  #   test "update_unit_price/1", %{line_items: line_items} do
+  #     priced_items = LineItem.update_unit_price(line_items)
 
-      assert [
-               %{quantity: 2, product_id: -1},
-               %{quantity: nil, unit_price: %Money{}, product_id: _},
-               %{quantity: 2, product_id: nil}
-             ] = priced_items
-    end
-  end
+  #     assert [
+  #              %{quantity: 2, product_id: -1},
+  #              %{quantity: nil, unit_price: %Money{}, product_id: _},
+  #              %{quantity: 2, product_id: nil}
+  #            ] = priced_items
+  #   end
+  # end
 
-  describe "compute_total/1 with empty list" do
-    setup :verify_on_exit!
+  # describe "compute_total/1 with empty list" do
+  #   setup :verify_on_exit!
 
-    test "when default currency is set in the store" do
-      config = insert(:general_config)
-      assert GCModel.fetch_currency() == config.currency
-      assert Money.zero(config.currency) == LineItem.compute_total([])
-    end
+  #   test "when default currency is set in the store" do
+  #     config = insert(:general_config)
+  #     assert GCModel.fetch_currency() == config.currency
+  #     assert Money.zero(config.currency) == LineItem.compute_total([])
+  #   end
 
-    test "when default currency is not set" do
-      assert GCModel.fetch_currency() == "USD"
-      assert Money.zero("USD") == LineItem.compute_total([])
-    end
-  end
+  #   test "when default currency is not set" do
+  #     assert GCModel.fetch_currency() == "USD"
+  #     assert Money.zero("USD") == LineItem.compute_total([])
+  #   end
+  # end
 
   describe "create/1" do
     setup :variants
     setup :stock_items_setup
 
-    @tag stock_item_count: 1
-    test "fails without an existing order or variant", %{stock_items: [si]} do
-      product = si.product
-      assert {:error, changeset} = LineItem.create(%{line_item_params(product) | order_id: -1})
+    # @tag stock_item_count: 1
+    # test "fails without an existing order or variant", %{stock_items: [si]} do
+    #   product = si.product
+    #   assert {:error, changeset} = LineItem.create(%{line_item_params(product) | order_id: -1})
 
-      assert %{order: ["does not exist"]} == errors_on(changeset)
+    #   assert %{order: ["does not exist"]} == errors_on(changeset)
 
-      assert {:error, changeset} = LineItem.create(line_item_params(product))
-      assert %{order_id: ["can't be blank"]} == errors_on(changeset)
+    #   assert {:error, changeset} = LineItem.create(line_item_params(product))
+    #   assert %{order_id: ["can't be blank"]} == errors_on(changeset)
 
-      order = insert(:order)
+    #   order = insert(:order)
 
-      assert {:error, changeset} =
-               LineItem.create(%{line_item_params(product) | product_id: nil, order_id: order.id})
+    #   assert {:error, changeset} =
+    #            LineItem.create(%{line_item_params(product) | product_id: nil, order_id: order.id})
 
-      assert %{product_id: ["can't be blank"]} == errors_on(changeset)
-    end
+    #   assert %{product_id: ["can't be blank"]} == errors_on(changeset)
+    # end
 
-    test "for an empty order" do
-      stock_item = insert(:stock_item)
-      variant = stock_item.product
-      order = insert(:order, line_items: [])
+    # test "for an empty order" do
+    #   stock_item = insert(:stock_item)
+    #   variant = stock_item.product
+    #   order = insert(:order, line_items: [])
 
-      assert {:ok, lineitem} = LineItem.create(%{line_item_params(variant) | order_id: order.id})
-    end
+    #   assert {:ok, lineitem} = LineItem.create(%{line_item_params(variant) | order_id: order.id})
+    # end
 
     @tag variant_count: 1
-    test "fails if stock insufficient", %{variants: [variant]} do
+    test "fails if stock insufficient and inventory tracking enabled", %{variants: [variant]} do
       order = insert(:order, line_items: [])
 
       assert {:error, changeset} =
@@ -96,42 +96,42 @@ defmodule Snitch.Data.Model.LineItemTest do
     end
   end
 
-  describe "update/1" do
-    setup :orders
+  # describe "update/1" do
+  #   setup :orders
 
-    test "with valid params", %{orders: [order]} do
-      stock_item = insert(:stock_item, count_on_hand: 5)
+  #   test "with valid params", %{orders: [order]} do
+  #     stock_item = insert(:stock_item, count_on_hand: 5)
 
-      product = stock_item.product
-      order = struct(order, line_items(%{order: order, variants: [product]}))
+  #     product = stock_item.product
+  #     order = struct(order, line_items(%{order: order, variants: [product]}))
 
-      [li] = order.line_items
+  #     [li] = order.line_items
 
-      params = %{quantity: li.quantity + 1}
+  #     params = %{quantity: li.quantity + 1}
 
-      assert {:ok, _} = LineItem.update(li, params)
-    end
-  end
+  #     assert {:ok, _} = LineItem.update(li, params)
+  #   end
+  # end
 
-  describe "delete/1 for order in `cart` state" do
-    setup :variants
-    setup :orders
+  # describe "delete/1 for order in `cart` state" do
+  #   setup :variants
+  #   setup :orders
 
-    @tag variant_count: 1
-    test "with valid params", %{variants: [v], orders: [order]} do
-      order = struct(order, line_items(%{order: order, variants: [v]}))
+  #   @tag variant_count: 1
+  #   test "with valid params", %{variants: [v], orders: [order]} do
+  #     order = struct(order, line_items(%{order: order, variants: [v]}))
 
-      [line_item] = order.line_items
+  #     [line_item] = order.line_items
 
-      {:ok, _} = LineItem.delete(line_item)
-      {:ok, order} = Order.get(order.id)
+  #     {:ok, _} = LineItem.delete(line_item)
+  #     {:ok, order} = Order.get(order.id)
 
-      assert [] =
-               order
-               |> Repo.preload(:line_items)
-               |> Map.fetch!(:line_items)
-    end
-  end
+  #     assert [] =
+  #              order
+  #              |> Repo.preload(:line_items)
+  #              |> Map.fetch!(:line_items)
+  #   end
+  # end
 
   defp good_line_items(context) do
     %{variants: vs} = context
