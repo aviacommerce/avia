@@ -16,7 +16,7 @@ defmodule Snitch.Application do
           supervisor(Snitch.Tools.ElasticsearchCluster, []),
           worker(Cachex, [:avia_cache, [limit: 1000]]),
           supervisor(Task.Supervisor, [[name: MailManager.TaskSupervisor]]),
-          worker(MailManager, [])
+          worker(MailManager, [[name: MailManager]])
         ],
         strategy: :one_for_one,
         name: Snitch.Supervisor

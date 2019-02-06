@@ -25,6 +25,7 @@ defmodule Snitch.Tools.OrderEmail do
   defp send_mail(nil, order), do: nil
 
   defp send_mail(general_config, order) do
+    raise "error"
     sender_email = general_config.sender_mail
     order = Repo.preload(order, [:user, line_items: [product: :images]])
     user_email = order.user.email
