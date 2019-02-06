@@ -1,6 +1,10 @@
 defmodule AdminApp.OrderContext do
+  @moduledoc """
+  Module for the order related helper functions
+  """
   import Ecto.Query
 
+  alias AdminAppWeb.Helpers
   alias BeepBop.Context
   alias Snitch.Domain.Order.DefaultMachine
   alias Snitch.Data.Schema.Order
@@ -9,13 +13,13 @@ defmodule AdminApp.OrderContext do
   alias Snitch.Domain.Order, as: OrderDomain
   alias SnitchPayments.PaymentMethodCode
   alias Snitch.Data.Model.Payment
+  alias AdminApp.Order.SearchContext
 
   def get_order(%{"number" => number}) do
     case OrderModel.get(%{number: number}) do
       {:ok, order} ->
         order =
-          order
-          |> Repo.preload([
+          Repo.preload(order, [
             [line_items: :product],
             [packages: [:items, :shipping_method]],
             [payments: :payment_method],
@@ -32,11 +36,10 @@ defmodule AdminApp.OrderContext do
   def get_order(%{"id" => id}) do
     {:ok, order} = id |> String.to_integer() |> OrderModel.get()
 
-    case String.to_integer(id) |> OrderModel.get() do
+    case OrderModel.get(String.to_integer(id)) do
       {:ok, order} ->
         order =
-          order
-          |> Repo.preload([
+          Repo.preload(order, [
             [line_items: :product],
             [packages: [:items, :shipping_method]],
             [payments: :payment_method],
@@ -121,16 +124,42 @@ defmodule AdminApp.OrderContext do
     {:error, errors}
   end
 
+  defp initial_date_range do
+    %{
+      start_date:
+        30
+        |> Helpers.date_days_before()
+        |> Date.from_iso8601()
+        |> elem(1)
+        |> SearchContext.format_date(),
+      end_date: SearchContext.format_date(Date.utc_today())
+    }
+  end
+
   def order_list("complete", sort_param) do
     rummage = get_rummage(sort_param)
     {queryable, _rummage} = Order.rummage(rummage)
-    query = from(p in queryable, where: p.state == "complete")
+
+    query =
+      from(p in queryable,
+        where:
+          p.state == "complete" and p.updated_at >= ^initial_date_range.start_date and
+            p.updated_at <= ^initial_date_range.end_date
+      )
+
     load_orders(query)
   end
 
   defp query_confirmed_orders(rummage) do
     {queryable, _rummage} = Order.rummage(rummage)
-    query = from(p in queryable, where: p.state == "confirmed", select: p)
+
+    query =
+      from(p in queryable,
+        where:
+          p.state == "confirmed" and p.updated_at >= ^initial_date_range.start_date and
+            p.updated_at <= ^initial_date_range.end_date,
+        select: p
+      )
   end
 
   defp get_rummage(sort_param) do
@@ -148,6 +177,8 @@ defmodule AdminApp.OrderContext do
   end
 
   defp load_orders(query) do
-    Repo.all(query) |> Repo.preload([:user, :packages, [line_items: :product]])
+    query
+    |> preload([:user, [packages: :items], [line_items: :product]])
+    |> Repo.all()
   end
 end

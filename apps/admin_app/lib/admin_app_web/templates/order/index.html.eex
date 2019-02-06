@@ -16,9 +16,25 @@
                   "shipped"), class: "nav-link" %></li>
                <li class="order-tab nav-item"><%= link "Complete", to: order_path(@conn, :index,
                   "complete"), class: "nav-link" %></li>
+               <div class="input-group mb-3">
+                  <input type="text" class="form-control" id="order_search_box" placeholder="Search by customer name, email or order number" aria-label="Recipient's username" aria-describedby="button-addon2">
+                  <div class="input-group-append">
+                     <button class="btn btn-outline-secondary" type="submit" id="order-search-button"><i class="fa fa-search"></i></button>
+                  </div>
+               </div>
+               <form class="form-inline mb-3 float-sm-right">
+                  <div class="form-group p-2">
+                     <label for="from" class="col-form-label-sm pr-2">From : </label>
+                     <input class="form-control form-control-sm" id="selected_start_date" value=<%= @start_date %> type="date" name="from">
+                  </div>
+                  <div class="form-group p-2">
+                     <label for="to" class="col-form-label-sm pr-2">To : </label>
+                     <input class="form-control form-control-sm" id="selected_end_date" value=<%= @end_date %> type="date" name="to">
+                  </div>
+               </form>
             </ul>
          </nav>
-         <div class="row m-0 list">
+         <div class="row m-0 list orders-list">
             <div class="col-12 p-0">
                <%= render "order_listing.html", conn: @conn, orders: @orders, token: @token %>
             </div>
@@ -59,6 +75,21 @@
                     <%= link("XLSX", to: order_path(@conn, :export_order, %{"format" => "xlsx"}), class: "dropdown-item")%>
                   </div>
                </div>
+               </br>
+               <div class="form-group">
+                  <label class="label-heading">Filter by state</label>
+                  <select class="form-control" id="selected_state">
+                     <option value="null" selected disabled>-- Please select an order state --</option>
+                     <option value="cart">Cart</option>
+                     <option value="address">Address</option>
+                     <option value="delivery">Delivery</option>
+                     <option value="payment">Payment</option>
+                     <option value="confirmed">Confirmed</option>
+                     <option value="complete">Complete</option>
+                     <option value="cancelled">Cancelled</option>
+                  </select>
+               </div>
+            </div>
             </div>
          </form>
       </div>

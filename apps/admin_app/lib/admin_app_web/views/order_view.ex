@@ -127,6 +127,10 @@ defmodule AdminAppWeb.OrderView do
     content_tag(:td, "#{line_item.quantity}")
   end
 
+  def render_address(nil) do
+    content_tag(:div, ["N.A"])
+  end
+
   def render_address(address) do
     content_tag(:div, [
       content_tag(:div, ["#{address.first_name} #{address.last_name}"], class: "name"),
