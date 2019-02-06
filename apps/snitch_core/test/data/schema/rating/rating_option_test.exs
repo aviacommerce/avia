@@ -2,7 +2,6 @@ defmodule Snitch.Data.Schema.RatingOptionTest do
   use ExUnit.Case, async: true
   use Snitch.DataCase
   import Snitch.Factory
-  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.RatingOption
 
   @valid_attrs %{
@@ -20,7 +19,6 @@ defmodule Snitch.Data.Schema.RatingOptionTest do
     test "fails? with all empty" do
       c = %{valid?: validity} = RatingOption.create_changeset(%RatingOption{}, %{})
       refute validity
-      require IEx
     end
   end
 
@@ -37,12 +35,6 @@ defmodule Snitch.Data.Schema.RatingOptionTest do
       c = RatingOption.update_changeset(rating_opt, %{position: nil, code: nil})
       refute c.valid?
       assert %{position: ["can't be blank"], code: ["can't be blank"]} == errors_on(c)
-    end
-
-    test "fails? with invalid parameters" do
-      rating_opt = insert(:rating_option)
-      c = RatingOption.update_changeset(rating_opt, %{value: 2})
-      assert c.changes == %{}
     end
   end
 end
