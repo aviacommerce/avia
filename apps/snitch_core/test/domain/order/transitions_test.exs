@@ -138,10 +138,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     setup :states
 
     setup %{embedded_shipping_methods: methods, states: states} do
-      order = insert(:order, shipping_address: address_manifest(List.first(states)))
-      tax_class_values = %{shipping_tax: %{class: insert(:tax_class), percent: 5}}
-      setup_tax_with_zone_and_rates(tax_class_values, states)
-
+      order = order_with_tax_manifest(states)
       [order: order, packages: [insert(:package, shipping_methods: methods, order: order)]]
     end
 
@@ -174,10 +171,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     setup :states
 
     setup %{embedded_shipping_methods: methods, states: states} do
-      order = insert(:order, shipping_address: address_manifest(List.first(states)))
-      tax_class_values = %{shipping_tax: %{class: insert(:tax_class), percent: 5}}
-      setup_tax_with_zone_and_rates(tax_class_values, states)
-
+      order = order_with_tax_manifest(states)
       [order: order, packages: [insert(:package, shipping_methods: methods, order: order)]]
     end
 
@@ -361,6 +355,14 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
       refute result.valid?
     end
+  end
+
+  defp order_with_tax_manifest(states) do
+    order = insert(:order, shipping_address: address_manifest(List.first(states)))
+    tax_class_values = %{shipping_tax: %{class: insert(:tax_class), percent: 5}}
+    setup_tax_with_zone_and_rates(tax_class_values, states)
+
+    order
   end
 
   defp setup_package_with_shipping(context, quantity, shipping_cost, states) do

@@ -63,7 +63,8 @@ defmodule Snitch.Data.Schema.PackageItem do
   The actual unit price for the package item. The `unit_price` may be same
   or different from the `line_item` unit price depending on whether, line
   item price is inclusive or exclusive of tax. In case line item price
-  is inclusive, this price is set after removing the tax amount form that.
+  is inclusive, this price is set after removing the tax amount from line_item
+  unit_price.
 
   ### `:tax`
   The tax levied over (or included in) the cost of the line item, as applicable
