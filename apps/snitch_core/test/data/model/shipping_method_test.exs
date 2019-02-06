@@ -111,7 +111,7 @@ defmodule Snitch.Data.Model.ShippingMethodTest do
          country_zone_count: 1,
          shipping_category_count: 1
     test "successfully deletes a shipping method", %{shipping_methods: [sm]} do
-      sm_deleted = ShippingMethod.delete(sm.id)
+      {:ok, _} = ShippingMethod.delete(sm.id)
       assert ShippingMethod.get(sm.id) == {:error, :shipping_method_not_found}
     end
 
