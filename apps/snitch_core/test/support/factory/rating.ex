@@ -3,7 +3,7 @@ defmodule Snitch.Factory.Rating do
 
   defmacro __using__(_opts) do
     quote do
-      alias Snitch.Data.Schema.{Rating, RatingOption}
+      alias Snitch.Data.Schema.{Rating, RatingOption,RatingOptionVote,Review}
 
       def rating_factory do
         %Rating{
@@ -18,6 +18,26 @@ defmodule Snitch.Factory.Rating do
           code: sequence(:code, ["1", "2", "3"]),
           value: sequence(:value, [1, 2, 3]),
           position: sequence(:position, [1, 2, 3])
+
+        }
+      end
+
+      def rating_option_vote_factory do
+        %RatingOptionVote{
+          rating_option: build(:rating_option),
+          review: build(:review)
+        }
+      end
+
+      def review_factory do
+        %Review{
+
+          title: "first review",
+          description: "2",
+          approved: false,
+          locale: "ss",
+          name: "ss",
+          user: build(:user)
         }
       end
 
@@ -26,6 +46,7 @@ defmodule Snitch.Factory.Rating do
         count = Map.get(context, :rating_option_count, 2)
         [rating_options: insert_list(3, :rating_option, rating: rating)]
       end
+
     end
   end
 end
