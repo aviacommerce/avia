@@ -198,7 +198,7 @@ defmodule Snitch.Domain.Order.Transitions do
         |> Stream.map(fn %{package_id: package_id, shipping_method_id: shipping_method_id} ->
           packages
           |> Enum.find(fn %{id: id} -> id == package_id end)
-          |> PackageDomain.set_shipping_method(shipping_method_id)
+          |> PackageDomain.set_shipping_method(shipping_method_id, order)
         end)
         |> fail_fast_reduce()
       end
@@ -210,7 +210,7 @@ defmodule Snitch.Domain.Order.Transitions do
   end
 
   @doc """
-  Marks all the `shipment` aka `packages` of an ordertransition from `pending`
+  Marks all the `shipment` aka `packages` of an order transition from `pending`
   to the `processing` state.
 
   This function is a side effect of the transition in which payment for an

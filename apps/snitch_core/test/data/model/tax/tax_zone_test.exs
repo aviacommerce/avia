@@ -4,12 +4,6 @@ defmodule Snitch.Data.Model.TaxZoneTest do
   import Snitch.Factory
   alias Snitch.Data.Model.TaxZone
 
-  @exculsivity %{
-    success: "Tax Zone mutually exclusive of others",
-    failure_state: "Tax Zone with one or more states in zone already present",
-    failure_country: "Tax Zone with one or more countries in zone already present"
-  }
-
   setup :states
   setup :countries
 
@@ -39,7 +33,6 @@ defmodule Snitch.Data.Model.TaxZoneTest do
       zone_1 = insert(:zone, zone_type: "S")
       %{states: states} = context
       setup_state_zone_members(zone_1, states)
-      [state_1, _, _] = states
       insert(:tax_zone, zone: zone_1)
 
       zone_2 = insert(:zone, zone_type: "S")
@@ -51,7 +44,7 @@ defmodule Snitch.Data.Model.TaxZoneTest do
     end
 
     @tag state_count: 3
-    test "fails for missing params", context do
+    test "fails for missing params" do
       params = %{}
       assert {:error, changeset} = TaxZone.create(params)
       assert %{name: ["can't be blank"], zone_id: ["can't be blank"]} == errors_on(changeset)
@@ -82,7 +75,6 @@ defmodule Snitch.Data.Model.TaxZoneTest do
       zone_1 = insert(:zone, zone_type: "C")
       %{countries: countries} = context
       setup_country_zone_members(zone_1, countries)
-      [country_1, _, _] = countries
       insert(:tax_zone, zone: zone_1)
 
       zone_2 = insert(:zone, zone_type: "C")
@@ -145,7 +137,7 @@ defmodule Snitch.Data.Model.TaxZoneTest do
       zone = insert(:zone, zone_type: "C")
       %{countries: countries} = context
       setup_country_zone_members(zone, countries)
-      tax_zone = insert(:tax_zone, zone: zone)
+      insert(:tax_zone, zone: zone)
 
       assert {:error, message} = TaxZone.get(-1)
       assert message == :tax_zone_not_found
@@ -158,7 +150,7 @@ defmodule Snitch.Data.Model.TaxZoneTest do
       zone = insert(:zone, zone_type: "C")
       %{countries: countries} = context
       setup_country_zone_members(zone, countries)
-      tax_zone = insert(:tax_zone, zone: zone)
+      insert(:tax_zone, zone: zone)
 
       assert [_] = TaxZone.get_all()
     end

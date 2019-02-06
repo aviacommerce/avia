@@ -12,7 +12,8 @@ defmodule Snitch.Factory.Product do
           max_retail_price: Money.new("14.99", currency()),
           shipping_category: build(:shipping_category),
           inventory_tracking: :product,
-          state: :active
+          state: :active,
+          tax_class: build(:tax_class)
         }
       end
     end
