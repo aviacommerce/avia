@@ -7,7 +7,8 @@ defmodule Snitch.Factory.Tax do
         TaxClass,
         TaxConfig,
         TaxZone,
-        TaxRate
+        TaxRate,
+        TaxRateClassValue
       }
 
       def tax_class_factory() do
@@ -45,6 +46,44 @@ defmodule Snitch.Factory.Tax do
           is_active?: true,
           priority: 0
         }
+      end
+
+      def tax_rate_class_value_factory() do
+        %TaxRateClassValue{
+          percent_amount: 2,
+          tax_class: build(:tax_class),
+          tax_rate: build(:tax_rate)
+        }
+      end
+
+      def setup_tax_with_zone_and_rates(tax_rate_values, states) do
+        zone = insert(:zone, zone_type: "S")
+
+        Enum.each(states, fn state ->
+          insert(:state_zone_member, zone: zone, state: state)
+        end)
+
+        default_state = List.first(states)
+
+        insert(:tax_config,
+          default_state: default_state,
+          default_country: default_state.country,
+          calculation_address_type: :shipping_address,
+          included_in_price?: true,
+          shipping_tax: tax_rate_values.shipping_tax.class
+        )
+
+        tax_zone = insert(:tax_zone, zone: zone)
+
+        tax_rate = insert(:tax_rate, tax_zone: tax_zone)
+
+        Enum.map(tax_rate_values, fn {_key, %{class: class, percent: percent}} ->
+          insert(:tax_rate_class_value,
+            tax_rate: tax_rate,
+            tax_class: class,
+            percent_amount: percent
+          )
+        end)
       end
     end
   end

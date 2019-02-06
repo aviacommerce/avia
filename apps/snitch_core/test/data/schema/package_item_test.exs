@@ -139,17 +139,17 @@ defmodule Snitch.Data.Schema.PackageItemTest do
     end
   end
 
-  defp product(context) do
+  defp product(_context) do
     product = insert(:product)
     [product: product]
   end
 
-  defp line_item(context) do
+  defp line_item(_context) do
     line_item = insert(:line_item)
     [line_item: line_item]
   end
 
-  defp package(context) do
+  defp package(_context) do
     package = insert(:package)
     [package: package]
   end

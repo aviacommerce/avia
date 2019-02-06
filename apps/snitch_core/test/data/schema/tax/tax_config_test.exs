@@ -19,7 +19,6 @@ defmodule Snitch.Data.Schema.TaxConfigTest do
     end
 
     test "failure for foreign key constraints" do
-      state = insert(:state)
       tax_class = insert(:tax_class)
 
       params = %{

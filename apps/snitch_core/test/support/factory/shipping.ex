@@ -59,7 +59,7 @@ defmodule Snitch.Factory.Shipping do
         %{
           items: [
             %{
-              line_item: build(:line_item),
+              line_item: insert(:line_item),
               variant: build(:variant),
               delta: 0,
               quantity: 4,
@@ -84,7 +84,7 @@ defmodule Snitch.Factory.Shipping do
                 line_item: line_item,
                 variant: v,
                 delta: 0,
-                quantity: 4,
+                quantity: line_item.quantity,
                 state: :fulfilled,
                 tax: Money.zero(:USD)
               }

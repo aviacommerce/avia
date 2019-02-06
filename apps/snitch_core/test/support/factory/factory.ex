@@ -32,7 +32,6 @@ defmodule Snitch.Factory do
     Permission,
     Role,
     User,
-    Variant,
     Variation,
     Product,
     ProductBrand,
@@ -105,13 +104,9 @@ defmodule Snitch.Factory do
   def order_factory do
     %Order{
       number: sequence("order"),
-      state: :cart
-    }
-  end
-
-  def taxon_factory do
-    %Taxon{
-      name: sequence("taxon")
+      state: :cart,
+      shipping_address: nil,
+      billing_address: nil
     }
   end
 
@@ -221,14 +216,6 @@ defmodule Snitch.Factory do
     %Permission{
       code: sequence(:code, ["manage_products", "manage_orders", "manage_all"]),
       description: "can manage respective"
-    }
-  end
-
-  def product_factory do
-    %Product{
-      name: sequence(:product, &"shoes-nike-#{&1}"),
-      description: "awesome products",
-      slug: sequence(:slug, &"nike-#{&1}")
     }
   end
 

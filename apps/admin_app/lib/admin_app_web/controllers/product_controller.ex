@@ -76,7 +76,7 @@ defmodule AdminAppWeb.ProductController do
 
     with {:ok, %ProductSchema{} = product} <- ProductModel.get(id) do
       product = product |> Repo.preload(preloads)
-      changeset = ProductSchema.create_changeset(product, params)
+      changeset = ProductSchema.update_changeset(product, params)
 
       rummage_params = RummageHelper.get_rummage_params(conn)
 
