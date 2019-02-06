@@ -11,9 +11,11 @@ defmodule MailManager do
   end
 
   def handle_cast({:send_mail, order}, state) do
-    {:ok, _pid} = Task.Supervisor.start_child(MailManager.TaskSupervisor, fn ->
+    {:ok, _pid} =
+      Task.Supervisor.start_child(MailManager.TaskSupervisor, fn ->
         OrderEmail.order_confirmation_mail(order)
-    end)
+      end)
+
     {:noreply, state}
   end
 
@@ -26,5 +28,4 @@ defmodule MailManager do
   def send_mail(order) do
     GenServer.cast(__MODULE__, {:send_mail, order})
   end
-
 end
