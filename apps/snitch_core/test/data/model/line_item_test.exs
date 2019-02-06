@@ -5,7 +5,7 @@ defmodule Snitch.Data.Model.LineItemTest do
   import Mox, only: [expect: 3, verify_on_exit!: 1]
   import Snitch.Factory
 
-  alias Snitch.Data.Model.{LineItem, Order}
+  alias Snitch.Data.Model.{LineItem, Order, Product}
   alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
 
   describe "with valid params" do
@@ -93,6 +93,16 @@ defmodule Snitch.Data.Model.LineItemTest do
                LineItem.create(%{line_item_params(variant) | order_id: order.id})
 
       assert %{stock: ["Stock Insufficient"]} = errors_on(changeset)
+    end
+
+    @tag variant_count: 1
+    test "successfully if stock insufficient and inventory tracking disabled", %{
+      variants: [variant]
+    } do
+      order = insert(:order, line_items: [])
+      taxon = insert(:taxon)
+      {:ok, variant} = Product.update(variant, %{inventory_tracking: :none, taxon_id: taxon.id})
+      assert {:ok, line_item} = LineItem.create(%{line_item_params(variant) | order_id: order.id})
     end
   end
 
