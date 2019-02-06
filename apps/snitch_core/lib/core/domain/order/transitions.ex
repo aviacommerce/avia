@@ -310,8 +310,8 @@ defmodule Snitch.Domain.Order.Transitions do
       ) do
     multi =
       Multi.run(multi, :add_email, fn _ ->
-        mail = OrderEmail.order_confirmation_mail(order)
-        {:ok, mail}
+        MailManager.send_mail(order)
+        {:ok, "mail_sent"}
       end)
 
     struct(context, state: context.state, multi: multi)
