@@ -13,26 +13,42 @@ defmodule AdminAppWeb.PaginationHelpers do
   def pagination_links(conn, list, route) do
     content_tag :div, class: "pagination" do
       children = []
+      abc = get_previous(children, conn, list, route) ++ get_next(children, conn, list, route)
+      {:safe, abc}
+    end
+  end
 
-      if list.has_prev do
-        children =
+  defp get_previous(children, conn, list, route) do
+    case list.has_prev do
+      true ->
+        {:safe, children} =
           children ++
             link("Previous",
-              to: route.(conn, :index, page: list.prev_page),
-              class: "btn btn-secondary col-md-1"
+              to: route.(conn, :index, "?page=#{list.prev_page}"),
+              class: "btn btn-secondary btn-lg"
             )
-      end
 
-      if list.has_next do
-        children =
+        children
+
+      false ->
+        children
+    end
+  end
+
+  defp get_next(children, conn, list, route) do
+    case list.has_next do
+      true ->
+        {:safe, children} =
           children ++
             link("Next",
-              to: route.(conn, :index, page: list.next_page),
-              class: "btn btn-secondary col-md-1"
+              to: route.(conn, :index, "?page=#{list.next_page}"),
+              class: "btn btn-secondary btn-lg"
             )
-      end
 
-      children
+        children
+
+      false ->
+        children
     end
   end
 end

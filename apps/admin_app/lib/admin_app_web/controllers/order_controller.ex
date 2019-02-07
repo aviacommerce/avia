@@ -21,8 +21,7 @@ defmodule AdminAppWeb.OrderController do
     page = params["page"] || 1
     sort_param = conn.query_params["sort"]
 
-    orders =
-      OrderContext.order_list(category, sort_param, page)
+    orders = OrderContext.order_list(category, sort_param, page)
 
     token = get_csrf_token()
 
@@ -43,9 +42,10 @@ defmodule AdminAppWeb.OrderController do
   def index(conn, params) do
     conn = assign_initial_date_range(conn)
     page = params["page"] || 0
+    orders = OrderContext.order_list("pending", nil, page)
 
     render(conn, "index.html", %{
-      orders: OrderContext.order_list("pending", nil, page),
+      orders: orders,
       token: get_csrf_token()
     })
   end

@@ -7,7 +7,7 @@ defmodule AdminApp.OrderContext do
   alias AdminAppWeb.Helpers
   alias BeepBop.Context
   alias Snitch.Domain.Order.DefaultMachine
-  alias Snitch.Data.Schema.Order
+  alias Snitch.Data.Schema.{Order, Package}
   alias Snitch.Data.Model.Order, as: OrderModel
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Domain.Order, as: OrderDomain
@@ -58,39 +58,45 @@ defmodule AdminApp.OrderContext do
     OrderDomain.total_amount(order)
   end
 
-  def order_list("pending", sort_param, page) do
+  def order_list(order_state, sort_param, page, per_page \\ 10)
+
+  def order_list("pending", sort_param, page, per_page) do
     rummage = get_rummage(sort_param)
     query = query_confirmed_orders(rummage)
-    orders = load_orders(query, page)
-    Enum.filter(orders, fn order ->
-      Enum.any?(order.packages, fn package ->
-        package.state == :processing
-      end)
-    end)
+    orders = load_orders(query)
+
+    from(order in orders,
+      left_join: package in Package,
+      on: order.id == package.order_id,
+      where: package.state == ^:processing
+    )
+    |> Pagination.page(page, per_page: per_page)
   end
 
-  def order_list("unshipped", sort_param, page) do
+  def order_list("unshipped", sort_param, page, per_page) do
     rummage = get_rummage(sort_param)
     query = query_confirmed_orders(rummage)
-    orders = load_orders(query, page)
+    orders = load_orders(query)
 
-    Enum.filter(orders, fn order ->
-      Enum.any?(order.packages, fn package ->
-        package.state == :ready
-      end)
-    end)
+    from(order in orders,
+      left_join: package in Package,
+      on: order.id == package.order_id,
+      where: package.state == ^:ready
+    )
+    |> Pagination.page(page, per_page: per_page)
   end
 
-  def order_list("shipped", sort_param, page) do
+  def order_list("shipped", sort_param, page, per_page) do
     rummage = get_rummage(sort_param)
     query = query_confirmed_orders(rummage)
-    orders = load_orders(query, page)
+    orders = load_orders(query)
 
-    Enum.filter(orders, fn order ->
-      Enum.any?(order.packages, fn package ->
-        package.state == :shipped || package.state == :delivered
-      end)
-    end)
+    from(order in orders,
+      left_join: package in Package,
+      on: order.id == package.order_id,
+      where: package.state == ^:shipped or package.state == ^:delivered
+    )
+    |> Pagination.page(page, per_page: per_page)
   end
 
   def update_cod_payment(order, state) do
@@ -136,7 +142,7 @@ defmodule AdminApp.OrderContext do
     }
   end
 
-  def order_list("complete", sort_param, page) do
+  def order_list("complete", sort_param, page, per_page) do
     rummage = get_rummage(sort_param)
     {queryable, _rummage} = Order.rummage(rummage)
 
@@ -147,7 +153,7 @@ defmodule AdminApp.OrderContext do
             p.updated_at <= ^initial_date_range.end_date
       )
 
-    load_orders(query, page)
+    load_orders(query) |> Pagination.page(page, per_page: per_page)
   end
 
   defp query_confirmed_orders(rummage) do
@@ -176,15 +182,7 @@ defmodule AdminApp.OrderContext do
     end
   end
 
-  defp load_orders(query, page, per_page \\ 2) do
-    # orders =
-    #   query
-    #   |> order_by(desc: :inserted_at)
-    #   |> Pagination.page(page, per_page: per_page)
-
-    # orders.list |> Repo.preload([:user, :packages, [line_items: :product]])
-    query
-    |> preload([:user, [packages: :items], [line_items: :product]])
-    |> Repo.all()
+  defp load_orders(query) do
+    query |> preload([:user, [packages: :items], [line_items: :product]])
   end
 end

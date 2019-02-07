@@ -28,7 +28,7 @@ defmodule Snitch.Pagination do
 
     has_next = length(result) == count
     has_prev = page > 0
-    total_count = Repo.one(from(t in subquery(query), select: count("*")))
+    total_count = Repo.aggregate(from(p in query), :count, :id)
 
     page = %{
       has_next: has_next,
