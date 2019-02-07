@@ -8,17 +8,18 @@ defmodule Snitch.Domain.Package do
   import Ecto.Query
   alias Ecto.Multi
   alias Snitch.Core.Tools.MultiTenancy.MultiQuery
-  alias Snitch.Data.Schema.Package
+  alias Snitch.Data.Schema.{Package, Order}
   alias Snitch.Domain.{ShippingCalculator, Inventory}
   alias Snitch.Tools.Money, as: MoneyTools
   alias Snitch.Data.Model.StockItem
   alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
+  alias Snitch.Domain.Tax
 
   @doc """
   Saves
   """
-  @spec set_shipping_method(Package.t(), non_neg_integer) :: Package.t()
-  def set_shipping_method(package, shipping_method_id) do
+  @spec set_shipping_method(Package.t(), non_neg_integer, Order.t()) :: Package.t()
+  def set_shipping_method(package, shipping_method_id, order) do
     # TODO: clean up this hack!
     #
     # if we can't find the selected shipping method, we must force the
@@ -31,11 +32,11 @@ defmodule Snitch.Domain.Package do
         id == shipping_method_id
       end)
 
-    shipping_cost = ShippingCalculator.calculate(package)
+    %{original_amount: shipping_cost, tax: tax} = shipping_cost_with_tax(package, order)
 
     params = %{
       cost: shipping_cost,
-      shipping_tax: shipping_tax(package),
+      shipping_tax: tax,
       shipping_method_id: shipping_method.id
     }
 
@@ -44,9 +45,12 @@ defmodule Snitch.Domain.Package do
     |> Repo.update()
   end
 
-  @spec shipping_tax(Package.t()) :: Money.t()
-  def shipping_tax(_package) do
-    MoneyTools.zero!()
+  @doc """
+  Returns shipping cost with tax.
+  """
+  defp shipping_cost_with_tax(package, order) do
+    shipping_cost = ShippingCalculator.calculate(package)
+    Tax.calculate(:shipping, shipping_cost, order, package.origin)
   end
 
   @doc """

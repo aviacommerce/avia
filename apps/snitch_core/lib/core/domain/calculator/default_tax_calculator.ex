@@ -1,22 +1,26 @@
-defmodule Snitch.Domain.Calculator.Default do
+defmodule Snitch.Domain.Calculator.DefaultTaxCalculator do
   @moduledoc """
-  This module provides `compute` function for DefaultCalculator.
+  The default tax calculator module.
   """
-  @behaviour Snitch.Domain.Calculator
 
-  alias Snitch.Data.Schema.LineItem
+  def compute(tax_percent, amount, _included = true) do
+    offset =
+      amount
+      |> Money.mult!(100)
+      |> Money.div!(100 + tax_percent)
+      |> Money.round(currency_digits: :cash)
 
-  def compute(tax_rate, %LineItem{} = line_item) do
-    total = Money.mult!(line_item.unit_price, line_item.quantity)
+    tax_value = Money.sub!(amount, offset)
+    %{amount: offset, tax: tax_value}
+  end
 
-    {:ok, value} =
-      if tax_rate.included_in_price do
-        {:ok, offset} = Money.div(total, 1 + tax_rate.value)
-        Money.sub(total, offset)
-      else
-        Money.mult(total, tax_rate.value)
-      end
+  def compute(tax_percent, amount, _included = false) do
+    tax_value =
+      amount
+      |> Money.mult!(tax_percent)
+      |> Money.div!(100)
+      |> Money.round(currency_digits: :cash)
 
-    value
+    %{amount: amount, tax: tax_value}
   end
 end

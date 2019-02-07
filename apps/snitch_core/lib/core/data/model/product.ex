@@ -549,4 +549,34 @@ defmodule Snitch.Data.Model.Product do
   defp get_product_with_upi(upi) do
     from(p in "snitch_products", select: p.upi, where: p.upi == ^upi) |> Repo.one()
   end
+
+  @doc """
+  Returns the `parent product` of the supplied `variant`.
+
+  In case supplied product is not a variant, returns nil.
+  """
+  @spec get_parent_product(Product.t()) :: Product.t() | nil
+  def get_parent_product(product) do
+    product = Repo.preload(product, parent_variation: :parent_product)
+    if product.parent_variation, do: product.parent_variation.parent_product, else: nil
+  end
+
+  @doc """
+  Returns `tax_class_id` of the product.
+
+  Since tax class is set only for parent and not variants, if the
+  supplied product is a variant, tax class of the parent product is
+  returned.
+  """
+  @spec get_tax_class_id(Product.t()) :: non_neg_integer
+  def get_tax_class_id(product) do
+    tax_class_id(product, product.tax_class_id)
+  end
+
+  defp tax_class_id(product, nil) do
+    product = get_parent_product(product)
+    product.tax_class_id
+  end
+
+  defp tax_class_id(_product, tax_class_id), do: tax_class_id
 end
