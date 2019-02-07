@@ -3,12 +3,9 @@ defmodule Snitch.Repo.Migrations.UpdateGeneralConfigSeoTitle do
 
   def change do
     alter table("snitch_general_configurations") do
-      remove :seo_title
-      remove :frontend_url
-      remove :backend_url
-      add :seo_title, :string, default: ""
-      add :frontend_url, :string, default: ""
-      add :backend_url, :string, default: ""
+      modify :seo_title, :string, null: true
+      modify :frontend_url, :string, null: true
+      modify :backend_url, :string, null: true
     end
   end
 end
