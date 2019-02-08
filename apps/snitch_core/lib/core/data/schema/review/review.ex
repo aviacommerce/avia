@@ -35,7 +35,7 @@ defmodule Snitch.Data.Schema.Review do
   @optional_params ~w(title locale approved)a
 
   @create_params @required_params ++ @optional_params
-  @update_params ~w(description)a ++ @optional_params
+  @update_params ~w(description user_id)a ++ @optional_params
 
   @doc """
   Returns a product review changeset.
