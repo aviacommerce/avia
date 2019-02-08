@@ -54,5 +54,28 @@ defmodule Snitch.Data.Schema.ShippingRuleIdentifierTest do
       changeset = SRIdentifier.changeset(%SRIdentifier{}, params)
       assert %{code: ["is invalid"]} == errors_on(changeset)
     end
+
+    test "identifier_with_module returns the defined map" do
+      expected_map = %{
+        fso: %{
+          description: "free shipping for order",
+          module: Snitch.Data.Schema.ShippingRule.OrderFree
+        },
+        fsoa: %{
+          description: "free shipping above specified amount",
+          module: Snitch.Data.Schema.ShippingRule.OrderConditionalFree
+        },
+        fsrp: %{
+          description: "fixed shipping rate per product",
+          module: Snitch.Data.Schema.ShippingRule.ProductFlatRate
+        },
+        ofr: %{
+          description: "fixed shipping rate for order",
+          module: Snitch.Data.Schema.ShippingRule.OrderFlatRate
+        }
+      }
+
+      assert expected_map = SRIdentifier.identifier_with_module()
+    end
   end
 end
