@@ -5,16 +5,19 @@ defmodule AdminAppWeb.PaginationHelpers do
   import Phoenix.HTML.Tag
 
   def pagination_text(list) do
-    # ~e"""
-    # Displaying <%= List.first(list) %>-<%= List.last(list) %> of <%= length(list) %>
-    # """
+    content_tag :div, class: "text-primary" do
+      "Displaying #{list.first}-#{list.last} of #{list.count}"
+    end
   end
 
   def pagination_links(conn, list, route) do
     content_tag :div, class: "pagination" do
       children = []
-      abc = get_previous(children, conn, list, route) ++ get_next(children, conn, list, route)
-      {:safe, abc}
+
+      page_links =
+        get_previous(children, conn, list, route) ++ get_next(children, conn, list, route)
+
+      {:safe, page_links}
     end
   end
 
@@ -24,8 +27,8 @@ defmodule AdminAppWeb.PaginationHelpers do
         {:safe, children} =
           children ++
             link("Previous",
-              to: route.(conn, :index, "?page=#{list.prev_page}"),
-              class: "btn btn-secondary btn-lg"
+              to: route.(conn, :index, "", page: list.prev_page),
+              class: "btn btn-primary btn-lg"
             )
 
         children
@@ -41,8 +44,8 @@ defmodule AdminAppWeb.PaginationHelpers do
         {:safe, children} =
           children ++
             link("Next",
-              to: route.(conn, :index, "?page=#{list.next_page}"),
-              class: "btn btn-secondary btn-lg"
+              to: route.(conn, :index, "", page: list.next_page),
+              class: "btn btn-primary btn-lg"
             )
 
         children

@@ -41,7 +41,7 @@ defmodule AdminAppWeb.OrderController do
 
   def index(conn, params) do
     conn = assign_initial_date_range(conn)
-    page = params["page"] || 0
+    page = params["page"] || 1
     orders = OrderContext.order_list("pending", nil, page)
 
     render(conn, "index.html", %{

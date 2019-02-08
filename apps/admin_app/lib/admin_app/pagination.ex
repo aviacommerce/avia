@@ -23,11 +23,11 @@ defmodule Snitch.Pagination do
     result =
       query
       |> limit(^count)
-      |> offset(^(page * per_page))
+      |> offset(^(per_page * (page - 1)))
       |> Repo.all()
 
-    has_next = length(result) == count
-    has_prev = page > 0
+    has_next = length(result) > per_page
+    has_prev = page > 1
     total_count = Repo.aggregate(from(p in query), :count, :id)
 
     page = %{
@@ -36,10 +36,10 @@ defmodule Snitch.Pagination do
       prev_page: page - 1,
       next_page: page + 1,
       page: page,
-      first: page * per_page + 1,
-      last: Enum.min([page + 1 * per_page, total_count]),
+      first: (page - 1) * per_page + 1,
+      last: Enum.min([page * per_page, total_count]),
       count: total_count,
-      list: Enum.slice(result, 0, count - 1)
+      list: Enum.slice(result, 0, per_page)
     }
   end
 end
