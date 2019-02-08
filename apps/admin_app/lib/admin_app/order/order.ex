@@ -58,9 +58,7 @@ defmodule AdminApp.OrderContext do
     OrderDomain.total_amount(order)
   end
 
-  def order_list(order_state, sort_param, page, per_page \\ 10)
-
-  def order_list("pending", sort_param, page, per_page) do
+  def order_list("pending", sort_param, page) do
     rummage = get_rummage(sort_param)
     query = query_confirmed_orders(rummage)
     orders = load_orders(query)
@@ -70,10 +68,10 @@ defmodule AdminApp.OrderContext do
       on: order.id == package.order_id,
       where: package.state == ^:processing
     )
-    |> Pagination.page(page, per_page: per_page)
+    |> Pagination.page(page)
   end
 
-  def order_list("unshipped", sort_param, page, per_page) do
+  def order_list("unshipped", sort_param, page) do
     rummage = get_rummage(sort_param)
     query = query_confirmed_orders(rummage)
     orders = load_orders(query)
@@ -83,10 +81,10 @@ defmodule AdminApp.OrderContext do
       on: order.id == package.order_id,
       where: package.state == ^:ready
     )
-    |> Pagination.page(page, per_page: per_page)
+    |> Pagination.page(page)
   end
 
-  def order_list("shipped", sort_param, page, per_page) do
+  def order_list("shipped", sort_param, page) do
     rummage = get_rummage(sort_param)
     query = query_confirmed_orders(rummage)
     orders = load_orders(query)
@@ -96,7 +94,7 @@ defmodule AdminApp.OrderContext do
       on: order.id == package.order_id,
       where: package.state == ^:shipped or package.state == ^:delivered
     )
-    |> Pagination.page(page, per_page: per_page)
+    |> Pagination.page(page)
   end
 
   def update_cod_payment(order, state) do
@@ -142,7 +140,7 @@ defmodule AdminApp.OrderContext do
     }
   end
 
-  def order_list("complete", sort_param, page, per_page) do
+  def order_list("complete", sort_param, page) do
     rummage = get_rummage(sort_param)
     {queryable, _rummage} = Order.rummage(rummage)
 
@@ -153,7 +151,7 @@ defmodule AdminApp.OrderContext do
             p.updated_at <= ^initial_date_range.end_date
       )
 
-    load_orders(query) |> Pagination.page(page, per_page: per_page)
+    load_orders(query) |> Pagination.page(page)
   end
 
   defp query_confirmed_orders(rummage) do

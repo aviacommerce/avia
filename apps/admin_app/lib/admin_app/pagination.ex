@@ -1,23 +1,19 @@
 defmodule Snitch.Pagination do
   import Ecto.Query
   alias Snitch.Core.Tools.MultiTenancy.Repo
-  #
-  # ## Example
-  #
-  #    Snippets.Snippet
-  #    |> order_by(desc: :inserted_at)
-  #    |> Pagination.page(1, per_page: 10)
-  #
-  def page(query, page, per_page: per_page) when is_nil(page) do
-    page(query, 1, per_page: per_page)
+
+  def page(query, page, per_page \\ 10)
+
+  def page(query, page, per_page) when is_nil(page) do
+    page(query, 1, per_page)
   end
 
-  def page(query, page, per_page: per_page) when is_binary(page) do
+  def page(query, page, per_page) when is_binary(page) do
     page = String.to_integer(page)
-    page(query, page, per_page: per_page)
+    page(query, page, per_page)
   end
 
-  def page(query, page, per_page: per_page) do
+  def page(query, page, per_page) do
     count = per_page + 1
 
     result =

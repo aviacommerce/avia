@@ -9,9 +9,11 @@ defmodule AdminApp.Order.SearchContext do
   import Ecto.Query
   alias Snitch.Data.Schema.{Order, User}
   alias Snitch.Core.Tools.MultiTenancy.Repo
+  alias Snitch.Pagination
 
   def search_orders(%{"term" => term} = payload) do
     state = get_order_state(term)
+    page = payload["page"] || 1
 
     user_ids =
       User
@@ -27,20 +29,22 @@ defmodule AdminApp.Order.SearchContext do
       user_ids
       |> get_orders_with_state(term, state)
       |> preload([:user, [packages: [:shipping_method, :items]], [line_items: :product]])
-      |> Repo.all()
+      |> Pagination.page(page)
   end
 
   def search_orders(%{
         "start_date" => start_date,
-        "end_date" => end_date
+        "end_date" => end_date,
+        "page" => page
       }) do
     start_date = format_date(start_date)
     end_date = format_date(end_date)
+    page = page || 1
 
     Order
     |> where([o], o.updated_at >= ^start_date and o.updated_at <= ^end_date)
     |> preload([:user, [packages: [:shipping_method, :items]], [line_items: :product]])
-    |> Repo.all()
+    |> Pagination.page(page)
   end
 
   def format_date(date) do

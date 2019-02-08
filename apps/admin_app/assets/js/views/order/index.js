@@ -45,18 +45,20 @@ export default class View extends MainView {
           channel.push('order:search', { // send the message to the server on "ping" channel
             term: $("#order_search_box").val(),
             start_date: $("#selected_start_date").val(),
-            end_date: $("#selected_end_date").val()
+            end_date: $("#selected_end_date").val(),
+            page: getUrlParameter("page")
           });
           $("#order_search_box").val = ''; // reset the message input field for next message.
         }
       });
-      $(document).on('change', '#selected_state', function () {    
+      $(document).on('change', '#selected_state', function () {
         $(".orders-list").html("");
         $(".orders-list").addClass("loader");
         channel.push('order:search', { // send the message to the server on "ping" channel
           term: $("#selected_state").val(),
           start_date: $("#selected_start_date").val(),
-          end_date: $("#selected_end_date").val()
+          end_date: $("#selected_end_date").val(),
+          page: getUrlParameter("page")
         });
       });
       $(document).on('change', '#selected_start_date, #selected_end_date', function () {
@@ -64,7 +66,8 @@ export default class View extends MainView {
         $(".orders-list").addClass("loader");
         channel.push(`order:search`, { // send the message to the server on "ping" channel
           start_date: $("#selected_start_date").val(),
-          end_date: $("#selected_end_date").val()
+          end_date: $("#selected_end_date").val(),
+          page: getUrlParameter("page")
         });
       });
     }
@@ -74,3 +77,10 @@ export default class View extends MainView {
       super.unmount();
     }
   }
+
+function getUrlParameter(name) {
+  name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+  var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+  var results = regex.exec(location.search);
+  return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
