@@ -29,6 +29,7 @@ defmodule AdminAppWeb.OrderController do
       render_to_string(
         OrderView,
         "order_listing.html",
+        conn: conn,
         orders: orders,
         token: token
       )

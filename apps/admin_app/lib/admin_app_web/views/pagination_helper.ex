@@ -27,7 +27,7 @@ defmodule AdminAppWeb.PaginationHelpers do
         {:safe, children} =
           children ++
             link("Previous",
-              to: route.(conn, :index, "", page: list.prev_page),
+              to: route.(conn, :index, "", %{"page" => list.prev_page}),
               class: "btn btn-primary btn-lg"
             )
 
@@ -44,7 +44,7 @@ defmodule AdminAppWeb.PaginationHelpers do
         {:safe, children} =
           children ++
             link("Next",
-              to: route.(conn, :index, "", page: list.next_page),
+              to: route.(conn, :index, "", %{"page" => list.next_page}),
               class: "btn btn-primary btn-lg"
             )
 

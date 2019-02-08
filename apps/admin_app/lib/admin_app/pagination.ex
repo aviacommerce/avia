@@ -6,10 +6,10 @@ defmodule Snitch.Pagination do
   #
   #    Snippets.Snippet
   #    |> order_by(desc: :inserted_at)
-  #    |> Pagination.page(0, per_page: 10)
+  #    |> Pagination.page(1, per_page: 10)
   #
   def page(query, page, per_page: per_page) when is_nil(page) do
-    page(query, 0, per_page: per_page)
+    page(query, 1, per_page: per_page)
   end
 
   def page(query, page, per_page: per_page) when is_binary(page) do

@@ -36,11 +36,8 @@
          </nav>
          <div class="row m-0 list orders-list">
             <div class="col-12 p-0">
-               <%= render "order_listing.html", conn: @conn, orders: @orders.list, token: @token %>
+               <%= render "order_listing.html", conn: @conn, orders: @orders, token: @token %>
             </div>   
-            <%= pagination_links(@conn, @orders, &order_path/4) %>
-            <hr>
-            <%= pagination_text(@orders) %> 
          </div>
       </div>
       <div class="col-3 rightbar">
