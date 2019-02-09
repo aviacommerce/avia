@@ -52,6 +52,34 @@ defmodule Snitch.Data.Model.HostedPaymentTest do
     assert updated_hosted_payment.transaction_id == hosted_params.transaction_id
   end
 
+  describe "get/1" do
+    test "returns a hosted payment with valid id", %{hosted_payment: hosted_payment} do
+      {:ok, returned_hosted_payment} = HostedPayment.get(hosted_payment.id)
+      assert hosted_payment.id == returned_hosted_payment.id
+    end
+
+    test "fails for invalid id" do
+      assert {:error, :hosted_payment_not_found} = HostedPayment.get(-1)
+    end
+
+    test "returns a hosted payment with  map", %{hosted_payment: hosted_payment} do
+      map = %{payment_id: hosted_payment.payment_id}
+      {:ok, returned_hosted_payment} = HostedPayment.get(map)
+      assert returned_hosted_payment.id == hosted_payment.id
+    end
+  end
+
+  test "get_all/0", %{hosted_payment: hosted_payment, payment: payment} do
+    returned_hosted_payments = HostedPayment.get_all()
+    assert returned_hosted_payments != []
+  end
+
+  test "from_payment/1 returns a hosted payment", %{hosted_payment: hosted_payment} do
+    id = hosted_payment.payment_id
+    returned_hosted_payment = HostedPayment.from_payment(id)
+    assert returned_hosted_payment.id == hosted_payment.id
+  end
+
   defp payment_params() do
     %{
       amount: Money.zero(:USD),
