@@ -50,7 +50,6 @@ defmodule AdminAppWeb.Router do
     get("/products/export_products", ProductController, :export_product)
     get("/fetch_states/:country_id", StockLocationController, :fetch_country_states)
     get("/orders/export_orders", OrderController, :export_order)
-    get("/orders/:category", OrderController, :index)
     get("/orders", OrderController, :index)
     get("/orders/:number/detail", OrderController, :show)
     put("/orders/:id/packages/", OrderController, :update_package, as: :order_package)

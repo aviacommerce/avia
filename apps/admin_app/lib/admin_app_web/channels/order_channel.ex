@@ -25,8 +25,7 @@ defmodule AdminAppWeb.OrderChannel do
     Repo.set_tenant(socket.assigns.tenant)
     orders = SearchContext.search_orders(payload)
 
-    conn = %Plug.Conn{}
-
+    conn = %Plug.Conn{params: payload}
     broadcast!(socket, "order:search:#{socket.assigns.user_token}", %{
       body:
         Phoenix.View.render_to_string(AdminAppWeb.OrderView, "index.html",

@@ -4,6 +4,7 @@ defmodule AdminAppWeb.OrderView do
   alias Snitch.Domain.Order, as: OrderDomain
   alias AdminAppWeb.Helpers
   alias SnitchPayments.PaymentMethodCode
+  import Phoenix.HTML.Tag
 
   @bootstrap_contextual_class %{
     "slug" => "light",
@@ -24,6 +25,11 @@ defmodule AdminAppWeb.OrderView do
 
       name ->
         name
+    end
+  end
+
+  def get_params(params) do
+    content_tag :div, class: "pagination-params", data: Map.to_list(params) do
     end
   end
 

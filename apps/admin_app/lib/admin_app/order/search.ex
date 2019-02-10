@@ -30,6 +30,9 @@ defmodule AdminApp.Order.SearchContext do
       |> get_orders_with_state(term, state)
       |> preload([:user, [packages: [:shipping_method, :items]], [line_items: :product]])
       |> Pagination.page(page)
+    # require IEx
+    # IEx.pry
+    # query
   end
 
   def search_orders(%{

@@ -4,7 +4,10 @@
   <%= for {order, index} <- Enum.with_index(@orders.list) do %>
     <%= render "order_list_card.html", order: order %>
   <% end %>
-  <%= pagination_links(@conn, @orders, &order_path/4) %>
-  <hr>
-  <%= pagination_text(@orders) %>
+  <div class="order-pagination">
+    <%= pagination_links(@conn, @orders, &order_path/3) %>
+    <hr>
+    <%= pagination_text(@orders) %>
+    <%= get_params(@conn.params) %>
+  </div>
 <% end %> 
