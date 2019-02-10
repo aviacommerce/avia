@@ -77,8 +77,7 @@ export default class View extends MainView {
       var page = $(this).data("page")
       var category = $(this).parent().data("category") || "pending"
       var params = $('.pagination-params').data();
-      // debugger;
-      if (params["start_date"] != undefined){
+      if (params["startDate"] != undefined){
         params["page"] = page
         $(".orders-list").html("");
         $(".orders-list").addClass("loader");
