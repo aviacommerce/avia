@@ -9,7 +9,7 @@ defmodule SnitchApi.Mixfile do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.8.1",
+      elixir: "~> 1.7.2",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
@@ -36,7 +36,6 @@ defmodule SnitchApi.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-
       {:phoenix, "~> 1.4.0"},
       {:phoenix_pubsub, "~> 1.1"},
       {:gettext, "~> 0.11"},
