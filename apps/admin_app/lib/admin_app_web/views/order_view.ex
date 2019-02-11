@@ -1,10 +1,10 @@
 defmodule AdminAppWeb.OrderView do
   use AdminAppWeb, :view
+  import Phoenix.HTML.Tag
   alias Snitch.Data.Model.{Country, State, User}
   alias Snitch.Domain.Order, as: OrderDomain
   alias AdminAppWeb.Helpers
   alias SnitchPayments.PaymentMethodCode
-  import Phoenix.HTML.Tag
 
   @bootstrap_contextual_class %{
     "slug" => "light",
@@ -257,11 +257,11 @@ defmodule AdminAppWeb.OrderView do
   end
 
   def get_country(country_id) do
-    Country.get(country_id) |> get_response
+    country_id |> Country.get() |> get_response
   end
 
   def get_state(state_id) do
-    State.get(state_id) |> get_response
+    state_id |> State.get() |> get_response
   end
 
   defp get_response({:ok, struct}) do

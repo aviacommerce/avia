@@ -63,12 +63,12 @@ defmodule AdminApp.OrderContext do
     query = query_confirmed_orders(rummage)
     orders = load_orders(query)
 
-    from(order in orders,
+    orders_query = from(order in orders,
       left_join: package in Package,
       on: order.id == package.order_id,
       where: package.state == ^:processing
     )
-    |> Pagination.page(page)
+    Pagination.page(orders_query, page)
   end
 
   def order_list("unshipped", sort_param, page) do
@@ -76,12 +76,12 @@ defmodule AdminApp.OrderContext do
     query = query_confirmed_orders(rummage)
     orders = load_orders(query)
 
-    from(order in orders,
+    orders_query = from(order in orders,
       left_join: package in Package,
       on: order.id == package.order_id,
       where: package.state == ^:ready
     )
-    |> Pagination.page(page)
+    Pagination.page(orders_query, page)
   end
 
   def order_list("shipped", sort_param, page) do
@@ -89,12 +89,12 @@ defmodule AdminApp.OrderContext do
     query = query_confirmed_orders(rummage)
     orders = load_orders(query)
 
-    from(order in orders,
+    orders_query = from(order in orders,
       left_join: package in Package,
       on: order.id == package.order_id,
       where: package.state == ^:shipped or package.state == ^:delivered
     )
-    |> Pagination.page(page)
+    Pagination.page(orders_query, page)
   end
 
   def update_cod_payment(order, state) do

@@ -1,4 +1,8 @@
 defmodule Snitch.Pagination do
+  @moduledoc """
+  Module with functions to query the database according to the 
+  requested data per page.
+  """
   import Ecto.Query
   alias Snitch.Core.Tools.MultiTenancy.Repo
 

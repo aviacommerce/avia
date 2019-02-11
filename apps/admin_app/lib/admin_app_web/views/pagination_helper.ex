@@ -1,4 +1,8 @@
 defmodule AdminAppWeb.PaginationHelpers do
+  @moduledoc """
+  Helper functions to generate links on the frontend according to the information 
+  in paginated queries.
+  """
   import Phoenix.HTML
   import Phoenix.HTML.Form
   import Phoenix.HTML.Link
