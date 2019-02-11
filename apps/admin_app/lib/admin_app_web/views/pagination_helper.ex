@@ -19,13 +19,14 @@ defmodule AdminAppWeb.PaginationHelpers do
   end
 
   def pagination_links(conn, list, route) do
-
     params = fetch_params(conn.params)
+
     content_tag :div, class: "pagination", data: [category: params["category"]] do
       children = []
 
       page_links =
-        get_previous(children, conn, params, list, route) ++ get_next(children, conn, params, list, route)
+        get_previous(children, conn, params, list, route) ++
+          get_next(children, conn, params, list, route)
 
       {:safe, page_links}
     end
@@ -37,9 +38,12 @@ defmodule AdminAppWeb.PaginationHelpers do
         {:safe, children} =
           children ++
             link("Previous",
-              to: route.(conn, :index, Map.put(params, "page", list.prev_page)),
-              class: "pagination-btn btn btn-primary btn-lg",
-              data: [page: list.prev_page] 
+              to: '#',
+              class: "pagination-btn btn btn-primary btn-lg previous",
+              data: [
+                page: list.prev_page,
+                route: route.(conn, :index, Map.put(params, "page", list.prev_page))
+              ]
             )
 
         children
@@ -55,9 +59,12 @@ defmodule AdminAppWeb.PaginationHelpers do
         {:safe, children} =
           children ++
             link("Next",
-              to: route.(conn, :index, Map.put(params, "page", list.next_page)),
-              class: "pagination-btn btn btn-primary btn-lg",
-              data: [page: list.next_page] 
+              to: '#',
+              class: "pagination-btn btn btn-primary btn-lg next",
+              data: [
+                page: list.next_page,
+                route: route.(conn, :index, Map.put(params, "page", list.next_page))
+              ]
             )
 
         children

@@ -30,19 +30,17 @@ defmodule AdminApp.Order.SearchContext do
       |> get_orders_with_state(term, state)
       |> preload([:user, [packages: [:shipping_method, :items]], [line_items: :product]])
       |> Pagination.page(page)
-    # require IEx
-    # IEx.pry
-    # query
   end
 
-  def search_orders(%{
-        "start_date" => start_date,
-        "end_date" => end_date,
-        "page" => page
-      }) do
+  def search_orders(
+        %{
+          "start_date" => start_date,
+          "end_date" => end_date
+        } = payload
+      ) do
     start_date = format_date(start_date)
     end_date = format_date(end_date)
-    page = page || 1
+    page = payload["page"] || 1
 
     Order
     |> where([o], o.updated_at >= ^start_date and o.updated_at <= ^end_date)
