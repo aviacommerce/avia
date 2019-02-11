@@ -63,11 +63,13 @@ defmodule AdminApp.OrderContext do
     query = query_confirmed_orders(rummage)
     orders = load_orders(query)
 
-    orders_query = from(order in orders,
-      left_join: package in Package,
-      on: order.id == package.order_id,
-      where: package.state == ^:processing
-    )
+    orders_query =
+      from(order in orders,
+        left_join: package in Package,
+        on: order.id == package.order_id,
+        where: package.state == ^:processing
+      )
+
     Pagination.page(orders_query, page)
   end
 
@@ -76,11 +78,13 @@ defmodule AdminApp.OrderContext do
     query = query_confirmed_orders(rummage)
     orders = load_orders(query)
 
-    orders_query = from(order in orders,
-      left_join: package in Package,
-      on: order.id == package.order_id,
-      where: package.state == ^:ready
-    )
+    orders_query =
+      from(order in orders,
+        left_join: package in Package,
+        on: order.id == package.order_id,
+        where: package.state == ^:ready
+      )
+
     Pagination.page(orders_query, page)
   end
 
@@ -89,11 +93,13 @@ defmodule AdminApp.OrderContext do
     query = query_confirmed_orders(rummage)
     orders = load_orders(query)
 
-    orders_query = from(order in orders,
-      left_join: package in Package,
-      on: order.id == package.order_id,
-      where: package.state == ^:shipped or package.state == ^:delivered
-    )
+    orders_query =
+      from(order in orders,
+        left_join: package in Package,
+        on: order.id == package.order_id,
+        where: package.state == ^:shipped or package.state == ^:delivered
+      )
+
     Pagination.page(orders_query, page)
   end
 

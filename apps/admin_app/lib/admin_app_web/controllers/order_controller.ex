@@ -132,7 +132,7 @@ defmodule AdminAppWeb.OrderController do
 
   def show_invoice(conn, params) do
     order =
-    %{number: params["number"]}
+      %{number: params["number"]}
       |> load_order()
       |> Repo.preload([:line_items, :user])
 
@@ -253,7 +253,6 @@ defmodule AdminAppWeb.OrderController do
       |> Map.drop([:__meta])
 
     context =
-      
       Context.new(
         order,
         state: %{
@@ -320,7 +319,7 @@ defmodule AdminAppWeb.OrderController do
   end
 
   defp struct_to_map(items) do
-    Enum.map(items, fn item -> item |> Map.from_struct |> Map.drop([:__meta]) end)
+    Enum.map(items, fn item -> item |> Map.from_struct() |> Map.drop([:__meta]) end)
   end
 
   defp search_item_variant(search) do
