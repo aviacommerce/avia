@@ -151,7 +151,9 @@ defmodule AdminApp.OrderContext do
             p.updated_at <= ^initial_date_range.end_date
       )
 
-    load_orders(query) |> Pagination.page(page)
+    query
+    |> load_orders()
+    |> Pagination.page(page)
   end
 
   defp query_confirmed_orders(rummage) do
@@ -181,6 +183,6 @@ defmodule AdminApp.OrderContext do
   end
 
   defp load_orders(query) do
-    query |> preload([:user, [packages: :items], [line_items: :product]])
+    preload(query, [:user, [packages: :items], [line_items: :product]])
   end
 end

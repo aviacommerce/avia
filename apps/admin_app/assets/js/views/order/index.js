@@ -4,7 +4,7 @@ import socket from './../../socket';
 export default class View extends MainView {
   mount() {
     super.mount();
-    let target_div = $('.list');
+    let order_list_container = $('.list');
     
     $('.order-tab .nav-link').on('click', (e) => {
       e.preventDefault();
@@ -18,7 +18,7 @@ export default class View extends MainView {
         data: { category: category },
         dataType: 'json',
         success: (data) => {
-          target_div.empty().append(data.html)
+          order_list_container.empty().append(data.html)
           this.mount();
         }
       })
@@ -32,7 +32,7 @@ export default class View extends MainView {
         type: 'GET',
         data: { sort: sort_order },
         success: (data) => {
-          target_div.empty().append(data.html);
+          order_list_container.empty().append(data.html);
           this.mount();
         }
       })

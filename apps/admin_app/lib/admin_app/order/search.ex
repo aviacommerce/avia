@@ -11,6 +11,8 @@ defmodule AdminApp.Order.SearchContext do
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Pagination
 
+  @order_preloads [:user, [packages: [:shipping_method, :items]], [line_items: :product]]
+
   def search_orders(%{"term" => term} = payload) do
     state = get_order_state(term)
     page = payload["page"] || 1
@@ -28,7 +30,7 @@ defmodule AdminApp.Order.SearchContext do
     query =
       user_ids
       |> get_orders_with_state(term, state)
-      |> preload([:user, [packages: [:shipping_method, :items]], [line_items: :product]])
+      |> preload(^@order_preloads)
       |> Pagination.page(page)
   end
 
@@ -44,7 +46,7 @@ defmodule AdminApp.Order.SearchContext do
 
     Order
     |> where([o], o.updated_at >= ^start_date and o.updated_at <= ^end_date)
-    |> preload([:user, [packages: [:shipping_method, :items]], [line_items: :product]])
+    |> preload(^@order_preloads)
     |> Pagination.page(page)
   end
 

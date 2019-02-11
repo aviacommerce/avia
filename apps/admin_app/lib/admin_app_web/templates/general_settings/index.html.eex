@@ -47,9 +47,6 @@
   <div class = "col">
     <%= link("Edit", to: general_settings_path(@conn, :edit, @general_configuration.id), class: "btn btn-info")
     %>
-    <%= link("Delete", to: general_settings_path(@conn, :delete, @general_configuration.id),
-    method: :delete, data: [confirm: "Are you sure you want to delete?"], class: "btn btn-danger")
-    %>
   </div>
 </div>
 

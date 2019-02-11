@@ -29,7 +29,8 @@ defmodule Snitch.Domain.Stock.Quantifier do
   def validate_in_stock(%Ecto.Changeset{valid?: true} = changeset) do
     with {_, product_id} <- fetch_field(changeset, :product_id),
          {_, quantity} <- fetch_field(changeset, :quantity),
-         {:track_inventory, true} <- {:track_inventory, is_inventory_tracking_enabled(product_id)},
+         {:track_inventory, true} <-
+           {:track_inventory, is_inventory_tracking_enabled(product_id)},
          total when quantity <= total and not is_nil(total) <- total_on_hand(product_id) do
       changeset
     else

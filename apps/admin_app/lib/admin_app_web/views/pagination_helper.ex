@@ -22,21 +22,17 @@ defmodule AdminAppWeb.PaginationHelpers do
     params = fetch_params(conn.params)
 
     content_tag :div, class: "pagination", data: [category: params["category"]] do
-      children = []
-
-      page_links =
-        get_previous(children, conn, params, list, route) ++
-          get_next(children, conn, params, list, route)
+      page_links = get_previous(conn, params, list, route) ++ get_next(conn, params, list, route)
 
       {:safe, page_links}
     end
   end
 
-  defp get_previous(children, conn, params, list, route) do
+  defp get_previous(conn, params, list, route) do
     case list.has_prev do
       true ->
         {:safe, children} =
-          children ++
+          [] ++
             link("Previous",
               to: '#',
               class: "pagination-btn btn btn-primary btn-lg previous",
@@ -49,15 +45,15 @@ defmodule AdminAppWeb.PaginationHelpers do
         children
 
       false ->
-        children
+        []
     end
   end
 
-  defp get_next(children, conn, params, list, route) do
+  defp get_next(conn, params, list, route) do
     case list.has_next do
       true ->
         {:safe, children} =
-          children ++
+          [] ++
             link("Next",
               to: '#',
               class: "pagination-btn btn btn-primary btn-lg next",
@@ -70,7 +66,7 @@ defmodule AdminAppWeb.PaginationHelpers do
         children
 
       false ->
-        children
+        []
     end
   end
 end

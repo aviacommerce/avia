@@ -26,8 +26,7 @@ defmodule AdminAppWeb.OrderChannel do
     orders = SearchContext.search_orders(payload)
 
     conn = %Plug.Conn{params: payload}
-    # require IEx
-    # IEx.pry
+
     broadcast!(socket, "order:search:#{socket.assigns.user_token}", %{
       body:
         Phoenix.View.render_to_string(AdminAppWeb.OrderView, "order_listing.html",
