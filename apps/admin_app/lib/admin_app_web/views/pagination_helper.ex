@@ -36,15 +36,14 @@ defmodule AdminAppWeb.PaginationHelpers do
     case list.has_prev do
       true ->
         {:safe, children} =
-          [] ++
-            link("Previous",
-              to: '#',
-              class: "pagination-btn btn btn-primary btn-lg previous",
-              data: [
-                page: list.prev_page,
-                route: route.(conn, :index, Map.put(params, "page", list.prev_page))
-              ]
-            )
+          link("Previous",
+            to: '#',
+            class: "pagination-btn btn btn-primary btn-lg previous",
+            data: [
+              page: list.prev_page,
+              route: route.(conn, :index, Map.put(params, "page", list.prev_page))
+            ]
+          )
 
         children
 
@@ -57,15 +56,14 @@ defmodule AdminAppWeb.PaginationHelpers do
     case list.has_next do
       true ->
         {:safe, children} =
-          [] ++
-            link("Next",
-              to: '#',
-              class: "pagination-btn btn btn-primary btn-lg next",
-              data: [
-                page: list.next_page,
-                route: route.(conn, :index, Map.put(params, "page", list.next_page))
-              ]
-            )
+          link("Next",
+            to: '#',
+            class: "pagination-btn btn btn-primary btn-lg next",
+            data: [
+              page: list.next_page,
+              route: route.(conn, :index, Map.put(params, "page", list.next_page))
+            ]
+          )
 
         children
 
