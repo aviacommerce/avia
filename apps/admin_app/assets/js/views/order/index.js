@@ -4,6 +4,8 @@ import socket from './../../socket';
 export default class View extends MainView {
   mount() {
     super.mount();
+    let channel = socket.channel("order:search", {})
+    paginatedSearch(channel);
     let order_list_container = $('.list');
     
     $('.order-tab .nav-link').on('click', (e) => {
@@ -19,7 +21,7 @@ export default class View extends MainView {
         dataType: 'json',
         success: (data) => {
           order_list_container.empty().append(data.html)
-          this.mount();
+          paginatedSearch(channel);
         }
       })
     })
@@ -33,16 +35,14 @@ export default class View extends MainView {
         data: { sort: sort_order },
         success: (data) => {
           order_list_container.empty().append(data.html);
-          this.mount();
+          paginatedSearch(channel);
         }
       })
     });
 
-    let channel = socket.channel("order:search", {})
-
     channel.on(`order:search:${window.userToken}`, payload => {
       $('.list').empty().append(payload.body);
-      this.mount();
+      paginatedSearch(channel);
       removeLoadedData();
     })
 
@@ -82,30 +82,7 @@ export default class View extends MainView {
       channel.push(`order:search`, payload); // send the message to the server on "ping" channel
     });
 
-    $('a.pagination-btn').on('click', (e) => {
-      var btn = $(e.currentTarget);
-      var page = btn.data("page");
-      var category = btn.parent().data("category") || "pending"
-      var params = $('.pagination-params').data()
-      var paginated_params = Object.assign({}, toSnakeCase(params));
-      if (typeof paginated_params["start_date"] === 'undefined'){
-        $.ajax({
-          url: "/orders",
-          type: 'GET',
-          data: { category: category, page: page },
-          dataType: 'json',
-          success: (data) => {
-            $('.list').empty().append(data.html);
-            this.mount();
-          }
-        })
-      }else{
-        params["page"] = page
-        $(".orders-list").html("");
-        $(".orders-list").addClass("loader");
-        channel.push('order:search', params);
-      }
-    });
+   
   }
 
   unmount() {
@@ -126,4 +103,31 @@ function toSnakeCase(params){
 function removeLoadedData(){
   $("#order-search-button").html('<i class="fa fa-search"></i>');
   $(".orders-list").removeClass("loader");
+}
+
+export function paginatedSearch(channel) {
+  $('a.pagination-btn').on('click', (e) => {
+    var btn = $(e.currentTarget);
+    var page = btn.data("page");
+    var category = btn.parent().data("category") || "pending"
+    var params = $('.pagination-params').data()
+    var paginated_params = Object.assign({}, toSnakeCase(params));
+    if (typeof paginated_params["start_date"] === 'undefined'){
+      $.ajax({
+        url: "/orders",
+        type: 'GET',
+        data: { category: category, page: page },
+        dataType: 'json',
+        success: (data) => {
+          $('.list').empty().append(data.html);
+          paginatedSearch(channel);
+        }
+      })
+    }else{
+      params["page"] = page
+      $(".orders-list").html("");
+      $(".orders-list").addClass("loader");
+      channel.push('order:search', params);
+    }
+  });
 }
