@@ -21,8 +21,19 @@ defenum(PackageStateEnum,
   complete: 6
 )
 
+defenum(UserStateEnum,
+  active: 0,
+  deleted: 1
+)
+
 defenum(InventoryTrackingEnum,
   none: 0,
   product: 1,
   variant: 2
+)
+
+defenum(AddressTypes,
+  shipping_address: 0,
+  billing_address: 1,
+  store_address: 2
 )

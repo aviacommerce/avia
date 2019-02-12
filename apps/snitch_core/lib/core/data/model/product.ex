@@ -7,6 +7,7 @@ defmodule Snitch.Data.Model.Product do
 
   import Ecto.Query
   alias Ecto.Multi
+  alias Snitch.Tools.GenNanoid
   alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Data.Schema.{Image, Product, Variation, Taxon}
   alias Snitch.Tools.Helper.ImageUploader
@@ -38,9 +39,16 @@ defmodule Snitch.Data.Model.Product do
   @doc """
   Returns all Products with the given parameters.
   """
-  @spec get(map | non_neg_integer) :: Product.t() | nil
+  @spec get(map | non_neg_integer) :: {:ok, Product.t()} | {:error, atom}
   def get(query_params) do
-    QH.get(Product, query_params, Repo)
+    case QH.get(Product, query_params, Repo) do
+      {:error, msg} ->
+        {:error, msg}
+
+      {:ok, product} ->
+        product = preload_with_variants_in_state(product)
+        {:ok, product}
+    end
   end
 
   @spec get_product_list() :: [Product.t()]
@@ -70,20 +78,21 @@ defmodule Snitch.Data.Model.Product do
       |> Repo.all()
 
     Product
-    |> where([p], p.state == "active" and p.id not in ^child_product_ids)
+    |> where([p], p.id not in ^child_product_ids)
   end
 
-  def get_product_with_present_variants(product) do
-    query =
-      Product
-      |> join(:left, [p], v in Variation, v.parent_product_id == ^product.id)
-      |> where(
-        [p, v],
-        p.state != "deleted" and p.id == v.child_product_id
-      )
+  def preload_with_variants_in_state(product, states \\ [:active, :in_active, :draft]) do
+    product = Repo.preload(product, :variants)
 
-    Repo.one(from(p in Product, where: p.id == ^product.id, preload: [variants: ^query]))
+    %{
+      product
+      | variants: Enum.filter(product.variants, fn variant -> variant.state in states end)
+    }
   end
+
+  defdelegate preload_non_deleted_variants(product),
+    to: __MODULE__,
+    as: :preload_with_variants_in_state
 
   @doc """
   Get listtable product
@@ -109,9 +118,12 @@ defmodule Snitch.Data.Model.Product do
 
   @spec get_product_with_default_image(Product.t()) :: Product.t()
   def get_product_with_default_image(product) do
-    default_image = from(image in Image, where: image.is_default == true)
-    query = from(p in Product, where: p.id == ^product.id, preload: [images: ^default_image])
-    Repo.one(query)
+    product = Repo.preload(product, :images)
+
+    %{
+      product
+      | images: Enum.filter(product.images, & &1.is_default)
+    }
   end
 
   @spec get_rummage_product_list(any) :: Product.t()
@@ -124,17 +136,16 @@ defmodule Snitch.Data.Model.Product do
       end
 
     {query, _rummage} =
-      from(p in Product)
+      from(p in admin_display_product_query())
       |> Map.put(:prefix, Repo.get_prefix())
       |> Rummage.Ecto.rummage(opts)
 
-    child_product_ids = from(c in Variation, select: c.child_product_id) |> Repo.all()
-
-    query = from(p in query, where: p.id not in ^child_product_ids)
+    query = from(p in query, preload: [:images, :variants])
 
     query
     |> Ecto.Queryable.to_query()
     |> Repo.all()
+    |> Enum.map(&preload_non_deleted_variants/1)
   end
 
   defp convert_to_atom_map(map), do: to_atom_map("", map)
@@ -184,7 +195,7 @@ defmodule Snitch.Data.Model.Product do
   """
   @spec get(integer) :: {:ok, Product.t()} | {:error, Ecto.Changeset.t()} | nil
   def delete(id) do
-    with %Product{} = product <- get(id),
+    with {:ok, %Product{} = product} <- get(id),
          _ <- ESProductStore.update_product_to_es(product, :delete),
          changeset <- Product.delete_changeset(product) do
       product = product |> Repo.preload(:images)
@@ -327,10 +338,10 @@ defmodule Snitch.Data.Model.Product do
   defp get_image(multi, image_id) do
     Multi.run(multi, :image, fn _ ->
       case QH.get(Image, image_id, Repo) do
-        nil ->
+        {:error, _} ->
           {:error, "image not found"}
 
-        image ->
+        {:ok, image} ->
           {:ok, image}
       end
     end)
@@ -339,10 +350,10 @@ defmodule Snitch.Data.Model.Product do
   defp get_product(multi, product_id) do
     Multi.run(multi, :product, fn _ ->
       case get(product_id) do
-        nil ->
-          {:error, "prodcut not found"}
+        {:error, _} ->
+          {:error, "product not found"}
 
-        product ->
+        {:ok, product} ->
           {:ok, product}
       end
     end)
@@ -500,7 +511,7 @@ defmodule Snitch.Data.Model.Product do
   """
   @spec has_variants?(Product.t()) :: true | false
   def has_variants?(product) do
-    product = get_product_with_present_variants(product)
+    product = preload_with_variants_in_state(product)
     length(product.variants) > 0
   end
 
@@ -511,4 +522,61 @@ defmodule Snitch.Data.Model.Product do
   def is_variant_tracking_enabled?(product) do
     Product.is_variant_tracking_enabled?(product)
   end
+
+  def generate_upi() do
+    upi = "A#{GenNanoid.gen_nano_id()}C"
+
+    case get_upi_if_unique(upi) do
+      {:error, _} ->
+        generate_upi()
+
+      {:ok, upi} ->
+        upi
+    end
+  end
+
+  # TODO: write test case for this
+  def get_upi_if_unique(upi) do
+    case get_product_with_upi(upi) do
+      nil ->
+        {:ok, upi}
+
+      _ ->
+        {:error, "not_unique"}
+    end
+  end
+
+  defp get_product_with_upi(upi) do
+    from(p in "snitch_products", select: p.upi, where: p.upi == ^upi) |> Repo.one()
+  end
+
+  @doc """
+  Returns the `parent product` of the supplied `variant`.
+
+  In case supplied product is not a variant, returns nil.
+  """
+  @spec get_parent_product(Product.t()) :: Product.t() | nil
+  def get_parent_product(product) do
+    product = Repo.preload(product, parent_variation: :parent_product)
+    if product.parent_variation, do: product.parent_variation.parent_product, else: nil
+  end
+
+  @doc """
+  Returns `tax_class_id` of the product.
+
+  Since tax class is set only for parent and not variants, if the
+  supplied product is a variant, tax class of the parent product is
+  returned.
+  """
+  @spec get_tax_class_id(Product.t()) :: non_neg_integer
+  def get_tax_class_id(product) do
+    tax_class_id(product, product.tax_class_id)
+  end
+
+  defp tax_class_id(product, nil) do
+    product = get_parent_product(product)
+    product.tax_class_id
+  end
+
+  defp tax_class_id(_product, tax_class_id), do: tax_class_id
 end

@@ -1,5 +1,6 @@
 defmodule AdminAppWeb.OrderView do
   use AdminAppWeb, :view
+  import Phoenix.HTML.Tag
   alias Snitch.Data.Model.{Country, State, User}
   alias Snitch.Domain.Order, as: OrderDomain
   alias AdminAppWeb.Helpers
@@ -24,6 +25,11 @@ defmodule AdminAppWeb.OrderView do
 
       name ->
         name
+    end
+  end
+
+  def get_params(params) do
+    content_tag :div, class: "pagination-params", data: Map.to_list(params) do
     end
   end
 
@@ -125,6 +131,10 @@ defmodule AdminAppWeb.OrderView do
 
   def render_quantity_with_stock(line_item) do
     content_tag(:td, "#{line_item.quantity}")
+  end
+
+  def render_address(nil) do
+    content_tag(:div, ["N.A"])
   end
 
   def render_address(address) do
@@ -247,11 +257,15 @@ defmodule AdminAppWeb.OrderView do
   end
 
   def get_country(country_id) do
-    Country.get(country_id)
+    country_id |> Country.get() |> get_response
   end
 
   def get_state(state_id) do
-    State.get(state_id)
+    state_id |> State.get() |> get_response
+  end
+
+  defp get_response({:ok, struct}) do
+    struct
   end
 
   defp get_state_name(state_id) do

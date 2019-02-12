@@ -61,7 +61,7 @@ defmodule Snitch.Data.Model.LineItem do
     |> Repo.delete()
   end
 
-  @spec get(map) :: LineItem.t() | nil
+  @spec get(map) :: {:ok, LineItem.t()} | {:error, atom}
   def get(query_fields) do
     QH.get(LineItem, query_fields, Repo)
   end

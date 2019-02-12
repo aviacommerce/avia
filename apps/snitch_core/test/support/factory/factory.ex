@@ -14,7 +14,8 @@ defmodule Snitch.Factory do
     Rating,
     VariationTheme,
     ShippingCategory,
-    Promotion
+    Promotion,
+    Tax
   }
 
   alias Snitch.Data.Schema.{
@@ -30,10 +31,7 @@ defmodule Snitch.Factory do
     PaymentMethod,
     Permission,
     Role,
-    TaxCategory,
-    TaxRate,
     User,
-    Variant,
     Variation,
     Product,
     ProductBrand,
@@ -106,13 +104,9 @@ defmodule Snitch.Factory do
   def order_factory do
     %Order{
       number: sequence("order"),
-      state: :cart
-    }
-  end
-
-  def taxon_factory do
-    %Taxon{
-      name: sequence("taxon")
+      state: :cart,
+      shipping_address: nil,
+      billing_address: nil
     }
   end
 
@@ -190,27 +184,8 @@ defmodule Snitch.Factory do
     }
   end
 
-  def tax_category_factory do
-    %TaxCategory{
-      name: sequence(:tax_category, ["CE_VAT", "GST", "CGST", "AU_VAT"]),
-      description: "tax applied",
-      is_default?: false,
-      tax_code: sequence(:tax_code, ["CE_1", "GST", "CGST", "AU_VAT"]),
-      deleted_at: nil
-    }
-  end
-
   defp random_price(currency, min, delta) do
     Money.new(currency, "#{:rand.uniform(delta) + min}.99")
-  end
-
-  def tax_rate_factory do
-    %TaxRate{
-      name: sequence(:tax_region, ["North America", "Europe", "India", "China"]),
-      value: 0.5,
-      included_in_price: false,
-      calculator: Snitch.Domain.Calculator.Default
-    }
   end
 
   def general_config_factory do
@@ -220,8 +195,7 @@ defmodule Snitch.Factory do
       frontend_url: "https://abc.com",
       backend_url: "https://abc.com",
       seo_title: "store",
-      currency: "USD",
-      hosted_payment_url: "https://abc.com"
+      currency: "USD"
     }
   end
 
@@ -242,14 +216,6 @@ defmodule Snitch.Factory do
     %Permission{
       code: sequence(:code, ["manage_products", "manage_orders", "manage_all"]),
       description: "can manage respective"
-    }
-  end
-
-  def product_factory do
-    %Product{
-      name: sequence(:product, &"shoes-nike-#{&1}"),
-      description: "awesome products",
-      slug: sequence(:slug, &"nike-#{&1}")
     }
   end
 
@@ -364,24 +330,6 @@ defmodule Snitch.Factory do
       |> DateTime.from_unix()
 
     time
-  end
-
-  def tax_categories(context) do
-    count = Map.get(context, :tax_category_count, 3)
-    [tax_categories: insert_list(count, :tax_category)]
-  end
-
-  def tax_rate(_context) do
-    tc = insert(:tax_category)
-    zone = insert(:zone, %{zone_type: "S"})
-    [tax_rate: insert(:tax_rate, %{tax_category_id: tc.id, zone_id: zone.id})]
-  end
-
-  def tax_rates(context) do
-    tc = insert(:tax_category)
-    zone = insert(:zone, %{zone_type: "S"})
-    count = Map.get(context, :tax_rate_count, 3)
-    [tax_rates: insert_list(count, :tax_rate, %{tax_category_id: tc.id, zone_id: zone.id})]
   end
 
   def permissions(context) do

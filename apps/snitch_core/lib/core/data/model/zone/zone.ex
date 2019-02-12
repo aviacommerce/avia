@@ -145,16 +145,29 @@ defmodule Snitch.Data.Model.Zone do
   end
 
   @spec get(map | non_neg_integer) :: Zone.t() | nil
-  def get(id) do
+  def get(id) when is_integer(id) do
     Zone
     |> where([z], z.id == ^id)
     |> Repo.all()
     |> List.first()
   end
 
+  def get(id) when is_binary(id) do
+    id = String.to_integer(id)
+    get(id)
+  end
+
   def get_all() do
     Zone
     |> order_by([z], asc: z.name)
+    |> Repo.all()
+  end
+
+  @spec formatted_list() :: [{String.t(), non_neg_integer}]
+  def formatted_list do
+    Zone
+    |> order_by([s], asc: s.name)
+    |> select([s], {s.name, s.id})
     |> Repo.all()
   end
 end

@@ -23,7 +23,7 @@ defmodule Snitch.Data.Model.ShippingRule do
   @doc """
   Returns a `shipping rule` by the supplied `id`.
   """
-  @spec get(non_neg_integer) :: ShippingRule.t() | nil
+  @spec get(non_neg_integer) :: {:ok, ShippingRule.t()} | {:error, atom}
   def get(id) do
     QH.get(ShippingRule, id, Repo)
     |> Repo.preload([:shipping_category, :shipping_rule_identifier])

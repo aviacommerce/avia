@@ -15,35 +15,50 @@ defmodule AdminAppWeb.OrderController do
   alias AdminApp.PackageContext
   alias AdminAppWeb.Helpers
 
-  @root_path [File.cwd!(), "invoices"] |> Path.join()
+  @root_path Path.join([File.cwd!(), "invoices"])
 
-  def index(conn, %{"category" => category}) do
+  def index(conn, %{"category" => category} = params) do
+    page = params["page"] || 1
     sort_param = conn.query_params["sort"]
-    orders = OrderContext.order_list(category, sort_param)
+
+    orders = OrderContext.order_list(category, sort_param, page)
+
     token = get_csrf_token()
 
     html =
       render_to_string(
         OrderView,
         "order_listing.html",
+        conn: conn,
         orders: orders,
         token: token
       )
 
     conn
+    |> assign_initial_date_range
     |> put_status(200)
     |> json(%{html: html})
   end
 
-  def index(conn, _params) do
+  def index(conn, params) do
+    conn = assign_initial_date_range(conn)
+    page = params["page"] || 1
+    orders = OrderContext.order_list("pending", nil, page)
+
     render(conn, "index.html", %{
-      orders: OrderContext.order_list("pending", nil),
+      orders: orders,
       token: get_csrf_token()
     })
   end
 
+  defp assign_initial_date_range(conn) do
+    conn
+    |> assign(:end_date, Date.utc_today())
+    |> assign(:start_date, 30 |> Helpers.date_days_before() |> Date.from_iso8601() |> elem(1))
+  end
+
   def show(conn, %{"number" => _number} = params) do
-    with %OrderSchema{} = order <- OrderContext.get_order(params),
+    with {:ok, %OrderSchema{} = order} <- OrderContext.get_order(params),
          order_total = OrderContext.get_total(order) do
       render(
         conn,
@@ -52,7 +67,7 @@ defmodule AdminAppWeb.OrderController do
         order_total: order_total
       )
     else
-      nil ->
+      {:error, _} ->
         conn
         |> put_flash(:error, "No such order exists with given number")
         |> redirect(to: dashboard_path(conn, :index))
@@ -60,7 +75,7 @@ defmodule AdminAppWeb.OrderController do
   end
 
   def update_package(conn, %{"id" => id, "state" => state}) do
-    order = OrderContext.get_order(%{"id" => id})
+    {:ok, order} = OrderContext.get_order(%{"id" => id})
 
     case PackageContext.update_packages(state, String.to_integer(id)) do
       {:ok, _} ->
@@ -77,7 +92,7 @@ defmodule AdminAppWeb.OrderController do
   end
 
   def update_state(conn, %{"id" => id, "state" => state}) do
-    order = OrderContext.get_order(%{"id" => id})
+    {:ok, order} = OrderContext.get_order(%{"id" => id})
 
     case OrderContext.state_transition(state, order) do
       {:ok, message} ->
@@ -93,7 +108,7 @@ defmodule AdminAppWeb.OrderController do
   end
 
   def cod_payment_update(conn, %{"id" => id, "state" => state}) do
-    order = OrderContext.get_order(%{"id" => id})
+    {:ok, order} = OrderContext.get_order(%{"id" => id})
 
     case OrderContext.update_cod_payment(order, state) do
       {:ok, _} ->
@@ -117,7 +132,8 @@ defmodule AdminAppWeb.OrderController do
 
   def show_invoice(conn, params) do
     order =
-      load_order(%{number: params["number"]})
+      %{number: params["number"]}
+      |> load_order()
       |> Repo.preload([:line_items, :user])
 
     render(conn, "invoice.html", %{order: order})
@@ -143,7 +159,8 @@ defmodule AdminAppWeb.OrderController do
     order = load_order(%{number: params["order_number"]})
 
     update_item =
-      fetch_line_item(params["update"], order.line_items)
+      params["update"]
+      |> fetch_line_item(order.line_items)
       |> List.first()
 
     render(conn, "edit.html", %{order: order, search: [], update_item: update_item})
@@ -230,13 +247,14 @@ defmodule AdminAppWeb.OrderController do
     address_id = String.to_integer(params["address_id"])
 
     address =
-      Repo.get(Address, address_id)
+      Address
+      |> Repo.get(address_id)
       |> Map.from_struct()
       |> Map.drop([:__meta])
 
     context =
-      order
-      |> Context.new(
+      Context.new(
+        order,
         state: %{
           billing_address: address,
           shipping_address: address
@@ -293,16 +311,15 @@ defmodule AdminAppWeb.OrderController do
   defp remove_line_item(edit_item, line_items) do
     line_items
     |> Enum.reject(fn %{id: id} -> id == String.to_integer(edit_item) end)
-    |> Enum.map(fn item -> Map.from_struct(item) |> Map.drop([:__meta]) end)
+    |> Enum.map(fn item -> item |> Map.from_struct() |> Map.drop([:__meta]) end)
   end
 
   defp fetch_line_item(edit_item, line_items) do
-    line_items
-    |> Enum.reject(fn %{id: id} -> id != String.to_integer(edit_item) end)
+    Enum.reject(line_items, fn %{id: id} -> id != String.to_integer(edit_item) end)
   end
 
   defp struct_to_map(items) do
-    Enum.map(items, fn item -> Map.from_struct(item) |> Map.drop([:__meta]) end)
+    Enum.map(items, fn item -> item |> Map.from_struct() |> Map.drop([:__meta]) end)
   end
 
   defp search_item_variant(search) do
@@ -326,9 +343,9 @@ defmodule AdminAppWeb.OrderController do
   end
 
   defp load_order(order) do
-    order
-    |> Order.get()
-    |> Repo.preload([
+    {:ok, order} = Order.get(order)
+
+    Repo.preload(order, [
       [line_items: :product],
       [packages: [:items, :shipping_method]],
       :payments,
@@ -342,12 +359,12 @@ defmodule AdminAppWeb.OrderController do
         send_file_response(
           conn,
           params,
-          @root_path |> Path.join("#{type}_#{params["number"]}.pdf"),
+          Path.join(@root_path, "#{type}_#{params["number"]}.pdf"),
           type
         )
 
       {:ok, {:error, reason}} ->
-        send_pdf_response(conn, params, {:error, reason |> format_error()}, type)
+        send_pdf_response(conn, params, {:error, format_error(reason)}, type)
 
       {:error, message} ->
         send_pdf_response(conn, params, {:error, message}, type)
@@ -360,7 +377,7 @@ defmodule AdminAppWeb.OrderController do
         send_pdf_response(conn, params, {:ok, file}, type)
 
       {:error, reason} ->
-        send_pdf_response(conn, params, {:error, reason |> format_error()}, type)
+        send_pdf_response(conn, params, {:error, format_error(reason)}, type)
     end
   end
 
@@ -393,7 +410,7 @@ defmodule AdminAppWeb.OrderController do
 
   defp generate_pdf(order, type) do
     case generate_binary(order, type) do
-      {true, file} -> {:ok, order |> write_file(file, type)}
+      {true, file} -> {:ok, write_file(order, file, type)}
       {false, _file} -> {:error, "Path resolution error!"}
       {:error, message} -> {:error, message}
     end
@@ -424,7 +441,7 @@ defmodule AdminAppWeb.OrderController do
   end
 
   defp resolve_dir_path() do
-    (@root_path |> File.dir?() || @root_path |> File.mkdir_p()) in [:ok, true]
+    (File.dir?(@root_path) || File.mkdir_p(@root_path)) in [:ok, true]
   end
 
   defp format_error(error), do: :file.format_error(error)

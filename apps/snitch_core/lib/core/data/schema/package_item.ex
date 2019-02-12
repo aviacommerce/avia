@@ -59,10 +59,19 @@ defmodule Snitch.Data.Schema.PackageItem do
   The difference between the `:quantity` and the number of units "on
   hand".
 
+  ### `:unit_price`
+  The actual unit price for the package item. The `unit_price` may be same
+  or different from the `line_item` unit price depending on whether, line
+  item price is inclusive or exclusive of tax. In case line item price
+  is inclusive, this price is set after removing the tax amount from line_item
+  unit_price.
+
   ### `:tax`
   The tax levied over (or included in) the cost of the line item, as applicable
-  when the line item is sold from the `:origin` stock location.
-  This does not include any shipping tax components.
+  when the line item is sold from the `:origin` stock location. The tax depends
+  on the type of shipping address set in `tax configuration`.
+  See `Snitch.Data.Schema.TaxConfig`. This does not include any shipping tax
+  components.
 
   ### `:shipping_tax`
   The sum of all shipping taxes that apply for the shipping of this item from
@@ -80,6 +89,7 @@ defmodule Snitch.Data.Schema.PackageItem do
     field(:backordered?, :boolean)
     field(:tax, Money.Ecto.Composite.Type)
     field(:shipping_tax, Money.Ecto.Composite.Type)
+    field(:unit_price, Money.Ecto.Composite.Type)
 
     belongs_to(:product, Product)
     belongs_to(:line_item, LineItem)
@@ -90,9 +100,10 @@ defmodule Snitch.Data.Schema.PackageItem do
     timestamps()
   end
 
-  @create_fields ~w(state delta quantity line_item_id product_id package_id tax shipping_tax)a
+  @create_fields ~w(state delta quantity line_item_id product_id package_id tax
+    shipping_tax unit_price)a
   @required_fields ~w(state quantity line_item_id product_id tax)a
-  @update_fields ~w(state quantity delta tax shipping_tax)a
+  @update_fields ~w(state quantity delta tax shipping_tax unit_price)a
 
   @doc """
   Returns a `PackageItem` changeset to create a new `package_item`.
@@ -124,6 +135,7 @@ defmodule Snitch.Data.Schema.PackageItem do
     |> validate_number(:quantity, greater_than: -1)
     |> validate_number(:delta, greater_than: -1)
     |> validate_amount(:tax)
+    |> validate_amount(:unit_price)
     |> validate_amount(:shipping_tax)
     |> set_backordered()
   end

@@ -31,11 +31,11 @@ defmodule AdminAppWeb.PrototypeController do
 
   def edit(conn, %{"id" => id}) do
     case PrototypeModel.get(id) do
-      %PrototypeSchema{} = prototype ->
+      {:ok, %PrototypeSchema{} = prototype} ->
         changeset = PrototypeSchema.update_changeset(prototype, %{})
         render(conn, "edit.html", changeset: changeset)
 
-      nil ->
+      {:error, _} ->
         conn
         |> put_flash(:info, "Prototype not found")
         |> redirect(to: prototype_path(conn, :index))
@@ -43,18 +43,18 @@ defmodule AdminAppWeb.PrototypeController do
   end
 
   def update(conn, %{"id" => id, "product_prototype" => params}) do
-    with %PrototypeSchema{} = prototype <- PrototypeModel.get(id),
+    with {:ok, %PrototypeSchema{} = prototype} <- PrototypeModel.get(id),
          {:ok, _} <- PrototypeModel.update(prototype, params) do
       prototypes = PrototypeModel.get_all()
       render(conn, "index.html", prototypes: prototypes)
     else
-      {:error, changeset} ->
-        render(conn, "edit.html", changeset: %{changeset | action: :edit})
-
-      nil ->
+      {:error, :product_prototype_not_found} ->
         conn
         |> put_flash(:info, "Prototype not found")
         |> redirect(to: prototype_path(conn, :index))
+
+      {:error, changeset} ->
+        render(conn, "edit.html", changeset: %{changeset | action: :edit})
     end
   end
 

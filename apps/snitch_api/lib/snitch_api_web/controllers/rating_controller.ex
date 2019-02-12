@@ -12,11 +12,8 @@ defmodule SnitchApiWeb.RatingController do
   end
 
   def show(conn, %{"id" => rating_id}) do
-    rating =
-      rating_id
-      |> String.to_integer()
-      |> Rating.get()
-      |> Repo.preload(:rating_options)
+    {:ok, rating} = rating_id |> String.to_integer() |> Rating.get()
+    rating = rating |> Repo.preload(:rating_options)
 
     render(
       conn,

@@ -33,11 +33,12 @@ defmodule AdminAppWeb.ProductBrandController do
   end
 
   def edit(conn, %{"id" => id}) do
-    with %ProductBrandSchema{} = brand <- id |> ProductBrandModel.get() |> Repo.preload(:image),
+    with {:ok, %ProductBrandSchema{} = brand_struct} <- id |> ProductBrandModel.get(),
+         brand <- brand_struct |> Repo.preload(:image),
          changeset <- ProductBrandSchema.update_changeset(brand, %{}) do
       render(conn, "edit.html", changeset: changeset, brand: brand)
     else
-      nil ->
+      {:error, _} ->
         conn
         |> put_flash(:info, "Product Brand not found")
         |> redirect(to: product_brand_path(conn, :index))
@@ -47,19 +48,20 @@ defmodule AdminAppWeb.ProductBrandController do
   def update(conn, %{"id" => id, "product_brand" => params}) do
     params = handle_params(params)
 
-    with %ProductBrandSchema{} = brand <- id |> ProductBrandModel.get() |> Repo.preload(:image),
+    with {:ok, %ProductBrandSchema{} = brand_struct} <- id |> ProductBrandModel.get(),
+         brand <- brand_struct |> Repo.preload(:image),
          {:ok, _} <- ProductBrandModel.update(brand, params) do
       conn
       |> put_flash(:info, "Product Brand update successfully")
       |> redirect(to: product_brand_path(conn, :index))
     else
-      {:error, changeset} ->
-        render(conn, "edit.html", changeset: %{changeset | action: :edit})
-
-      nil ->
+      {:error, :product_brand_not_found} ->
         conn
         |> put_flash(:info, "Product Brand not found")
         |> redirect(to: product_brand_path(conn, :index))
+
+      {:error, changeset} ->
+        render(conn, "edit.html", changeset: %{changeset | action: :edit})
     end
   end
 

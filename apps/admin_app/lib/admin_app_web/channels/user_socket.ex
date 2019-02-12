@@ -1,8 +1,11 @@
 defmodule AdminAppWeb.UserSocket do
   use Phoenix.Socket
+  @secret_key_base Application.get_env(:admin_app, AdminAppWeb.Endpoint)[:secret_key_base]
 
   ## Channels
   # channel "room:*", AdminAppWeb.RoomChannel
+  channel("product:*", AdminAppWeb.ProductChannel)
+  channel("order:*", AdminAppWeb.OrderChannel)
 
   ## Transports
   transport(:websocket, Phoenix.Transports.WebSocket)
@@ -19,8 +22,32 @@ defmodule AdminAppWeb.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(_params, socket) do
-    {:ok, socket}
+  # def connect(_params, socket) do
+  #   {:ok, socket}
+  # end
+
+  def connect(%{"token" => token}, socket) do
+    # max_age: 1209600 is equivalent to two weeks in seconds
+    case Phoenix.Token.verify(
+           socket,
+           @secret_key_base,
+           token,
+           max_age: 86_400
+         ) do
+      {:ok, tenant_user_id} ->
+        [tenant, user_id] = String.split(tenant_user_id, "_")
+
+        socket =
+          socket
+          |> assign(:user_token, token)
+          |> assign(:tenant, tenant)
+          |> assign(:current_user, user_id)
+
+        {:ok, socket}
+
+      {:error, reason} ->
+        :error
+    end
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:

@@ -12,10 +12,10 @@ defmodule SnitchApi.Review do
     %{"rating_option_id" => option_id} = params
 
     case Rating.get_rating_option(option_id) do
-      nil ->
+      {:error, _} ->
         {:error, %{message: "rating_option_not_found"}}
 
-      rating_option ->
+      {:ok, rating_option} ->
         params = product_review_params(attributes, product_id, rating_option)
         ProductReview.add(params)
     end
@@ -25,10 +25,10 @@ defmodule SnitchApi.Review do
     attributes = parse_attribute_params(params)
 
     case Rating.get_rating_option(rating_option_id) do
-      nil ->
+      {:error, _} ->
         {:error, %{message: "rating_option_not_found"}}
 
-      rating_option ->
+      {:ok, rating_option} ->
         params = Map.put(attributes, :rating_option_vote, %{rating_option: rating_option})
         update_review(id, params)
     end

@@ -38,13 +38,14 @@ defmodule AdminAppWeb.GeneralSettingsController do
   end
 
   def edit(conn, %{"id" => id}) do
-    general_configuration = GCModel.get_general_configuration(id) |> Repo.preload(:image)
+    general_configuration = GCModel.get_general_configuration(id)
 
     case general_configuration do
-      nil ->
+      {:error, _} ->
         handle_nil_response(conn)
 
-      _ ->
+      {:ok, general_config} ->
+        general_configuration = general_config |> Repo.preload(:image)
         changeset = GCSchema.update_changeset(general_configuration, %{})
 
         render(
@@ -59,14 +60,14 @@ defmodule AdminAppWeb.GeneralSettingsController do
   def update(conn, %{"id" => id, "settings" => params}) do
     params = handle_params(params)
     params = %{params | "image" => Image.handle_image_value(params["image"])}
-    general_configuration = GCModel.get_general_configuration(id) |> Repo.preload(:image)
 
-    case general_configuration do
-      nil ->
+    case GCModel.get_general_configuration(id) do
+      {:error, _} ->
         handle_nil_response(conn)
 
-      _ ->
+      {:ok, general_configuration} ->
         params
+        general_configuration = general_configuration |> Repo.preload(:image)
 
         case GCModel.update(general_configuration, params) do
           {:ok, general_configuration} ->

@@ -39,10 +39,7 @@ defmodule AdminAppWeb.ProductController do
 
   def index(conn, params) do
     if params["rummage"] do
-      products =
-        ProductModel.get_rummage_product_list(params["rummage"])
-        |> Enum.map(fn product -> ProductModel.get_product_with_present_variants(product) end)
-        |> Repo.preload([:images, [variants: :images]])
+      products = ProductModel.get_rummage_product_list(params["rummage"])
 
       render(conn, "index.html", products: products)
     else
@@ -77,8 +74,9 @@ defmodule AdminAppWeb.ProductController do
   def edit(conn, %{"id" => id} = params) do
     preloads = [variants: [options: :option_type], images: [], taxon: [:variation_themes]]
 
-    with %ProductSchema{} = product <- ProductModel.get(id) |> Repo.preload(preloads) do
-      changeset = ProductSchema.create_changeset(product, params)
+    with {:ok, %ProductSchema{} = product} <- ProductModel.get(id) do
+      product = product |> Repo.preload(preloads)
+      changeset = ProductSchema.update_changeset(product, params)
 
       rummage_params = RummageHelper.get_rummage_params(conn)
 
@@ -87,11 +85,16 @@ defmodule AdminAppWeb.ProductController do
         parent_product: product,
         rummage_params: rummage_params
       )
+    else
+      {:error, :product_not_found} ->
+        conn
+        |> put_flash(:error, "Product not found")
+        |> redirect(to: "/")
     end
   end
 
   def update(conn, %{"product" => params}) do
-    with %ProductSchema{} = product <- ProductModel.get(params["id"]),
+    with {:ok, %ProductSchema{} = product} <- ProductModel.get(params["id"]),
          {:ok, product} <- ProductModel.update(product, params) do
       updated_params = conn.params |> Map.take(["rummage"]) |> Map.merge(params)
       save_publish_redirect_handler(conn, product, updated_params)
@@ -99,7 +102,7 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def update_inventory_tracking(conn, %{"product" => product_params} = params) do
-    with %ProductSchema{} = product <- ProductModel.get(params["product_id"]) do
+    with {:ok, %ProductSchema{} = product} <- ProductModel.get(params["product_id"]) do
       tracking_level = product_params["inventory_tracking"]
       Inventory.set_inventory_tracking(product, tracking_level, params)
 
@@ -120,7 +123,7 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def toggle_variant_state(conn, %{"state" => state, "id" => product_id}) do
-    product = ProductModel.get(%{id: product_id})
+    {:ok, product} = ProductModel.get(%{id: product_id})
 
     case ProductModel.update(product, %{state: state}) do
       {:ok, _} ->
@@ -145,9 +148,8 @@ defmodule AdminAppWeb.ProductController do
   end
 
   defp preload_product_images(id) do
-    ProductSchema
-    |> Query.get(id, Repo)
-    |> Repo.preload(:images)
+    {:ok, product} = ProductSchema |> Query.get(id, Repo)
+    product |> Repo.preload(:images)
   end
 
   def update_default_image(conn, %{"product_id" => id, "default_image" => default_image}) do
@@ -211,12 +213,11 @@ defmodule AdminAppWeb.ProductController do
 
   def delete_image(conn, %{"image_id" => image_id, "product_id" => product_id}) do
     image_id = String.to_integer(image_id)
-    product_id = String.to_integer(product_id)
+    {:ok, product} = String.to_integer(product_id) |> ProductModel.get()
 
-    case ProductModel.delete_image(product_id, image_id) do
+    case ProductModel.delete_image(product.id, image_id) do
       {:ok, _} ->
-        product_id
-        |> ProductModel.get()
+        product
         |> ESProductStore.update_product_to_es()
 
         conn
@@ -254,7 +255,7 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def new_variant(conn, params) do
-    with %ProductSchema{} = parent_product <- ProductModel.get(params["product_id"]),
+    with {:ok, %ProductSchema{} = parent_product} <- ProductModel.get(params["product_id"]),
          variant_params <- generate_variant_params(parent_product, params["options"]),
          %Ecto.Changeset{valid?: true} = changeset <-
            ProductSchema.variant_create_changeset(parent_product, %{
@@ -272,16 +273,16 @@ defmodule AdminAppWeb.ProductController do
     end
   end
 
-  def delete_variant(conn, %{"id" => id} = params) do
+  def delete_variant(conn, %{"id" => id, "parent_id" => parent_id} = params) do
     with {:ok, _product} = deleted_variant <- ProductModel.delete(id) do
       conn
       |> put_flash(:info, "Variant deleted successfully")
-      |> redirect(to: product_path(conn, :edit, id))
+      |> redirect(to: product_path(conn, :edit, parent_id))
     else
       _ ->
         conn
         |> put_flash(:error, "Failed to delete variant")
-        |> redirect(to: product_path(conn, :edit, id))
+        |> redirect(to: product_path(conn, :edit, parent_id))
     end
   end
 
@@ -418,8 +419,9 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def create_property(conn, params) do
-    with %ProductSchema{} = _product <- ProductModel.get(params["product_id"]),
-         %Property{} = _property <- Model.Property.get(params["product_property"]["property_id"]),
+    with {:ok, %ProductSchema{} = _product} <- ProductModel.get(params["product_id"]),
+         {:ok, %Property{} = _property} <-
+           Model.Property.get(params["product_property"]["property_id"]),
          {:ok, _product_property} <- Model.ProductProperty.create(params["product_property"]) do
       redirect(conn, to: product_path(conn, :edit, params["product_id"]))
     else
@@ -434,7 +436,7 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def update_property(conn, params) do
-    with %ProductProperty{} = product_property <-
+    with {:ok, %ProductProperty{} = product_property} <-
            Model.ProductProperty.get_by(%{
              product_id: params["product_property"]["product_id"],
              property_id: params["product_property"]["property_id"]
@@ -448,7 +450,7 @@ defmodule AdminAppWeb.ProductController do
   end
 
   def delete_property(conn, params) do
-    with %ProductProperty{} = product_property <-
+    with {:ok, %ProductProperty{} = product_property} <-
            Model.ProductProperty.get_by(%{
              product_id: params["product_id"],
              property_id: params["property_id"]

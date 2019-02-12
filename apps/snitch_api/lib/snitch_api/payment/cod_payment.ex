@@ -5,13 +5,13 @@ defmodule SnitchApi.CodPayment do
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
   def make_payment(order_id) do
-    with order when not is_nil(order) <- Order.get(order_id) do
+    with {:ok, order} <- Order.get(order_id) do
       context = Context.new(order)
       transition = DefaultMachine.confirm_cod_payment(context)
       transition_response(transition)
     else
-      _ ->
-        {:error, :not_found}
+      {:error, msg} ->
+        {:error, msg}
     end
   end
 

@@ -436,18 +436,33 @@ defmodule Snitch.Domain.ShipmentTest do
   end
 
   describe "to_package/1" do
-    setup do
-      [order: insert(:order)]
+    setup :states
+
+    setup %{states: states} do
+      stock_item = insert(:stock_item, count_on_hand: 5)
+      product = stock_item.product
+
+      order = insert(:order, shipping_address: address_manifest(List.first(states)))
+
+      tax_class_values = %{
+        shipping_tax: %{class: insert(:tax_class), percent: 5},
+        product_tax: %{class: product.tax_class, percent: 5}
+      }
+
+      setup_tax_with_zone_and_rates(tax_class_values, states)
+
+      line_item = insert(:line_item, order: order, product: product, quantity: 2)
+
+      [order: order, line_items: [line_item], variants: [product]]
     end
 
-    setup :variants
-    setup :line_items
     setup :shipment!
 
-    @tag variant_count: 1
+    @tag state_count: 3
     test "embeds cost and shipping method together", context do
       %{
         order: order,
+        line_items: [line_item],
         shipment: %{items: [shipment_item], shipping_methods: [shipping_method]} = shipment
       } = context
 
@@ -455,7 +470,7 @@ defmodule Snitch.Domain.ShipmentTest do
                items: [
                  %{
                    delta: 0,
-                   quantity: 4,
+                   quantity: 2,
                    backordered?: false,
                    state: "fulfilled"
                  } = item
@@ -532,5 +547,19 @@ defmodule Snitch.Domain.ShipmentTest do
     |> Enum.map(fn %{name: name} -> name end)
     |> MapSet.new()
     |> MapSet.equal?(MapSet.new(expected))
+  end
+
+  defp address_manifest(state) do
+    %{
+      first_name: "someone",
+      last_name: "enoemos",
+      address_line_1: "BR Ambedkar Chowk",
+      address_line_2: "street",
+      zip_code: "11111",
+      city: "Rajendra Nagar",
+      phone: "1234567890",
+      country_id: state.country_id,
+      state_id: state.id
+    }
   end
 end

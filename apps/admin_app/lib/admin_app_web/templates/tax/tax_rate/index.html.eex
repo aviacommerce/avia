@@ -1,0 +1,48 @@
+<h4 class="p-3 m-0">Tax Rate</h4>
+<%= button("+ Add Tax Rate", to: tax_zone_tax_rate_path(@conn, :new, @tax_zone_id, []), method: "get", class: "btn btn-primary submit") %>
+<br><br>
+<ul class="list-group">
+</ul>
+
+<div class="list-container">
+   <div class="row m-0 list">
+     <%= for tax_rate <- @tax_rates do %>
+      <div class="table-contaner col-12 p-3 mb-2">
+         <div class="row">
+            <div class="col-11 pl-0">
+               <div class="media">
+                  <div class="checkbox mx-3">
+                     <label>
+                     <input type="checkbox" value="">
+                     <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+                     </label>
+                  </div>
+                  <div class="media-body">
+                     <div class="row">
+                        <div class="col"> <%= tax_rate.name %> </div>
+                        <%= if tax_rate.is_active? do %>
+                          <div class="col"><kbd>Active</kbd></div>
+                        <% else %>
+                          <div class="col"></div>
+                        <% end %>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="col-1">
+               <div class="dropdown col-12 p-0 float-right options-container">
+                  <a class="p-2 dropdown-toggle options" href="#" role="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="fa fa-cog"></i>
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-right" >
+                     <%= link("Edit", to: tax_zone_tax_rate_path(@conn, :edit, @tax_zone_id, tax_rate.id), class: "dropdown-item") %>
+                     <%= link("Delete", to: tax_zone_tax_rate_path(@conn, :delete, @tax_zone_id, tax_rate.id),
+                        method: :delete, data: [confirm: "Are you sure to delete"], class: "dropdown-item") %>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+     <% end %>
+   </div>
+</div>

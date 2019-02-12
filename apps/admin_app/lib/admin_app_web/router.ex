@@ -1,6 +1,9 @@
 defmodule AdminAppWeb.Router do
   use AdminAppWeb, :router
   use Sentry.Plug
+  import Snitch.Core.Tools.MultiTenancy.Repo, only: [get_prefix: 0]
+
+  @secret_key_base Application.get_env(:admin_app, AdminAppWeb.Endpoint)[:secret_key_base]
 
   pipeline :browser do
     plug(:accepts, ["html"])
@@ -8,6 +11,15 @@ defmodule AdminAppWeb.Router do
     plug(:fetch_flash)
     plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
+  end
+
+  defp put_user_token(conn, _) do
+    if current_user = conn.assigns[:current_user] do
+      token = Phoenix.Token.sign(conn, @secret_key_base, "#{get_prefix()}_#{current_user.id}")
+      assign(conn, :user_token, token)
+    else
+      conn
+    end
   end
 
   # This pipeline is just to avoid CSRF token.
@@ -25,6 +37,8 @@ defmodule AdminAppWeb.Router do
 
   pipeline :authentication do
     plug(AdminAppWeb.AuthenticationPipe)
+    plug(Auth.CurrentUser)
+    plug(:put_user_token)
   end
 
   scope "/", AdminAppWeb do
@@ -36,7 +50,6 @@ defmodule AdminAppWeb.Router do
     get("/products/export_products", ProductController, :export_product)
     get("/fetch_states/:country_id", StockLocationController, :fetch_country_states)
     get("/orders/export_orders", OrderController, :export_order)
-    get("/orders/:category", OrderController, :index)
     get("/orders", OrderController, :index)
     get("/orders/:number/detail", OrderController, :show)
     put("/orders/:id/packages/", OrderController, :update_package, as: :order_package)
@@ -70,7 +83,7 @@ defmodule AdminAppWeb.Router do
     resources("/product_brands", ProductBrandController)
     resources("/payment_methods", PaymentMethodController)
     resources("/zones", ZoneController, only: [:index, :new, :create, :edit, :update, :delete])
-    resources("/general_settings", GeneralSettingsController)
+    resources("/general_settings", GeneralSettingsController, except: [:delete])
     post("/payment-provider-inputs", PaymentMethodController, :payment_preferences)
     get("/product/category", ProductController, :select_category)
     post("/product-images/:product_id", ProductController, :add_images)
@@ -114,11 +127,28 @@ defmodule AdminAppWeb.Router do
     get("/product/import/etsy/callback", ProductImportController, :oauth_callback)
     get("/product/import/etsy/progress", ProductImportController, :import_progress)
 
+    ### tax
+    get("/tax", Tax.TaxConfigController, :index)
+    put("/tax/:id", Tax.TaxConfigController, :update)
+    get("/tax/tax-classes", Tax.TaxClassController, :index)
+    get("/tax/tax-classes/new", Tax.TaxClassController, :new)
+    get("/tax/tax-classes/:id/edit", Tax.TaxClassController, :edit)
+    post("/tax/tax-classes/new", Tax.TaxClassController, :create)
+    put("/tax/tax-classes/:id", Tax.TaxClassController, :update)
+    delete("/tax/tax-classes/:id", Tax.TaxClassController, :delete)
+
+    resources("/tax/tax-zones", Tax.TaxZoneController, except: [:show]) do
+      resources("/tax-rates", Tax.TaxRateController, except: [:show])
+    end
+  end
+
+  scope "api/", AdminAppWeb do
     ### promotions
+
     resources("/promotions", PromotionController, except: [:show, :new])
     get("/promo-rules", PromotionController, :rules, as: :promo_rules)
     get("/promo-actions", PromotionController, :actions, as: :promo_actions)
-    post("/promo-calculators", PromotionController, :calculators, as: :promo_calc)
+    get("/promo-calculators", PromotionController, :calculators, as: :promo_calc)
     post("/promo-rule-prefs", PromotionController, :rule_preferences, as: :promo_rule_prefs)
     post("/promo-action-prefs", PromotionController, :action_preferences, as: :promo_action_prefs)
     post("/promo-calc-prefs", PromotionController, :calc_preferences, as: :promo_calc_prefs)

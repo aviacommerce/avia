@@ -83,4 +83,28 @@ defmodule Snitch.Data.Model.UserTest do
       assert user_name == nil
     end
   end
+
+  describe "get all the active users" do
+    setup do
+      users = insert_list(3, :user)
+      [users: users]
+    end
+
+    test "if all the users are active", %{users: users} do
+      assert length(User.get_all()) == length(users)
+    end
+
+    test "if a user is soft deleted", %{valid_attrs: va, users: users} do
+      {:ok, user} = User.create(va)
+      assert length(User.get_all()) == length(users) + 1
+
+      {:ok, deleted_user} = User.delete(user.id)
+      assert deleted_user.state == :deleted
+
+      {:ok, recreated_user} = User.create(va)
+      assert recreated_user.state == :active
+      assert deleted_user.email == recreated_user.email
+      assert Enum.member?(User.get_all(), deleted_user) == false
+    end
+  end
 end

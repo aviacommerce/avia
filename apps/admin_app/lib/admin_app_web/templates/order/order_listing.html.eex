@@ -1,7 +1,11 @@
-<%= if length(@orders) == 0 do %>
+<%= if length(@orders.list) == 0 do %>
   <p>No Orders to Show</p>
 <% else %>
-  <%= for {order, index} <- Enum.with_index(@orders) do %>
-    <%= render "order_list_card.html", order: order %>
-  <% end %>
-<% end %>
+  <%= render_many @orders.list, AdminAppWeb.OrderView, "order_list_card.html", conn: @conn, as: :order %>
+  <div class="order-pagination">
+    <%= pagination_links(@conn, @orders, &order_path/3) %>
+    <hr>
+    <%= pagination_text(@orders) %>
+    <%= get_params(@conn.params) %>
+  </div>
+<% end %> 

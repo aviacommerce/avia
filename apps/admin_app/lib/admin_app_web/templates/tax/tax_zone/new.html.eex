@@ -1,0 +1,7 @@
+<div class="list-container">
+  <h4 class="p-3 m-0">Add Tax Zone</h4> 
+  <div class="col-12">
+    <%= render "_form.html", changeset: @changeset, conn: @conn,
+    action: tax_zone_path(@conn, :create)%>
+  </div>
+</div>

@@ -12,7 +12,7 @@ defmodule Snitch.Domain.PackageItemTest do
       variant = insert(:variant)
 
       stock_query_map = %{product_id: variant.id, stock_location_id: stock_location.id}
-      assert StockItem.get(stock_query_map) == nil
+      assert StockItem.get(stock_query_map) == {:error, :stock_item_not_found}
 
       stock_params = %{
         "product_id" => variant.id,
@@ -38,7 +38,7 @@ defmodule Snitch.Domain.PackageItemTest do
       assert stock_item.inventory_warning_level == 3
     end
 
-    test "stock less then 0" do
+    test "stock less than 0" do
       stock_location = insert(:stock_location)
       variant = insert(:variant)
 
@@ -77,7 +77,7 @@ defmodule Snitch.Domain.PackageItemTest do
       assert product.inventory_tracking == :product
 
       stock_query_map = %{product_id: product.id, stock_location_id: stock_location.id}
-      stock_item = StockItem.get(stock_query_map)
+      {:ok, stock_item} = StockItem.get(stock_query_map)
 
       assert stock_item.count_on_hand == 10
       assert stock_item.inventory_warning_level == 0

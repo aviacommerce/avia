@@ -52,4 +52,8 @@ defmodule AdminAppWeb.LayoutView do
     user = conn.private.guardian_default_resource
     "#{user.first_name} #{user.last_name}"
   end
+
+  def render_layout(layout, assigns, do: content) do
+    render(layout, Map.put(assigns, :inner_layout, content))
+  end
 end

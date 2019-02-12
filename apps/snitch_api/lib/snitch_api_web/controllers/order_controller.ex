@@ -73,7 +73,7 @@ defmodule SnitchApiWeb.OrderController do
   end
 
   def fetch_guest_order(conn, %{"order_number" => order_number}) do
-    with %Order{} = order <- OrderModel.get(%{number: order_number}) do
+    with {:ok, %Order{} = order} <- OrderModel.get(%{number: order_number}) do
       line_item_query =
         from(
           LineItem,
@@ -95,7 +95,7 @@ defmodule SnitchApiWeb.OrderController do
         ]
       )
     else
-      nil ->
+      {:error, _} ->
         conn
         |> put_status(200)
         |> render("empty.json-api", data: %{})

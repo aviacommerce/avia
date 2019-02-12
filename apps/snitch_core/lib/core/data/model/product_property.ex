@@ -56,12 +56,12 @@ defmodule Snitch.Data.Model.ProductProperty do
 
   Takes ProductProperty id as input
   """
-  @spec get(integer) :: ProductProperty.t() | nil
+  @spec get(integer) :: {:ok, ProductProperty.t()} | {:error, atom}
   def get(id) do
     QH.get(ProductProperty, id, Repo)
   end
 
-  @spec get(map | non_neg_integer) :: ProductProperty.t() | nil
+  @spec get(map | non_neg_integer) :: {:ok, ProductProperty.t()} | {:error, atom}
   def get_by(query_fields_or_primary_key) do
     QH.get(ProductProperty, query_fields_or_primary_key, Repo)
   end

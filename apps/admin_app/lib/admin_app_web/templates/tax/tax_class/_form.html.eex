@@ -1,0 +1,9 @@
+<%= form_for @changeset, @action, [id: :tax_class_form], fn f -> %>
+  <div class="form-group row ">
+    <%= input f, :name, nil, is_horizontal: true, description: "Tax Class name" %>
+  </div>
+  <div class="form-group row" >
+    <%= submit "Submit", class: "btn btn-primary submit-btn float-right", style: "margin:5px;"%>
+  </div>
+
+<% end %>

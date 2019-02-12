@@ -36,7 +36,7 @@ defmodule Snitch.Data.Model.StockItem do
     QH.delete(StockItemSchema, id_or_instance, Repo)
   end
 
-  @spec get(non_neg_integer | map) :: StockItemSchema.t()
+  @spec get(non_neg_integer | map) :: {:ok, StockItemSchema.t()} | {:error, atom}
   def get(query_fields) do
     QH.get(StockItemSchema, query_fields, Repo)
   end

@@ -23,13 +23,13 @@ defmodule SnitchApiWeb.AddressView do
   ])
 
   def country(address, _conn) do
-    Country.get(address.country_id)
-    |> Map.take([:name, :iso_name])
+    {:ok, country} = Country.get(address.country_id)
+    country |> Map.take([:name, :iso_name])
   end
 
   def state(address, _conn) do
-    State.get(address.state_id)
-    |> Map.take([:name, :code])
+    {:ok, state} = State.get(address.state_id)
+    state |> Map.take([:name, :code])
   end
 
   def render("address.json-api", %{data: address}) do

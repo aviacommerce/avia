@@ -4,10 +4,13 @@ defmodule Snitch.Data.Model.StateZoneTest do
 
   import Snitch.Factory
 
+  alias Ecto.Query
   alias Snitch.Data.Model.StateZone
   alias Snitch.Data.Schema.{StateZoneMember, Zone}
 
   setup :states
+  setup :state_zone
+  setup :zones
 
   @tag state_count: 3
   describe "create/3 and member_ids" do
@@ -82,6 +85,84 @@ defmodule Snitch.Data.Model.StateZoneTest do
       assert errors == [state_id: {"does not exist", []}]
       assert old_state_ids == StateZone.member_ids(updated_zone)
     end
+  end
+
+  describe "get/1" do
+    test "returns a state_zone using a zone_id", %{zone: zone} do
+      {:ok, new_zone} = StateZone.get(zone.id)
+      assert new_zone.id == zone.id
+    end
+
+    test "fails for invalid id", %{zone: zone} do
+      {:error, :zone_not_found} = StateZone.get(-1)
+    end
+  end
+
+  describe "get_all/0" do
+    @tag state_zone_count: 3
+    test "returns all state_zones", %{zones: zone} do
+      state_zones = StateZone.get_all()
+      state_zones = Enum.all?(state_zones, fn x -> x.zone_type == "S" end)
+      assert state_zones
+    end
+
+    @tag country_zone_count: 3
+    test "fails when no state_zone is present", %{zones: zone} do
+      state_zones = StateZone.get_all()
+      sz_list = List.delete_at(state_zones, 0)
+      state_zones = Enum.any?(sz_list, fn x -> x.zone_type == "S" end)
+      refute state_zones
+    end
+  end
+
+  describe "member_changesets/2" do
+    test "returns a valid changeset", %{zone: zone, states: states} do
+      state_ids = Enum.map(states, &Map.get(&1, :id))
+      stream = StateZone.member_changesets(state_ids, zone)
+      changeset = Enum.find_value(stream, fn x -> x end)
+      assert changeset.valid?
+    end
+
+    test "fails to return a valid changeset", %{zone: zone, states: states} do
+      state_ids = Enum.map(states, &Map.get(&1, :id))
+      zone = Map.put(zone, :id, nil)
+      stream = StateZone.member_changesets(state_ids, zone)
+      changeset = Enum.find_value(stream, fn x -> x end)
+      refute changeset.valid?
+      assert %{zone_id: ["can't be blank"]} == errors_on(changeset)
+    end
+  end
+
+  test "remove_members_query/2 returns a valid query", %{zone: zone, states: states} do
+    state_ids = Enum.map(states, &Map.get(&1, :id))
+
+    expected =
+      Query.from(c in StateZoneMember,
+        where: c.state_id in ^state_ids and c.zone_id == ^zone.id
+      )
+
+    result = StateZone.remove_members_query(state_ids, zone)
+
+    assert inspect(result) == inspect(expected)
+  end
+
+  @tag state_count: 2
+  test "common_zone_query/2 returns a valid query", %{states: states} do
+    [state_a_id, state_b_id] = Enum.map(states, fn x -> x.id end)
+
+    expected =
+      Query.from(c0 in StateZoneMember,
+        join: c1 in StateZoneMember,
+        on: true,
+        join: z in Zone,
+        on: c0.zone_id == c1.zone_id and c0.zone_id == z.id,
+        where: c0.state_id == ^state_a_id and c1.state_id == ^state_b_id,
+        select: z
+      )
+
+    result = StateZone.common_zone_query(state_a_id, state_b_id)
+
+    assert inspect(result) == inspect(expected)
   end
 
   defp state_zone(%{states: states}) do
