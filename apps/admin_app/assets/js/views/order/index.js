@@ -26,13 +26,14 @@ export default class View extends MainView {
       })
     })
 
-    $('.selected-option').on('change', () => {
-      var sort_order = this.value;
-      var url = $(".nav-tabs .active").text().toLowerCase();
+    $('.selected-option').on('change', (e) => {
+      var sort_order = $(e.currentTarget).val();
+      var category = $(".nav-tabs .active").text().toLowerCase();
       $.ajax({
-        url: `/orders/${url}`,
+        url: `/orders`,
         type: 'GET',
-        data: { sort: sort_order },
+        dataType: 'json',
+        data: { category: category , sort: sort_order, },
         success: (data) => {
           order_list_container.empty().append(data.html);
           paginatedSearch(channel);
@@ -116,7 +117,7 @@ export function paginatedSearch(channel) {
       $.ajax({
         url: "/orders",
         type: 'GET',
-        data: { category: category, page: page },
+        data: { category: category, page: page, sort: params["sort"] },
         dataType: 'json',
         success: (data) => {
           $('.list').empty().append(data.html);
