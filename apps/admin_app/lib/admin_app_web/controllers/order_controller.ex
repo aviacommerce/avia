@@ -19,7 +19,7 @@ defmodule AdminAppWeb.OrderController do
 
   def index(conn, %{"category" => category} = params) do
     page = params["page"] || 1
-    sort_param = conn.query_params["sort"]
+    sort_param = conn.query_params["sort"] || params["sort"]
 
     orders = OrderContext.order_list(category, sort_param, page)
 
