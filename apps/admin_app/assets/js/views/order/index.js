@@ -7,7 +7,7 @@ export default class View extends MainView {
     let channel = socket.channel("order:search", {})
     paginatedSearch(channel);
     let order_list_container = $('.list');
-    
+
     $('.order-tab .nav-link').on('click', (e) => {
       e.preventDefault();
       var elm = $(e.currentTarget);
@@ -49,7 +49,7 @@ export default class View extends MainView {
     channel.join()
 
     $('#order_search_box').on('change', () => {
-      if ($("#order_search_box").val.length > 0) { // don't send empty msg.
+      if (!$("#order_search_box").val.length) { // don't send empty msg.
         $("#order-search-button").text("loading....");
         var payload = { // send the message to the server on "ping" channel
           term: $("#order_search_box").val(),
@@ -82,7 +82,7 @@ export default class View extends MainView {
       channel.push(`order:search`, payload); // send the message to the server on "ping" channel
     });
 
-   
+
   }
 
   unmount() {
@@ -91,16 +91,16 @@ export default class View extends MainView {
   }
 }
 
-function toSnakeCase(params){
+function toSnakeCase(params) {
   Object.keys(params).forEach(key => {
     const value = params[key];
-    delete params[key]; 
-    params[key.replace(/([a-zA-Z])(?=[A-Z])/g, '$1_').toLowerCase()] = value ;
+    delete params[key];
+    params[key.replace(/([a-zA-Z])(?=[A-Z])/g, '$1_').toLowerCase()] = value;
   })
   return params;
 }
 
-function removeLoadedData(){
+function removeLoadedData() {
   $("#order-search-button").html('<i class="fa fa-search"></i>');
   $(".orders-list").removeClass("loader");
 }
@@ -112,7 +112,7 @@ export function paginatedSearch(channel) {
     var category = btn.parent().data("category") || "pending"
     var params = $('.pagination-params').data()
     var paginated_params = Object.assign({}, toSnakeCase(params));
-    if (typeof paginated_params["start_date"] === 'undefined'){
+    if (typeof paginated_params["start_date"] === 'undefined') {
       $.ajax({
         url: "/orders",
         type: 'GET',
@@ -123,7 +123,7 @@ export function paginatedSearch(channel) {
           paginatedSearch(channel);
         }
       })
-    }else{
+    } else {
       params["page"] = page
       $(".orders-list").html("");
       $(".orders-list").addClass("loader");
