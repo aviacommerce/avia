@@ -171,7 +171,14 @@ defmodule Snitch.Domain.Shipment do
 
     items =
       Enum.map(package.items, fn %{line_item: li, variant: v} = item ->
+        %{
+          original_amount: unit_price,
+          tax: tax
+        } = PackageItem.unit_price_with_tax(li, order, package.origin)
+
         item
+        |> Map.put(:unit_price, unit_price)
+        |> Map.put(:tax, tax)
         |> Map.put(:line_item_id, li.id)
         |> Map.put(:product_id, v.id)
         |> Map.put(:backordered?, item.delta > 0)

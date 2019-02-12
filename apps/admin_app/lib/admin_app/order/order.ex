@@ -1,21 +1,26 @@
 defmodule AdminApp.OrderContext do
+  @moduledoc """
+  Module for the order related helper functions
+  """
   import Ecto.Query
 
+  alias AdminAppWeb.Helpers
   alias BeepBop.Context
   alias Snitch.Domain.Order.DefaultMachine
-  alias Snitch.Data.Schema.Order
+  alias Snitch.Data.Schema.{Order, Package}
   alias Snitch.Data.Model.Order, as: OrderModel
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Domain.Order, as: OrderDomain
   alias SnitchPayments.PaymentMethodCode
   alias Snitch.Data.Model.Payment
+  alias AdminApp.Order.SearchContext
+  alias Snitch.Pagination
 
   def get_order(%{"number" => number}) do
     case OrderModel.get(%{number: number}) do
       {:ok, order} ->
         order =
-          order
-          |> Repo.preload([
+          Repo.preload(order, [
             [line_items: :product],
             [packages: [:items, :shipping_method]],
             [payments: :payment_method],
@@ -32,11 +37,10 @@ defmodule AdminApp.OrderContext do
   def get_order(%{"id" => id}) do
     {:ok, order} = id |> String.to_integer() |> OrderModel.get()
 
-    case String.to_integer(id) |> OrderModel.get() do
+    case OrderModel.get(String.to_integer(id)) do
       {:ok, order} ->
         order =
-          order
-          |> Repo.preload([
+          Repo.preload(order, [
             [line_items: :product],
             [packages: [:items, :shipping_method]],
             [payments: :payment_method],
@@ -54,40 +58,49 @@ defmodule AdminApp.OrderContext do
     OrderDomain.total_amount(order)
   end
 
-  def order_list("pending", sort_param) do
+  def order_list("pending", sort_param, page) do
     rummage = get_rummage(sort_param)
     query = query_confirmed_orders(rummage)
     orders = load_orders(query)
 
-    Enum.filter(orders, fn order ->
-      Enum.any?(order.packages, fn package ->
-        package.state == :processing
-      end)
-    end)
+    orders_query =
+      from(order in orders,
+        left_join: package in Package,
+        on: order.id == package.order_id,
+        where: package.state == ^:processing
+      )
+
+    Pagination.page(orders_query, page)
   end
 
-  def order_list("unshipped", sort_param) do
+  def order_list("unshipped", sort_param, page) do
     rummage = get_rummage(sort_param)
     query = query_confirmed_orders(rummage)
     orders = load_orders(query)
 
-    Enum.filter(orders, fn order ->
-      Enum.any?(order.packages, fn package ->
-        package.state == :ready
-      end)
-    end)
+    orders_query =
+      from(order in orders,
+        left_join: package in Package,
+        on: order.id == package.order_id,
+        where: package.state == ^:ready
+      )
+
+    Pagination.page(orders_query, page)
   end
 
-  def order_list("shipped", sort_param) do
+  def order_list("shipped", sort_param, page) do
     rummage = get_rummage(sort_param)
     query = query_confirmed_orders(rummage)
     orders = load_orders(query)
 
-    Enum.filter(orders, fn order ->
-      Enum.any?(order.packages, fn package ->
-        package.state == :shipped || package.state == :delivered
-      end)
-    end)
+    orders_query =
+      from(order in orders,
+        left_join: package in Package,
+        on: order.id == package.order_id,
+        where: package.state == ^:shipped or package.state == ^:delivered
+      )
+
+    Pagination.page(orders_query, page)
   end
 
   def update_cod_payment(order, state) do
@@ -121,16 +134,44 @@ defmodule AdminApp.OrderContext do
     {:error, errors}
   end
 
-  def order_list("complete", sort_param) do
+  defp initial_date_range do
+    %{
+      start_date:
+        30
+        |> Helpers.date_days_before()
+        |> Date.from_iso8601()
+        |> elem(1)
+        |> SearchContext.format_date(),
+      end_date: SearchContext.format_date(Date.utc_today())
+    }
+  end
+
+  def order_list("complete", sort_param, page) do
     rummage = get_rummage(sort_param)
     {queryable, _rummage} = Order.rummage(rummage)
-    query = from(p in queryable, where: p.state == "complete")
-    load_orders(query)
+
+    query =
+      from(p in queryable,
+        where:
+          p.state == "complete" and p.updated_at >= ^initial_date_range.start_date and
+            p.updated_at <= ^initial_date_range.end_date
+      )
+
+    query
+    |> load_orders()
+    |> Pagination.page(page)
   end
 
   defp query_confirmed_orders(rummage) do
     {queryable, _rummage} = Order.rummage(rummage)
-    query = from(p in queryable, where: p.state == "confirmed", select: p)
+
+    query =
+      from(p in queryable,
+        where:
+          p.state == "confirmed" and p.updated_at >= ^initial_date_range.start_date and
+            p.updated_at <= ^initial_date_range.end_date,
+        select: p
+      )
   end
 
   defp get_rummage(sort_param) do
@@ -148,6 +189,6 @@ defmodule AdminApp.OrderContext do
   end
 
   defp load_orders(query) do
-    Repo.all(query) |> Repo.preload([:user, :packages, [line_items: :product]])
+    preload(query, [:user, [packages: :items], [line_items: :product]])
   end
 end

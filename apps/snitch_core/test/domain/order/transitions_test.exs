@@ -132,8 +132,14 @@ defmodule Snitch.Domain.Order.TransitionsTest do
   end
 
   describe "persist_shipment" do
-    setup do
-      [order: insert(:order)]
+    setup :zones
+    setup :shipping_methods
+    setup :embedded_shipping_methods
+    setup :states
+
+    setup %{embedded_shipping_methods: methods, states: states} do
+      order = order_with_tax_manifest(states)
+      [order: order, packages: [insert(:package, shipping_methods: methods, order: order)]]
     end
 
     test "when shipment is empty", %{order: order} do
@@ -146,6 +152,7 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       assert {:ok, []} = result.state.packages
     end
 
+    @tag shipping_method_count: 1, state_count: 3
     test "fails when shipment is erroneous", %{order: order} do
       result =
         order
@@ -161,13 +168,14 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     setup :zones
     setup :shipping_methods
     setup :embedded_shipping_methods
+    setup :states
 
-    setup %{embedded_shipping_methods: methods} do
-      order = insert(:order)
+    setup %{embedded_shipping_methods: methods, states: states} do
+      order = order_with_tax_manifest(states)
       [order: order, packages: [insert(:package, shipping_methods: methods, order: order)]]
     end
 
-    @tag shipping_method_count: 1
+    @tag shipping_method_count: 1, state_count: 3
     test "with packages", %{order: order, packages: [package], shipping_methods: [sm]} do
       preference = [
         %{package_id: package.id, shipping_method_id: sm.id}
@@ -183,16 +191,17 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       assert {:ok, %{packages: _}} = Repo.transaction(result.multi)
     end
 
-    @tag shipping_method_count: 1
-    test "check order total after tranisition",
+    @tag shipping_method_count: 1, state_count: 3
+    test "check order total after transition",
          %{
-           shipping_methods: [sm]
+           shipping_methods: [sm],
+           states: states
          } = context do
       set_cost = 20
       quantity = 3
 
       %{order: order, package: package, shipping_rule: shipping_rule} =
-        setup_package_with_shipping(context, quantity, set_cost)
+        setup_package_with_shipping(context, quantity, set_cost, states)
 
       preference = [
         %{package_id: package.id, shipping_method_id: sm.id}
@@ -213,7 +222,11 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       line_item_total = OrderDomain.line_item_total(order)
       [package] = order.packages
 
-      final_order_total = line_item_total |> Money.add!(package.cost) |> Money.round()
+      final_order_total =
+        line_item_total
+        |> Money.add!(package.cost)
+        |> Money.add!(package.shipping_tax)
+        |> Money.round()
 
       assert result.valid?
 
@@ -328,13 +341,12 @@ defmodule Snitch.Domain.Order.TransitionsTest do
           origin: stock_item.stock_location
         )
 
-      package_item =
-        insert(:package_item,
-          quantity: 7,
-          product: product,
-          line_item: line_item,
-          package: package
-        )
+      insert(:package_item,
+        quantity: 7,
+        product: product,
+        line_item: line_item,
+        package: package
+      )
 
       result =
         order
@@ -345,7 +357,15 @@ defmodule Snitch.Domain.Order.TransitionsTest do
     end
   end
 
-  defp setup_package_with_shipping(context, quantity, shipping_cost) do
+  defp order_with_tax_manifest(states) do
+    order = insert(:order, shipping_address: address_manifest(List.first(states)))
+    tax_class_values = %{shipping_tax: %{class: insert(:tax_class), percent: 5}}
+    setup_tax_with_zone_and_rates(tax_class_values, states)
+
+    order
+  end
+
+  defp setup_package_with_shipping(context, quantity, shipping_cost, states) do
     %{embedded_shipping_methods: embedded_shipping_methods} = context
 
     # setup stock for product
@@ -370,7 +390,10 @@ defmodule Snitch.Domain.Order.TransitionsTest do
 
     # make order and it's packages
     product = stock_item.product
-    order = insert(:order, state: :address)
+
+    order =
+      insert(:order, state: :address, shipping_address: address_manifest(List.first(states)))
+
     line_item = insert(:line_item, order: order, product: product, quantity: quantity)
 
     package =
@@ -391,5 +414,19 @@ defmodule Snitch.Domain.Order.TransitionsTest do
       )
 
     %{order: order, package: package, shipping_rule: shipping_rule}
+  end
+
+  defp address_manifest(state) do
+    %{
+      first_name: "someone",
+      last_name: "enoemos",
+      address_line_1: "BR Ambedkar Chowk",
+      address_line_2: "street",
+      zip_code: "11111",
+      city: "Rajendra Nagar",
+      phone: "1234567890",
+      country_id: state.country_id,
+      state_id: state.id
+    }
   end
 end
