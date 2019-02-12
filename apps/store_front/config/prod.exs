@@ -11,7 +11,7 @@ use Mix.Config
 # before starting your production server.
 config :store_front, StoreFrontWeb.Endpoint,
   load_from_system_env: true,
-  http: [:inet6, port: System.get_env("STORE_FRONT_PORT") || 4444],
+  http: [:inet6, port: System.get_env("STORE_PORT") || 4444],
   server: true,
   cache_static_manifest: "priv/static/cache_manifest.json",
   version: Application.spec(:store_front, :vsn),
