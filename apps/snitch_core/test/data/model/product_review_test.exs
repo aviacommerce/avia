@@ -42,7 +42,6 @@ defmodule Snitch.Data.Model.ProductReviewTest do
     %{rating_options: rating_options} = context
 
     [rating_option_1 | [rating_option_2 | _]] = rating_options
-    IO.inspect(rating_option_1.value)
     review_params = product_review_params(product, user1, rating_option_1)
     assert {:ok, _} = ProductReview.add(review_params)
     review_params = product_review_params(product, user2, rating_option_2)
@@ -60,7 +59,7 @@ defmodule Snitch.Data.Model.ProductReviewTest do
   describe "fetch_rating_option/1" do
     test "return a valid rating_option", context do
       %{rating_options: rating_options} = context
-      [rating_option_1 | [rating_option_2 | _]] = rating_options
+      [rating_option_1 | rating_option_2] = rating_options
       {:ok, returned_rating_option} = ProductReview.fetch_rating_option(rating_option_1.id)
       assert returned_rating_option.id == rating_option_1.id
     end

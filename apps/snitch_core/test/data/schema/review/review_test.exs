@@ -25,7 +25,7 @@ defmodule Snitch.Data.Schema.ReviewTest do
              } == errors_on(changeset)
     end
 
-    test "fails for duplicate user_id", %{params: params} do
+    test "fails for non-existent user_id", %{params: params} do
       params = %{params | user_id: -1}
       cs = Review.create_changeset(%Review{}, params)
       {:error, changeset} = Repo.insert(cs)
@@ -34,7 +34,7 @@ defmodule Snitch.Data.Schema.ReviewTest do
   end
 
   describe "update_changeset/2" do
-    test "returns a valid changset", %{review: review} do
+    test "returns a valid changeset", %{review: review} do
       params = %{description: "hakuna matata"}
       cs = Review.update_changeset(review, params)
       assert cs.valid?
@@ -44,13 +44,6 @@ defmodule Snitch.Data.Schema.ReviewTest do
       params = %{description: ""}
       cs = Review.update_changeset(review, params)
       assert %{description: ["can't be blank"]} == errors_on(cs)
-    end
-
-    test "fails for non-existent user_id", %{review: review} do
-      params = %{user_id: -1}
-      cs = Review.update_changeset(review, params)
-      {:error, changeset} = Repo.update(cs)
-      assert %{user_id: ["does not exist"]} == errors_on(changeset)
     end
   end
 
