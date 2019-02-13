@@ -162,4 +162,12 @@ defmodule Snitch.Data.Model.Zone do
     |> order_by([z], asc: z.name)
     |> Repo.all()
   end
+
+  @spec formatted_list() :: [{String.t(), non_neg_integer}]
+  def formatted_list do
+    Zone
+    |> order_by([s], asc: s.name)
+    |> select([s], {s.name, s.id})
+    |> Repo.all()
+  end
 end

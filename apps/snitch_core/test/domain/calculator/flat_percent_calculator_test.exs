@@ -70,13 +70,12 @@ defmodule Snitch.Domain.Calculator.FlatPercentTest do
         shipping_category: shipping_category
       )
 
-    package_item =
-      insert(:package_item,
-        quantity: quantity,
-        product: product,
-        line_item: line_item,
-        package: package
-      )
+    insert(:package_item,
+      quantity: quantity,
+      product: product,
+      line_item: line_item,
+      package: package
+    )
 
     %{order: order, line_item: line_item}
   end

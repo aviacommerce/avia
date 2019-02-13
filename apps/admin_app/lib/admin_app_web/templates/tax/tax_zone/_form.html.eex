@@ -1,0 +1,25 @@
+<%= form_for @changeset, @action, fn f -> %>
+  <div class="form-group row ">
+    <%= input f, :name, nil, description: "Name of the Tax Zone. E.g. APAC", is_horizontal: true %>
+  </div>
+  <div class="form-group row ">
+    <%= select_input f, :zone_id, formatted_list(:zone), nil, 
+      description: "Select the zone with which this particular tax zone is associated. 
+        You can create new country or state zones from the zones configuration and select it here.", 
+        is_horizontal: true %>
+        <div class="col-sm-3">
+          <%= link "Add Zone", to: "/zones", class: "btn btn-outline-dark btn-sm" %>
+        </div>
+  </div>
+  <div class="form-group row ">
+    <%= checkbox_input f, :is_active?, nil, 
+      description: "Toggle to change the status of tax zone as active or inactive.", is_horizontal: true %>
+  </div>
+  <div class="form-group row stickformbutton">
+  <div class="col-sm-10">
+    <%= button("Cancel", to: tax_zone_path(@conn, :index), method: "get",
+            class: "btn submit-btn float-left", type: "button") %>
+    <%= submit "Submit", class: "btn btn-primary submit-btn float-right" %>
+  </div>
+  </div>
+<% end %>

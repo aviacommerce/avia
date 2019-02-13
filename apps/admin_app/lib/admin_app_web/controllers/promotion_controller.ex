@@ -77,7 +77,7 @@ defmodule AdminAppWeb.PromotionController do
   end
 
   def actions(conn, _params) do
-    rules = PromotionHelper.all_rules()
+    rules = PromotionHelper.all_actions()
     render(conn, "list.json", data: rules)
   end
 

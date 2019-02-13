@@ -22,13 +22,15 @@ defmodule Snitch.Data.Model.OptionTypeTest do
       |> VTModel.create()
 
     taxon = insert(:taxon)
+    tax_class = insert(:tax_class)
 
     params = %{
       "name" => "ProductXYZ",
       "selling_price" => Money.new("12.99", currency()),
       "max_retail_price" => Money.new("14.99", currency()),
       "taxon_id" => taxon.id,
-      "shipping_category_id" => shipping_category.id
+      "shipping_category_id" => shipping_category.id,
+      "tax_class_id" => tax_class.id
     }
 
     {:ok, product} = ProductModel.create(params)

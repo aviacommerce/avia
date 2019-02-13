@@ -10,15 +10,24 @@ defmodule Snitch.Data.Model.GeneralConfiguration do
   alias Snitch.Tools.Helper.ImageUploader
   alias Snitch.Data.Model.Image, as: ImageModel
   alias Ecto.Multi
+  alias Snitch.Tools.Cache
 
   @currency_list ["USD", "INR", "GBP", "EUR"]
 
   @spec fetch_currency() :: String.t()
   def fetch_currency do
-    case Repo.one(GC) do
-      nil -> "USD"
-      gc -> gc.currency
-    end
+    Cache.get(
+      Repo.get_prefix() <> "_gc_currency",
+      {
+        fn ->
+          case Repo.one(GC) do
+            nil -> "USD"
+            gc -> gc.currency
+          end
+        end,
+        []
+      }
+    )
   end
 
   @spec get_currency_list() :: List.t()

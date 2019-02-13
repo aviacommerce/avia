@@ -1,0 +1,47 @@
+<div class="col-3 px-2 pb-3 m-0">
+  <div class="card p-0">
+    <%= img_tag(get_product_display_image(@item), class: "card-img-top") %>
+    <div class="card-body">
+      <h5 class="card-title">  <%= @item.name %></h5>
+      <div class="card-text">
+        <%= if has_variants(@item) do %>
+        <div class="variants">
+          <span >  <%= @item.variants |> length %> Variants </span>
+        </div>
+        <% else %>
+        <div class="variants">
+          <span>  </span>
+        </div>
+        <% end %>
+      </div>
+      <div class="card-footer">
+        <div class="row">
+          <div class="checkbox col-4 pl-4 mt-1">
+            <label>
+            <input type="checkbox" value= <%="#{@item.id}" %> id=<%="product_#{@item.id}" %> >
+            <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+            </label>
+          </div>
+          <div class="col-4">
+            <i class="fa fa-star"></i>
+          </div>
+          <div class="dropdown col-4 p-0 float-right">
+            <a class="p-2 dropdown-toggle options" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-cog"></i>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+              <%= link("Edit", to: product_path(@conn, :edit, @item.id, "product": @conn.query_params |> Map.take(["rummage"])), class: "dropdown-item") %>
+              <%= if @item.state in [:in_active, :draft] do %>
+                <%= link("Activate", to: product_path(@conn, :update, @item.id, "product": @conn.query_params |> Map.take(["rummage"]) |> Map.merge(%{"state": :active, "id": @item.id})), method: :patch, class: "dropdown-item")%>
+              <% else %>
+                <%= link("Deactivate", to: product_path(@conn, :update, @item.id, "product": @conn.query_params |> Map.take(["rummage"]) |> Map.merge(%{"state": :in_active, "id": @item.id})), method: :patch, class: "dropdown-item")%>
+              <% end %>
+              <%= link("Delete", to: product_path(@conn, :delete, @item.id, @conn.query_params), method: :delete, data: [confirm: "Are you sure?"], class: "dropdown-item") %>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

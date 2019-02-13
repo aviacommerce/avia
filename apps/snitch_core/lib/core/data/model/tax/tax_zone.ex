@@ -45,4 +45,11 @@ defmodule Snitch.Data.Model.TaxZone do
   def get_all() do
     Repo.all(TaxZone)
   end
+
+  @doc """
+  Deletes a TaxZone.
+  """
+  def delete(id) do
+    QH.delete(TaxZone, id, Repo)
+  end
 end
