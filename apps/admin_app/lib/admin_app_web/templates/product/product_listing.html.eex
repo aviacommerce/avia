@@ -1,0 +1,11 @@
+<div class="panel-group mt-3">
+  <div class="row">
+    <%= render_many @products.list, AdminAppWeb.ProductView, "_product_card.html", conn: @conn, as: :item %>
+  </div>
+  <br>
+  <div>
+  <%= pagination_links(@conn, @products, &product_path/3) %>
+  <hr>
+  <%= pagination_text(@products) %>
+  </div>
+</div>

@@ -39,10 +39,8 @@
           <button id="search-button" type="submit"><i class="fa fa-search"></i></button>
         </div>
       </div>
-      <div class="panel-group mt-3">
-        <div class="row">
-          <%= render_many @products, AdminAppWeb.ProductView, "_product_card.html", conn: @conn, as: :item %>
-        </div>
+      <div class = "products_list">
+        <%= render "product_listing.html", conn: @conn, products: @products %>
       </div>
     </div>
     <div class="col-3">

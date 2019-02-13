@@ -10,6 +10,7 @@ defmodule Snitch.Data.Model.Product do
   alias Snitch.Tools.GenNanoid
   alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Data.Schema.{Image, Product, Variation, Taxon}
+  alias Snitch.Pagination
   alias Snitch.Tools.Helper.ImageUploader
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Tools.ElasticSearch.Product.Store, as: ESProductStore
@@ -126,8 +127,8 @@ defmodule Snitch.Data.Model.Product do
     }
   end
 
-  @spec get_rummage_product_list(any) :: Product.t()
-  def get_rummage_product_list(rummage_opts) do
+  @spec get_rummage_product_list(any, integer) :: Product.t()
+  def get_rummage_product_list(rummage_opts, page) do
     opts =
       if rummage_opts do
         convert_to_atom_map(rummage_opts)
@@ -140,12 +141,12 @@ defmodule Snitch.Data.Model.Product do
       |> Map.put(:prefix, Repo.get_prefix())
       |> Rummage.Ecto.rummage(opts)
 
-    query = from(p in query, preload: [:images, :variants])
+    variant_preloader = from(p in Product, where: p.state != ^:deleted)
+    query = from(p in subquery(query), preload: [:images, variants: ^variant_preloader])
 
     query
     |> Ecto.Queryable.to_query()
-    |> Repo.all()
-    |> Enum.map(&preload_non_deleted_variants/1)
+    |> Pagination.page(page)
   end
 
   defp convert_to_atom_map(map), do: to_atom_map("", map)

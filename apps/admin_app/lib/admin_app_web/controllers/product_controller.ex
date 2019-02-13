@@ -38,8 +38,10 @@ defmodule AdminAppWeb.ProductController do
   }
 
   def index(conn, params) do
+    page = params["page"] || 1
+
     if params["rummage"] do
-      products = ProductModel.get_rummage_product_list(params["rummage"])
+      products = ProductModel.get_rummage_product_list(params["rummage"], page)
 
       render(conn, "index.html", products: products)
     else

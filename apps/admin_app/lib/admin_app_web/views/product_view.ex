@@ -18,6 +18,7 @@ defmodule AdminAppWeb.ProductView do
   alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Data.Schema
   import Ecto.Query
+  import Phoenix.HTML.Tag
 
   @dummy_image_url "/images/empty-img.png"
   @search_keys ["rummage", "search", "state", "search_term"]

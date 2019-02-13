@@ -16,7 +16,7 @@ defmodule AdminAppWeb.ProductChannel do
 
   def handle_in("product:search", payload, socket) do
     Repo.set_tenant(socket.assigns.tenant)
-    products = SearchContext.search_products_by_name(payload["term"])
+    products = SearchContext.search_products_by_name(payload)
 
     conn = %Plug.Conn{
       query_params: %{
@@ -35,7 +35,7 @@ defmodule AdminAppWeb.ProductChannel do
 
     broadcast!(socket, "product:search:#{socket.assigns.user_token}", %{
       body:
-        Phoenix.View.render_to_string(AdminAppWeb.ProductView, "index.html",
+        Phoenix.View.render_to_string(AdminAppWeb.ProductView, "product_listing.html",
           conn: conn,
           products: products
         )
