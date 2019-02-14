@@ -148,11 +148,22 @@ defmodule Snitch.Data.Model.Image do
 
     case check_arc_config do
       true ->
-        base_path = String.replace(@cwd, "snitch_core", "admin_app")
-        Path.join(["/"], Path.relative_to(image_url, base_path))
+        handle_image_url(image_url)
 
       false ->
         image_url
+    end
+  end
+
+  defp handle_image_url(image_url) do
+    base_path = String.replace(@cwd, "snitch_core", "admin_app")
+
+    case image_url do
+      nil ->
+        ""
+
+      url ->
+        Path.join(["/"], Path.relative_to(url, base_path))
     end
   end
 

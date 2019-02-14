@@ -8,14 +8,14 @@
       <div class="col-9 p-0">
          <nav class="navbar navbar-expand-sm">
             <ul class="nav nav-tabs">
-               <li class="order-tab nav-item"><%= link "Pending", to: order_path(@conn, :index, "pending"),
+               <li class="order-tab nav-item"><%= link "Pending", to: order_path(@conn, :index, %{"category" => "pending"}),
                   class: "nav-link active" %></li>
                <li class="order-tab nav-item"><%= link "Unshipped", to: order_path(@conn, :index,
-                  "unshipped"), class: "nav-link" %></li>
+                  %{"category" => "unshipped"}), class: "nav-link" %></li>
                <li class="order-tab nav-item"><%= link "Shipped", to: order_path(@conn, :index,
-                  "shipped"), class: "nav-link" %></li>
+                  %{"category" => "shipped"}), class: "nav-link" %></li>
                <li class="order-tab nav-item"><%= link "Complete", to: order_path(@conn, :index,
-                  "complete"), class: "nav-link" %></li>
+                  %{"category" => "complete"}), class: "nav-link" %></li>
                <div class="input-group mb-3">
                   <input type="text" class="form-control" id="order_search_box" placeholder="Search by customer name, email or order number" aria-label="Recipient's username" aria-describedby="button-addon2">
                   <div class="input-group-append">
@@ -37,7 +37,7 @@
          <div class="row m-0 list orders-list">
             <div class="col-12 p-0">
                <%= render "order_listing.html", conn: @conn, orders: @orders, token: @token %>
-            </div>
+            </div>   
          </div>
       </div>
       <div class="col-3 rightbar">

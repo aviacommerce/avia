@@ -157,9 +157,13 @@ defmodule Snitch.Data.Model.Zone do
     get(id)
   end
 
+  @doc """
+  Returns a list of zones with the default zone as the first element
+  of the list.
+  """
   def get_all() do
     Zone
-    |> order_by([z], asc: z.name)
+    |> order_by([z], desc: z.is_default)
     |> Repo.all()
   end
 

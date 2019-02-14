@@ -36,15 +36,11 @@ defmodule Snitch.Data.Model.ShippingCategory do
   """
   @spec get_with_rules(non_neg_integer) :: {:ok, ShippingCategory.t()} | {:error, atom}
   def get_with_rules(id) do
-    case QH.get(ShippingCategory, id, Repo) do
-      {:ok, shipping_category} ->
-        shipping_category =
-          shipping_category |> Repo.preload(shipping_rules: :shipping_rule_identifier)
+    with {:ok, shipping_category} <- QH.get(ShippingCategory, id, Repo) do
+      shipping_category =
+        shipping_category |> Repo.preload(shipping_rules: :shipping_rule_identifier)
 
-        {:ok, shipping_category}
-
-      {:error, msg} ->
-        {:error, msg}
+      {:ok, shipping_category}
     end
   end
 end

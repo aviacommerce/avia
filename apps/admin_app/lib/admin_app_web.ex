@@ -57,6 +57,7 @@ defmodule AdminAppWeb do
       import AdminAppWeb.ErrorHelpers
       import AdminAppWeb.Gettext
       import AdminAppWeb.InputHelpers
+      import AdminAppWeb.PaginationHelpers
       import AdminAppWeb.DataHelpers
     end
   end
