@@ -8,6 +8,7 @@ defmodule Snitch.Domain.Tax do
   alias Snitch.Domain.Calculator.DefaultTaxCalculator, as: TaxCalculator
   alias Snitch.Data.Schema.{Order, StockLocation, TaxZone, StateZoneMember, CountryZoneMember}
   alias Snitch.Data.Model.{TaxConfig, Product}
+  alias Snitch.Data.Model.TaxZone, as: TaxZoneModel
   import Ecto.Query
 
   @doc """
@@ -44,51 +45,65 @@ defmodule Snitch.Domain.Tax do
 
   ################# package item tax calulation related helpers ###############
 
-  defp calculate_item_tax(nil, line_item, _tax_config, _tax_class_id) do
-    %{original_amount: line_item.unit_price, tax: Money.new!(line_item.unit_price.currency, 0)}
+  defp calculate_item_tax(nil, line_item, tax_config, tax_class_id) do
+    tax_zone = TaxZoneModel.get_default()
+    calculate_item_tax(tax_zone, line_item, tax_config, tax_class_id)
   end
 
   defp calculate_item_tax(tax_zone, line_item, tax_config, tax_class_id) do
-    tax_rates = tax_zone.tax_rates
+    with tax_rates when tax_rates != [] <- tax_zone.tax_rates do
+      amount_with_taxes =
+        Enum.map(tax_rates, fn tax_rate ->
+          tax_by_rate_and_class(tax_rate, tax_class_id, line_item.unit_price, tax_config)
+        end)
 
-    amount_with_taxes =
-      Enum.map(tax_rates, fn tax_rate ->
-        tax_by_rate_and_class(tax_rate, tax_class_id, line_item.unit_price, tax_config)
-      end)
+      amount_with_tax = List.first(amount_with_taxes)
 
-    amount_with_tax = List.first(amount_with_taxes)
+      total_tax =
+        amount_with_taxes
+        |> Enum.reduce(Money.new!(line_item.unit_price.currency, 0), fn %{tax: tax}, acc ->
+          Money.add!(acc, tax)
+        end)
+        |> Money.mult!(line_item.quantity)
 
-    total_tax =
-      amount_with_taxes
-      |> Enum.reduce(Money.new!(line_item.unit_price.currency, 0), fn %{tax: tax}, acc ->
-        Money.add!(acc, tax)
-      end)
-      |> Money.mult!(line_item.quantity)
-
-    %{original_amount: amount_with_tax.amount, tax: total_tax}
+      %{original_amount: amount_with_tax.amount, tax: total_tax}
+    else
+      [] ->
+        %{
+          original_amount: line_item.unit_price,
+          tax: Money.new!(line_item.unit_price.currency, 0)
+        }
+    end
   end
 
   ######################## shipping tax helpers ###############################
 
-  defp calculate_shipping_tax(nil, shipping_cost, _tax_config) do
-    %{original_amount: shipping_cost, tax: Money.new!(shipping_cost.currency, 0)}
+  # If supplied tax_zone is nil then default tax zone is used for
+  # calculation
+  defp calculate_shipping_tax(_tax_zone = nil, shipping_cost, tax_config) do
+    tax_zone = TaxZoneModel.get_default()
+    calculate_shipping_tax(tax_zone, shipping_cost, tax_config)
   end
 
   defp calculate_shipping_tax(tax_zone, shipping_cost, tax_config) do
-    tax_rates = tax_zone.tax_rates
+    with tax_rates when tax_rates != [] <- tax_zone.tax_rates do
+      amount_with_taxes =
+        Enum.map(tax_rates, fn tax_rate ->
+          tax_by_rate_and_class(tax_rate, tax_config.shipping_tax_id, shipping_cost, tax_config)
+        end)
 
-    amount_with_taxes =
-      Enum.map(tax_rates, fn tax_rate ->
-        tax_by_rate_and_class(tax_rate, tax_config.shipping_tax_id, shipping_cost, tax_config)
-      end)
+      total_tax =
+        Enum.reduce(amount_with_taxes, Money.new!(shipping_cost.currency, 0), fn %{tax: tax},
+                                                                                 acc ->
+          Money.add!(acc, tax)
+        end)
 
-    total_tax =
-      Enum.reduce(amount_with_taxes, Money.new!(shipping_cost.currency, 0), fn %{tax: tax}, acc ->
-        Money.add!(acc, tax)
-      end)
-
-    amount_with_tax = List.first(amount_with_taxes)
-    %{original_amount: amount_with_tax.amount, tax: total_tax}
+      amount_with_tax = List.first(amount_with_taxes)
+      %{original_amount: amount_with_tax.amount, tax: total_tax}
+    else
+      [] ->
+        %{original_amount: shipping_cost, tax: Money.new!(shipping_cost.currency, 0)}
+    end
   end
 
   ################# tax calculation helpers ###########################

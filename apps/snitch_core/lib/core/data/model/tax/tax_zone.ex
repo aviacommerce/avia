@@ -41,9 +41,18 @@ defmodule Snitch.Data.Model.TaxZone do
     QH.get(TaxZone, id, Repo)
   end
 
+  @doc """
+  Returns the default tax zone with it's rates.
+  """
+  def get_default() do
+    TaxZone
+    |> Repo.get_by(is_default: true)
+    |> Repo.preload(tax_rates: [tax_rate_class_values: :tax_class])
+  end
+
   @spec get_all() :: [TaxZone.t()]
   def get_all() do
-    Repo.all(TaxZone)
+    TaxZone |> Repo.all() |> Repo.preload(:zone)
   end
 
   @doc """
