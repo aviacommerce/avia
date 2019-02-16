@@ -90,6 +90,10 @@
       <li>
         <a class="nav-link" href="/zones">Zones</a>
       </li>
+      <li>
+        <a class="nav-link" href="/promotions">Promotions</a>
+      </li>
+
     </ul>
   </li>
   <li class="profile">
@@ -116,5 +120,7 @@
       </li>
     </ul>
   </li>
+
+
 
 </ul>

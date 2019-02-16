@@ -63,7 +63,17 @@ module.exports = (env, options) => ({
             }
           }
         ]
-      }
+      },
+      {
+        //exclude: /(node_modules)/, // This piece of code is important to avoid conflict with React-DnD
+        test: /\.css$/,
+        // use: "style-loader!css-loader!less-loader"
+        use: [{
+          loader: 'style-loader' // creates style nodes from JS strings
+        }, {
+          loader: 'css-loader' // translates CSS into CommonJS
+        }]
+      },
     ]
   },
   plugins: [

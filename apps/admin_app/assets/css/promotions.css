@@ -1,0 +1,169 @@
+.App {
+    text-align: center;
+  }
+  
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+    height: 40vmin;
+  }
+  
+  .App-header {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+  }
+  
+  .App-link {
+    color: #61dafb;
+  }
+  
+  .form .formrow{
+    text-align: left;
+    margin:25px auto;
+    max-width: 400px;
+  }
+  
+
+
+  .topnav{
+    background-color: rgba(255,255,255,1);
+    overflow:hidden;
+    margin-top: 20px; 
+    height: 70px;
+  }
+
+  .topnav a{
+    font-size: 30px;
+    float:right;
+    padding:10px 50px 10px 50px;
+  }
+
+  .topnav button{
+    font-size: 30px;
+    float:right;
+    padding:10px 50px 10px 50px;
+    z-index: 2;
+    background: none;
+    background-color: lightslategray;
+  }
+
+  .topnav button:hover{
+    cursor: pointer;
+  }
+
+  .info{
+    font: 20px sans-serif;
+    margin: 70px auto 0px 200px;
+  }
+
+  .rulesandactions{
+    font: 20px sans-serif;
+    margin: 70px auto 0px 200px;
+  }
+  
+  .form{
+    text-align: right;
+    max-width: 480px;
+    max-width: 640px;
+    margin: 50px auto;
+    box-sizing: border-box;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    font: 20px sans-serif;
+    text-align: center;
+  }
+  
+
+.iconbutton{
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 5px 5px 5px 5px;
+  margin:4px 2px;
+  font-size: 10px;
+  color: #4c565e;
+
+}
+
+.iconbutton:hover{
+  font-size: 15px;
+}
+ .Title{
+    display: inline-block;
+    box-sizing: border-box;
+    color: #4c565e;
+    font-size: 40px;
+    padding: 0 10px 15px;
+    margin: 0;
+    text-align: center;
+  }
+
+  .TitlePromotion{
+    box-sizing: border-box;
+    color: #4c565e;
+    font-size: 40px;
+    padding: 0 10px 15px;
+    margin: 0;
+    text-align: left;
+  }
+
+  .createButton{
+    border-radius: 3px;
+    font-size:14px;
+    background-color: #222;
+    color: #fff;
+    border-color: #222;
+    height: 38px;
+    line-height: 1.6;
+    padding: 8px 12px;
+    float: right;
+    margin-top: 15px;
+  }
+
+  .promotionstable{
+
+    border-collapse: separate;
+  } 
+
+  .promotionsrow{
+    border-radius: 3px;
+  }
+
+  .headerrow{
+    border: 1px solid #e1e3df;
+    border-collapse: collapse;
+    padding: 1rem!important;
+  }
+
+  .id{
+    background-color: rgba(255,255,255,1);
+    width: 12%;
+    border-bottom: 1px solid #e1e3df;
+    border-collapse: collapse;
+    padding: 1rem!important;
+    margin-bottom: .5rem!important;
+  }
+
+  .dates{
+    background-color: rgba(255,255,255,1);
+    width: 20%;
+    border-bottom: 1px solid #e1e3df;
+    border-collapse: collapse;
+    padding: 1rem!important;
+    margin-bottom: .5rem!important;
+
+  }
+
+  @keyframes App-logo-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
