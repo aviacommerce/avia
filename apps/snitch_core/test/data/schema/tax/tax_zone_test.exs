@@ -22,7 +22,7 @@ defmodule Snitch.Data.Schema.TaxZoneTest do
 
     test "fails for unique constraitnts" do
       zone = insert(:zone, zone_type: "S")
-      tax_zone = insert(:tax_zone, zone: zone)
+      tax_zone = insert(:tax_zone, zone: zone, is_default: true)
 
       params = %{name: "AAPCTax", zone_id: zone.id}
       changeset = TaxZone.create_changeset(%TaxZone{}, params)
@@ -37,6 +37,12 @@ defmodule Snitch.Data.Schema.TaxZoneTest do
       {:error, changeset} = Repo.insert(changeset)
 
       assert %{name: ["has already been taken"]} == errors_on(changeset)
+
+      params = %{name: "EUVAT", is_default: true, zone_id: zone_new.id}
+      changeset = TaxZone.create_changeset(%TaxZone{}, params)
+
+      {:error, changeset} = Repo.insert(changeset)
+      assert %{is_default: ["unique default tax zone"]} == errors_on(changeset)
     end
   end
 end

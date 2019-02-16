@@ -168,6 +168,14 @@ defmodule Snitch.Data.Model.TaxZoneTest do
     assert message == :tax_zone_not_found
   end
 
+  test "get_default tax zone" do
+    zone = insert(:zone, zone_type: "C")
+    tax_zone = insert(:tax_zone, zone: zone, is_default: true)
+
+    returned_tax_zone = TaxZone.get_default()
+    assert returned_tax_zone.id == tax_zone.id
+  end
+
   defp setup_state_zone_members(zone, states) do
     Enum.each(states, fn state ->
       insert(:state_zone_member, zone: zone, state: state)

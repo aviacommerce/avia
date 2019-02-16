@@ -35,6 +35,7 @@ defmodule Snitch.Factory.Tax do
         %TaxZone{
           name: sequence(:tax_zone_name, fn id -> "taxzone_#{id}" end),
           is_active?: false,
+          is_default: false,
           zone: build(:zone)
         }
       end
@@ -58,6 +59,7 @@ defmodule Snitch.Factory.Tax do
 
       def setup_tax_with_zone_and_rates(tax_rate_values, states) do
         zone = insert(:zone, zone_type: "S")
+        zone_c = insert(:zone, zone_type: "C")
 
         Enum.each(states, fn state ->
           insert(:state_zone_member, zone: zone, state: state)
@@ -74,6 +76,7 @@ defmodule Snitch.Factory.Tax do
         )
 
         tax_zone = insert(:tax_zone, zone: zone)
+        _default_tax_zone = insert(:tax_zone, zone: zone_c, is_default: true)
 
         tax_rate = insert(:tax_rate, tax_zone: tax_zone)
 
