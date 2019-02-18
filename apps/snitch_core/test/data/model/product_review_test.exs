@@ -55,6 +55,20 @@ defmodule Snitch.Data.Model.ProductReviewTest do
     assert result.review_count == 2
   end
 
+  @tag rating_option_count: 2
+  describe "fetch_rating_option/1" do
+    test "return a valid rating_option", context do
+      %{rating_options: rating_options} = context
+      [rating_option_1 | rating_option_2] = rating_options
+      {:ok, returned_rating_option} = ProductReview.fetch_rating_option(rating_option_1.id)
+      assert returned_rating_option.id == rating_option_1.id
+    end
+
+    test "fails for invalid id" do
+      assert {:error, :rating_option_not_found} = ProductReview.fetch_rating_option(-1)
+    end
+  end
+
   defp product_review_params(product, user, rating_option) do
     %{
       attributes: %{
