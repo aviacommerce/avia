@@ -4,19 +4,19 @@ defmodule Snitch.Data.Schema.ProductReview do
   """
 
   use Snitch.Data.Schema
-  alias Snitch.Data.Schema.Product
-  alias Snitch.Data.Schema.Review
+  alias Snitch.Data.Schema.{Product, Review, User}
 
   @type t :: %__MODULE__{}
 
   schema "snitch_product_reviews" do
     belongs_to(:product, Product)
     belongs_to(:review, Review)
+    belongs_to(:user, User)
 
     timestamps()
   end
 
-  @required_params ~w(product_id review_id)a
+  @required_params ~w(product_id review_id user_id)a
 
   @spec create_changeset(t, map) :: Ecto.Changeset.t()
   def create_changeset(%__MODULE__{} = product_review, params) do
@@ -34,5 +34,7 @@ defmodule Snitch.Data.Schema.ProductReview do
     |> validate_required(@required_params)
     |> foreign_key_constraint(:product_id)
     |> foreign_key_constraint(:review_id)
+    |> foreign_key_constraint(:user_id)
+    |> unique_constraint(:user_id)
   end
 end
