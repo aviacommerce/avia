@@ -74,7 +74,7 @@ sed \
   -e 's/$PORT/'$PORT'/g' \
   -e 's/$API_PORT/'$API_PORT'/g' \
   -e 's/$ADMIN_PORT/'$ADMIN_PORT'/g' \
-  config/deploy/docker-compose.yml > temp-docker-compose.yml
+  config/deploy/docker-compose.yml >temp-docker-compose.yml
 
 # Deregister old task definition.
 # Every deploy we want a new task definition to be created with the latest
@@ -85,7 +85,7 @@ if [ ! -z "$REVISION" ]; then
   aws ecs deregister-task-definition \
     --region $AWS_DEFAULT_REGION \
     --task-definition $AWS_ECS_PROJECT_NAME:$REVISION \
-    >> /dev/null
+    >>/dev/null
 
   # Stop current task that is running ou application.
   # This is what will stop the application.

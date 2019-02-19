@@ -4,10 +4,11 @@
 
 The repo includes some handy `git` hooks under `.scripts/`:
 
-* `pre-commit` Runs the `format --check-formatted` task.
-* `post-commit` Runs a customised `credo` check.
+- `pre-commit` Runs the `format --check-formatted` task.
+- `post-commit` Runs a customised `credo` check.
 
 We strongly recommend that you set up these git hooks on your machine by:
+
 ```sh
 # sh
 # in the project root, run:
@@ -48,4 +49,3 @@ Have fun commiting new changes! :rainbow:
 [dev]: https://github.com/aviabird/snitch/tree/develop
 [commit-format]: https://chris.beams.io/posts/git-commit/
 [our-template]: https://github.com/aviabird/snitch/blob/develop/.git_commit_msg.txt
-

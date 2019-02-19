@@ -41,13 +41,13 @@ All you have to do is:
     fevicon: 'http://via.placeholder.com/350x150',
     header: {
       brand: {
-        logo: "/assets/default/logo.png",
-        name: "Angularspree",
-        height: "40",
-        width: "112"
+        logo: '/assets/default/logo.png',
+        name: 'Angularspree',
+        height: '40',
+        width: '112'
       },
       searchPlaceholder: 'Find the best product for me ...',
-      showGithubRibon: false,
+      showGithubRibon: false
     },
     ...APP_DATA
   };

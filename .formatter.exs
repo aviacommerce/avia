@@ -1,11 +1,17 @@
 [
   inputs: [
-    "apps/*/{lib,config}/**/*.{ex,exs}", # lib and config
-    "apps/*/test/**/*.{ex,exs}", # tests
+    # lib and config
+    "apps/*/{lib,config}/**/*.{ex,exs}",
+    # tests
+    "apps/*/test/**/*.{ex,exs}",
     # "apps/*/priv/repo/migrations/*.{ex,exs}", # migrations
-    "apps/*/priv/repo/seed/*.{ex,exs}", # seeds
-    "apps/*/priv/repo/demo/*.{ex,exs}", #demo
-    "apps/*/mix.exs", # mix files
-    "mix.exs", # top-level
+    # seeds
+    "apps/*/priv/repo/seed/*.{ex,exs}",
+    # demo
+    "apps/*/priv/repo/demo/*.{ex,exs}",
+    # mix files
+    "apps/*/mix.exs",
+    # top-level
+    "mix.exs"
   ]
 ]
