@@ -26,6 +26,7 @@ defmodule Snitch.Data.Schema.Product do
   }
 
   alias Money.Ecto.Composite.Type, as: MoneyType
+  alias Snitch.Tools.EctoType.UnixTimestamp
 
   @type t :: %__MODULE__{}
 
@@ -33,7 +34,7 @@ defmodule Snitch.Data.Schema.Product do
     field(:name, :string, null: false, default: "")
     field(:description, :string)
     field(:available_on, :utc_datetime)
-    field(:deleted_at, :utc_datetime)
+    field(:deleted_at, UnixTimestamp, default: 0)
     field(:discontinue_on, :utc_datetime)
     field(:slug, :string)
 
@@ -198,6 +199,7 @@ defmodule Snitch.Data.Schema.Product do
     changeset
     |> validate_amount(:selling_price)
     |> NameSlug.maybe_generate_slug()
+    |> unique_constraint(:slug, name: :snitch_products_slug_deleted_at_index)
   end
 
   def product_by_category_query(taxon_id) do
