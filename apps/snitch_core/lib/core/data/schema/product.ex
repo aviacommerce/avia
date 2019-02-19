@@ -199,7 +199,10 @@ defmodule Snitch.Data.Schema.Product do
     changeset
     |> validate_amount(:selling_price)
     |> NameSlug.maybe_generate_slug()
-    |> unique_constraint(:slug, name: :snitch_products_slug_deleted_at_index)
+    |> unique_constraint(:name,
+      name: :snitch_products_slug_deleted_at_index,
+      message: "unique name for products"
+    )
   end
 
   def product_by_category_query(taxon_id) do

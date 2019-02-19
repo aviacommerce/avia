@@ -47,7 +47,7 @@ defmodule Snitch.Data.Schema.ProductTest do
     {:ok, _} = Repo.insert(changeset)
     cs = Product.create_changeset(%Product{}, params)
     {:error, changeset} = Repo.insert(cs)
-    assert %{slug: ["has already been taken"]} == errors_on(changeset)
+    assert %{name: ["unique name for products"]} == errors_on(changeset)
   end
 
   test "test invalid data for create_changeset/2" do
