@@ -168,18 +168,17 @@ defmodule Snitch.Data.Schema.Product do
 
   def delete_changeset(product, _params \\ %{}) do
     product = Repo.preload(product, [:products])
+    current_time = DateTime.utc_now() |> DateTime.to_unix()
 
     variant_params =
       product.products
-      |> Enum.map(
-        &%{"state" => "deleted", "id" => &1.id, "deleted_at" => NaiveDateTime.utc_now()}
-      )
+      |> Enum.map(&%{"state" => "deleted", "id" => &1.id, "deleted_at" => current_time})
 
     params = %{
       "id" => product.id,
       "state" => "deleted",
       "products" => variant_params,
-      "deleted_at" => NaiveDateTime.utc_now()
+      "deleted_at" => current_time
     }
 
     product
@@ -214,8 +213,10 @@ defmodule Snitch.Data.Schema.Product do
   end
 
   def set_delete_fields(%Ecto.Query{} = product_query) do
+    current_time = DateTime.utc_now() |> DateTime.to_unix()
+
     from(p in product_query,
-      update: [set: [state: "deleted", deleted_at: ^NaiveDateTime.utc_now(), taxon_id: nil]]
+      update: [set: [state: "deleted", deleted_at: ^current_time, taxon_id: nil]]
     )
   end
 
