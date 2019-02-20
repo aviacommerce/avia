@@ -40,8 +40,8 @@ defmodule Snitch.Data.Model.PaymentTest do
   end
 
   test "get_all/0 return all payments", %{ccd: cod, chk: check, hpm: hosted_payment} do
-    returned_hosted_payments = Payment.get_all()
-    assert returned_hosted_payments != []
+    returned_payments = Payment.get_all()
+    assert returned_payments != []
   end
 
   test "delete/1 deletes a payment", %{hpm: payment} do
