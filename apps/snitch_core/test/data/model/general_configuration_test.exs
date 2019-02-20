@@ -84,9 +84,8 @@ defmodule Snitch.Data.Model.GeneralConfigurationTest do
   end
 
   describe "fetch currency" do
-
     test "if general currency not set", %{general_config: gc} do
-      GCModel.delete_general_configuration(gc.id) 
+      GCModel.delete_general_configuration(gc.id)
       assert "USD" == GCModel.fetch_currency()
     end
 

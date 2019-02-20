@@ -5,58 +5,60 @@ defmodule Snitch.Data.Model.ReviewTest do
   import Snitch.Factory
   alias Snitch.Data.Model.{Review, ProductReview}
 
-  setup do
-    product = insert(:product)
-    [product: product]
-  end
-
   setup :rating_options
+  setup :review_params
 
-  @tag rating_option_count: 2
-  test "update a review successfully", context do
-    %{product: product} = context
-    user = insert(:user)
-    %{rating_options: rating_options} = context
-    [rating_option_1 | [rating_option_2 | _]] = rating_options
-    review_params = product_review_params(product, user, rating_option_1)
-    assert {:ok, review} = ProductReview.add(review_params)
+  describe "update/2" do
+    test "updates a review successfully", %{
+      review: review,
+      rating_option_vote: rating_option_vote
+    } do
+      update_params = %{
+        description: "new description",
+        rating_option_vote: rating_option_vote
+      }
 
-    update_params = %{
-      description: "new description",
-      rating_option_vote: %{rating_option: rating_option_2}
-    }
+      {:ok, updated_review} = Review.update(update_params, review)
+      assert updated_review.id == review.id
+      assert updated_review.description != review.description
+    end
 
-    assert {:ok, updated_review} = Review.update(update_params, review)
-    assert updated_review.id == review.id
-    assert updated_review.description != review.description
+    test "fails for invalid params", %{review: review} do
+      update_params = %{description: ""}
+
+      {:error, updated_review} = Review.update(update_params, review)
+      assert %{description: ["can't be blank"]} == errors_on(updated_review)
+    end
   end
 
-  @tag rating_option_count: 1
-  test "delete a product review", context do
-    %{product: product} = context
-    user = insert(:user)
-    %{rating_options: rating_options} = context
-    rating_option = List.first(rating_options)
-    review_params = product_review_params(product, user, rating_option)
-    assert {:ok, review} = ProductReview.add(review_params)
-    product_before_delete = Repo.preload(product, :reviews)
-    assert length(product_before_delete.reviews) != 0
-    assert {:ok, _} = Review.delete(review.id)
-    product_after_delete = Repo.preload(product, :reviews)
-    assert product_after_delete.reviews == []
+  describe "delete/1" do
+    test "successful for valid id", %{review: review} do
+      assert {:ok, _} = Review.delete(review.id)
+      assert Review.get(review.id) == {:error, :review_not_found}
+    end
+
+    test "fails for invalid id" do
+      {:error, :review_not_found} = Review.get(-1)
+    end
   end
 
-  defp product_review_params(product, user, rating_option) do
-    %{
-      attributes: %{
-        description: "awesomeness redefined",
-        user_id: user.id,
-        name: "stark"
-      },
-      rating_option_vote: %{
-        rating_option: rating_option
-      },
-      product_id: product.id
-    }
+  describe "get/1" do
+    test "returns a review", %{review: review} do
+      {:ok, new_review} = Review.get(review.id)
+      assert new_review.id == review.id
+    end
+
+    test "fails for invalid id" do
+      {:error, :review_not_found} = Review.get(-1)
+    end
+  end
+
+  defp review_params(context) do
+    %{rating_options: rating_options} = context
+    [rating_option_1, rating_option_2] = rating_options
+
+    review = insert(:review, rating_option_vote: %{rating_option: rating_option_1})
+    rating_option_vote = %{rating_option: rating_option_2}
+    %{review: review, rating_option_vote: rating_option_vote}
   end
 end

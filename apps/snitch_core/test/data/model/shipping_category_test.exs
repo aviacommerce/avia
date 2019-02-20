@@ -36,6 +36,21 @@ defmodule Snitch.Data.Model.ShippingCategoryTest do
     end
   end
 
+  describe "get_with_rules/1" do
+    test "successfully returns shipping_category with its rule" do
+      shipping_rule = insert(:shipping_rule)
+      id = shipping_rule.shipping_category_id
+      {:ok, sc} = ShippingCategory.get_with_rules(id)
+      assert sc.id == id
+      new_sc = sc.shipping_rules |> List.first()
+      assert new_sc.id == shipping_rule.id
+    end
+
+    test "fails for invalid id" do
+      assert {:error, :shipping_category_not_found} = ShippingCategory.get_with_rules(-1)
+    end
+  end
+
   defp setup_category_rules(shipping_category) do
     shipping_identifier_1 =
       insert(:shipping_identifier,
