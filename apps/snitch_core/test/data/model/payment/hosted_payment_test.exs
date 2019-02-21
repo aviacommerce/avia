@@ -91,25 +91,6 @@ defmodule Snitch.Data.Model.HostedPaymentTest do
 
       assert %{slug: ["has already been taken"]} == errors_on(changeset)
     end
-
-    test "" do
-      %{hosted_method: payment_method} = context
-      %{order: order} = context
-      payment_params = payment_params()
-      hosted_payment_params = hosted_payment_params()
-      hosted_payment = slug = "hosted-payment" <> to_string(:rand.uniform(1000))
-      payment_method_id = payment_method.id
-      order_id = order.id
-
-      assert {:ok, %{payment: payment, hosted_payment: hosted_payment}} =
-               HostedPayment.create(
-                 slug,
-                 order_id,
-                 payment_params,
-                 hosted_payment_params,
-                 payment_method_id
-               )
-    end
   end
 
   describe "update/3" do
