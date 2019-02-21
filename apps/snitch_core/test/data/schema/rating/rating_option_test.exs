@@ -6,14 +6,25 @@ defmodule Snitch.Data.Schema.RatingOptionTest do
 
   setup :rating_options
 
-  @tag rating_option_count: 1
   describe "create_changeset/2" do
-    test "returns a valid changeset", %{rating_options: [rating_option]} do
-      rating_option = Map.from_struct(rating_option)
-      changeset = RatingOption.create_changeset(%RatingOption{}, rating_option)
+    setup %{rating_options: [rating_option]} do
+      params = %{
+        code: rating_option.code,
+        value: rating_option.value,
+        position: rating_option.position,
+        rating_id: rating_option.rating_id
+      }
+
+      [params: params]
+    end
+
+    @tag rating_option_count: 1
+    test "returns a valid changeset", %{params: params} do
+      changeset = RatingOption.create_changeset(%RatingOption{}, params)
       assert changeset.valid?
     end
 
+    @tag rating_option_count: 1
     test "fails for invalid params" do
       changeset = RatingOption.create_changeset(%RatingOption{}, %{})
       refute changeset.valid?
@@ -24,6 +35,14 @@ defmodule Snitch.Data.Schema.RatingOptionTest do
                position: ["can't be blank"],
                rating_id: ["can't be blank"]
              } == errors_on(changeset)
+    end
+
+    @tag rating_option_count: 1
+    test "fails for non-existent rating_id", %{params: params} do
+      params = %{params | rating_id: -1}
+      cs = RatingOption.create_changeset(%RatingOption{}, params)
+      {:error, changeset} = Repo.insert(cs)
+      assert %{rating_id: ["does not exist"]} == errors_on(changeset)
     end
   end
 
