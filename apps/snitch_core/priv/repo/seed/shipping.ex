@@ -14,7 +14,7 @@ defmodule Snitch.Seed.Shipping do
 
   @zone_manifest %{
     "apac" => %{zone_type: "C"},
-    "india" => %{zone_type: "S"},
+    "india" => %{zone_type: "S", is_default: true},
     "north-india" => %{zone_type: "S"}
   }
 
