@@ -25,7 +25,7 @@ defmodule SnitchApi.ProductsContext do
   """
   @spec product_by_slug(String.t()) :: map
   def product_by_slug(slug) do
-    case ProductModel.get(%{slug: slug}) do
+    case ProductModel.get(%{slug: slug, deleted_at: 0}) do
       {:error, _} ->
         {:error, :not_found}
 
@@ -41,8 +41,6 @@ defmodule SnitchApi.ProductsContext do
             theme: [:option_types],
             options: :option_type
           )
-
-        {:ok, product}
     end
   end
 
