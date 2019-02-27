@@ -1,369 +1,559 @@
 import * as React from "react";
-import { DatePicker, Input, Select, Button, InputNumber, Switch, Icon} from 'antd';
+import { DatePicker, Select, Button, InputNumber } from 'antd';
 import 'antd/dist/antd.css';
-import '../../css/promotions.css';
-import {Link, Redirect} from 'react-router-dom';
+import { Promotions } from "./Promotions";
+import * as moment from 'moment';
+import { fetchGet, fetchPost, fetchPut } from '../api';
+import * as myconstants from '../constants';
 
-export class PromotionsForm extends React.Component<{},any>{
-    constructor(props){
+
+export class PromotionsForm extends React.Component<any, any>{
+    constructor(props) {
         super(props);
-        this.state={
-            code:"",
-            name:"",
-            description:"",
-            starts_at:"",
-            expires_at:"",
-            usageLimit:"",
-            usageCount:"Nil",
-            matchPolicy:"",
-            activeStatus:false,
-            success:false,
-            ruleDown:false,
-            addRule:false,
-            actiondown:false,
-            addedRules:[],
-            availableRules:"",
-            addAction:false,
-            availableActions:"",
-            availableCalculators:"",
-            selectedRule:"",
-            selectedCalc:"",
-            lowRange:"",
-            upRange:"",
-            selectedProducts:"",
-            productMatchPolicy:"",
-            addedActions:[],
-            selectedAction:"",
-            selectedCalculator:""
+        this.state = {
+            code: "",
+            name: "",
+            description: "",
+            starts_at: null,
+            expires_at: null,
+            usageLimit: "",
+            usageCount: "Nil",
+            matchPolicy: "",
+            activeStatus: false,
+            success: false,
+            ruleDown: false,
+            addRule: false,
+            actiondown: false,
+            addedRules: [],
+            availableRules: "",
+            addAction: false,
+            availableActions: "",
+            availableCalculators: "",
+            selectedRule: "",
+            selectedCalc: "",
+            lowRange: "",
+            upRange: "",
+            selectedProducts: "",
+            productMatchPolicy: "",
+            addedActions: [],
+            selectedAction: "",
+            amount: "",
+            rules: [],
+            actions: [],
+            failed: false,
+            errors: {},
+            back: false,
+            calcdata: {}
         }
-
-        this.handleStartDate = this.handleStartDate.bind(this);
-        this.handleEndDate = this.handleEndDate.bind(this);
-        this.handleSave = this.handleSave.bind(this);
-        this.handleAddRule = this.handleAddRule.bind(this); 
-        this.fetchPOST = this.fetchPOST.bind(this);
-        this.handleAddAction = this.handleAddAction.bind(this);
-        this.handleRule = this.handleRule.bind(this);
-        this.renderRuleOptions = this.renderRuleOptions.bind(this);
-        this.handleCalculator = this.handleCalculator.bind(this);
-        this.renderCalculatorOptions = this.renderCalculatorOptions.bind(this);
-        this.handleSaveRule = this.handleSaveRule.bind(this);
-        this.onSuccess = this.onSuccess.bind(this);
-        this.handleDeleteRule = this.handleDeleteRule.bind(this);
     }
 
-    handleStartDate = (date,dateString)=>{
+    componentDidMount() {
+        this.props.editResponse === undefined ? null : this.editPromotion(this.props.editResponse)
+    }
+
+    handleStartDate = (dateString) => {
         const startDate = new Date(dateString)
-        startDate.setHours(0,0,0)
-        this.setState({starts_at:startDate})
+        startDate.setHours(0, 0, 0)
+        this.setState({ starts_at: startDate.toISOString() })
     }
 
-    handleEndDate = (date,dateString)=>{
+    handleEndDate = (dateString) => {
         const endDate = new Date(dateString)
-        endDate.setHours(0,0,0)
-        this.setState({expires_at:endDate})
+        endDate.setHours(0, 0, 0)
+        this.setState({ expires_at: endDate.toISOString() })
     }
-
-    fetchPOST = (url,data)=>{
-        return fetch(url,{
-            credentials: 'include',
-            method:'POST',
-            body:JSON.stringify(data),
-            headers: {'Content-Type': 'application/json; charset=UTF-8'},
-        }).then(res =>res.json())
-        
-    }
-
-    fetchGET =(url)=>{
-        return fetch(url,{
-            credentials:'include',
-            method:"GET",
-            headers:{'Content-Type': 'application/json; charset=UTF-8'}
-        }).then(res =>res.json())
-    }
-
-    handleSave = () =>{
+    handleSubmit = () => {
         var data = {
-            "data":{
-                "starta_at":this.state.starts_at,
-                "expires_at":this.state.expires_at,
-                "code":this.state.code,
-                "name":this.state.name,
-                "rules":[],
-                "actions":[]
+            "data": {
+                "starts_at": this.state.starts_at,
+                "expires_at": this.state.expires_at,
+                "code": this.state.code,
+                "name": this.state.name,
+                "rules": this.state.addedRules,
+                "actions": this.state.addedActions,
+                "usage_limit": this.state.usageLimit,
+                "description": this.state.description,
+                "active?": this.state.activeStatus,
             }
         }
-        var url = 'http://localhost:4000/api/promotions'
-        this.fetchPOST(url,data).then(response=>{
-            var arrofkeys=Object.keys(response)
-            arrofkeys[0]=="errors"?this.onFail(response):this.onSuccess()
-            console.log('Success',JSON.stringify(response))})
-        .catch(error=>console.error('Error',error));
-        
+
+        if (this.props.editResponse === undefined) {
+            const url = myconstants.PROMOTIONS_LIST_URL;
+            fetchPost(url, data).then(res => res.json()).then(response => {
+                var arrofkeys = Object.keys(response)
+                arrofkeys[0] == "errors" ? this.onFail(response) : this.onSuccess()
+            })
+                .catch(error => console.error('Error', error));
+        }
+        else {
+            let id = this.props.editResponse["attributes"]["id"]
+            const url = myconstants.PROMOTIONS_LIST_URL + id
+
+            fetchPut(url, data).then(res => res.json()).then(response => {
+                var arrofkeys = Object.keys(response)
+                arrofkeys[0] == "errors" ? this.onFail(response) : this.onSuccess()
+            }).catch(error => console.error('Error', error))
+        }
     }
 
-    onSuccess =()=>{
-        this.setState({success:true})
-        alert("Saved Successfully!")
+    onSuccess = () => {
+        this.setState({ success: true })
     }
-    onFail=(response)=>{
-        Object.keys(response).map((res)=>{
-            var errormsg=""
-            Object.keys(response[res]).map((res1)=>{
-                errormsg=errormsg+res1+" "+response[res][res1][0]["message"]+"\n"
+    onFail = (response) => {
+        this.setState({ failed: true, errors: response })
+        Object.keys(response).map((res) => {
+            var errormsg = ""
+            Object.keys(response[res]).map((res1) => {
+                errormsg = errormsg + res1 + " " + response[res][res1][0]["message"] + "\n"
             })
-            alert(errormsg)
         })
     }
-    handleAddRule=()=>{
-        
-        this.setState({addRule:true})
-        var url="http://localhost:4000/api/promo-rules"
-        this.fetchGET(url).then(response=>{
-            var availableRules=response
-            this.setState({availableRules:availableRules})
-            console.log('Success',JSON.stringify(response))})
-        .catch(error=>console.error('Error',error));
-        
+    handleAddRule = () => {
+        this.setState({ addRule: true })
+        const url = myconstants.RULES_LIST_URL;
+        fetchGet(url).then(res => res.json()).then(response => {
+            var availableRules = response
+            this.setState({ availableRules: availableRules })
+        })
     }
 
-    handleAddAction=()=>{
-        this.setState(prevState=>({
-            actionDown:!prevState.actionDown,
-            addAction:!prevState.addAction
+    handleAddAction = () => {
+        this.setState(prevState => ({
+            actionDown: !prevState.actionDown,
+            addAction: !prevState.addAction
         }))
 
-        var url="http://localhost:4000/api/promo-actions"
-        this.fetchGET(url).then(response=>{
-            var availableActions=response
-            this.setState({availableActions:availableActions})
-            console.log('Success',JSON.stringify(response))})
-        .catch(error=>console.error('Error',error));
-        
-        this.fetchGET("http://localhost:4000/api/promo-calculators").then(response=>{
-            var availableCalculators=response
-            this.setState({availableCalculators:availableCalculators})
-            console.log('Success',JSON.stringify(response))})
-        .catch(error=>console.error('Error',error));
+        const url = myconstants.ACTIONS_LIST_URL;
+        fetchGet(url).then(res => res.json()).then(response => {
+            var availableActions = response
+            this.setState({ availableActions: availableActions })
+        })
+            .catch(error => console.error('Error', error));
+
+        fetchGet(myconstants.CALCULATORS_LIST_URL).then(res => res.json()).then(response => {
+            var availableCalculators = response
+            this.setState({ availableCalculators: availableCalculators })
+        })
+            .catch(error => console.error('Error', error));
     }
 
-    handleRule=(rule)=>{
-        console.log("module",rule)
-        this.setState({selectedRule:rule})
-        var url="http://localhost:4000/api/promo-rule-prefs"
-        var data={"rule":rule}
-        this.fetchPOST(url,data).then(response=>{}).catch(error=>console.error('Error',error));
+    handleRule = (rule) => {
+        this.setState({ selectedRule: rule })
+        const url = myconstants.RULE_PREFERENCES_URL
+        var data = { "rule": rule }
+        fetchPost(url, data).then(res => res.json()).then(response => { }).catch(error => console.error('Error', error));
     }
 
-    handleSaveRule=(rule)=>{
-        const addedRules=this.state.addedRules
+    handleSaveRule = (rule) => {
+        const addedRules = this.state.addedRules
         addedRules.push(rule)
-        this.setState({addedRules:addedRules})
+        this.setState({ addedRules: addedRules })
     }
 
-    handleSaveAction=(action)=>{
-        const addedActions=this.state.addedActions
+    handleSaveAction = (action) => {
+
+        const addedActions = this.state.addedActions
         addedActions.push(action)
-        this.setState({addedActions:addedActions})
+        this.setState({ addedActions: addedActions })
     }
 
-    handleDeleteRule=(index)=>{
-        var addedRules=this.state.addedRules;
-        addedRules.splice(index,1)
-        this.setState({addedRules:addedRules})
+    handleDeleteRule = (index) => {
+        var addedRules = this.state.addedRules;
+        addedRules.splice(index, 1)
+        this.setState({ addedRules: addedRules })
     }
 
-    handleDeleteAction=(index)=>{
-        var addedActions=this.state.addedActions;
-        addedActions.splice(index,1)
-        this.setState({addedActions:addedActions})
+    handleDeleteAction = (index) => {
+        var addedActions = this.state.addedActions;
+        addedActions.splice(index, 1)
+        this.setState({ addedActions: addedActions })
     }
 
-    renderRuleOptions=()=>{
-        switch(this.state.selectedRule){
-            case "Elixir.Snitch.Data.Schema.PromotionRule.OrderTotal":
-                return(
-                <div>
-                    Lower Range:
-                    <InputNumber placeholder="Lower Range" onChange={(value)=>{this.setState({lowRange:value})}} />
-                    <br/>
-                    Upper Range:
-                    <InputNumber placeholder="Upper Range" onChange={(value)=>{this.setState({upRange:value})}}/>
-                    <Button icon="save" onClick={()=>{this.setState({addRule:false,selectedRule:""});this.handleSaveRule({"name":"Order Item Total","value":{",LowerRange":this.state.lowRange,",UpperRange":this.state.upRange}});}}>Save</Button>
-                </div>
+    handleProducts = (products) => {
+        const product_list = []
+        products.map(item => { product_list.push(parseInt(item)) })
+        this.setState({ selectedProducts: product_list })
+    }
+
+    renderRuleOptions = () => {
+        switch (this.state.selectedRule) {
+            case myconstants.ORDER_TOTAL_MODULE:
+                return (
+                    <div>
+                        Lower Range:
+                    <InputNumber value={this.state.lowRange} placeholder="Lower Range" onChange={(value) => { this.setState({ lowRange: value }) }} />
+                        <br />
+                        Upper Range:
+                    <InputNumber value={this.state.upRange} placeholder="Upper Range" onChange={(value) => { this.setState({ upRange: value }) }} />
+                        <Button icon="save" onClick={() => { this.setState({ addRule: false, selectedRule: "" }); this.handleSaveRule({ "name": myconstants.ORDER_TOTAL_NAME, "module": this.state.selectedRule, "preferences": { "lower_range": this.state.lowRange, "upper_range": this.state.upRange } }); }}>Save</Button>
+                    </div>
                 )
-            case "Elixir.Snitch.Data.Schema.PromotionRule.Product":
-            const Option = Select.Option;
-                return(
+            case myconstants.PRODUCT_RULE_MODULE:
+                const Option = Select.Option;
+                return (
                     <div>
                         Products:
-                        <Select mode="multiple" onChange={(selectedProducts)=>{this.setState({selectedProducts:selectedProducts})}}>
-                        <Option value="shoes">
-                         shoes
+
+                        <Select mode="multiple" onChange={(selectedProducts) => { this.handleProducts(selectedProducts) }}>
+                            <Option value="1">
+                                shoes
                         </Option>
-                        <Option value="tshirts">
-                            tshirts
+                            <Option value="2">
+                                tshirts
                         </Option>
-                        <Option value="watches">
-                            watches
+                            <Option value="3">
+                                watches
                         </Option>
 
                         </Select>
 
                         Match Policy:
-                        <Select onChange={(productMatchPolicy)=>{this.setState({productMatchPolicy:productMatchPolicy})}}>
-                            <Option value = "all">All</Option>
+                        <Select value={this.state.productMatchPolicy} onChange={(productMatchPolicy) => { this.setState({ productMatchPolicy: productMatchPolicy }) }}>
+                            <Option value="all">All</Option>
                             <Option value="any">Any</Option>
                             <Option value="none">None</Option>
-                        </Select> 
-                        <Button icon="save" onClick={()=>{this.setState({addRule:false,selectedRule:""});this.handleSaveRule({"name":"Product Rule","value":{",Categories":this.state.selectedProducts,",Match Policy":this.state.productMatchPolicy}});}}>Save</Button>
-                        
+                        </Select>
+                        <Button icon="save" onClick={() => { this.setState({ addRule: false, selectedRule: "" }); this.handleSaveRule({ "name": myconstants.PRODUCT_RULE_NAME, "module": this.state.selectedRule, "preferences": { "product_list": this.state.selectedProducts, "match_policy": this.state.productMatchPolicy } }); }}>Save</Button>
+
                     </div>
                 )
             default:
                 return null
         }
-        
+
     }
 
-    handleCalculator=(calc)=>{
-        console.log("calcc",calc)
-        this.setState({selectedCalc:calc})
-        var url="http://localhost:4000/api/promo-calc-prefs"
-        var data={"calculator":calc}
-        this.fetchPOST(url,data).then(response=>{}).catch(error=>console.error('Error',error));
+    handleCalculator = (calc) => {
+        this.setState({ selectedCalc: calc })
+        const url = myconstants.CALCULATORS_PREFERENCES_URL
+        var data = { "calculator": calc }
+        fetchPost(url, data).then(res => res.json()).then(response => { this.setState({ calcdata: response }) }).catch(error => console.error('Error', error));
     }
 
-    renderCalculatorOptions=()=>{
-        console.log("calc",this.state.selectedCalc)
-        switch(this.state.selectedCalc){
-            case "Elixir.Snitch.Domain.Calculator.FlatRate":
-                return(
-                    <div>
-                        Enter the Rate:
-                        <InputNumber placeholder="FlatRate" onChange={(number)=>{this.setState({selectedCalculator:number})}}/>
-                        <Button icon="save" onClick={()=>{this.setState({addRule:false,selectedAction:"",selectedCalc:"",selectedCalculator:""});this.handleSaveAction({"name":this.state.selectedAction,"value":{"Rate - ":this.state.selectedCalculator}});}}>Save</Button>
-                    </div>
+    editPromotion = (editResponse) => {
+        this.setState({
+            code: editResponse["attributes"]["code"],
+            name: editResponse["attributes"]["name"],
+            activeStatus: editResponse["attributes"]["active?"],
+            matchPolicy: editResponse["attributes"]["match_policy"],
+            usageLimit: editResponse["attributes"]["usage_limit"],
+            usageCount: editResponse["attributes"]["usage_count"],
+            starts_at: editResponse["attributes"]["starts_at"],
+            expires_at: editResponse["attributes"]["expires_at"],
+            description: editResponse["attributes"]["description"]
+        })
 
-                )
-            case "Elixir.Snitch.Domain.Calculator.FlatPercent":
-                return(
-                    <div>
-                        Enter the Percent Amount:
-                        <InputNumber placeholder="FlatPercent" onChange={(number)=>{this.setState({selectedCalculator:number})}}/>
-                        <Button icon="save" onClick={()=>{this.setState({addRule:false,selectedAction:"",selectedCalc:"",selectedCalculator:""});this.handleSaveAction({"name":this.state.selectedAction,"value":{"Percent-":this.state.selectedCalculator}});}}>Save</Button>
-                    </div>
-                )
-            default:
-                return null
-        }
+        const rules = [];
+        editResponse["rules"].map((ruleobject) => {
+            let ruleobj = { name: '', module: '', preferences: {} }
+            ruleobject["rule_data"].map((preferences) => {
+                ruleobj["preferences"][preferences["key"]] = preferences["value"]
+            })
+            ruleobj["module"] = ruleobject["name"]
+            switch (ruleobject["name"]) {
+                case myconstants.ORDER_TOTAL_MODULE:
+                    ruleobj["name"] = myconstants.ORDER_TOTAL_NAME
+                    break;
+                case myconstants.PRODUCT_RULE_MODULE:
+                    ruleobj["name"] = myconstants.PRODUCT_RULE_NAME
+                    break;
+                default:
+                    null
+            }
+            rules.push(ruleobj)
+        })
+        this.setState({ addedRules: rules })
+
+        const actions = []
+        editResponse["actions"].map((actionobject) => {
+            let actionobj = { name: '', module: '', preferences: { calculator_module: '', calculator_preferences: { amount: '' } } }
+            actionobj["preferences"]["calculator_module"] = actionobject["action_data"][0]["value"]
+            actionobj["preferences"]["calculator_preferences"]["amount"] = actionobject["action_data"][1]["value"]["data"][0]["value"]
+            actionobj["module"] = actionobject["name"]
+            switch (actionobject["name"]) {
+                case myconstants.ORDER_ACTION_MODULE:
+                    actionobj["name"] = myconstants.ORDER_ACTION_NAME
+                    break;
+                case myconstants.LINE_ITEM_ACTION_MODULE:
+                    actionobj["name"] = myconstants.LINE_ITEM_ACTION_NAME
+                    break;
+                default:
+                    null
+            }
+            actions.push(actionobj)
+        })
+        this.setState({ addedActions: actions })
+
     }
 
-    render(){
-        if(this.state.success){
-            return <Redirect to="/"/>
+    render() {
+        if (this.state.success || this.state.back) {
+            return <Promotions />
         }
         const Option = Select.Option;
-        let ruledown=this.state.ruleDown?"up":"down"
-        let actiondown = this.state.actionDown?"up":"down"
-        var a=this.state.selectedRule
-        return(
-            <div>                
-              <div className="Title">Promotions Form </div>  
-              <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
-              <div className="topnav"> 
-                    <button style={{backgroundColor:"rgba()"}} onClick={this.handleSave}>Save</button>    
-                    <Link to="/"><Icon type="arrow-left" />   Back</Link>
-              </div>
-              <div className="info">Promotion Information</div>
-                <form className="form">
-                    <div className="formrow">
-                       Code <input placeholder = " Enter Code" onChange={(e)=>{this.setState({code:e.target.value})}}></input>
-                    </div>
-                    <div className="formrow">
-                        Name <input placeholder = " Enter Name" onChange={(e)=>{this.setState({name:e.target.value})}} ></input>
-                    </div>
-                    <div className="formrow">
-                        Description  <input placeholder = " Enter Description" onChange={(e)=>{this.setState({description:e.target.value})}}></input>
-                    </div>
-                    <div className="formrow">
-                        Starts At:  <DatePicker onChange={this.handleStartDate} />
-                    </div>
-                    <div className="formrow"> 
-                        Expires At: <DatePicker onChange={this.handleEndDate} />
-                    </div>
-                    <div className="formrow">
-                    Usage Limit:
-                        <InputNumber placeholder="Usage Limit" onChange={(usageLimit)=>{this.setState({usageLimit:usageLimit})}}/>
-                    </div>
-                    <div className="formrow">
-                        <Input placeholder = {this.state.usageCount} addonBefore = "Current Usage" disabled={true} />
-                    </div>
-                    <div className="formrow">
-                    Active?
-                        <Switch onChange={()=>{ this.setState(prevState=>({activeStatus:!prevState.activeStatus}))}} />
-                    </div>
-                    <hr/>
-                </form>
-                
-                    <div className="rulesandactions">
-                    Rules   <Button style={{float:"right" marginRight:"35%"}} icon={ruledown} onClick={()=>{ this.setState(prevState=>({ruleDown:!prevState.ruleDown}))}}></Button>
-                    </div>
-                <form className="form">    
-                    {this.state.ruleDown?(
-                      <div className="formrow">
-                      Match Policy:  
-                        <Select onChange={(matchPolicy)=>{this.setState({matchPolicy:matchPolicy})}}>
-                            <Option value = "all">All</Option>
-                            <Option value="any">Any</Option>
-                        </Select> 
-                        Select Rule: 
-                        {this.state.addRule?(<div>
-                        <Select onChange={this.handleRule}>                            
-                            {this.state.availableRules["data"]===undefined?null:this.state.availableRules["data"].map(rule=>{return(<Option value={rule["module"]}>{rule["name"]}</Option>)})}
-                        </Select>
-                        <Button onClick={()=>{this.setState({addRule:false,selectedRule:""})}}>Cancel</Button>
-                        {
-                            this.renderRuleOptions()
-                        }
-        
-                         </div>
-                        ):(<Button className="iconbutton" onClick={this.handleAddRule}>Add</Button>)}  
-                        <br/>
-                        Added Rules:
-                        {this.state.addedRules.map((rule,index)=>{return(<div>{rule["name"]}-{ Object.keys(rule["value"]).map((res,index)=>{return(<div style={{display:"inline"}}>{res}-{rule["value"][res]}</div>)})}<Button icon="delete" onClick={(index)=>this.handleDeleteRule(index)}></Button></div>)})}
-                      </div>
-                    ):null}
-                    <hr/>
-                    </form>
+        return (
 
-                    <div className="rulesandactions">
-                    Actions and Calculators <Button style={{float:"right" marginRight:"35%"}} icon={actiondown} onClick={this.handleAddAction}></Button>
-                    <form className="form">
-                    {this.state.addAction?
-                    (<div className="formrow">
-                    Action:
-                    <Select onChange={(selectedAction)=>{this.setState({selectedAction:selectedAction})}}>
-                        {this.state.availableActions["data"]===undefined?null:this.state.availableActions["data"].map(action=>{return(<Option value={action["name"]}>{action["name"]}</Option>)})}
-                    </Select> 
-                    Calulator:
-                    <Select
-                    onChange={this.handleCalculator}
-                    >
-                        {this.state.availableCalculators["data"]===undefined?null:this.state.availableCalculators["data"].map(calculator=>{return(<Option value={calculator["module"]}>{calculator["name"]}</Option>))} 
-                    </Select>
-                    {this.renderCalculatorOptions()}
-                    Added Actions:
-                    {this.state.addedActions.map((action,index)=>{return(<div>{action["name"]}-{ Object.keys(action["value"]).map((res,index)=>{return(<div style={{display:"inline"}}>{res}-{action["value"][res]}</div>)})}<Button icon="delete" onClick={(index)=>this.handleDeleteAction(index)}></Button></div>)})}
-                     </div>
-                    
-                    ):
-                        null}
-                    </form>
+            <div className="list-container">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+                <div className="pt-3 pb-0 pr-3 pl-3 back" > <img src="/images/left-arrow.svg" width="20" height="20" className="d-inline-block align-top" alt="" /><a onClick={() => { this.setState({ back: true }) }}>Promotions</a>
+                </div>
+                <h4 className="p-3 m-0">Add a new Promotion</h4>
+                <div className="col-12">
+                    <div className="card col-12">
+                        <form>
+                            <div className="form-group row">
+                                <label className="col-sm-3 col-form-label">
+                                    <div className="label required">
+                                        Code
+                                </div>
+                                </label>
+                                <div className="col-sm-9">
+                                    <div className="col-sm-12">
+                                        <div className="form-group">
+                                            <div className="label required">Code</div>
+                                            {this.state.failed && this.state.errors["errors"]["code"] != undefined ? (
+                                                <div>
+                                                    <input className="form-control is-invalid" value={this.state.code} onChange={(e) => { this.setState({ code: e.target.value }) }} />
+                                                    <span className="invalid-feedback">{this.state.errors["errors"]["code"][0]["message"]}</span>
+                                                </div>
+                                            ) : (
+                                                    <div>
+                                                        <input className="form-control" value={this.state.code} onChange={(e) => { this.setState({ code: e.target.value }) }} />
+                                                    </div>
+                                                )}
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="form-group row">
+                                <label className="col-sm-3 col-form-label">
+                                    <div className="label required">
+                                        Name
+                                </div>
+                                </label>
+                                <div className="col-sm-9">
+                                    <div className="col-sm-12">
+                                        <div className="form-group">
+                                            <div className="label required">Name</div>
+                                            {this.state.failed && this.state.errors["errors"]["name"] != undefined ? (
+                                                <div>
+                                                    <input className="form-control is-invalid" value={this.state.name} onChange={(e) => { this.setState({ name: e.target.value }) }} />
+                                                    <span className="invalid-feedback">{this.state.errors["errors"]["name"][0]["message"]}</span>
+                                                </div>
+                                            ) : (
+                                                    <div>
+                                                        <input className="form-control" value={this.state.name} onChange={(e) => { this.setState({ name: e.target.value }) }} />
+                                                    </div>
+                                                )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="form-group row">
+                                <label className="col-sm-3 col-form-label">
+                                    <div className="label">
+                                        Description
+                                </div>
+                                </label>
+                                <div className="col-sm-9">
+                                    <div className="col-sm-12">
+                                        <div className="form-group">
+                                            <div className="label">Description</div>
+                                            <input className="form-control" value={this.state.description} onChange={(e) => { this.setState({ description: e.target.value }) }} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="form-group row">
+                                <label className="col-sm-3 col-form-label">
+                                    <div className="label required">
+                                        Starts At:
+                                </div>
+                                </label>
+                                <div className="col-sm-9">
+                                    <div className="col-sm-12">
+                                        <div>
+                                            <div className="label required">Starts At:</div>
+                                            <DatePicker value={this.state.starts_at == null ? null : moment.utc(this.state.starts_at)} onChange={this.handleStartDate} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="form-group row">
+                                <label className="col-sm-3 col-form-label">
+                                    <div className="label required">
+                                        Expires At:
+                                </div>
+                                </label>
+                                <div className="col-sm-9">
+                                    <div className="col-sm-12">
+                                        <div>
+                                            <div className="label required">Expires At:</div>
+                                            <DatePicker value={this.state.expires_at == null ? null : moment.utc(this.state.expires_at)} onChange={this.handleEndDate} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="form-group row">
+                                <label className="col-sm-3 col-form-label">
+                                    <div className="label">
+                                        Usage Limit
+                                </div>
+                                </label>
+                                <div className="col-sm-9">
+                                    <div className="col-sm-12">
+                                        <div className="form-group">
+                                            <div className="label">Usage Limit</div>
+                                            <input className="form-control" value={this.state.usageLimit} onChange={(e) => { this.setState({ usageLimit: e.target.value }) }} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="form-group row">
+                                <label className="col-sm-3 col-form-label">
+                                    <div className="label">
+                                        Usage Count
+                                </div>
+                                </label>
+                                <div className="col-sm-9">
+                                    <div className="col-sm-12">
+                                        <div className="form-group">
+                                            <div className="label">Usage Count</div>
+                                            <input className="form-control" value={this.state.usageCount} disabled />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="form-group row">
+                                <label className="col-sm-3 col-form-label">
+                                    <div className="label">
+                                        Active?
+                                </div>
+                                </label>
+                                <div className="col-sm-9">
+                                    <div className="col-sm-12">
+                                        <div className="form-group">
+                                            <div className="label">Active Status</div>
+                                            <select className="form-control" value={this.state.activeStatus} onChange={(e) => { this.setState({ activeStatus: e.target.value === "true" ? true : false }) }} placeholder="Select">
+                                                <option value="true" >True</option>
+                                                <option value="false">False</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="form-group row stickformbutton">
+                                <div className="col-sm-10">
+                                    <button type="button" className="btn btn-primary submit-btn float-right" onClick={this.handleSubmit}> Submit</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                    <hr/>            
+                    <h4 className="p-3 m-0"> Add a Rule <i onClick={() => { this.setState(prevState => ({ ruleDown: !prevState.ruleDown })); this.handleAddRule() }} className="fa fa-angle-down downangle"></i></h4>
+                    {this.state.ruleDown ? (
+                        <div className="card col-12">
+                            <form>
+                                <div className="form-group row">
+                                    <label className="col-sm-3 col-form-label">
+                                        <div className="label">
+                                            Match Policy
+                                </div>
+                                    </label>
+                                    <div className="col-sm-9">
+                                        <select className="form-control" onChange={(e) => { this.setState({ matchPolicy: e.target.value }) }} placeholder="Select">
+                                            <option value="all" >All</option>
+                                            <option value="any">Any</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="form-group row">
+                                    <label className="col-sm-3 col-form-label">
+                                        <div className="label">
+                                            Rule
+                                </div>
+                                    </label>
+                                    <div className="col-sm-9">
+                                        <select className="form-control" defaultValue=" " onChange={(e) => { this.handleRule(e.target.value) }}>
+                                            {this.state.availableRules["data"] === undefined ? null : this.state.availableRules["data"].map((rule, index) => { return (<option key={index} value={rule["module"]}>{rule["name"]}</option>) })}
+                                        </select>
+                                        {this.renderRuleOptions()}
+                                    </div>
+                                </div>
+                                <div className="form-group row">
+                                    <label className="col-sm-3 col-form-label">
+                                        <div className="label">
+                                            Added Rules
+                                </div>
+                                    </label>
+                                    <div className="col-sm-9">
+                                        {this.state.addedRules.map((rule, index) => { return (<div key={index}>{rule["name"]}-{Object.keys(rule["preferences"]).map((res, index) => { return (<div key={index} style={{ display: "inline" }}>{res}-{rule["preferences"][res]}</div>) })}<Button icon="delete" onClick={(index) => this.handleDeleteRule(index)}></Button></div>) })}
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    ) : null}
+                    <h4 className="p-3 m-0"> Add an Action <i onClick={this.handleAddAction} className="fa fa-angle-down downangle"></i></h4>
+                    {this.state.addAction ? (
+                        <div className="card col-12">
+                            <form>
+                                <div className="form-group row">
+                                    <label className="col-sm-3 col-form-label">
+                                        <div className="label">
+                                            Action
+                                </div>
+                                    </label>
+                                    <div className="col-sm-9">
+                                        <Select className="form-control" onChange={(action) => { this.setState({ selectedAction: [action[0], action[1]] }) }}>
+                                            {this.state.availableActions["data"] === undefined ? null : this.state.availableActions["data"].map((action, index) => {
+                                                return (
+                                                    <Option key={index} value={[action["name"], action["module"]]}>{action["name"]}</Option>
+                                                )
+                                            })}
+                                        </Select>
+
+                                    </div>
+                                </div>
+                                <div className="form-group row">
+                                    <label className="col-sm-3 col-form-label">
+                                        <div className="label">
+                                            Calculator
+                                </div>
+                                    </label>
+                                    <div className="col-sm-9">
+                                        <select className="form-control" onChange={(e) => { this.handleCalculator(e.target.value) }}>
+                                            {this.state.availableCalculators["data"] === undefined ? null : this.state.availableCalculators["data"].map((calculator, index) => { return (<option key={index} value={calculator["module"]}>{calculator["name"]}</option>))}
+                                        </select>
+                                        {this.state.calcdata["data"] === undefined ? null : (
+                                            <div>{
+                                                this.state.calcdata["data"]["data"][0]["key"]}
+                                                <input onChange={(e) => { this.setState({ amount: e.target.value }) }} />
+                                                <Button icon="save" onClick={() => {
+                                                    this.setState({ addRule: false, selectedCalc: "", selectedCalculator: "", calcdata: "" });
+                                                    this.handleSaveAction({ "name": this.state.selectedAction[0], "module": this.state.selectedAction[1], "preferences": { "calculator_module": this.state.selectedCalc, "calculator_preferences": { [this.state.calcdata["data"]["data"][0]["key"]]: this.state.amount } } });
+                                                }}>
+                                                    Save
+                                    </Button>
+                                            </div>)
+                                        }
+                                    </div>
+                                </div>
+                                <div className="form-group row">
+                                    <label className="col-sm-3 col-form-label">
+                                        <div className="label">
+                                            Added Actions
+                                </div>
+                                    </label>
+                                    <div className="col-sm-9">
+                                        {this.state.addedActions.map((action, index) => { return (<div key={index}>{action["name"]}-<div style={{ display: "inline" }}>{action["preferences"]["calculator_preferences"]["amount"] === undefined ? (<div>percent_amount - { action["preferences"]["calculator_preferences"]["percent_amount"]}</div>) : (<div>amount - { action["preferences"]["calculator_preferences"]["amount"]}</div>)}</div><Button icon="delete" onClick={(index) => this.handleDeleteAction(index)}></Button></div>) })}
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    ) : null}
+                </div>
             </div>
-            
+
         )
     }
 }

@@ -1,77 +1,118 @@
 import * as React from "react";
-import { Link, Redirect} from 'react-router-dom'
-import '../../css/promotions.css';
-
-export class Promotions extends React.Component<{},any>{
-    constructor(props){
+import { PromotionsForm } from "./CreatePromotions"
+import { fetchGet, fetchPost } from '../api';
+import * as myconstants from '../constants';
+import '@babel/polyfill'
+export class Promotions extends React.Component<any, any>{
+    constructor(props) {
         super(props);
-        this.state={
-            createpromotion:false,
-            allPromotions:{}
+        this.state = {
+            createpromotion: false,
+            allPromotions: {},
+            editValues: {},
+            editId: "",
+            editCode: "",
+            editPromotion: false,
+            editResponse: {}
         }
-        this.fetchPromotions=this.fetchPromotions.bind(this)
-        this.fetchGET = this.fetchGET.bind(this)
     }
 
-    componentDidMount(){
+    componentDidMount() {
         this.fetchPromotions()
     }
 
-    fetchGET =(url)=>{
-        return fetch(url,{
-            credentials:'include',
-            method:"GET",
-            headers:{'Content-Type': 'application/json; charset=UTF-8'}
-        }).then(res =>res.json())
+    fetchPromotions = () => {
+        fetchGet(myconstants.PROMOTIONS_LIST_URL).then(res => res.json()).then(response => {
+            var allPromotions = response
+            this.setState({ allPromotions: allPromotions })
+        })
     }
 
-    fetchPromotions=()=>{
-        var url="http://localhost:4000/api/promotions"
-        this.fetchGET(url).then(response=>{
-            var allPromotions=response
-            this.setState({allPromotions:allPromotions})
-            console.log('Success',JSON.stringify(response))})
-        .catch(error=>console.error('Error',error))
+    onArchive = (index, id) => {
+        const url = "/api/promo/" + id + "/archive"
+
+        fetchPost(url, null).then(res => res.json()).then(response => {
+            console.log('Success', JSON.stringify(response))
+        }).catch(error => console.error('Error', error))
+
+        var allPromotions = this.state.allPromotions;
+        allPromotions["data"].splice(index, 1)
+        this.setState({ allPromotions: allPromotions })
     }
 
-    render(){
-        if(this.state.createpromotion){
-            return <Redirect to="/create"/>
+    onEdit = (id) => {
+        const url = "/api/promotions/" + id + "/edit"
+        fetchGet(url).then(res => res.json()).then(response => {
+            this.setState({ editResponse: response })
+            console.log("onEdit", response)
+        }).catch(error => console.error('Error', error))
+
+        this.setState({ editId: id, editPromotion: true })
+
+    }
+
+    render() {
+        if (this.state.createpromotion) {
+            return <PromotionsForm />
         }
-        return(
-            <div>
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
-                <div className="TitlePromotion">
-                    Promotions 
-                    <button className="createButton" onClick={()=>{this.setState({createpromotion:true})}}><i class="fas fa-plus"></i> Add a Promotion </button>
-                </div> 
+        if (this.state.editPromotion) {
+            if (this.state.editResponse["attributes"] != undefined) {
+                return <PromotionsForm editResponse={this.state.editResponse} />
+            }
 
-            <table className="promotionstable" style={{width:"100%"}}>
-                <tbody>
-                    <tr className="headerrow">
-                        <th style={{width:"12%"}}>ID</th>
-                        <th style={{width:"12%"}}>Name</th>
-                        <th style={{width:"12%"}}>Code</th>
-                        <th style={{width:"20%"}}>Starts At</th>
-                        <th style={{width:"20%"}}> Expires At</th>
-                        <th style={{width:"12%"}}>Usage Count</th>
-                        <th style={{width:"12%"}}>Usage Limit</th>
-                    </tr>
-                    {this.state.allPromotions["data"]===undefined?null:this.state.allPromotions["data"].map(promotion=>{return(
-                    <tr className="promotionsrow">
-                        <td className="id">{promotion["id"]}</td>
-                        <td className="id" >{promotion["name"]}</td>
-                        <td className="id" >{promotion["code"]}</td>
-                        <td className="dates" >{promotion["starts_at"]}</td>
-                        <td className="dates" >{promotion["expires_at"]}</td>
-                        <td className="id" >{promotion["usage_count"]}</td>
-                        <td className="id" >{promotion["usage_limit"]}</td>
-                    </tr>)})}
+        }
+        return (
+            <div className="list-container">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+                <div className="row m-0 list-header">
+                    <div className="col-10 p-0">
+                        <h2>Promotions</h2>
+                    </div>
+                    <div className="col-2 p-0 float-right text-right">
+                        <div className="btn btn-primary" onClick={() => { this.setState({ createpromotion: true }) }}><i className='fas fa-plus'></i> Add a Promotion</div>
+                    </div>
+                </div>
+                <div className="row m-0 list">
+                    {this.state.allPromotions["data"] === undefined ? null : this.state.allPromotions["data"].map((promotion, index) => {
+                        return (
+                            <div key={index} className="table-contaner col-12 p-3 mb-2">
+                                <div className="row" id="spree_zone_1">
 
-                </tbody>
-            </table> 
+                                    <div className="col-11 p-0">
+                                        <div className="media">
+                                            <div className="checkbox mx-3">
+                                                <label>
+                                                    <input type="checkbox" value="" />
+                                                    <span className="cr"><i className="cr-icon fa fa-check"></i></span>
+                                                </label>
+                                            </div>
+                                            <div className="media-body">
+                                                <div className="row">
+                                                    <div className="col-5">   {promotion["name"]}   </div>
+                                                    <div className="col-4">                       </div>
+                                                    <div className="col-3">  {promotion["code"]}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-1 float-right">
+                                        <div className="dropdown col-12 p-0 float-right options-container">
+                                            <a className="p-2 dropdown-toggle options" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i className="fa fa-cog"></i>
+                                            </a>
+                                            <div className="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
+                                                <div className="dropdown-item" onClick={() => { this.onEdit(promotion["id"]) }}>Edit</div>
+                                                <div className="dropdown-item" onClick={() => { this.onArchive(index, promotion["id"]) }} >Archive</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    })}
 
-            </div>     
+                </div>
+            </div>
         )
     }
 }
