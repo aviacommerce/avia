@@ -43,6 +43,7 @@ defmodule AdminAppWeb.PromotionView do
         code: promotion.code,
         starts_at: promotion.starts_at,
         expires_at: promotion.expires_at,
+        description: promotion.description,
         usage_count: promotion.current_usage_count,
         usage_limit: promotion.usage_limit,
         match_policy: promotion.match_policy,

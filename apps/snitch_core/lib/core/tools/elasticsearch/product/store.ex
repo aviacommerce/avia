@@ -76,7 +76,7 @@ defmodule Snitch.Tools.ElasticSearch.Product.Store do
     end
   end
 
-  defp update_sellable_product_to_es(%{state: :active, deleted_at: nil} = product, :create),
+  defp update_sellable_product_to_es(%{state: :active, deleted_at: 0} = product, :create),
     do:
       Elasticsearch.put_document!(
         EC,

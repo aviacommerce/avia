@@ -200,6 +200,7 @@ defmodule Snitch.Data.Model.ProductTest do
       product = insert(:product, attrs)
       variant = product.products |> List.first()
       variation = insert(:variation, %{parent_product: product, child_product: variant})
+
       sellable_products = Product.sellable_products_query() |> Repo.all() |> Enum.map(& &1.id)
       assert Enum.member?(sellable_products, variant.id) == true
       refute Enum.member?(sellable_products, product.id)
