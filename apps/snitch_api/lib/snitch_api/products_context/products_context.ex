@@ -41,6 +41,8 @@ defmodule SnitchApi.ProductsContext do
             theme: [:option_types],
             options: :option_type
           )
+
+        {:ok, product}
     end
   end
 
