@@ -1,7 +1,7 @@
 coverage:
   precision: 2
   round: down
-  range: "60...90"
+  range: '60...90'
 
   status:
     project:
@@ -15,7 +15,7 @@ codecov:
   branch: develop
 
 comment:
-  layout: "header, reach, diff, flags, files, footer"
+  layout: 'header, reach, diff, flags, files, footer'
   behavior: default
   require_changes: no
   require_base: no

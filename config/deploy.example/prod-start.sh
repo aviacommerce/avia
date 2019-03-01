@@ -14,9 +14,10 @@ until
     --build-arg SENDGRID_SENDER_EMAIL=$SENDGRID_SENDER_EMAIL \
     --build-arg SENDGRID_API_KEY=$SENDGRID_API_KEY \
     --build-arg ELASTIC_HOST=$ELASTIC_HOST \
-    . -f ./config/docker/prod/Dockerfile; do
+    . -f ./config/docker/prod/Dockerfile
+do
   echo Docker build failed, retrying in 1 seconds...
   sleep 1
 done
 
-docker run --rm -it -p 4001:4001 -p 3000:3000 -p 5432:5432 -e API_PORT=3000 -e ADMIN_PORT=4001 snitch:latest /bin/bash
+docker run --rm -it -p 4001:4001 -p 3000:3000 -p 5432:5432 -p 4444:4444 -e API_PORT=3000 -e ADMIN_PORT=4001 -e STORE_PORT=4444 snitch:latest /bin/bash

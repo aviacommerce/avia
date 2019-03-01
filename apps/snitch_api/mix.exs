@@ -36,11 +36,11 @@ defmodule SnitchApi.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.3.0"},
-      {:phoenix_pubsub, "~> 1.0"},
+      {:phoenix, "~> 1.4.0"},
+      {:phoenix_pubsub, "~> 1.1"},
       {:gettext, "~> 0.11"},
-      {:cowboy, "~> 1.0"},
       {:snitch_core, "~> 0.0.1", in_umbrella: true},
+      {:plug_cowboy, "~> 2.0"},
       {:plug, "~> 1.0"},
       {:corsica, "~> 1.0"},
       {:uuid, "~> 1.1"},

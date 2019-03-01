@@ -73,6 +73,9 @@ RUN apt-get clean \
 RUN cd apps/admin_app/assets \
   && yarn install
 
+RUN cd apps/store_front/assets \
+  && yarn install
+
 RUN ["chmod", "+x", "./config/docker/dev/docker-dev-provision.sh"]
 
 CMD ["./config/docker/dev/docker-dev-provision.sh"]

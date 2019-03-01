@@ -8,14 +8,13 @@
 |> Enum.map(&Code.eval_file(&1))
 
 use Mix.Releases.Config,
-    # This sets the default release built by `mix release`
-    default_release: :default,
-    # This sets the default environment used by `mix release`
-    default_environment: Mix.env()
+  # This sets the default release built by `mix release`
+  default_release: :default,
+  # This sets the default environment used by `mix release`
+  default_environment: Mix.env()
 
 # For a full list of config options for both releases
 # and environments, visit https://hexdocs.pm/distillery/config/distillery.html
-
 
 # You may define one or more environments in this file,
 # an environment's settings will override those of a release
@@ -29,15 +28,15 @@ environment :dev do
   # It is recommended that you build with MIX_ENV=prod and pass
   # the --env flag to Distillery explicitly if you want to use
   # dev mode.
-  set dev_mode: true
-  set include_erts: false
-  set cookie: :"a]W7Kkh~35[}P&we8Vk!pppF!af;XH>82J8Wxep*GH@l!.]9qz341}ncHx3;i%5:"
+  set(dev_mode: true)
+  set(include_erts: false)
+  set(cookie: :"a]W7Kkh~35[}P&we8Vk!pppF!af;XH>82J8Wxep*GH@l!.]9qz341}ncHx3;i%5:")
 end
 
 environment :prod do
-  set include_erts: true
-  set include_src: false
-  set cookie: :"jZbqQZT/2bBKHZVuGpE~F$eQrG/N0.W1>3p4L$Pw|m%pQAm/:iSl3Gt~M0YuXaE<"
+  set(include_erts: true)
+  set(include_src: false)
+  set(cookie: :"jZbqQZT/2bBKHZVuGpE~F$eQrG/N0.W1>3p4L$Pw|m%pQAm/:iSl3Gt~M0YuXaE<")
 end
 
 # You may define one or more releases in this file.
@@ -46,18 +45,25 @@ end
 # will be used by default
 
 release :snitch do
-  set version: current_version(:snitch_api)
-  set applications: [
-    :runtime_tools,
-    admin_app: :permanent,
-    help: :permanent,
-    snitch_api: :permanent,
-    snitch_core: :permanent
-  ]
-  set commands: [
-    seed: "rel/commands/seed.sh",
-  ]
-  set pre_start_hooks: "rel/hooks/pre_start"
-  set post_start_hooks: "rel/hooks/post_start"
-end
+  set(version: current_version(:snitch_api))
 
+  set(
+    applications: [
+      :runtime_tools,
+      admin_app: :permanent,
+      help: :permanent,
+      snitch_api: :permanent,
+      snitch_core: :permanent,
+      store_front: :permanent
+    ]
+  )
+
+  set(
+    commands: [
+      seed: "rel/commands/seed.sh"
+    ]
+  )
+
+  set(pre_start_hooks: "rel/hooks/pre_start")
+  set(post_start_hooks: "rel/hooks/post_start")
+end
