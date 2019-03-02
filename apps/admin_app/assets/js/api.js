@@ -26,3 +26,23 @@ export const fetchPut = (url, data) => {
   };
   return fetch(url, request);
 };
+
+export const fetchProducts = () => {
+  const productsList = {
+    products: [
+      {
+        category: 'shoes',
+        id: 1,
+      },
+      {
+        category: 'tshirts',
+        id: 2,
+      },
+      {
+        category: 'watches',
+        id: 3,
+      },
+    ],
+  };
+  return productsList;
+};

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { PromotionsForm } from "./CreatePromotions"
-import { fetchGet, fetchPost } from '../api';
+import { fetchGet, fetchPut } from '../api';
 import * as myconstants from '../constants';
 import '@babel/polyfill'
 export class Promotions extends React.Component<any, any>{
@@ -31,7 +31,7 @@ export class Promotions extends React.Component<any, any>{
     onArchive = (index, id) => {
         const url = "/api/promo/" + id + "/archive"
 
-        fetchPost(url, null).then(res => res.json()).then(response => {
+        fetchPut(url, null).then(res => res.json()).then(response => {
             console.log('Success', JSON.stringify(response))
         }).catch(error => console.error('Error', error))
 
@@ -63,7 +63,6 @@ export class Promotions extends React.Component<any, any>{
         }
         return (
             <div className="list-container">
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
                 <div className="row m-0 list-header">
                     <div className="col-10 p-0">
                         <h2>Promotions</h2>

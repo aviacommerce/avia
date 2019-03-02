@@ -8,6 +8,9 @@ export const ORDER_ACTION_MODULE = 'Elixir.Snitch.Data.Schema.PromotionAction.Or
 export const ORDER_ACTION_NAME = 'Order Action';
 export const LINE_ITEM_ACTION_MODULE = 'Elixir.Snitch.Data.Schema.PromotionAction.LineItemAction';
 export const LINE_ITEM_ACTION_NAME = 'LineItem Action';
+// CALCULATORS
+export const CALCULATOR_FLAT_RATE = 'Elixir.Snitch.Domain.Calculator.FlatRate';
+export const CALCULATOR_FLAT_PERCENT = 'Elixir.Snitch.Domain.Calculator.FlatPercent';
 // URLS
 export const PROMOTIONS_LIST_URL = '/api/promotions/';
 export const RULES_LIST_URL = '/api/promo-rules';
