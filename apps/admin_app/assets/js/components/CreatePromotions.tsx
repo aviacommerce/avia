@@ -648,13 +648,13 @@ export class PromotionsForm extends React.Component<any, any>{
                                         </div>
                                     </label>
                                     <div className="col-sm-9">
-                                        <Select className="form-control" onChange={(action) => { this.setState({ selectedAction: [action[0], action[1]] }) }}>
+                                        <select className="form-control" onChange={(action) => { this.setState({ selectedAction: [action[0], action[1]] }) }}>
                                             {this.state.availableActions["data"] === undefined ? null : this.state.availableActions["data"].map((action, index) => {
                                                 return (
-                                                    <Option key={index} value={[action["name"], action["module"]]}>{action["name"]}</Option>
+                                                    <option key={index} value={[action["name"], action["module"]]}>{action["name"]}</option>
                                                 )
                                             })}
-                                        </Select>
+                                        </select>
                                     </div>
                                 </div>
                                 <div className="form-group row">
@@ -665,9 +665,11 @@ export class PromotionsForm extends React.Component<any, any>{
                                     </label>
                                     <div className="col-sm-9">
                                         <select className="form-control" onChange={(e) => { this.handleCalculator(e.target.value) }}>
-                                            {this.state.availableCalculators["data"] === undefined ? null : 
-                                                this.state.availableCalculators["data"].map((calculator, index) => 
-                                                    { return (<option key={index} value={calculator["module"]}>{calculator["name"]}</option>))}
+                                            {this.state.availableCalculators["data"] === undefined ? null : this.state.availableCalculators["data"].map((calculator, index) => {
+                                                return (
+                                                    <option key={index} value={calculator["module"]}>{calculator["name"]}</option>
+                                                )
+                                            })}                                               
                                         </select>
                                         {this.state.calcData["data"] === undefined ? null : (
                                             <div>{
