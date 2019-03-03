@@ -38,6 +38,7 @@ defmodule Snitch.Data.Schema.RatingOption do
     rating_option
     |> cast(params, @required_fields)
     |> validate_required(@required_fields)
+    |> foreign_key_constraint(:rating_id)
   end
 
   @doc """
