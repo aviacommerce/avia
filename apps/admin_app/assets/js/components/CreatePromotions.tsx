@@ -126,7 +126,9 @@ export class PromotionsForm extends React.Component<any, any>{
             let availableRules = response
             this.setState({ availableRules: availableRules })
         })
-        this.setState({availableProducts:fetchProducts()})
+        fetchProducts().then(
+            result => this.setState({ availableProducts: result })
+        )
     }
 
     handleAddAction = () => {
@@ -231,9 +233,9 @@ export class PromotionsForm extends React.Component<any, any>{
                         <Select mode="multiple" 
                             onChange={(selectedProducts) => { this.handleProducts(selectedProducts) }}
                         >
-                        {this.state.availableProducts["products"].map((productObject)=>{
+                        {this.state.availableProducts["products"].map((productObject, index)=>{
                            return(
-                             <Option value = {productObject["id"]}>
+                             <Option key={index} value = {productObject["id"]}>
                                 {productObject["category"]}
                             </Option>  
                            ) 

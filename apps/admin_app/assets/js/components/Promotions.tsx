@@ -17,7 +17,7 @@ export class Promotions extends React.Component<any, any>{
         }
     }
 
-    componentDidMount() {
+    componentDidMount() { 
         this.fetchPromotions()
     }
 
@@ -55,6 +55,7 @@ export class Promotions extends React.Component<any, any>{
         if (this.state.createpromotion) {
             return <PromotionsForm />
         }
+ 
         if (this.state.editPromotion) {
             if (this.state.editResponse["attributes"] != undefined) {
                 return <PromotionsForm editResponse={this.state.editResponse} />
@@ -65,7 +66,7 @@ export class Promotions extends React.Component<any, any>{
             <div className="list-container">
                 <div className="row m-0 list-header">
                     <div className="col-10 p-0">
-                        <h2>Promotions</h2>
+                        <h2>Promos</h2>
                     </div>
                     <div className="col-2 p-0 float-right text-right">
                         <div className="btn btn-primary" onClick={() => { this.setState({ createpromotion: true }) }}><i className='fas fa-plus'></i> Add a Promotion</div>

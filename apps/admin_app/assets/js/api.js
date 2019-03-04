@@ -44,5 +44,8 @@ export const fetchProducts = () => {
       },
     ],
   };
-  return productsList;
+
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(productsList), 300);
+  });
 };
