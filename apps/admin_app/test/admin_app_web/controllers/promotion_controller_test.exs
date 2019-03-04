@@ -72,7 +72,8 @@ defmodule AdminAppWeb.PromotionControllerTest do
         starts_at: Timex.shift(DateTime.utc_now(), hours: 2),
         expires_at: Timex.shift(DateTime.utc_now(), hours: 8),
         rules: @rule_params,
-        actions: @action_params
+        actions: @action_params,
+        description: "5% off on goods."
       }
 
       params = %{"data" => params}

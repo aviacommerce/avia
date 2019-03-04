@@ -44,6 +44,7 @@ defmodule Snitch.Data.Schema.TaxZone do
   schema "snitch_tax_zones" do
     field(:name, :string)
     field(:is_active?, :boolean, default: true)
+    field(:is_default, :boolean, default: false)
 
     belongs_to(:zone, Zone, on_replace: :raise)
     has_many(:tax_rates, TaxRate)
@@ -52,7 +53,7 @@ defmodule Snitch.Data.Schema.TaxZone do
   end
 
   @required ~w(name zone_id)a
-  @optional ~w(is_active?)a
+  @optional ~w(is_active? is_default)a
   @permitted @required ++ @optional
 
   def create_changeset(%__MODULE__{} = tax_zone, params) do
@@ -67,7 +68,7 @@ defmodule Snitch.Data.Schema.TaxZone do
     |> common_changeset()
   end
 
-  def common_changeset(changeset) do
+  defp common_changeset(changeset) do
     changeset
     |> validate_required(@required)
     |> unique_constraint(:name)
@@ -77,6 +78,10 @@ defmodule Snitch.Data.Schema.TaxZone do
       message: "tax zone exists with supplied zone"
     )
     |> tax_zone_exclusivity()
+    |> unique_constraint(:is_default,
+      name: :unique_default_tax_zone,
+      message: "unique default tax zone"
+    )
   end
 
   # Runs a check for mutual exclusivity with other tax zones so that, no two

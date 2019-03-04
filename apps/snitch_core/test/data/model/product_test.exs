@@ -46,6 +46,8 @@ defmodule Snitch.Data.Model.ProductTest do
       ]
     }
 
+    tax_class = insert(:tax_class)
+
     valid_params = %{
       name: "New Product",
       description: "New Product Description",
@@ -53,7 +55,8 @@ defmodule Snitch.Data.Model.ProductTest do
       selling_price: Money.new("12.99", currency()),
       max_retail_price: Money.new("14.99", currency()),
       shipping_category_id: shipping_category.id,
-      taxon_id: taxon.id
+      taxon_id: taxon.id,
+      tax_class_id: tax_class.id
     }
 
     [valid_attrs: valid_attrs, valid_params: valid_params, image_params: image_params]
@@ -197,6 +200,7 @@ defmodule Snitch.Data.Model.ProductTest do
       product = insert(:product, attrs)
       variant = product.products |> List.first()
       variation = insert(:variation, %{parent_product: product, child_product: variant})
+
       sellable_products = Product.sellable_products_query() |> Repo.all() |> Enum.map(& &1.id)
       assert Enum.member?(sellable_products, variant.id) == true
       refute Enum.member?(sellable_products, product.id)
@@ -495,6 +499,49 @@ defmodule Snitch.Data.Model.ProductTest do
       product = insert(:product, inventory_tracking: :none)
 
       refute Product.is_variant_tracking_enabled?(product)
+    end
+  end
+
+  describe "get_parent_product/1" do
+    setup do
+      attrs = %{products: [build(:variant)]}
+      product = insert(:product, attrs)
+      [product: product, variants: product.products]
+    end
+
+    test "returns parent if variant supplied", context do
+      %{product: product, variants: variants} = context
+      variant = List.first(variants)
+      parent = Product.get_parent_product(variant)
+      assert parent.id == product.id
+    end
+
+    test "returns nil if parent product supplied", context do
+      %{product: product} = context
+      parent = Product.get_parent_product(product)
+      refute parent
+    end
+  end
+
+  describe "get_tax_class_id" do
+    setup do
+      attrs = %{products: [build(:variant)]}
+      product = insert(:product, attrs)
+      [product: product, variants: product.products]
+    end
+
+    test "returns parents tax class id if, variant supplied", context do
+      %{product: product, variants: variants} = context
+      variant = List.first(variants)
+      refute variant.tax_class_id
+      tax_class_id = Product.get_tax_class_id(variant)
+      assert tax_class_id == product.tax_class_id
+    end
+
+    test "returns tax class id if, product supplied", context do
+      %{product: product} = context
+      tax_class_id = Product.get_tax_class_id(product)
+      assert tax_class_id == product.tax_class_id
     end
   end
 

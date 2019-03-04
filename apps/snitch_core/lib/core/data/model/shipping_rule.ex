@@ -25,8 +25,10 @@ defmodule Snitch.Data.Model.ShippingRule do
   """
   @spec get(non_neg_integer) :: {:ok, ShippingRule.t()} | {:error, atom}
   def get(id) do
-    QH.get(ShippingRule, id, Repo)
-    |> Repo.preload([:shipping_category, :shipping_rule_identifier])
+    with {:ok, shipping_rule} <- QH.get(ShippingRule, id, Repo) do
+      shipping_rule |> Repo.preload([:shipping_category, :shipping_rule_identifier])
+      {:ok, shipping_rule}
+    end
   end
 
   def get_all_by_shipping_category(category_id) do

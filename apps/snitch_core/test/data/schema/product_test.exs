@@ -9,6 +9,7 @@ defmodule Snitch.Data.Schema.ProductTest do
   test "test valid data create_changeset/2" do
     taxon = insert(:taxon)
     shipping_category = insert(:shipping_category)
+    tax_class = insert(:tax_class)
 
     params = %{
       name: "HTC Desire 620",
@@ -16,7 +17,8 @@ defmodule Snitch.Data.Schema.ProductTest do
       selling_price: Money.new("12.99", currency()),
       max_retail_price: Money.new("14.99", currency()),
       taxon_id: taxon.id,
-      shipping_category_id: shipping_category.id
+      shipping_category_id: shipping_category.id,
+      tax_class_id: tax_class.id
     }
 
     changeset = Product.create_changeset(%Product{}, params)
@@ -24,6 +26,28 @@ defmodule Snitch.Data.Schema.ProductTest do
     assert changeset.valid?
     assert changeset.changes.slug == "htc-desire-620"
     assert {:ok, _product} = Repo.insert(changeset)
+  end
+
+  test "create_changeset/2 fails for duplicate slug" do
+    taxon = insert(:taxon)
+    shipping_category = insert(:shipping_category)
+    tax_class = insert(:tax_class)
+
+    params = %{
+      name: "HTC Desire 620",
+      description: "HTC desire 620",
+      selling_price: Money.new("12.99", currency()),
+      max_retail_price: Money.new("14.99", currency()),
+      taxon_id: taxon.id,
+      shipping_category_id: shipping_category.id,
+      tax_class_id: tax_class.id
+    }
+
+    changeset = Product.create_changeset(%Product{}, params)
+    {:ok, _} = Repo.insert(changeset)
+    cs = Product.create_changeset(%Product{}, params)
+    {:error, changeset} = Repo.insert(cs)
+    assert %{name: ["unique name for products"]} == errors_on(changeset)
   end
 
   test "test invalid data for create_changeset/2" do

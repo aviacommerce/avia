@@ -18,6 +18,7 @@ defmodule Snitch.Demo.Product do
   alias Snitch.Tools.Helper.ImageUploader
   alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Data.Model.Product, as: ProductModel
+  alias Snitch.Data.Model.TaxClass, as: TaxClassModel
 
   @base_path Application.app_dir(:snitch_core, "priv/repo/demo/demo_data")
 
@@ -46,6 +47,8 @@ defmodule Snitch.Demo.Product do
       taxon = Repo.get_by(Taxon, name: taxon)
       variation_theme = Repo.get_by(VariationTheme, name: "size")
       theme_id = [to_string(variation_theme.id)]
+      {:ok, tax_class} = TaxClassModel.get(%{name: "Default Tax Class"})
+      tax_class_id = tax_class.id
 
       {:ok, updated_taxon} =
         Taxonomy.update_taxon(taxon, %{"variation_theme_ids" => theme_id, "image" => nil})
@@ -64,7 +67,9 @@ defmodule Snitch.Demo.Product do
           maximum_retail_price,
           updated_taxon,
           image,
-          inventory_tracking
+          inventory_tracking,
+          tax_class_id,
+          :product
         )
 
       associate_theme(product, variation_theme.id)
@@ -130,11 +135,14 @@ defmodule Snitch.Demo.Product do
           maximum_retail_price,
           taxon,
           image,
-          "none"
+          "none",
+          nil,
+          :variant
         )
 
       create_product_option_value(variant, product)
       associate_product_variant(variant, product)
+      ProductModel.update(variant, %{state: :active})
     end)
   end
 
@@ -148,7 +156,9 @@ defmodule Snitch.Demo.Product do
          maximum_retail_price,
          taxon,
          image_name,
-         inventory_tracking
+         inventory_tracking,
+         tax_class_id,
+         product_type
        ) do
     light = Repo.get_by(ShippingCategory, name: "light")
     image = [create_image(image_name)]
@@ -163,9 +173,23 @@ defmodule Snitch.Demo.Product do
       shipping_category_id: light.id,
       max_retail_price: maximum_retail_price,
       taxon_id: taxon.id,
-      inventory_tracking: inventory_tracking
+      inventory_tracking: inventory_tracking,
+      tax_class_id: tax_class_id
     }
 
+    persist_product(params, product_type, image, image_name)
+  end
+
+  defp persist_product(params, :variant, image, image_name) do
+    product =
+      %Product{}
+      |> Product.child_product(params)
+      |> Repo.insert!()
+
+    associate_image(product, image, image_name)
+  end
+
+  defp persist_product(params, :product, image, image_name) do
     product = %Product{} |> Product.create_changeset(params) |> Repo.insert!()
     {:ok, product} = ProductModel.update(product, %{state: :active})
     associate_image(product, image, image_name)

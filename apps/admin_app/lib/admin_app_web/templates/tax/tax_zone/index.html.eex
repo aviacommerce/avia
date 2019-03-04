@@ -21,6 +21,11 @@
                      <div class="row">
                         <div class="col"> <%= tax_zone.name %> </div>
                         <div class="col"><%= zone_type(tax_zone) %></div>
+                        <%= if tax_zone.is_default do %>
+                           <div class="col-3"><kbd>Default</kbd></div>
+                        <% else %>
+                           <div class="col-3"></div>
+                        <% end %>
                         <%= if tax_zone.is_active? do %>
                           <div class="col"><kbd>Active</kbd></div>
                         <% else %>
@@ -37,8 +42,10 @@
                   </a>
                   <div class="dropdown-menu dropdown-menu-right" >
                      <%= link("Edit", to: tax_zone_path(@conn, :edit, tax_zone.id), class: "dropdown-item") %>
-                     <%= link("Delete", to: tax_zone_path(@conn, :delete, tax_zone.id),
-                        method: :delete, data: [confirm: "Are you sure to delete"], class: "dropdown-item") %>
+                     <%= unless tax_zone.is_default do %>
+                        <%= link("Delete", to: tax_zone_path(@conn, :delete, tax_zone.id),
+                        method: :delete, data: [confirm: "Are you sure to delete"], class: "dropdown-item") %>  
+                     <% end %>
                   </div>
                </div>
             </div>
