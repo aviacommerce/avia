@@ -1,0 +1,7 @@
+{
+  "editor.fontSize": 12,
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "prettier.eslintIntegration": true,
+  "files.insertFinalNewline": true
+}

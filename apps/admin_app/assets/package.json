@@ -50,6 +50,7 @@
     "optimize-css-assets-webpack-plugin": "^4.0.0",
     "popper.js": "^1.14.3",
     "postcss-loader": "^3.0.0",
+    "prettier": "^1.16.4",
     "sass-loader": "^7.1.0",
     "typescript": "^3.2.2",
     "uglifyjs-webpack-plugin": "^1.2.4",
