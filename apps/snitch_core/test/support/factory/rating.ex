@@ -3,7 +3,7 @@ defmodule Snitch.Factory.Rating do
 
   defmacro __using__(_opts) do
     quote do
-      alias Snitch.Data.Schema.{Rating, RatingOption}
+      alias Snitch.Data.Schema.{Rating, RatingOption, Review, ProductReview}
 
       def rating_factory do
         %Rating{
@@ -45,7 +45,17 @@ defmodule Snitch.Factory.Rating do
       def rating_options(context) do
         rating = insert(:rating)
         count = Map.get(context, :rating_option_count, 2)
-        [rating_options: insert_list(3, :rating_option, rating: rating)]
+        [rating_options: insert_list(count, :rating_option, rating: rating)]
+      end
+      
+      def reviews(context) do
+        rating_option = insert(:rating_option)
+        count = Map.get(context, :review_count, 1)
+
+        [
+          reviews:
+            insert_list(count, :review, rating_option_vote: %{rating_option: rating_option})
+        ]
       end
     end
   end

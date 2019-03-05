@@ -7,7 +7,7 @@ defmodule AdminApp.Product.SearchContext do
     Product
     |> where(
       [p],
-      (ilike(p.name, ^"%#{term}%") or ilike(p.sku, ^"%#{term}%")) and is_nil(p.deleted_at)
+      (ilike(p.name, ^"%#{term}%") or ilike(p.sku, ^"%#{term}%")) and p.deleted_at == ^0
     )
     |> preload([:images, :variants])
     |> Repo.all()

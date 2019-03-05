@@ -5,6 +5,7 @@ FROM elixir:1.7.3-slim as builder
 # 2. `/apps/snitch_core/config/dev.exs' file
 
 EXPOSE 4000
+EXPOSE 3000
 
 ENV APP_HOME /avia-backend
 ENV AWS_ACCESS_KEY_ID dasdas

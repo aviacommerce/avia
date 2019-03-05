@@ -112,7 +112,7 @@ defmodule Snitch.Data.Model.Product do
     |> join(:left, [p], v in Variation, v.child_product_id == p.id)
     |> where(
       [p, v],
-      p.state == "active" and is_nil(p.deleted_at) and p.id not in ^parent_product_ids
+      p.state == "active" and p.deleted_at == ^0 and p.id not in ^parent_product_ids
     )
   end
 

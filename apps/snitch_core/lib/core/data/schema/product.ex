@@ -26,6 +26,7 @@ defmodule Snitch.Data.Schema.Product do
   }
 
   alias Money.Ecto.Composite.Type, as: MoneyType
+  alias Snitch.Tools.EctoType.UnixTimestamp
 
   @type t :: %__MODULE__{}
 
@@ -33,7 +34,7 @@ defmodule Snitch.Data.Schema.Product do
     field(:name, :string, null: false, default: "")
     field(:description, :string)
     field(:available_on, :utc_datetime)
-    field(:deleted_at, :utc_datetime)
+    field(:deleted_at, UnixTimestamp, default: 0)
     field(:discontinue_on, :utc_datetime)
     field(:slug, :string)
 
@@ -167,18 +168,17 @@ defmodule Snitch.Data.Schema.Product do
 
   def delete_changeset(product, _params \\ %{}) do
     product = Repo.preload(product, [:products])
+    current_time = DateTime.utc_now() |> DateTime.to_unix()
 
     variant_params =
       product.products
-      |> Enum.map(
-        &%{"state" => "deleted", "id" => &1.id, "deleted_at" => NaiveDateTime.utc_now()}
-      )
+      |> Enum.map(&%{"state" => "deleted", "id" => &1.id, "deleted_at" => current_time})
 
     params = %{
       "id" => product.id,
       "state" => "deleted",
       "products" => variant_params,
-      "deleted_at" => NaiveDateTime.utc_now()
+      "deleted_at" => current_time
     }
 
     product
@@ -198,6 +198,10 @@ defmodule Snitch.Data.Schema.Product do
     changeset
     |> validate_amount(:selling_price)
     |> NameSlug.maybe_generate_slug()
+    |> unique_constraint(:name,
+      name: :snitch_products_slug_deleted_at_index,
+      message: "unique name for products"
+    )
   end
 
   def product_by_category_query(taxon_id) do
@@ -209,8 +213,10 @@ defmodule Snitch.Data.Schema.Product do
   end
 
   def set_delete_fields(%Ecto.Query{} = product_query) do
+    current_time = DateTime.utc_now() |> DateTime.to_unix()
+
     from(p in product_query,
-      update: [set: [state: "deleted", deleted_at: ^NaiveDateTime.utc_now(), taxon_id: nil]]
+      update: [set: [state: "deleted", deleted_at: ^current_time, taxon_id: nil]]
     )
   end
 

@@ -1,11 +1,16 @@
 import * as React from "react";
-import { Hello } from "./Hello";
-
-class App extends React.Component {
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+import {Promotions} from "./Promotions"
+class App extends React.Component<any,any> {
+  constructor(props){
+    super(props)
+  }
   render() {
     return (
       <div>
-        <Hello compiler="Typescript" framework="React" />
+        <Router basename = '/promotions'>
+            <Route exact path="/" component={Promotions} />
+        </Router>
       </div>
     );
   }
