@@ -17,7 +17,7 @@ defmodule Snitch.Tools.ElasticSearch.Product.Search do
     %{
       "hits" => %{
         "hits" => collection,
-        "total" => total
+        "total" => %{"value" => total}
       },
       "aggregations" => aggregations
     } =
