@@ -14,7 +14,7 @@ defmodule Snitch.Data.Schema.Payment do
 
   schema "snitch_payments" do
     field(:slug, :string)
-    field(:payment_type, :string, size: 3)
+    field(:payment_type, :string)
     field(:amount, Money.Ecto.Composite.Type, default: Money.new(0, :USD))
     field(:state, :string, default: "pending")
 

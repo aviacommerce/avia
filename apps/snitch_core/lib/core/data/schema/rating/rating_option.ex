@@ -18,9 +18,9 @@ defmodule Snitch.Data.Schema.RatingOption do
   @type t :: %__MODULE__{}
 
   schema "snitch_rating_options" do
-    field(:code, :string, null: false)
-    field(:value, :integer, null: false)
-    field(:position, :integer, null: false)
+    field(:code, :string)
+    field(:value, :integer)
+    field(:position, :integer)
 
     belongs_to(:rating, Rating)
 

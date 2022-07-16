@@ -9,7 +9,7 @@ defmodule Snitch.Data.Schema.ProductBrand do
   @type t :: %__MODULE__{}
 
   schema "snitch_product_brands" do
-    field(:name, :string, null: false)
+    field(:name, :string)
     field(:tenant, :string, virtual: true)
     timestamps()
 

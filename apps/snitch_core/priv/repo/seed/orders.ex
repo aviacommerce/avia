@@ -18,6 +18,7 @@ defmodule Snitch.Seed.Orders do
     inserted_at: DateTime.utc(),
     updated_at: DateTime.utc()
   }
+
   # @stock_items %{
   #   "origin" => %{
   #     counts: [10, 10, 10, 10, 00, 00],

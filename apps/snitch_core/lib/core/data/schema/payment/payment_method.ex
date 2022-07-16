@@ -32,7 +32,7 @@ defmodule Snitch.Data.Schema.PaymentMethod do
 
   schema "snitch_payment_methods" do
     field(:name, :string)
-    field(:code, :string, size: 3)
+    field(:code, :string)
     field(:active?, :boolean, default: true)
 
     field(:live_mode?, :boolean, default: false)

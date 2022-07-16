@@ -215,9 +215,7 @@ defmodule SnitchApiWeb.HostedPaymentController do
 
   defp generate_payubiz_hash(params) do
     hash_string =
-      "#{params[:key]}|#{params[:txnid]}|#{params[:amount]}|#{params[:productinfo]}|#{
-        params[:firstname]
-      }|#{params[:email]}#{String.duplicate("|", 11)}#{params[:salt]}"
+      "#{params[:key]}|#{params[:txnid]}|#{params[:amount]}|#{params[:productinfo]}|#{params[:firstname]}|#{params[:email]}#{String.duplicate("|", 11)}#{params[:salt]}"
 
     Base.encode16(:crypto.hash(:sha512, hash_string), case: :lower)
   end

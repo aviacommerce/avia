@@ -101,7 +101,7 @@ defmodule Snitch.Core.Mixfile do
       {:nanoid, "~> 2.0"},
       {:sentry, "~> 7.0"},
       {:jason, "~> 1.1"},
-      {:nimble_csv, "~> 0.1.0"},
+      {:nimble_csv, "~> 1.2.0"},
 
       # Multi tenancy
       {:triplex, "~> 1.3.0"},

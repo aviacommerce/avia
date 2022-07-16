@@ -5,7 +5,6 @@ defmodule Snitch.Data.Schema.Variant do
 
   use Snitch.Data.Schema
 
-  alias Money.Ecto.Composite.Type, as: MoneyType
   alias Snitch.Data.Schema.{Image, Product, ShippingCategory, StockItem}
 
   @type t :: %__MODULE__{}
@@ -16,8 +15,8 @@ defmodule Snitch.Data.Schema.Variant do
     field(:height, :decimal, default: Decimal.new(0))
     field(:width, :decimal, default: Decimal.new(0))
     field(:depth, :decimal, default: Decimal.new(0))
-    field(:selling_price, MoneyType)
-    field(:cost_price, MoneyType)
+    field(:selling_price, Money.Ecto.Composite.Type)
+    field(:cost_price, Money.Ecto.Composite.Type)
     field(:position, :integer)
     field(:track_inventory, :boolean, default: true)
     field(:discontinue_on, :utc_datetime)

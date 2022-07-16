@@ -109,7 +109,7 @@ defmodule Snitch.Data.Model.Product do
       |> Repo.all()
 
     Product
-    |> join(:left, [p], v in Variation, v.child_product_id == p.id)
+    |> join(:left, [p], v in Variation, on: v.child_product_id == p.id)
     |> where(
       [p, v],
       p.state == "active" and p.deleted_at == ^0 and p.id not in ^parent_product_ids
