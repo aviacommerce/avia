@@ -59,7 +59,7 @@ defmodule AdminApp.Mixfile do
 
       # import from store
       {:oauther, "~> 1.1"},
-      {:honeydew, "~> 1.2.6"}
+      {:honeydew, "~> 1.5"}
     ]
   end
 end

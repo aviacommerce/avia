@@ -44,7 +44,7 @@ defmodule Snitch.Core.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:postgrex, "~> 0.14.0"},
+      {:postgrex, "~> 0.16.3"},
       {:ecto, "~> 3.8.4"},
       {:bamboo, "~> 1.1"},
       {:combination, "~> 0.0.3"},
