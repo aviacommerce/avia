@@ -1,4 +1,4 @@
-FROM elixir:1.7.3-slim as builder
+FROM elixir:1.13.4-slim as builder
 
 # Before running following commands, configure
 # 1. 'env/local.env' file.

@@ -5,7 +5,7 @@
 #
 
 # Builder stage
-FROM elixir:1.7.3-slim as builder
+FROM elixir:1.13.4-slim as builder
 
 ARG PHOENIX_SECRET_KEY_BASE
 ARG SESSION_COOKIE_NAME
