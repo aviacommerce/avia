@@ -36,7 +36,7 @@ defmodule Snitch.Data.Schema.PaymentMethod do
     field(:active?, :boolean, default: true)
 
     field(:live_mode?, :boolean, default: false)
-    field(:provider, Ecto.Atom)
+    field(:provider, Ecto.Enum, values: [:ccd, :hpm, :cod, :stc])
     field(:preferences, :map)
     field(:description, :string)
 

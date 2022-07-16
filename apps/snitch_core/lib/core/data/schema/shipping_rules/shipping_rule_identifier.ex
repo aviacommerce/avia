@@ -9,7 +9,7 @@ defmodule Snitch.Data.Schema.ShippingRuleIdentifier do
   @type t :: %__MODULE__{}
 
   schema "snitch_shipping_rule_identifiers" do
-    field(:code, Ecto.Atom)
+    field(:code, Ecto.Enum, values: [:fso, :fsoa, :fsrp, :ofr])
     field(:description, :string)
 
     timestamps()
