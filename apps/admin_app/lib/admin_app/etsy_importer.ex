@@ -108,8 +108,8 @@ defmodule Avia.Etsy.Importer do
 
   defp timestamps() do
     %{
-      inserted_at: Ecto.DateTime.utc(),
-      updated_at: Ecto.DateTime.utc()
+      inserted_at: DateTime.utc_now(),
+      updated_at: DateTime.utc_now()
     }
   end
 

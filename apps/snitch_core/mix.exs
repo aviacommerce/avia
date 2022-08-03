@@ -51,6 +51,7 @@ defmodule Snitch.Core.Mixfile do
       {:bamboo_smtp, "~> 1.6.0"},
       {:bamboo_eex, "~> 0.1.0"},
       {:ex_money, "~> 5.12"},
+      {:ex_money_sql, "~> 1.7"},
       {:rummage_ecto, "~> 2.0"},
       {:credo, "~> 0.9.1", only: :dev, runtime: false},
       {:credo_contrib, "~> 0.1.0-rc3", only: :dev, runtime: false},

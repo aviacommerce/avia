@@ -58,8 +58,8 @@ defmodule Snitch.Seed.CountryState do
       iso3: country.alpha_3,
       name: country.name,
       numcode: country.numeric,
-      inserted_at: Ecto.DateTime.utc(),
-      updated_at: Ecto.DateTime.utc()
+      inserted_at: DateTime.utc_now(),
+      updated_at: DateTime.utc_now()
     }
   end
 
@@ -72,8 +72,8 @@ defmodule Snitch.Seed.CountryState do
       name: name,
       code: code,
       country_id: country_id,
-      inserted_at: Ecto.DateTime.utc(),
-      updated_at: Ecto.DateTime.utc()
+      inserted_at: DateTime.utc_now(),
+      updated_at: DateTime.utc_now()
     }
   end
 end

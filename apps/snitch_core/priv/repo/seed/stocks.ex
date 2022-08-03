@@ -102,8 +102,8 @@ defmodule Snitch.Seed.Stocks do
           country_id: countries.country4
         }
       ]
-      |> Stream.map(&Map.put(&1, :inserted_at, Ecto.DateTime.utc()))
-      |> Enum.map(&Map.put(&1, :updated_at, Ecto.DateTime.utc()))
+      |> Stream.map(&Map.put(&1, :inserted_at, DateTime.utc_now()))
+      |> Enum.map(&Map.put(&1, :updated_at, DateTime.utc_now()))
 
     {count, locations} =
       Repo.insert_all(StockLocation, locations, on_conflict: :nothing, returning: true)
@@ -124,8 +124,8 @@ defmodule Snitch.Seed.Stocks do
             stock_location_id: Map.fetch!(locations, location),
             count_on_hand: count,
             backorderable: if(backorder == :t, do: true, else: false),
-            inserted_at: Ecto.DateTime.utc(),
-            updated_at: Ecto.DateTime.utc()
+            inserted_at: DateTime.utc_now(),
+            updated_at: DateTime.utc_now()
           }
         end)
       end)

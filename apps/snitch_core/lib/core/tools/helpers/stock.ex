@@ -23,15 +23,13 @@ defmodule Snitch.Tools.Helper.Stock do
   }
   """
 
-  alias Ecto.DateTime
-
   @stock_item %{
     backorderable: false,
     count_on_hand: nil,
     product_id: nil,
     stock_location_id: nil,
-    inserted_at: DateTime.utc(),
-    updated_at: DateTime.utc()
+    inserted_at: DateTime.utc_now(),
+    updated_at: DateTime.utc_now()
   }
 
   @stock_location %{
@@ -43,8 +41,8 @@ defmodule Snitch.Tools.Helper.Stock do
     propagate_all_variants: false,
     default: false,
     active: true,
-    inserted_at: DateTime.utc(),
-    updated_at: DateTime.utc()
+    inserted_at: DateTime.utc_now(),
+    updated_at: DateTime.utc_now()
   }
 
   def stock_locations_with_manifest(manifest) do

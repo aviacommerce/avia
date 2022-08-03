@@ -3,15 +3,13 @@ defmodule Snitch.Tools.Helper.Order do
   Helpers to insert variants and line items for handcrafted orders.
   """
 
-  alias Ecto.DateTime
-
   @line_item %{
     quantity: nil,
     unit_price: nil,
     product_id: nil,
     order_id: nil,
-    inserted_at: DateTime.utc(),
-    updated_at: DateTime.utc()
+    inserted_at: DateTime.utc_now(),
+    updated_at: DateTime.utc_now()
   }
 
   @variant %{
@@ -22,8 +20,8 @@ defmodule Snitch.Tools.Helper.Order do
     width: Decimal.new("0.4"),
     selling_price: nil,
     shipping_category_id: nil,
-    inserted_at: DateTime.utc(),
-    updated_at: DateTime.utc(),
+    inserted_at: DateTime.utc_now(),
+    updated_at: DateTime.utc_now(),
     slug: "",
     max_retail_price: nil
   }

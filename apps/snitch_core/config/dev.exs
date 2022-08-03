@@ -7,7 +7,8 @@ config :snitch_core, Snitch.Repo,
   password: "postgres",
   database: "snitch_dev",
   hostname: System.get_env("DB_HOST"),
-  pool_size: 10
+  pool_size: 10,
+  show_sensitive_data_on_connection_error: true
 
 config :snitch_core, :defaults_module, Snitch.Tools.Defaults
 config :arc, storage: Arc.Storage.Local

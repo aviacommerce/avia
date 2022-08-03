@@ -5,14 +5,13 @@ defmodule Snitch.Tools.Helper.Shipment do
 
   use Snitch.Domain
 
-  alias Ecto.DateTime
   alias Snitch.Data.Model.ShippingMethod
   alias Snitch.Data.Schema.ShippingCategory
 
   @shipping_category %{
     name: nil,
-    inserted_at: DateTime.utc(),
-    updated_at: DateTime.utc()
+    inserted_at: DateTime.utc_now(),
+    updated_at: DateTime.utc_now()
   }
 
   @doc """
