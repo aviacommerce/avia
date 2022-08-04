@@ -12,7 +12,8 @@ defmodule AdminApp.Application do
     # Define workers and child supervisors to be supervised
     children = [
       # Start the endpoint when the application starts
-      supervisor(AdminAppWeb.Endpoint, [])
+      supervisor(AdminAppWeb.Endpoint, []),
+      {Phoenix.PubSub, [name: AdminApp.PubSub, adapter: Phoenix.PubSub.PG2]}
       # Start your own worker by calling: AdminApp.Worker.start_link(arg1, arg2, arg3)
       # worker(AdminApp.Worker, [arg1, arg2, arg3]),
     ]

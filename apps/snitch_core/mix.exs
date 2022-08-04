@@ -95,7 +95,7 @@ defmodule Snitch.Core.Mixfile do
       {:ex_aws_s3, "~> 2.0"},
       {:hackney, "~> 1.9"},
       {:sweet_xml, "~> 0.6"},
-      {:cowboy, "~> 1.0"},
+      {:plug_cowboy, "~> 2.5"},
       {:plug, "~> 1.0"},
 
       # unique id generator
@@ -111,7 +111,7 @@ defmodule Snitch.Core.Mixfile do
       {:xml_builder, "~> 2.1", override: true},
 
       # ecto_enum
-      {:ecto_enum, "~> 1.0"},
+      {:ecto_enum, "~> 1.4.0"},
 
       # Elastic search integration
       {:elasticsearch, "~> 0.6.0"},

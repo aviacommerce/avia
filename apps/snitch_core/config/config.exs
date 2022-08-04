@@ -47,4 +47,6 @@ config :snitch_core, Snitch.Tools.ElasticsearchCluster,
     }
   }
 
+config :ex_cldr, default_backend: Snitch.Tools.Cldr
+
 import_config "#{Mix.env()}.exs"
