@@ -32,7 +32,7 @@ defmodule Snitch.Data.Model.Promotion.ApplicabilityTest do
     end
 
     test "returns error if promotion archived" do
-      current_unix_time = DateTime.utc_now() |> DateTime.to_unix()
+      current_unix_time = NaiveDateTime.local_now() |> DateTime.to_unix()
       promotion = insert(:promotion)
 
       # does not return error if promotion not archived
@@ -75,7 +75,7 @@ defmodule Snitch.Data.Model.Promotion.ApplicabilityTest do
     test "returns true if starts_at is in past" do
       promotion =
         insert(:promotion,
-          starts_at: Timex.shift(DateTime.utc_now(), days: -2)
+          starts_at: Timex.shift(NaiveDateTime.local_now(), days: -2)
         )
 
       assert {true, message} = Applicability.starts_at_check(promotion)
@@ -85,7 +85,7 @@ defmodule Snitch.Data.Model.Promotion.ApplicabilityTest do
     test "returns false if starts_at is in future" do
       promotion =
         insert(:promotion,
-          starts_at: Timex.shift(DateTime.utc_now(), days: 2)
+          starts_at: Timex.shift(NaiveDateTime.local_now(), days: 2)
         )
 
       assert {false, message} = Applicability.starts_at_check(promotion)
@@ -97,7 +97,7 @@ defmodule Snitch.Data.Model.Promotion.ApplicabilityTest do
     test "returns false if expires_at is in past" do
       promotion =
         insert(:promotion,
-          expires_at: Timex.shift(DateTime.utc_now(), days: -1)
+          expires_at: Timex.shift(NaiveDateTime.local_now(), days: -1)
         )
 
       assert {false, message} = Applicability.expires_at_check(promotion)
@@ -107,8 +107,8 @@ defmodule Snitch.Data.Model.Promotion.ApplicabilityTest do
     test "returns true if expires_at is in future" do
       promotion =
         insert(:promotion,
-          starts_at: Timex.shift(DateTime.utc_now(), days: -2),
-          expires_at: Timex.shift(DateTime.utc_now(), days: 4)
+          starts_at: Timex.shift(NaiveDateTime.local_now(), days: -2),
+          expires_at: Timex.shift(NaiveDateTime.local_now(), days: 4)
         )
 
       assert {true, message} = Applicability.expires_at_check(promotion)

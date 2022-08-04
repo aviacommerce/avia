@@ -20,8 +20,8 @@ defmodule Snitch.Seed.Tax do
   @tax_class %{
     name: "",
     is_default: false,
-    inserted_at: DateTime.utc_now(),
-    updated_at: DateTime.utc_now()
+    inserted_at: NaiveDateTime.local_now(),
+    updated_at: NaiveDateTime.local_now()
   }
 
   @default_tax_zone_params %{

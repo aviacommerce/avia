@@ -14,8 +14,8 @@ defmodule Snitch.Seed.Role do
           %{}
           |> Map.put(:name, role)
           |> Map.put(:description, description)
-          |> Map.put(:inserted_at, DateTime.utc_now())
-          |> Map.put(:updated_at, DateTime.utc_now())
+          |> Map.put(:inserted_at, NaiveDateTime.local_now())
+          |> Map.put(:updated_at, NaiveDateTime.local_now())
 
         [value | acc]
       end)

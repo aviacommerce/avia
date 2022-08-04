@@ -132,8 +132,8 @@ defmodule Snitch.Data.Model.Role do
       [
         permission_id: permission,
         role_id: role.id,
-        inserted_at: DateTime.utc_now(),
-        updated_at: DateTime.utc_now()
+        inserted_at: NaiveDateTime.local_now(),
+        updated_at: NaiveDateTime.local_now()
       ]
     end)
   end

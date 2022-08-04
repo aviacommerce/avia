@@ -10,8 +10,8 @@ defmodule Snitch.Tools.Helper.Shipment do
 
   @shipping_category %{
     name: nil,
-    inserted_at: DateTime.utc_now(),
-    updated_at: DateTime.utc_now()
+    inserted_at: NaiveDateTime.local_now(),
+    updated_at: NaiveDateTime.local_now()
   }
 
   @doc """

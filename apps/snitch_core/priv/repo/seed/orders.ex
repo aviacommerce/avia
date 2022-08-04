@@ -15,8 +15,8 @@ defmodule Snitch.Seed.Orders do
     user_id: nil,
     billing_address: nil,
     shipping_address: nil,
-    inserted_at: DateTime.utc_now(),
-    updated_at: DateTime.utc_now()
+    inserted_at: NaiveDateTime.local_now(),
+    updated_at: NaiveDateTime.local_now()
   }
 
   # @stock_items %{
@@ -132,8 +132,8 @@ defmodule Snitch.Seed.Orders do
       selling_price: price,
       max_retail_price: price,
       shipping_category_id: nil,
-      inserted_at: DateTime.utc_now(),
-      updated_at: DateTime.utc_now(),
+      inserted_at: NaiveDateTime.local_now(),
+      updated_at: NaiveDateTime.local_now(),
       taxon_id: taxon.id
     }
   end

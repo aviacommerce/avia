@@ -17,7 +17,7 @@
 #     width: Decimal.new("0.4"),
 #     cost_price: Money.new("9.99", :USD),
 #     selling_price: Money.new("14.99", :USD),
-#     discontinue_on: offset_date_by(DateTime.utc_now(), 365)
+#     discontinue_on: offset_date_by(NaiveDateTime.local_now(), 365)
 #   }
 #
 #   describe "variant creation" do
@@ -62,7 +62,7 @@
 #     end
 #
 #     test "fails with invalid discontinue_on" do
-#       params = %{@valid_params | discontinue_on: DateTime.utc_now()}
+#       params = %{@valid_params | discontinue_on: NaiveDateTime.local_now()}
 #       cs = %{valid?: validity} = Variant.create_changeset(%Variant{}, params)
 #       refute validity
 #

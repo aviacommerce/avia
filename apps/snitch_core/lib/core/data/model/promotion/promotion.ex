@@ -74,8 +74,8 @@ defmodule Snitch.Data.Model.Promotion do
     active = promotion.active?
 
     date_check =
-      DateTime.compare(promotion.starts_at, DateTime.utc_now()) == :lt and
-        DateTime.compare(promotion.expires_at, DateTime.utc_now()) == :gt
+      DateTime.compare(promotion.starts_at, NaiveDateTime.local_now()) == :lt and
+        DateTime.compare(promotion.expires_at, NaiveDateTime.local_now()) == :gt
 
     if active && date_check && has_adjustments?(promotion) do
       {true, "promotion ongoing"}
@@ -95,7 +95,7 @@ defmodule Snitch.Data.Model.Promotion do
           {:ok, Promotion.t()}
           | {:error, Ecto.Changeset.t()}
   def archive(promotion) do
-    params = %{archived_at: DateTime.to_unix(DateTime.utc_now())}
+    params = %{archived_at: DateTime.to_unix(NaiveDateTime.local_now())}
     QH.update(Promotion, params, promotion, Repo)
   end
 

@@ -51,8 +51,8 @@ defmodule Snitch.Data.Model.PromotionTest do
       params = %{
         code: "OFF5",
         name: "5off",
-        starts_at: Timex.shift(DateTime.utc_now(), hours: 2),
-        expires_at: Timex.shift(DateTime.utc_now(), hours: 8),
+        starts_at: Timex.shift(NaiveDateTime.local_now(), hours: 2),
+        expires_at: Timex.shift(NaiveDateTime.local_now(), hours: 8),
         rules: @rule_params,
         actions: @action_params
       }
@@ -73,8 +73,8 @@ defmodule Snitch.Data.Model.PromotionTest do
       params = %{
         code: "OFF5",
         name: "5off",
-        starts_at: Timex.shift(DateTime.utc_now(), hours: 2),
-        expires_at: Timex.shift(DateTime.utc_now(), hours: 8),
+        starts_at: Timex.shift(NaiveDateTime.local_now(), hours: 2),
+        expires_at: Timex.shift(NaiveDateTime.local_now(), hours: 8),
         rules: rule_params,
         actions: @action_params
       }
@@ -99,8 +99,8 @@ defmodule Snitch.Data.Model.PromotionTest do
       params = %{
         code: "OFF5",
         name: "5off",
-        starts_at: Timex.shift(DateTime.utc_now(), hours: 2),
-        expires_at: Timex.shift(DateTime.utc_now(), hours: 8),
+        starts_at: Timex.shift(NaiveDateTime.local_now(), hours: 2),
+        expires_at: Timex.shift(NaiveDateTime.local_now(), hours: 8),
         rules: @rule_params,
         actions: action_params
       }
@@ -136,7 +136,7 @@ defmodule Snitch.Data.Model.PromotionTest do
     test "update fails as promotion archived" do
       promotion =
         insert(:promotion,
-          archived_at: DateTime.to_unix(DateTime.utc_now())
+          archived_at: DateTime.to_unix(NaiveDateTime.local_now())
         )
 
       insert(:order_total_rule, promotion: promotion)
@@ -170,7 +170,7 @@ defmodule Snitch.Data.Model.PromotionTest do
       # insert promotion but archive it
       insert(:promotion,
         code: "10Off",
-        archived_at: DateTime.to_unix(DateTime.utc_now())
+        archived_at: DateTime.to_unix(NaiveDateTime.local_now())
       )
 
       # insert promotion which is not archived

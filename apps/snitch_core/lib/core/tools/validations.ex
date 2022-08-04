@@ -41,7 +41,7 @@ defmodule Snitch.Tools.Validations do
       when is_atom(key) do
     case fetch_change(changeset, key) do
       {:ok, date} ->
-        current_time = DateTime.utc_now()
+        current_time = NaiveDateTime.local_now()
 
         if DateTime.compare(date, current_time) == :gt do
           changeset

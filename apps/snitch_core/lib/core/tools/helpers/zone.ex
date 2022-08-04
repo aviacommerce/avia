@@ -10,16 +10,16 @@ defmodule Snitch.Tools.Helper.Zone do
     name: nil,
     description: nil,
     zone_type: nil,
-    inserted_at: DateTime.utc_now(),
-    updated_at: DateTime.utc_now()
+    inserted_at: NaiveDateTime.local_now(),
+    updated_at: NaiveDateTime.local_now()
   }
 
   @state %{
     name: nil,
     code: nil,
     country_id: nil,
-    inserted_at: DateTime.utc_now(),
-    updated_at: DateTime.utc_now()
+    inserted_at: NaiveDateTime.local_now(),
+    updated_at: NaiveDateTime.local_now()
   }
 
   @country %{
@@ -28,22 +28,22 @@ defmodule Snitch.Tools.Helper.Zone do
     iso3: nil,
     name: nil,
     numcode: nil,
-    inserted_at: DateTime.utc_now(),
-    updated_at: DateTime.utc_now()
+    inserted_at: NaiveDateTime.local_now(),
+    updated_at: NaiveDateTime.local_now()
   }
 
   @state_zone_member %{
     state_id: nil,
     zone_id: nil,
-    inserted_at: DateTime.utc_now(),
-    updated_at: DateTime.utc_now()
+    inserted_at: NaiveDateTime.local_now(),
+    updated_at: NaiveDateTime.local_now()
   }
 
   @country_zone_member %{
     country_id: nil,
     zone_id: nil,
-    inserted_at: DateTime.utc_now(),
-    updated_at: DateTime.utc_now()
+    inserted_at: NaiveDateTime.local_now(),
+    updated_at: NaiveDateTime.local_now()
   }
 
   def countries_with_manifest(manifest) do

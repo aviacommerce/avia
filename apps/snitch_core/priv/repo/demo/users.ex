@@ -30,8 +30,8 @@ defmodule Snitch.Demo.User do
       password_confirmation: pwd,
       is_admin: admin,
       role_id: role_id,
-      inserted_at: DateTime.utc_now(),
-      updated_at: DateTime.utc_now()
+      inserted_at: NaiveDateTime.local_now(),
+      updated_at: NaiveDateTime.local_now()
     }
 
     %User{} |> User.create_changeset(params) |> Repo.insert!()

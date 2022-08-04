@@ -8,8 +8,8 @@ defmodule Snitch.Tools.Helper.Order do
     unit_price: nil,
     product_id: nil,
     order_id: nil,
-    inserted_at: DateTime.utc_now(),
-    updated_at: DateTime.utc_now()
+    inserted_at: NaiveDateTime.local_now(),
+    updated_at: NaiveDateTime.local_now()
   }
 
   @variant %{
@@ -20,8 +20,8 @@ defmodule Snitch.Tools.Helper.Order do
     width: Decimal.new("0.4"),
     selling_price: nil,
     shipping_category_id: nil,
-    inserted_at: DateTime.utc_now(),
-    updated_at: DateTime.utc_now(),
+    inserted_at: NaiveDateTime.local_now(),
+    updated_at: NaiveDateTime.local_now(),
     slug: "",
     max_retail_price: nil
   }

@@ -12,8 +12,8 @@ defmodule Snitch.Seed.ShippingRules do
   @shipping_rule_identifier %{
     code: nil,
     description: '',
-    inserted_at: DateTime.utc_now(),
-    updated_at: DateTime.utc_now()
+    inserted_at: NaiveDateTime.local_now(),
+    updated_at: NaiveDateTime.local_now()
   }
 
   @shipping_rule %{
@@ -21,8 +21,8 @@ defmodule Snitch.Seed.ShippingRules do
     shipping_rule_identifier_id: nil,
     shipping_category_id: nil,
     preferences: nil,
-    inserted_at: DateTime.utc_now(),
-    updated_at: DateTime.utc_now()
+    inserted_at: NaiveDateTime.local_now(),
+    updated_at: NaiveDateTime.local_now()
   }
 
   def seed!() do
