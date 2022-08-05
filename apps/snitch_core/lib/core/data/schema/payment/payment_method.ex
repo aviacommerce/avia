@@ -6,6 +6,8 @@ defmodule Snitch.Data.Schema.PaymentMethod do
   use Snitch.Data.Schema
 
   alias Snitch.Data.Schema.Payment
+  alias SnitchPayments.Gateway.{PayuBiz, Stripe, RazorPay}
+  alias SnitchPayments.Payment.CashOnDelivery
 
   @typedoc """
   A struct which represents PaymentMethod.
@@ -36,7 +38,7 @@ defmodule Snitch.Data.Schema.PaymentMethod do
     field(:active?, :boolean, default: true)
 
     field(:live_mode?, :boolean, default: false)
-    field(:provider, Ecto.Enum, values: [:ccd, :hpm, :cod, :stc])
+    field(:provider, Ecto.Enum, values: [PayuBiz, Stripe, RazorPay, CashOnDelivery])
     field(:preferences, :map)
     field(:description, :string)
 

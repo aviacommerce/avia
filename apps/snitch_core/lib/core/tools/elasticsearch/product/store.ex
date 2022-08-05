@@ -42,7 +42,7 @@ defmodule Snitch.Tools.ElasticSearch.Product.Store do
         |> select([p, v], merge(p, %{tenant: ^tenant}))
         |> preload([], ^@preload)
 
-      Repo.stream(query)
+      Repo.all(query)
     end)
   end
 
