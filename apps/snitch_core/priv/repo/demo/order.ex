@@ -3,8 +3,6 @@ defmodule Snitch.Demo.Order do
 
   import Snitch.Tools.Helper.Order, only: [line_items_with_price: 2]
 
-
-
   alias Snitch.Data.Schema.{
     LineItem,
     Order,

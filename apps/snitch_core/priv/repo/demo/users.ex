@@ -4,7 +4,6 @@ defmodule Snitch.Demo.User do
   alias Snitch.Data.Schema.{User, Role}
   alias Comeonin.Argon2
 
-
   @base_path Application.app_dir(:snitch_core, "priv/repo/demo/demo_data")
 
   def create_users do
