@@ -65,7 +65,7 @@ defmodule Snitch.Data.Schema.PackageTest do
     shipping_method_id: 1,
     shipping_category_id: -1,
     number: "WHAT",
-    shipped_at: NaiveDateTime.local_now()
+    shipped_at: DateTime.utc_now()
   }
   @shipping_params @update_params
 

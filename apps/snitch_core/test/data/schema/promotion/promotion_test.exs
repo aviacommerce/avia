@@ -18,7 +18,7 @@ defmodule Snitch.Data.Schema.PromotionTest do
       params = %{
         code: "OFF5",
         name: "5off",
-        expires_at: Timex.shift(NaiveDateTime.local_now(), hours: -2)
+        expires_at: Timex.shift(DateTime.utc_now(), hours: -2)
       }
 
       changeset = Promotion.create_changeset(%Promotion{}, params)
@@ -29,8 +29,8 @@ defmodule Snitch.Data.Schema.PromotionTest do
       params = %{
         code: "OFF5",
         name: "5off",
-        starts_at: Timex.shift(NaiveDateTime.local_now(), hours: 3),
-        expires_at: Timex.shift(NaiveDateTime.local_now(), hours: 1)
+        starts_at: Timex.shift(DateTime.utc_now(), hours: 3),
+        expires_at: Timex.shift(DateTime.utc_now(), hours: 1)
       }
 
       changeset = Promotion.create_changeset(%Promotion{}, params)

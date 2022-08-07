@@ -59,7 +59,7 @@ defmodule Snitch.Data.Schema.Card do
   def changeset(card, params, action)
 
   def changeset(%__MODULE__{} = card, params, :create) do
-    %{year: current_year, month: current_month} = NaiveDateTime.local_now()
+    %{year: current_year, month: current_month} = DateTime.utc_now()
 
     card
     |> cast(params, @cast_fields)

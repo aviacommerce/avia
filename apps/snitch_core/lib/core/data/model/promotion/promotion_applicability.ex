@@ -62,7 +62,7 @@ defmodule Snitch.Data.Model.Promotion.Applicability do
   for the promotion.
   """
   def starts_at_check(promotion) do
-    if DateTime.compare(NaiveDateTime.local_now(), promotion.starts_at) == :gt do
+    if DateTime.compare(DateTime.utc_now(), promotion.starts_at) == :gt do
       {true, @success.promo_active}
     else
       {false, @errors.inactive}
@@ -76,7 +76,7 @@ defmodule Snitch.Data.Model.Promotion.Applicability do
   still active.
   """
   def expires_at_check(promotion) do
-    if DateTime.compare(NaiveDateTime.local_now(), promotion.expires_at) == :lt do
+    if DateTime.compare(DateTime.utc_now(), promotion.expires_at) == :lt do
       {true, @success.promo_active}
     else
       {false, @errors.expired}

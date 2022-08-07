@@ -13,8 +13,8 @@ defmodule Snitch.Data.Model.Promotion.EligibilityTest do
       promotion =
         insert(:promotion,
           active?: true,
-          starts_at: Timex.shift(NaiveDateTime.local_now(), days: -2),
-          expires_at: Timex.shift(NaiveDateTime.local_now(), days: 3),
+          starts_at: Timex.shift(DateTime.utc_now(), days: -2),
+          expires_at: Timex.shift(DateTime.utc_now(), days: 3),
           usage_limit: 5,
           current_usage_count: 2
         )
@@ -28,8 +28,8 @@ defmodule Snitch.Data.Model.Promotion.EligibilityTest do
       promotion =
         insert(:promotion,
           active?: true,
-          starts_at: Timex.shift(NaiveDateTime.local_now(), days: -2),
-          expires_at: Timex.shift(NaiveDateTime.local_now(), days: 3),
+          starts_at: Timex.shift(DateTime.utc_now(), days: -2),
+          expires_at: Timex.shift(DateTime.utc_now(), days: 3),
           usage_limit: 5,
           current_usage_count: 2
         )
