@@ -3,8 +3,6 @@ defmodule Snitch.Demo.Order do
 
   import Snitch.Tools.Helper.Order, only: [line_items_with_price: 2]
 
-  alias Ecto.DateTime
-
   alias Snitch.Data.Schema.{
     LineItem,
     Order,
@@ -33,8 +31,8 @@ defmodule Snitch.Demo.Order do
     user_id: nil,
     billing_address: nil,
     shipping_address: nil,
-    inserted_at: Timex.now(),
-    updated_at: Timex.now()
+    inserted_at: NaiveDateTime.local_now(),
+    updated_at: NaiveDateTime.local_now()
   }
 
   defp build_orders(start_time) do
@@ -71,13 +69,13 @@ defmodule Snitch.Demo.Order do
   def create_orders do
     Repo.delete_all(Package)
     Repo.delete_all(Order)
-    end_time = Timex.now()
+    end_time = NaiveDateTime.local_now()
     start_time = Timex.shift(end_time, months: -1)
     seed_orders(start_time)
   end
 
   def seed_orders(start_time) do
-    end_time = Timex.now()
+    end_time = NaiveDateTime.local_now()
 
     case Timex.before?(start_time, end_time) do
       true ->

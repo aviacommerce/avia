@@ -2,7 +2,7 @@ defmodule Snitch.Seed.Users do
   @moduledoc false
 
   alias Comeonin.Argon2
-  alias Ecto.DateTime
+
   alias Snitch.Data.Model.{Country, State}
   alias Snitch.Data.Schema.{Address, User, Role}
   alias Snitch.Core.Tools.MultiTenancy.Repo
@@ -31,8 +31,8 @@ defmodule Snitch.Seed.Users do
       password_hash: pwd_hash,
       is_admin: admin,
       role_id: role_id,
-      inserted_at: DateTime.utc(),
-      updated_at: DateTime.utc()
+      inserted_at: NaiveDateTime.local_now(),
+      updated_at: NaiveDateTime.local_now()
     }
   end
 

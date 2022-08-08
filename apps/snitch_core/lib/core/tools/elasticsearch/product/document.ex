@@ -188,9 +188,9 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
       |> Decimal.sub(product.selling_price.amount)
       |> Decimal.div(product.max_retail_price.amount)
       |> Decimal.mult(100)
-      |> Decimal.round(0)
-      |> Decimal.to_integer()
       |> format_discount()
+      |> Decimal.round(0)
+      |> Decimal.to_float()
     rescue
       _ -> 0
     end

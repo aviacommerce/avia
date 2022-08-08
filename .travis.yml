@@ -25,7 +25,7 @@ after_script:
 - bash .scripts/inch_report.sh
 matrix:
   include:
-  - elixir: 1.7.2
+  - elixir: 1.13.4
     script:
     - mix coveralls.json --umbrella
 addons:

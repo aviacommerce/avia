@@ -37,7 +37,7 @@ defmodule Snitch.Data.Schema.Promotion do
     field(:code, :string)
     field(:name, :string)
     field(:description, :string)
-    field(:starts_at, :utc_datetime, default: DateTime.utc_now())
+    field(:starts_at, :utc_datetime, default: DateTime.truncate(DateTime.utc_now(), :second))
     field(:expires_at, :utc_datetime)
     field(:usage_limit, :integer, default: 0)
     field(:current_usage_count, :integer, default: 0)

@@ -2,7 +2,7 @@ defmodule Snitch.Seed.Product do
   @moduledoc """
   Seeds Products with variants and their images.
   """
-  alias Ecto.DateTime
+
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
   alias Snitch.Data.Schema.{
@@ -76,8 +76,8 @@ defmodule Snitch.Seed.Product do
               stock_location_id: location.id,
               count_on_hand: 10,
               backorderable: true,
-              inserted_at: Ecto.DateTime.utc(),
-              updated_at: Ecto.DateTime.utc()
+              inserted_at: NaiveDateTime.local_now(),
+              updated_at: NaiveDateTime.local_now()
             }
           end)
         end)
@@ -89,8 +89,8 @@ defmodule Snitch.Seed.Product do
 
   def variant_image(url, variant_id) do
     %{
-      inserted_at: Ecto.DateTime.utc(),
-      updated_at: Ecto.DateTime.utc(),
+      inserted_at: NaiveDateTime.local_now(),
+      updated_at: NaiveDateTime.local_now(),
       variant_id: variant_id
     }
   end
@@ -102,9 +102,9 @@ defmodule Snitch.Seed.Product do
       name: p["name"],
       description: p["description"],
       slug: Slugger.slugify(p["name"]),
-      available_on: DateTime.utc(),
-      inserted_at: DateTime.utc(),
-      updated_at: DateTime.utc(),
+      available_on: NaiveDateTime.local_now(),
+      inserted_at: NaiveDateTime.local_now(),
+      updated_at: NaiveDateTime.local_now(),
       selling_price: Money.new("14.99", :USD),
       max_retail_price: Money.new("12.99", :USD),
       taxon_id: taxon.id
@@ -122,8 +122,8 @@ defmodule Snitch.Seed.Product do
       position: 0,
       product_id: product_id,
       shipping_category_id: category_id,
-      inserted_at: DateTime.utc(),
-      updated_at: DateTime.utc()
+      inserted_at: NaiveDateTime.local_now(),
+      updated_at: NaiveDateTime.local_now()
     }
   end
 end

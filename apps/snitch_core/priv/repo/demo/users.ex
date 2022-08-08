@@ -3,7 +3,6 @@ defmodule Snitch.Demo.User do
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.{User, Role}
   alias Comeonin.Argon2
-  alias Ecto.DateTime
 
   @base_path Application.app_dir(:snitch_core, "priv/repo/demo/demo_data")
 
@@ -30,8 +29,8 @@ defmodule Snitch.Demo.User do
       password_confirmation: pwd,
       is_admin: admin,
       role_id: role_id,
-      inserted_at: DateTime.utc(),
-      updated_at: DateTime.utc()
+      inserted_at: NaiveDateTime.local_now(),
+      updated_at: NaiveDateTime.local_now()
     }
 
     %User{} |> User.create_changeset(params) |> Repo.insert!()

@@ -53,11 +53,7 @@ defmodule Snitch.Data.Schema.ShippingMethod do
   The `zones` must be `Snitch.Data.Schema.Zone.t` structs.
   The `categories` must be `Snitch.Data.Schema.ShippingCategory.t` structs.
 
-  The following fields must be present in `params`: `[#{
-    @create_fields
-    |> Enum.map(fn x -> ":#{x}" end)
-    |> Enum.intersperse(", ")
-  }]`
+  The following fields must be present in `params`: `[#{@create_fields |> Enum.map(fn x -> ":#{x}" end) |> Enum.intersperse(", ")}]`
   """
   @spec create_changeset(t, map, [Zone.t()], [ShippingCategory.t()]) :: Ecto.Changeset.t()
   def create_changeset(%__MODULE__{} = shipping_method, params, zones, categories) do

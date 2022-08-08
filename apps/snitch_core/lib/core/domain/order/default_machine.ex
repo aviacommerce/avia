@@ -45,6 +45,7 @@ defmodule Snitch.Domain.Order.DefaultMachine do
   modules/functions that perform some logic based on the state need to be
   generated or configured at compile-time as well.
   """
+
   # TODO: How to attach the additional info like ability, etc with the states?
   # TODO: make the order state machine a behaviour to simplify things.
 

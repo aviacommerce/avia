@@ -27,8 +27,8 @@ defmodule Snitch.Seed.ProductRating do
           value: value,
           position: position,
           rating_id: rating.id,
-          inserted_at: Ecto.DateTime.utc(),
-          updated_at: Ecto.DateTime.utc()
+          inserted_at: NaiveDateTime.local_now(),
+          updated_at: NaiveDateTime.local_now()
         }
       end)
 

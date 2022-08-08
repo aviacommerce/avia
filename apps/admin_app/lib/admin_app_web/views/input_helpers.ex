@@ -325,9 +325,7 @@ defmodule AdminAppWeb.InputHelpers do
 
     wrapper_opts = [
       class:
-        "form-group form-group-default input-group cb-group #{validate_required} #{
-          state_class(form, field)
-        }"
+        "form-group form-group-default input-group cb-group #{validate_required} #{state_class(form, field)}"
     ]
 
     type = Form.input_type(form, field)

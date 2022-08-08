@@ -123,9 +123,7 @@ defmodule AdminAppWeb.ProductView do
 
   def make_search_query_string(conn, column, expression, type, term) do
     query =
-      "&rummage[search][#{column}][search_expr]=#{expression}&rummage[search][#{column}][search_type]=#{
-        type
-      }&rummage[search][#{column}][search_term]=#{term}"
+      "&rummage[search][#{column}][search_expr]=#{expression}&rummage[search][#{column}][search_type]=#{type}&rummage[search][#{column}][search_term]=#{term}"
 
     conn_query =
       load_query_string(conn, ["rummage", "sort"], ["rummage", "search"])

@@ -21,7 +21,7 @@ defmodule Snitch.Data.Schema.ProductProperty do
   schema "snitch_product_properties" do
     belongs_to(:product, Product)
     belongs_to(:property, Property)
-    field(:value, :string, null: false)
+    field(:value, :string)
     timestamps()
   end
 

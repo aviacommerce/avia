@@ -91,7 +91,7 @@ defmodule Snitch.Data.Schema.User do
   def delete_changeset(user, _params \\ %{}) do
     params = %{
       state: :deleted,
-      deleted_at: NaiveDateTime.utc_now()
+      deleted_at: NaiveDateTime.local_now()
     }
 
     user

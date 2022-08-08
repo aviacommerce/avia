@@ -31,7 +31,7 @@ defmodule Snitch.Data.Schema.Product do
   @type t :: %__MODULE__{}
 
   schema "snitch_products" do
-    field(:name, :string, null: false, default: "")
+    field(:name, :string, default: "")
     field(:description, :string)
     field(:available_on, :utc_datetime)
     field(:deleted_at, UnixTimestamp, default: 0)

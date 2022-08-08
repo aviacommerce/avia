@@ -21,7 +21,7 @@ defmodule Snitch.Tools.Validations do
   def validate_amount(%Ecto.Changeset{} = changeset, key) when is_atom(key) do
     case fetch_change(changeset, key) do
       {:ok, %Money{amount: amount}} ->
-        if Decimal.cmp(Decimal.reduce(amount), Decimal.new(0)) == :lt do
+        if Decimal.cmp(Decimal.normalize(amount), Decimal.new(0)) == :lt do
           add_error(changeset, key, "must be equal or greater than 0", validation: :number)
         else
           changeset

@@ -3,7 +3,6 @@ defmodule Snitch.Seed.Orders do
 
   import Snitch.Tools.Helper.Order, only: [line_items_with_price: 2]
 
-  alias Ecto.DateTime
   alias Snitch.Data.Schema.{LineItem, Order, ShippingCategory, User, Product, Taxon}
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
@@ -15,9 +14,10 @@ defmodule Snitch.Seed.Orders do
     user_id: nil,
     billing_address: nil,
     shipping_address: nil,
-    inserted_at: DateTime.utc(),
-    updated_at: DateTime.utc()
+    inserted_at: NaiveDateTime.local_now(),
+    updated_at: NaiveDateTime.local_now()
   }
+
   # @stock_items %{
   #   "origin" => %{
   #     counts: [10, 10, 10, 10, 00, 00],
@@ -131,8 +131,8 @@ defmodule Snitch.Seed.Orders do
       selling_price: price,
       max_retail_price: price,
       shipping_category_id: nil,
-      inserted_at: DateTime.utc(),
-      updated_at: DateTime.utc(),
+      inserted_at: NaiveDateTime.local_now(),
+      updated_at: NaiveDateTime.local_now(),
       taxon_id: taxon.id
     }
   end

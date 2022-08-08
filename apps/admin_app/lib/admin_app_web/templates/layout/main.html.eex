@@ -5,6 +5,6 @@
     </div>
   <% end %>
   <div class="main" >
-    <%= Map.get(assigns, :inner_layout) || render @view_module, @view_template, assigns %>
+    <%= Map.get(assigns, :inner_layout) || @inner_content %>
   </div>
 </main>

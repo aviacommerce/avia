@@ -32,8 +32,8 @@ defmodule Snitch.Data.Schema.Taxon do
     timestamps()
   end
 
-  @cast_fields ~w(name parent_id taxonomy_id lft rgt)
-  @update_fields ~w(name)
+  @cast_fields ~w(name parent_id taxonomy_id lft rgt)a
+  @update_fields ~w(name)a
 
   def changeset(taxon, params) do
     taxon

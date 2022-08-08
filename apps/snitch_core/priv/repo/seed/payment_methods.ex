@@ -24,15 +24,15 @@ defmodule Snitch.Seed.PaymentMethods do
         name: "check",
         code: "chk",
         active?: true,
-        inserted_at: Ecto.DateTime.utc(),
-        updated_at: Ecto.DateTime.utc()
+        inserted_at: NaiveDateTime.local_now(),
+        updated_at: NaiveDateTime.local_now()
       },
       %{
         name: "card",
         code: "ccd",
         active?: true,
-        inserted_at: Ecto.DateTime.utc(),
-        updated_at: Ecto.DateTime.utc()
+        inserted_at: NaiveDateTime.local_now(),
+        updated_at: NaiveDateTime.local_now()
       }
     ]
 

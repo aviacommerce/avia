@@ -10,7 +10,7 @@ config :snitch_api, SnitchApiWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "VAvkjDkSJ/5nLB4aI+77rZ/PyR3foxuD6u1p1X01M3hpc0MJrRDwRNZ0/ERHfcUb",
   render_errors: [view: SnitchApiWeb.ErrorView, accepts: ~w(json)],
-  pubsub: [name: SnitchApi.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub_server: SnitchApi.PubSub
 
 # Configures Elixir's Logger
 config :logger, :console,
