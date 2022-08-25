@@ -8,7 +8,7 @@
     phx-value-key="error"><%= live_flash(@flash, :error) %></p>
 
   <main role="main" class="flex">
-    <%= if Guardian.Plug.authenticated?(@conn) do %>
+    <%= if @current_user do %>
       <div class="sidebar h-screen">
         <%= render "sidebar.html", conn: @conn %>
       </div>

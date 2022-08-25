@@ -1,20 +1,28 @@
-defmodule AdminAppWeb.DashboardController do
-  use AdminAppWeb, :controller
+defmodule AdminAppWeb.Live.Dashboard do
+  use AdminAppWeb, :live_view
 
   alias Snitch.Data.Model
   alias AdminAppWeb.Helpers
 
-  def index(conn, params) do
-    {start_date, end_date} = get_date_from_params(params)
+  def mount(params, session, socket) do
+    if connected?(socket),
+      do: IO.puts("Live Dashboard is connected")
 
-    conn
-    |> assign(:order_state_counts, get_order_state_count(start_date, end_date))
-    |> assign(:product_state_counts, get_product_state_count())
-    |> assign(:order_datepoints, get_order_datapoints(start_date, end_date))
-    |> assign(:payment_datapoints, get_payment_datapoints(start_date, end_date))
-    |> assign(:start_date, naive_date_to_string(start_date))
-    |> assign(:end_date, naive_date_to_string(end_date))
-    |> render("index.html")
+    with {:ok, socket} <- prepare_assigns(session, socket) do
+      {start_date, end_date} = get_date_from_params(params)
+      {:ok,
+       socket
+       |> assign(:conn, socket)
+       |> assign(:order_state_counts, get_order_state_count(start_date, end_date))
+       |> assign(:product_state_counts, get_product_state_count())
+       |> assign(:order_datepoints, get_order_datapoints(start_date, end_date))
+       |> assign(:payment_datapoints, get_payment_datapoints(start_date, end_date))
+       |> assign(:start_date, naive_date_to_string(start_date))
+       |> assign(:end_date, naive_date_to_string(end_date))}
+    else
+      _ ->
+        {:error, :not_authorized}
+    end
   end
 
   defp naive_date_to_string(date) do
