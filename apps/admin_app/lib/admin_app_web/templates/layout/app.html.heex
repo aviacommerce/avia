@@ -14,10 +14,9 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
   </head>
   <body data-js-view-name={js_view_name(@conn, view_template(@conn))}>
-    <%=# render "header.html", conn: @conn%>
     <%= render "flash.html", conn: @conn%>
     <%= render "main.html", assigns%>
-    <%=# render "footer.html" %>
+    <%= render "footer.html" %>
     <script>window.userToken = "<%= @conn.assigns[:user_token] %>";</script>
     <script defer phx-track-static type="text/javascript" src={static_path(@conn, "/assets/app.js")}></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>

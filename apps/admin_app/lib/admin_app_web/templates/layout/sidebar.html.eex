@@ -1,126 +1,112 @@
-<ul id="drilldown" class="nav nav-pills nav-stacked">
-  <li>
-    <div class="dropdown navshophead">
-      <a class="dropdown-toggle toggle in-progress"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <img src="/images/shop_manager.001.svg" width="32" height="32" class="d-inline-block align-top" alt="">
-        <span>Shop Manager</span>
-      </a>
-      <!--<div class="dropdown-menu shopdpdown">
-        <a class="dropdown-item" href="#">Action</a>
-        <a class="dropdown-item" href="#">Another action</a>
-        <a class="dropdown-item" href="#">Something else here</a>
-      </div>-->
-    </div>
-  </li>
-  <li>
-    <a class="nav-link" href=<%= "/dashboard" %>>
-    <i class="fa fa-clipboard-list" aria-hidden="true"></i> <span> Dashboard</span>
+<aside class="w-64 h-full" aria-label="Sidebar">
+  <div class="overflow-y-auto h-full py-4 px-3 bg-gray-50 rounded dark:bg-gray-800">
+    <a href="/" class="flex items-center pl-2.5 mb-5">
+      <img src="/images/logo.png" class="mr-3 h-6 sm:h-7" alt="Aviacommerce Logo" />
+      <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">Aviacommerce</span>
     </a>
-  </li>
-  <li>
-    <a class="nav-link" href="/orders">
-    <i class="fa fa-clipboard-list" aria-hidden="true"></i> <span> Orders</span>
-    </a>
-  </li>
-  <li>
-    <a class="nav-link" href="#" data-toggle="collapse" data-target="#drilldown-2">
-    <i class="fa fa-shapes" aria-hidden="true"></i>  <span> Products</span>
-    </a>
-    <ul id="drilldown-2" class="nav nav-pills nav-stacked collapse pl-3">
+    <ul class="space-y-2">
       <li>
-        <a class="nav-link" href="/products">Product Catalogue</a>
-      </li>
-      <li>
-        <a class="nav-link" href="/option_types">Option Types</a>
-      </li>
-      <li>
-        <a class="nav-link" href="/taxonomy" >Product Taxonomy</a>
-      </li>
-      <li>
-        <a class="nav-link" href="/properties">Properties</a>
-      </li>
-      <li>
-        <a class="nav-link" href="/variation_themes">Variation Themes</a>
-      </li>
-      <!-- <li>
-        <a class="nav-link" href="/prototypes">Prototypes</a>
-      </li> -->
-      <li>
-        <a class="nav-link" href="/product_brands">Product Brands</a>
-      </li>
-    </ul>
-  </li>
-  <li>
-    <a class="nav-link" href="/users">
-    <i class="fa fa-users" aria-hidden="true"></i>  <span> Users</span>
-    </a>
-  </li>
-  <li>
-    <a class="nav-link" href="#" data-toggle="collapse" data-target="#drilldown-1">
-    <i class="fa fa-sliders-h" aria-hidden="true"></i>  <span> Configurations</span>
-    </a>
-    <ul id="drilldown-1" class="nav nav-pills nav-stacked collapse pl-3">
-      <%= if check_general_settings() do %>
-        <li>
-          <a class="nav-link" href="/general_settings">General Settings</a>
-        </li>
-      <% else %>
-        <li>
-          <a class="nav-link" href="/general_settings/new">General Settings</a>
-        </li>
-      <% end %>
-      <li>
-        <a class="nav-link" href="/shipping-policy/new">Shipping Policy</a>
-      </li>
-      <li>
-        <a class="nav-link" href="/stock_locations">Stock Locations</a>
-      </li>
-       <li>
-        <a class="nav-link" href="/tax">Tax</a>
-      </li>
-      <li>
-        <a class="nav-link" href="/roles">Roles</a>
-      </li>
-      <li>
-        <a class="nav-link" href="/permissions">Permission</a>
-      </li>
-      <li>
-        <a class="nav-link" href="/payment_methods">Payment Methods</a>
-      </li>
-      <li>
-        <a class="nav-link" href="/zones">Zones</a>
-      </li>
-      <li>
-        <a class="nav-link" href="/promotions">Promotions</a>
-      </li>
-
-    </ul>
-  </li>
-  <li class="profile">
-    <ul>
-       <li class="dropdown">
-        <a class="dropdown-toggle"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <span class="usrimg">
-        <i class="fas fa-user"></i>
-        </span>
-        <span class="username">
-          <%= get_user_name(@conn) %>
-        </span>
-        </a>
-        <div class="dropdown-menu p-0 ">
-          <!--<a class="dropdown-item" href="#">Back to store</a>
-          <a class="dropdown-item" href="#">Account</a>-->
-          <%= link("LogOut", to: session_path(@conn, :new), method: :delete, class: "dropdown-item")%>
-        </div>
-      </li>
-      <li>
-        <a id="drawertoggle" class=" in-progress">
-          <i class="fas fa-angle-double-left"></i>
+        <a href="/dashboard" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+            <svg aria-hidden="true" class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
+            <span class="ml-3">Dashboard</span>
         </a>
       </li>
+      <li>
+        <a href="/orders" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+            <svg aria-hidden="true" class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
+            <span class="ml-3">Orders</span>
+        </a>
+      </li>
+      <li>
+        <button type="button" class="flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" aria-controls="dropdown-products" data-collapse-toggle="dropdown-products">
+              <svg aria-hidden="true" class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"></path></svg>
+              <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item="">Products</span>
+              <svg sidebar-toggle-item="" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+        </button>
+        <ul id="dropdown-products" class="hidden py-2 space-y-2">
+          <li>
+              <a href="/products" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Product Catalogue</a>
+          </li>
+          <li>
+              <a href="/option_types" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Option Types</a>
+          </li>
+          <li>
+              <a href="/taxonomy" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Product Taxonomy</a>
+          </li>
+          <li>
+              <a href="/properties" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Properties</a>
+          </li>
+          <li>
+              <a href="/variation_themes" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Variation Themes</a>
+          </li>
+          <li>
+              <a href="/product_brands" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Product Brands</a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a href="/users" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+            <svg aria-hidden="true" class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+            <span class="flex-1 ml-3 whitespace-nowrap">Users</span>
+            <%# <span class="inline-flex justify-center items-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-200 rounded-full dark:bg-gray-700 dark:text-gray-300">Pro</span> %>
+        </a>
+      </li>
+      <li>
+        <button type="button" class="flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" aria-controls="dropdown-configuration" data-collapse-toggle="dropdown-configuration">
+              <svg aria-hidden="true" class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"></path></svg>
+              <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item="">Configurations</span>
+              <svg sidebar-toggle-item="" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+        </button>
+        <ul id="dropdown-configuration" class="hidden py-2 space-y-2">
+          <li>
+            <%= if check_general_settings() do %>
+              <li>
+                <a href="/general_settings" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">General Settings</a>
+              </li>
+            <% else %>
+              <li>
+                <a href="/general_settings/new" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">General Settings</a>
+              </li>
+            <% end %>
+          </li>
+          <li>
+              <a href="/shipping-policy/new" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Shipping Policy</a>
+          </li>
+          <li>
+              <a href="/stock_locations" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Stock Locations</a>
+          </li>
+          <li>
+              <a href="/tax" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Tax</a>
+          </li>
+          <li>
+              <a href="/roles" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Roles</a>
+          </li>
+          <li>
+              <a href="/permissions" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Permission</a>
+          </li>
+          <li>
+              <a href="/payment_methods" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Payment Methods</a>
+          </li>
+          <li>
+              <a href="/zones" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Zones</a>
+          </li>
+          <li>
+              <a href="/promotions" class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Promotions</a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <button type="button" class="flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" aria-controls="dropdown-profile" data-collapse-toggle="dropdown-profile">
+              <svg aria-hidden="true" class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"></path></svg>
+              <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item=""><%= get_user_name(@conn) %></span>
+              <svg sidebar-toggle-item="" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+        </button>
+        <ul id="dropdown-profile" class="hidden py-2 space-y-2">
+          <li>
+            <%= link("LogOut", to: session_path(@conn, :new), method: :delete, class: "flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700")%>
+          </li>
+        </ul>
+      </li>
     </ul>
-  </li>
-
-
-
-</ul>
+  </div>
+</aside>
