@@ -15,7 +15,7 @@ defmodule AdminAppWeb.Endpoint do
     at: "/",
     from: :admin_app,
     gzip: true,
-    only: ~w(css fonts images js favicon.png robots.txt)
+    only: ~w(assets fonts images favicon.png robots.txt)
   )
 
   # Serve the images saved in the upload folder.
