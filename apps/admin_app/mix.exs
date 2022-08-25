@@ -36,10 +36,16 @@ defmodule AdminApp.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.5.0"},
+      {:phoenix, "~> 1.6.11"},
       {:phoenix_pubsub, "~> 2.0"},
-      {:phoenix_html, "~> 2.10"},
-      {:phoenix_live_reload, "~> 1.0", only: :dev},
+      {:phoenix_html, "~> 3.0"},
+      {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:phoenix_live_view, "~> 0.17.5"},
+      {:phoenix_live_dashboard, "~> 0.6"},
+      {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.1", runtime: Mix.env() == :dev},
+      {:telemetry_metrics, "~> 0.6"},
+      {:telemetry_poller, "~> 1.0"},
       {:phoenix_ecto, "~> 4.4"},
       {:gettext, "~> 0.11"},
       {:csv, "~> 2.0.0"},
@@ -50,9 +56,7 @@ defmodule AdminApp.Mixfile do
       {:params, "~> 2.2"},
       {:yaml_elixir, "~> 2.1.0"},
       # email
-      {:swoosh, "~> 0.15"},
-      {:phoenix_swoosh, "~> 0.2"},
-      {:gen_smtp, "~> 0.12"},
+      {:swoosh, "~> 0.20"},
       {:snitch_payments, github: "aviacommerce/avia_payments", branch: "develop"},
       {:pdf_generator, ">=0.3.7"},
       {:jason, "~> 1.1"},
@@ -60,6 +64,12 @@ defmodule AdminApp.Mixfile do
       # import from store
       {:oauther, "~> 1.1"},
       {:honeydew, "~> 1.5"}
+    ]
+  end
+
+  defp aliases do
+    [
+      "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
     ]
   end
 end

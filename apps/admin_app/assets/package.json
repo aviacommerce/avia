@@ -1,12 +1,7 @@
 {
   "repository": {},
   "license": "MIT",
-  "scripts": {
-    "deploy": "webpack --mode production",
-    "watch": "webpack --mode development --watch-stdin"
-  },
   "dependencies": {
-    "@babel/polyfill": "^7.2.5",
     "@types/jquery": "^3.3.29",
     "@types/prop-types": "^15.5.8",
     "@types/react": "^16.8.6",
@@ -19,8 +14,6 @@
     "font-awesome": "^4.7.0",
     "jquery": "^3.3.1",
     "moment": "^2.24.0",
-    "phoenix": "file:../../../deps/phoenix",
-    "phoenix_html": "file:../../../deps/phoenix_html",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-router": "^4.3.1",
@@ -31,9 +24,7 @@
     "tether": "^1.4.4"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
-    "@babel/preset-react": "^7.0.0",
+    "@babel/polyfill": "7.12.1",
     "@types/date-fns": "^2.6.0",
     "@types/moment": "^2.13.0",
     "awesome-typescript-loader": "^5.2.1",
@@ -47,21 +38,11 @@
     "eslint-plugin-import": "^2.16.0",
     "file-loader": "^3.0.1",
     "mini-css-extract-plugin": "^0.4.0",
-    "optimize-css-assets-webpack-plugin": "^4.0.0",
     "popper.js": "^1.14.3",
     "postcss-loader": "^3.0.0",
     "prettier": "^1.16.4",
     "sass-loader": "^7.1.0",
     "typescript": "^3.2.2",
-    "uglifyjs-webpack-plugin": "^1.2.4",
-    "url-loader": "^1.1.2",
-    "webpack": "4.4.0",
-    "webpack-cli": "^2.0.10"
-  },
-  "name": "assets",
-  "version": "0.1.0",
-  "description": "Admin interface for snitch",
-  "main": "index.js",
-  "keywords": [],
-  "author": ""
+    "url-loader": "^1.1.2"
+  }
 }
