@@ -6,12 +6,12 @@ defmodule AdminAppWeb.Router do
   @secret_key_base Application.get_env(:admin_app, AdminAppWeb.Endpoint)[:secret_key_base]
 
   pipeline :browser do
-    plug :accepts, ["html"]
-    plug :fetch_session
-    plug :fetch_live_flash
-    plug :put_root_layout, {AdminAppWeb.LayoutView, :root}
-    plug :protect_from_forgery
-    plug :put_secure_browser_headers
+    plug(:accepts, ["html"])
+    plug(:fetch_session)
+    plug(:fetch_live_flash)
+    plug(:put_root_layout, {AdminAppWeb.LayoutView, :root})
+    plug(:protect_from_forgery)
+    plug(:put_secure_browser_headers)
   end
 
   defp put_user_token(conn, _) do
@@ -105,7 +105,7 @@ defmodule AdminAppWeb.Router do
       :update_inventory_tracking
     )
 
-    get("/dashboard", DashboardController, :index)
+    live("/dashboard", Live.Dashboard)
 
     post(
       "/products/:product_id/property/:property_id/update",
@@ -204,12 +204,11 @@ defmodule AdminAppWeb.Router do
     import Phoenix.LiveDashboard.Router
 
     scope "/" do
-      pipe_through :browser
+      pipe_through(:browser)
 
-      live_dashboard "/live-dashboard", metrics: WeatherAppWeb.Telemetry
+      live_dashboard("/live-dashboard", metrics: WeatherAppWeb.Telemetry)
     end
   end
-
 
   scope "/", AdminAppWeb do
     pipe_through([:browser, :authentication])

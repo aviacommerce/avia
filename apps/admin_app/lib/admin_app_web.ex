@@ -62,6 +62,7 @@ defmodule AdminAppWeb do
       use Phoenix.LiveView,
         layout: {AdminAppWeb.LayoutView, "live.html"}
 
+      import AdminAppWeb.Live.Helpers.Auth
       unquote(view_helpers())
     end
   end
