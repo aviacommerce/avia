@@ -70,7 +70,7 @@ defmodule AdminAppWeb.OrderController do
       {:error, _} ->
         conn
         |> put_flash(:error, "No such order exists with given number")
-        |> redirect(to: live_path(conn, AdminAppWeb.Live.Dashboard))
+        |> redirect(to: live_path(conn, AdminAppWeb.DashboardIndex))
     end
   end
 
@@ -305,7 +305,7 @@ defmodule AdminAppWeb.OrderController do
 
     conn
     |> put_flash(:info, "Your request is accepted. Data will be emailed shortly")
-    |> redirect(to: live_path(conn, AdminAppWeb.Live.Dashboard))
+    |> redirect(to: live_path(conn, AdminAppWeb.DashboardIndex))
   end
 
   defp remove_line_item(edit_item, line_items) do

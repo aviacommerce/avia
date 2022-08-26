@@ -36,7 +36,15 @@ if (reactAppContainer) {
 
 function handleDOMContentLoaded() {
   // Get the current view name
-  const viewName = document.getElementsByTagName("body")[0].dataset.jsViewName;
+  let viewName = document.getElementsByTagName("body")[0].dataset.jsViewName;
+  
+  if (viewName === 'ViewTemplateView' || viewName === 'StaticTemplateView') {
+    viewName = document.querySelectorAll('[data-phx-view]')[0].dataset.phxView;
+    viewName = viewName
+      .replace('Elixir.AdminAppWeb.', '')
+      .replace('.', '')
+      .concat('View');
+  }
 
   // Load view class and mount it
   const ViewClass = loadView(viewName);

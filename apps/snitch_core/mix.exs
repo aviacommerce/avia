@@ -46,9 +46,9 @@ defmodule Snitch.Core.Mixfile do
     [
       {:postgrex, "~> 0.16.3"},
       {:ecto, "~> 3.8.4"},
-      {:bamboo, "~> 1.1"},
+      {:bamboo, "~> 2.2.0", override: true},
       {:combination, "~> 0.0.3"},
-      {:bamboo_smtp, "~> 1.6.0"},
+      {:bamboo_smtp, "~> 4.2.0"},
       {:bamboo_eex, "~> 0.1.0"},
       {:ex_money, "~> 5.12"},
       {:ex_money_sql, "~> 1.7"},
