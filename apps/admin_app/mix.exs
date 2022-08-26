@@ -42,6 +42,7 @@ defmodule AdminApp.Mixfile do
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.17.5"},
       {:phoenix_live_dashboard, "~> 0.6"},
+      {:vega_lite, "~> 0.1.6"},
       {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.1", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 0.6"},
@@ -56,7 +57,8 @@ defmodule AdminApp.Mixfile do
       {:params, "~> 2.2"},
       {:yaml_elixir, "~> 2.1.0"},
       # email
-      {:swoosh, "~> 0.20"},
+      {:swoosh, "~> 1.7.4"},
+      {:phoenix_swoosh, "~> 1.0.1"},
       {:snitch_payments, github: "aviacommerce/avia_payments", branch: "develop"},
       {:pdf_generator, ">=0.3.7"},
       {:jason, "~> 1.1"},

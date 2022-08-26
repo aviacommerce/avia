@@ -105,7 +105,7 @@ defmodule AdminAppWeb.Router do
       :update_inventory_tracking
     )
 
-    live("/dashboard", Live.Dashboard)
+    live("/dashboard", DashboardIndex)
 
     post(
       "/products/:product_id/property/:property_id/update",

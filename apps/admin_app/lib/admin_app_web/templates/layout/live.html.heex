@@ -1,4 +1,4 @@
-<main id="live-main" phx-hook="saveData">
+<main id="live-main" data-phx-view={@socket.view} >
   <p class="alert alert-info" role="alert"
     phx-click="lv:clear-flash"
     phx-value-key="info"><%= live_flash(@flash, :info) %></p>
