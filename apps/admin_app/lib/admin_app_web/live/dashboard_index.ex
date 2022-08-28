@@ -23,6 +23,7 @@ defmodule AdminAppWeb.DashboardIndex do
 
   def handle_params(params, _uri, socket) do
     {start_date, end_date} = get_date_from_params(params)
+    IO.inspect(get_order_state_count(start_date, end_date))
 
     {:noreply,
      socket
@@ -44,16 +45,34 @@ defmodule AdminAppWeb.DashboardIndex do
   def render(assigns) do
     ~H"""
     <div class="container">
-      <div class="row m-0 list-header">
-        <div class="col-10 p-0">
-          <h2>Dashboard</h2>
-        </div>
-      </div>
-      <div class="flex">
+      <h2 class="pb-5">Dashboard</h2>
+      <div class="flex justify-end">
         <.form class="group relative" let={f} for={:date_range}>
-          <%= text_input f, :start_date, type: "date", value: @start_date, phx_change: "update-start-date" %>
-          <%= text_input f, :end_date, type: "date", value: @end_date, phx_change: "update-end-date" %>
+          <label>from : </label>
+          <%= text_input f, :start_date, type: "date", value: @start_date, phx_change: "update-start-date", class: "border-0" %>
+          <%= text_input f, :end_date, type: "date", value: @end_date, phx_change: "update-end-date", class: "border-0" %>
         </.form>
+      </div>
+      <hr />
+      <div class="flex flex-col py-5">
+        <%= if @order_state_counts != [] do %> 
+          <div class="pb-5">
+            <h3 class="font-medium">Order stats</h3>
+            <hr />
+            <%= for %{state: state, count: count} <- @order_state_counts do %>
+              <%= "#{state} : #{count}" %>
+            <% end %>
+          </div>
+        <% end %>
+        <%= if @product_state_counts != [] do %> 
+          <div>
+            <h3 class="font-medium">Product stats</h3>
+            <hr />
+            <%= for %{state: state, count: count} <- @product_state_counts do %>
+              <%= "#{state} : #{count}" %>
+            <% end %>
+          </div>
+        <% end %>
       </div>
       <div class="flex">
         <.live_component module={AdminAppWeb.VegaLiteComponent}
@@ -72,14 +91,22 @@ defmodule AdminAppWeb.DashboardIndex do
   def handle_event("update-start-date", %{"date_range" => %{"start_date" => start_date}}, socket) do
     {:noreply,
      push_patch(socket,
-       to: Routes.live_path(socket, AdminAppWeb.DashboardIndex, %{from: start_date, to: socket.assigns.end_date})
+       to:
+         Routes.live_path(socket, AdminAppWeb.DashboardIndex, %{
+           from: start_date,
+           to: socket.assigns.end_date
+         })
      )}
   end
 
   def handle_event("update-end-date", %{"date_range" => %{"end_date" => end_date}}, socket) do
     {:noreply,
      push_patch(socket,
-       to: Routes.live_path(socket, AdminAppWeb.DashboardIndex, %{from: socket.assigns.start_date, to: end_date})
+       to:
+         Routes.live_path(socket, AdminAppWeb.DashboardIndex, %{
+           from: socket.assigns.start_date,
+           to: end_date
+         })
      )}
   end
 
