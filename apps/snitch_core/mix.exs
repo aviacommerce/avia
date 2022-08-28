@@ -53,8 +53,6 @@ defmodule Snitch.Core.Mixfile do
       {:ex_money, "~> 5.12"},
       {:ex_money_sql, "~> 1.7"},
       {:rummage_ecto, "~> 2.0"},
-      {:credo, "~> 0.9.1", only: :dev, runtime: false},
-      {:credo_contrib, "~> 0.1.0-rc3", only: :dev, runtime: false},
       {:as_nested_set, "~> 3.4"},
       # {:ecto_atom, "~> 1.0.0", override: true},
       {:ecto_identifier, "~> 0.2.0"},
