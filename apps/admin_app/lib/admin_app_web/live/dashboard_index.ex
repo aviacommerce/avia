@@ -9,21 +9,11 @@ defmodule AdminAppWeb.DashboardIndex do
     if connected?(socket),
       do: IO.puts("Live Dashboard is connected")
 
-    with {:ok, socket} <- prepare_assigns(session, socket) do
-      {start_date, end_date} = get_date_from_params(params)
-
-      {:ok,
-       socket
-       |> assign(:conn, socket)}
-    else
-      _ ->
-        {:error, :not_authorized}
-    end
+    prepare_assigns(session, socket)
   end
 
   def handle_params(params, _uri, socket) do
     {start_date, end_date} = get_date_from_params(params)
-    IO.inspect(get_order_state_count(start_date, end_date))
 
     {:noreply,
      socket
@@ -50,27 +40,32 @@ defmodule AdminAppWeb.DashboardIndex do
         <.form class="group relative" let={f} for={:date_range}>
           <label>from : </label>
           <%= text_input f, :start_date, type: "date", value: @start_date, phx_change: "update-start-date", class: "border-0" %>
+          <label>to : </label>
           <%= text_input f, :end_date, type: "date", value: @end_date, phx_change: "update-end-date", class: "border-0" %>
         </.form>
       </div>
       <hr />
       <div class="flex flex-col py-5">
         <%= if @order_state_counts != [] do %> 
-          <div class="pb-5">
-            <h3 class="font-medium">Order stats</h3>
-            <hr />
-            <%= for %{state: state, count: count} <- @order_state_counts do %>
-              <%= "#{state} : #{count}" %>
-            <% end %>
+          <div>
+            <h3 class="font-medium">Orders : 
+              <%= for %{state: state, count: count} <- @order_state_counts do %>
+                <span class="bg-green-200 text-gray-800 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded mr-2 dark:bg-gray-700 dark:text-gray-300">
+                  <%= "#{state} : #{count} " %>
+                </span>
+              <% end %>
+            </h3>
           </div>
         <% end %>
         <%= if @product_state_counts != [] do %> 
           <div>
-            <h3 class="font-medium">Product stats</h3>
-            <hr />
-            <%= for %{state: state, count: count} <- @product_state_counts do %>
-              <%= "#{state} : #{count}" %>
-            <% end %>
+            <h3 class="font-medium">Products :
+              <%= for %{state: state, count: count} <- @product_state_counts do %>
+                <span class="bg-blue-200 text-gray-800 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded mr-2 dark:bg-gray-700 dark:text-gray-300">
+                  <%= "#{state} : #{count} " %>
+                </span>
+              <% end %>
+            </h3>
           </div>
         <% end %>
       </div>
@@ -176,17 +171,6 @@ defmodule AdminAppWeb.DashboardIndex do
     start_date
     |> Model.Payment.get_payment_count_by_date(end_date)
     |> Enum.map(&%{date: &1.date, amount: get_amount(&1.count)})
-  end
-
-  defp only_key(data, key) do
-    data |> Enum.into([], fn x -> x |> Map.get(key) end)
-  end
-
-  defp format_response(data) do
-    Enum.map(data, &%{date: &1.date, orders: &1.count})
-  end
-
-  defp format_payment_response(data) do
   end
 
   defp get_amount(money) do
