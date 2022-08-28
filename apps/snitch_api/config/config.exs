@@ -19,6 +19,7 @@ config :logger, :console,
 
 # Configures JSON API encoding
 config :phoenix, :format_encoders, "json-api": Jason
+config :phoenix, :json_library, Jason
 
 # Configures JSON API mime type
 config :mime, :types, %{
