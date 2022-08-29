@@ -10,6 +10,7 @@ defmodule AdminApp.Mixfile do
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
       elixir: "~> 1.13.4",
+      aliases: aliases(),
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
@@ -71,7 +72,7 @@ defmodule AdminApp.Mixfile do
 
   defp aliases do
     [
-      "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
+      "assets.deploy": ["tailwind default --minify", "esbuild default --minify --loader:.js=jsx", "phx.digest"]
     ]
   end
 end
