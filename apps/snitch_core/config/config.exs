@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :snitch_core, ecto_repos: [Snitch.Repo]
 config :ecto, :json_library, Jason
@@ -49,4 +49,4 @@ config :snitch_core, Snitch.Tools.ElasticsearchCluster,
 
 config :ex_cldr, default_backend: Snitch.Tools.Cldr
 
-import_config "#{Mix.env()}.exs"
+import_config "#{config_env()}.exs"
