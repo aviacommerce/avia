@@ -14,7 +14,7 @@ defmodule AdminAppWeb.OrderIndex do
   def handle_params(params, _uri, socket) do
     {start_date, end_date} = get_date_from_params(params)
     page = params["page"] || 1
-    orders = OrderContext.order_list("pending", nil, page)
+    orders = OrderContext.order_list("pending", nil, page, {start_date, end_date})
 
     {:noreply,
      socket

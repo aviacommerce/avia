@@ -41,7 +41,7 @@ defmodule AdminApp.Mixfile do
       {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_html, "~> 3.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 0.17.5"},
+      {:phoenix_live_view, "~> 0.17.11"},
       {:phoenix_live_dashboard, "~> 0.6"},
       {:vega_lite, "~> 0.1.6"},
       {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
