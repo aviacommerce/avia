@@ -6,9 +6,15 @@ defmodule Snitch.Data.Model.Order do
   import Snitch.Tools.Helper.QueryFragment
 
   alias Snitch.Data.Schema.Order
+  alias Snitch.Data.Schema.Package
   alias Snitch.Data.Model.LineItem, as: LineItemModel
 
   @order_states ["confirmed", "complete"]
+  @order_package_state_map %{
+    "shipped" => [:shipped, :delivered],
+    "unshipped" => [:ready],
+    "pending" => [:processing]
+  }
   @doc """
   Creates an order with supplied `params` and `line_items`.
 
@@ -220,6 +226,17 @@ defmodule Snitch.Data.Model.Order do
 
     Repo.all(query)
   end
+
+  def with_states_query(query, states), do: from(q in query, where: q.state in ^states)
+
+  def updated_between_query(query, start_date, end_date),
+    do: from(q in query, where: q.updated_at >= ^start_date and q.updated_at <= ^end_date)
+
+  def with_package_states_query(query, states),
+    do:
+      from(q in query, left_join: p in Package, on: q.id == p.order_id, where: p.state in ^states)
+
+  def order_package_state_map, do: @order_package_state_map
 
   defp update_line_item_costs(line_items) when is_list(line_items) do
     LineItemModel.update_unit_price(line_items)
