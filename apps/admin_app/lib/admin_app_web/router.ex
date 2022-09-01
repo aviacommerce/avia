@@ -47,8 +47,8 @@ defmodule AdminAppWeb.Router do
     pipe_through([:browser, :authentication])
 
     get("/", PageController, :index)
-    live("/dashboard", DashboardIndex)
-    live("/orders", OrderIndex)
+    live("/dashboard", Live.DashboardIndex)
+    live("/orders", Live.OrderIndex)
 
     get("/products/export_products", ProductController, :export_product)
     get("/fetch_states/:country_id", StockLocationController, :fetch_country_states)
