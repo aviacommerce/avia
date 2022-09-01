@@ -37,10 +37,8 @@ defmodule AdminAppWeb.Live.OrderIndex do
         </.form>
       </div>
       <hr />
-      <div>
-        <%= for order <- @orders.list do %>
-          <.live_component module={AdminAppWeb.OrderListCardComponent} id={order.number} order={order} />
-        <% end %>
+      <div class="flex w-full">
+        <.live_component module={AdminAppWeb.OrderListComponent} id="orders-list" orders={@orders.list} />
       </div>
     </div>
     """
