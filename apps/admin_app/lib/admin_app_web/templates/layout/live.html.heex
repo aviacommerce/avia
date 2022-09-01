@@ -13,7 +13,7 @@
         <%= render "sidebar.html", conn: @conn %>
       </div>
     <% end %>
-    <div class="main p-5" >
+    <div class="main p-5 w-full">
       <%= Map.get(assigns, :inner_layout) || @inner_content %>
     </div>
   </main>
