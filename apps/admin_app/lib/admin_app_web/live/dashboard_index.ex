@@ -1,4 +1,4 @@
-defmodule AdminAppWeb.DashboardIndex do
+defmodule AdminAppWeb.Live.DashboardIndex do
   use AdminAppWeb, :live_view
 
   alias Snitch.Data.Model
@@ -87,7 +87,7 @@ defmodule AdminAppWeb.DashboardIndex do
     {:noreply,
      push_patch(socket,
        to:
-         Routes.live_path(socket, AdminAppWeb.DashboardIndex, %{
+         Routes.live_path(socket, AdminAppWeb.Live.DashboardIndex, %{
            from: start_date,
            to: socket.assigns.end_date
          })
@@ -98,7 +98,7 @@ defmodule AdminAppWeb.DashboardIndex do
     {:noreply,
      push_patch(socket,
        to:
-         Routes.live_path(socket, AdminAppWeb.DashboardIndex, %{
+         Routes.live_path(socket, AdminAppWeb.Live.DashboardIndex, %{
            from: socket.assigns.start_date,
            to: end_date
          })

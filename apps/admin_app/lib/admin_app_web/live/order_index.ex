@@ -1,4 +1,4 @@
-defmodule AdminAppWeb.OrderIndex do
+defmodule AdminAppWeb.Live.OrderIndex do
   use AdminAppWeb, :live_view
 
   alias AdminApp.OrderContext
@@ -37,9 +37,9 @@ defmodule AdminAppWeb.OrderIndex do
         </.form>
       </div>
       <hr />
-      <div class="flex">
+      <div>
         <%= for order <- @orders.list do %>
-          <%= order.number %> 
+          <.live_component module={AdminAppWeb.OrderListCardComponent} id={order.number} order={order} />
         <% end %>
       </div>
     </div>
@@ -50,7 +50,7 @@ defmodule AdminAppWeb.OrderIndex do
     {:noreply,
      push_patch(socket,
        to:
-         Routes.live_path(socket, AdminAppWeb.OrderIndex, %{
+         Routes.live_path(socket, AdminAppWeb.Live.OrderIndex, %{
            from: start_date,
            to: socket.assigns.end_date
          })
@@ -61,7 +61,7 @@ defmodule AdminAppWeb.OrderIndex do
     {:noreply,
      push_patch(socket,
        to:
-         Routes.live_path(socket, AdminAppWeb.OrderIndex, %{
+         Routes.live_path(socket, AdminAppWeb.Live.OrderIndex, %{
            from: socket.assigns.start_date,
            to: end_date
          })
