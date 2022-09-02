@@ -3,6 +3,7 @@ defmodule AdminAppWeb.Live.OrderIndex do
 
   alias AdminApp.OrderContext
   alias AdminAppWeb.Helpers
+  import AdminAppWeb.Live.DataTable
 
   def mount(params, session, socket) do
     if connected?(socket),
@@ -14,13 +15,14 @@ defmodule AdminAppWeb.Live.OrderIndex do
   def handle_params(params, _uri, socket) do
     {start_date, end_date} = get_date_from_params(params)
     page = params["page"] || 1
-    orders = OrderContext.order_list("pending", nil, page, {start_date, end_date})
+    orders = OrderContext.order_list("pending", sort(params), page, {start_date, end_date})
 
     {:noreply,
      socket
      |> assign(:end_date, naive_date_to_string(end_date))
      |> assign(:start_date, naive_date_to_string(start_date))
      |> assign(:conn, socket)
+     |> assign(:params, params)
      |> assign(:orders, orders)}
   end
 
@@ -38,7 +40,7 @@ defmodule AdminAppWeb.Live.OrderIndex do
       </div>
       <hr />
       <div class="flex w-full">
-        <.live_component module={AdminAppWeb.OrderListComponent} id="orders-list" orders={@orders.list} />
+        <.live_component module={AdminAppWeb.OrderListComponent} id="orders-list" params={@params} orders={@orders} />
       </div>
     </div>
     """
