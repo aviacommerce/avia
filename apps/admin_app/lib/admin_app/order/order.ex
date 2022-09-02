@@ -140,19 +140,7 @@ defmodule AdminApp.OrderContext do
     }
   end
 
-  defp get_rummage(sort_param) do
-    case sort_param do
-      nil ->
-        %{}
-
-      _ ->
-        sort_order = String.to_atom(sort_param)
-
-        %{
-          sort: %{field: :inserted_at, order: sort_order}
-        }
-    end
-  end
+  defp get_rummage(sort_param), do: %{ sort: sort_param }
 
   defp order_preloads(query) do
     preload(query, [:user, [packages: :items], [line_items: :product]])
