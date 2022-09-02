@@ -20,7 +20,10 @@ defmodule AdminAppWeb.OrderListComponent do
               <%= table_link(@params, "Placed On" , :inserted_at) %>
             </th>
             <th scope="col" class="py-3 px-6">
-              <%= table_link(@params, "Placed On" , :inserted_at) %>
+              <%= table_link(@params, "State" , :state) %>
+            </th>
+            <th scope="col" class="py-3 px-6">
+              Total
             </th>
           </tr>
         </thead>
@@ -37,6 +40,9 @@ defmodule AdminAppWeb.OrderListComponent do
               </th>
               <td class="py-4 px-6">
                 <%= order.inserted_at %>
+              </td>
+              <td class="py-4 px-6">
+                <%= order.state %>
               </td>
               <td class="py-4 px-6">
                 <%= order_total(order) %>
