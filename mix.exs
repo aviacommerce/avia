@@ -4,7 +4,7 @@ defmodule Snitch.Mixfile do
   def project do
     [
       apps_path: "apps",
-      elixir: "~> 1.13.4",
+      elixir: "~> 1.14.2",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       test_coverage: [tool: ExCoveralls],

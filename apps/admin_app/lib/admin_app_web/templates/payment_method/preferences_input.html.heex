@@ -1,0 +1,17 @@
+<%= for {credential, value} <- @credentials do %>
+  <div class="form-group row ">
+    <label for="inputEmail3" class="col-sm-3 col-form-label">
+      <div class="label">
+        <%= capitalize(credential) %>
+      </div>
+      <div class="label-txt">Add fee to this payment method.</div>
+    </label>
+    <div class="col-sm-9">
+      <%= text_input(:preferences, credential,
+        name: "payment_method[preferences][#{credential}]",
+        value: value,
+        class: "form-control"
+      ) %>
+    </div>
+  </div>
+<% end %>

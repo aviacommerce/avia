@@ -1,16 +1,16 @@
-<main id="live-main" data-phx-view={@socket.view} >
-  <p class="alert alert-info" role="alert"
-    phx-click="lv:clear-flash"
-    phx-value-key="info"><%= live_flash(@flash, :info) %></p>
+<main id="live-main" data-phx-view={@socket.view}>
+  <p class="alert alert-info" role="alert" phx-click="lv:clear-flash" phx-value-key="info">
+    <%= live_flash(@flash, :info) %>
+  </p>
 
-  <p class="alert alert-danger" role="alert"
-    phx-click="lv:clear-flash"
-    phx-value-key="error"><%= live_flash(@flash, :error) %></p>
+  <p class="alert alert-danger" role="alert" phx-click="lv:clear-flash" phx-value-key="error">
+    <%= live_flash(@flash, :error) %>
+  </p>
 
   <main role="main" class="flex">
     <%= if @current_user do %>
       <div class="sidebar h-screen">
-        <%= render "sidebar.html", conn: @conn %>
+        <%= render("sidebar.html", conn: @conn) %>
       </div>
     <% end %>
     <div class="main p-5 w-full">

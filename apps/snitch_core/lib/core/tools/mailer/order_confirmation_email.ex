@@ -12,7 +12,7 @@ defmodule Snitch.Tools.OrderEmail do
   email_template =
     Path.join([
       File.cwd!(),
-      "lib/core/tools/mailer/email_templates/order_confirmation_email.html.eex"
+      "lib/core/tools/mailer/email_templates/order_confirmation_email.html.heex"
     ])
 
   EEx.function_from_file(:defp, :order_email, email_template, [:assigns])

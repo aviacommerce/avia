@@ -1,23 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="csrf-token" content={csrf_token_value()}>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content={csrf_token_value()} />
     <link rel="icon" href="/favicon.png" type="image/x-icon" />
     <link rel="shortcut icon" href="/favicon.png" type="image/x-icon" />
-    <%= live_title_tag assigns[:page_title] || "Avia | Admin", suffix: " · Phoenix Framework" %>
-    <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")}/>
-    <script defer phx-track-static type="text/javascript" src={Routes.static_path(@conn, "/assets/app.js")}></script>
+    <%= live_title_tag(assigns[:page_title] || "Avia | Admin", suffix: " · Phoenix Framework") %>
+    <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")} />
+    <script
+      defer
+      phx-track-static
+      type="text/javascript"
+      src={Routes.static_path(@conn, "/assets/app.js")}
+    >
+    </script>
   </head>
-  <body class="antialiased text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900" data-js-view-name={js_view_name(@conn, view_template(@conn))}>
+  <body
+    class="antialiased text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900"
+    data-js-view-name={js_view_name(@conn, view_template(@conn))}
+  >
     <%= @inner_content %>
-    <script>window.userToken = "<%= @conn.assigns[:user_token] %>";</script>
-    <script defer phx-track-static type="text/javascript" src={static_path(@conn, "/assets/app.js")}></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-color/2.1.2/jquery.color.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script>
+      window.userToken = "<%= @conn.assigns[:user_token] %>";
+    </script>
+    <script
+      defer
+      phx-track-static
+      type="text/javascript"
+      src={static_path(@conn, "/assets/app.js")}
+    >
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-color/2.1.2/jquery.color.js">
+    </script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js">
+    </script>
   </body>
 </html>
