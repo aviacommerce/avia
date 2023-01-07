@@ -9,7 +9,7 @@ defmodule AdminApp.Mixfile do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.13.4",
+      elixir: "~> 1.14.2",
       aliases: aliases(),
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
@@ -37,7 +37,7 @@ defmodule AdminApp.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.6.11"},
+      {:phoenix, "~> 1.7.0-rc.0", override: true},
       {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_html, "~> 3.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
@@ -59,7 +59,7 @@ defmodule AdminApp.Mixfile do
       {:yaml_elixir, "~> 2.1.0"},
       # email
       {:swoosh, "~> 1.7.4"},
-      {:phoenix_swoosh, "~> 1.0.1"},
+      {:phoenix_swoosh, "~> 1.1.0"},
       {:snitch_payments, github: "aviacommerce/avia_payments", branch: "develop"},
       {:pdf_generator, ">=0.3.7"},
       {:jason, "~> 1.1"},
@@ -72,7 +72,11 @@ defmodule AdminApp.Mixfile do
 
   defp aliases do
     [
-      "assets.deploy": ["tailwind default --minify", "esbuild default --minify --loader:.js=jsx", "phx.digest"]
+      "assets.deploy": [
+        "tailwind default --minify",
+        "esbuild default --minify --loader:.js=jsx",
+        "phx.digest"
+      ]
     ]
   end
 end
