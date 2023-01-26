@@ -23,7 +23,7 @@
   >
     <%= @inner_content %>
     <script>
-      window.userToken = "<%= @conn.assigns[:user_token] %>";
+      window.userToken = { @conn.assigns[:user_token] };
     </script>
     <script
       defer
