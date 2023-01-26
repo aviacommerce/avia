@@ -16,36 +16,35 @@
         <div class="card-body">
           <div class="card-body">
             <form method="get">
-              <input type="text" name="address_search">
+              <input type="text" name="address_search" />
             </form>
           </div>
-            <div class="card-header text-center">Cart</div>
-            <div class="card-body">
-              <table class="table">
-                <thead class="thead-light">
-                  <tr>
-                    <th scope="col">First Name</th>
-                    <th scope="col">Last Name</th>
-                    <th scope="col">Address</th>
-                    <th scope="col">City</th>
-                    <th scope="col">Phone</th>
-                    <th scope="col">Attach</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <%= for address <- @address_list do %>
-                    <%= build_address(address, @order) %>
-                  <% end %>
-                </tbody>
-              </table>
-            </div>
+          <div class="card-header text-center">Cart</div>
+          <div class="card-body">
+            <table class="table">
+              <thead class="thead-light">
+                <tr>
+                  <th scope="col">First Name</th>
+                  <th scope="col">Last Name</th>
+                  <th scope="col">Address</th>
+                  <th scope="col">City</th>
+                  <th scope="col">Phone</th>
+                  <th scope="col">Attach</th>
+                </tr>
+              </thead>
+              <tbody>
+                <%= for address <- @address_list do %>
+                  <%= build_address(address, @order) %>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
     <div class="col-4">
       <h3>Order Summary</h3>
-      <%= render "order_total_summary.html", order: @order %>
+      <%= render("order_total_summary.html", order: @order) %>
     </div>
-  </div>
   </div>
 </div>
