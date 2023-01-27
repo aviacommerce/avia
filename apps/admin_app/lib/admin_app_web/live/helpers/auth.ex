@@ -1,5 +1,5 @@
 defmodule AdminAppWeb.Live.Helpers.Auth do
-  import Phoenix.LiveView, only: [assign: 3]
+  import Phoenix.Component, only: [assign: 3]
 
   def prepare_assigns(%{"guardian_default_token" => guardian_default_token}, _socket)
       when is_nil(guardian_default_token),

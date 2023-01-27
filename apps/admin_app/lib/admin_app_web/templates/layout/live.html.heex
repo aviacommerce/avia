@@ -1,11 +1,19 @@
-<main id="live-main" data-phx-view={@socket.view}>
-  <p class="alert alert-info" role="alert" phx-click="lv:clear-flash" phx-value-key="info">
-    <%= live_flash(@flash, :info) %>
-  </p>
+<.container>
+  <.alert
+    color="info"
+    class="mb-5"
+    label={live_flash(@flash, :info)}
+    phx-click="lv:clear-flash"
+    phx-value-key="info"
+  />
 
-  <p class="alert alert-danger" role="alert" phx-click="lv:clear-flash" phx-value-key="error">
-    <%= live_flash(@flash, :error) %>
-  </p>
+  <.alert
+    color="danger"
+    class="mb-5"
+    label={live_flash(@flash, :error)}
+    phx-click="lv:clear-flash"
+    phx-value-key="error"
+  />
 
   <main role="main" class="flex">
     <%= if @current_user do %>
@@ -17,4 +25,4 @@
       <%= Map.get(assigns, :inner_layout) || @inner_content %>
     </div>
   </main>
-</main>
+</.container>

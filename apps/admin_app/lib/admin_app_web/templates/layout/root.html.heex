@@ -7,7 +7,9 @@
     <meta name="csrf-token" content={csrf_token_value()} />
     <link rel="icon" href="/favicon.png" type="image/x-icon" />
     <link rel="shortcut icon" href="/favicon.png" type="image/x-icon" />
-    <%= live_title_tag(assigns[:page_title] || "Avia | Admin", suffix: " · Phoenix Framework") %>
+    <.live_title suffix="Aviacommerce – ">
+      <%= assigns[:page_title] || "Avia | Admin" %>
+    </.live_title>
     <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")} />
     <script
       defer
