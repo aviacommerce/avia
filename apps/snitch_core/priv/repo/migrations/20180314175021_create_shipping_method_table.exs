@@ -3,11 +3,12 @@ defmodule Snitch.Repo.Migrations.CreateShippingMethodTable do
 
   def change do
     create table("snitch_shipping_methods") do
-      add :slug, :string, null: :false
-      add :name, :string, null: :false
+      add :slug, :string, null: false
+      add :name, :string, null: false
       add :description, :text, null: false
       timestamps()
     end
+
     create unique_index("snitch_shipping_methods", :slug)
 
     create table("snitch_shipping_methods_zones") do

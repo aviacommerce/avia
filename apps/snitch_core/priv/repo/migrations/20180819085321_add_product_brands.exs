@@ -7,5 +7,4 @@ defmodule Snitch.Repo.Migrations.AddProductBrands do
       timestamps()
     end
   end
-
 end

@@ -14,7 +14,7 @@ defmodule Snitch.Repo.Migrations.AddShipmentUnitsTable do
     end
 
     create index(:snitch_shipment_units, [:line_item_id])
-    #create index(:snitch_shipment_units, [:shipment_id])
+    # create index(:snitch_shipment_units, [:shipment_id])
     create index(:snitch_shipment_units, [:variant_id])
   end
 end

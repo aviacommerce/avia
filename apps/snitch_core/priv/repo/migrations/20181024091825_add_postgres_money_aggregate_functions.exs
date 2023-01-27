@@ -48,6 +48,7 @@ defmodule Snitch.Repo.Migrations.AddPostgresMoneyAggregateFunctions do
 
   def down do
     execute "DROP AGGREGATE IF EXISTS sum(money_with_currency);"
+
     execute "DROP FUNCTION IF EXISTS money_state_function(agg_state money_with_currency, money money_with_currency);"
   end
 end

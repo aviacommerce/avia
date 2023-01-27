@@ -17,9 +17,12 @@ defmodule AdminAppWeb do
   and import those modules here.
   """
 
+  def static_paths, do: ~w(assets fonts images favicon.ico robots.txt)
+
   def controller do
     quote do
-      use Phoenix.Controller, namespace: AdminAppWeb
+      use Phoenix.Controller,
+        formats: [:html, :json]
 
       import Plug.Conn
       import AdminAppWeb.Router.Helpers
@@ -44,16 +47,18 @@ defmodule AdminAppWeb do
 
   def view do
     quote do
+      use Phoenix.Component
+
       use Phoenix.View,
         root: "lib/admin_app_web/templates",
         namespace: AdminAppWeb
 
       # Import convenience functions from controllers
       import Phoenix.Controller,
-        only: [get_flash: 1, get_flash: 2, view_module: 1, view_template: 1]
+        only: [get_csrf_token: 0, get_flash: 1, get_flash: 2, view_module: 1, view_template: 1]
 
       # Include shared imports and aliases for views
-      unquote(view_helpers())
+      unquote(html_helpers())
     end
   end
 
@@ -63,7 +68,7 @@ defmodule AdminAppWeb do
         layout: {AdminAppWeb.LayoutView, "live.html"}
 
       import AdminAppWeb.Live.Helpers.Auth
-      unquote(view_helpers())
+      unquote(html_helpers())
     end
   end
 
@@ -71,7 +76,7 @@ defmodule AdminAppWeb do
     quote do
       use Phoenix.LiveComponent
 
-      unquote(view_helpers())
+      unquote(html_helpers())
     end
   end
 
@@ -79,7 +84,7 @@ defmodule AdminAppWeb do
     quote do
       use Phoenix.Component
 
-      unquote(view_helpers())
+      unquote(html_helpers())
     end
   end
 
@@ -96,21 +101,16 @@ defmodule AdminAppWeb do
   def channel do
     quote do
       use Phoenix.Channel
-      import AdminAppWeb.Gettext
     end
   end
 
-  defp view_helpers do
+  defp html_helpers do
     quote do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
-      # Import LiveView and .heex helpers (live_render, live_patch, <.form>, etc)
-      import Phoenix.LiveView.Helpers
-      import Phoenix.Component
-
-      # Import basic rendering functionality (render, render_layout, etc)
-      import Phoenix.View
+      # Shortcut for generating JS commands
+      alias Phoenix.LiveView.JS
 
       use PetalComponents
 
@@ -121,6 +121,7 @@ defmodule AdminAppWeb do
       import AdminAppWeb.PaginationHelpers
       import AdminAppWeb.DataHelpers
       alias AdminAppWeb.Router.Helpers, as: Routes
+      unquote(verified_routes())
     end
   end
 
@@ -129,5 +130,14 @@ defmodule AdminAppWeb do
   """
   defmacro __using__(which) when is_atom(which) do
     apply(__MODULE__, which, [])
+  end
+
+  def verified_routes do
+    quote do
+      use Phoenix.VerifiedRoutes,
+        endpoint: AdminAppWeb.Endpoint,
+        router: AdminAppWeb.Router,
+        statics: AdminAppWeb.static_paths()
+    end
   end
 end

@@ -26,7 +26,8 @@ defmodule Snitch.Repo.Migrations.AddTaxZone do
     end
 
     create unique_index(:snitch_tax_rates, [:name, :tax_zone_id],
-      name: :unique_tax_rate_name_for_tax_zone)
+             name: :unique_tax_rate_name_for_tax_zone
+           )
 
     create table(:snitch_tax_rate_class_values) do
       add(:percent_amount, :integer, null: false)
@@ -37,6 +38,7 @@ defmodule Snitch.Repo.Migrations.AddTaxZone do
     end
 
     create unique_index(:snitch_tax_rate_class_values, [:tax_rate_id, :tax_class_id],
-      name: :unique_tax_rate_class_value)
+             name: :unique_tax_rate_class_value
+           )
   end
 end
