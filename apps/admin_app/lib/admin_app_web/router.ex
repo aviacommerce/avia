@@ -43,6 +43,18 @@ defmodule AdminAppWeb.Router do
   end
 
   scope "/", AdminAppWeb do
+    pipe_through(:browser)
+    get("/orders/:number/show-invoice", OrderController, :show_invoice)
+    get("/orders/:number/show-packing-slip", OrderController, :show_packing_slip)
+    get("/orders/:number/download-packing-slip", OrderController, :download_packing_slip_pdf)
+    get("/orders/:number/download-invoice", OrderController, :download_invoice_pdf)
+    resources("/session", SessionController, only: [:new, :create, :edit, :update])
+    get("/password_reset", SessionController, :password_reset)
+    get("/password_recovery", SessionController, :verify)
+    post("/check_email", SessionController, :check_email)
+  end
+
+  scope "/", AdminAppWeb do
     # Use the default browser stack
     pipe_through([:browser, :authentication])
 
@@ -160,18 +172,6 @@ defmodule AdminAppWeb.Router do
     pipe_through(:avoid_csrf)
     patch("/variant_state/:id", ProductController, :toggle_variant_state)
     post("/products/variants/new", ProductController, :new_variant)
-  end
-
-  scope "/", AdminAppWeb do
-    pipe_through(:browser)
-    get("/orders/:number/show-invoice", OrderController, :show_invoice)
-    get("/orders/:number/show-packing-slip", OrderController, :show_packing_slip)
-    get("/orders/:number/download-packing-slip", OrderController, :download_packing_slip_pdf)
-    get("/orders/:number/download-invoice", OrderController, :download_invoice_pdf)
-    resources("/session", SessionController, only: [:new, :create, :edit, :update])
-    get("/password_reset", SessionController, :password_reset)
-    get("/password_recovery", SessionController, :verify)
-    post("/check_email", SessionController, :check_email)
   end
 
   # Other scopes may use custom stacks.

@@ -2,20 +2,26 @@
 // https://tailwindcss.com/docs/configuration
 
 const plugin = require('tailwindcss/plugin');
+const colors = require("tailwindcss/colors");
 
 module.exports = {
   content: [
     './js/**/*.js',
     '../lib/*_web.ex',
     '../lib/*_web/**/*.*ex',
-    './node_modules/flowbite/**/*.js',
+    "../deps/petal_components/**/*.*ex",
   ],
+  darkMode: "class",
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: colors.blue,
+        secondary: colors.pink,
+      },
+    },
   },
   plugins: [
     require('@tailwindcss/forms'),
-    require('flowbite/plugin'),
     plugin(({ addVariant }) => addVariant('phx-no-feedback', ['&.phx-no-feedback', '.phx-no-feedback &'])),
     plugin(({ addVariant }) => addVariant('phx-click-loading', [
       '&.phx-click-loading',

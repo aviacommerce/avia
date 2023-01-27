@@ -20,8 +20,6 @@ import "phoenix_html";
 
 // import socket from "./socket"
 
-import "bootstrap";
-import 'flowbite';
 import select2Selector from "./form-helpers/select2-selector";
 import loadView from "./views/loader";
 
