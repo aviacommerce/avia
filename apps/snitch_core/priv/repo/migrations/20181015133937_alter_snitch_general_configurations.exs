@@ -1,6 +1,6 @@
 defmodule Snitch.Repo.Migrations.AlterSnitchGeneralConfigurations do
   use Ecto.Migration
- 
+
   def change do
     alter table("snitch_general_configurations") do
       remove :meta_description

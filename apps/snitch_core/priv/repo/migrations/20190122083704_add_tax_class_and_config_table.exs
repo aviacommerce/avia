@@ -10,8 +10,11 @@ defmodule Snitch.Repo.Migrations.AddTaxClassAndConfigTable do
     end
 
     create unique_index(:snitch_tax_classes, [:name])
-    create unique_index(:snitch_tax_classes, [:is_default], where: "is_default=true",
-    name: :unique_default_tax_class)
+
+    create unique_index(:snitch_tax_classes, [:is_default],
+             where: "is_default=true",
+             name: :unique_default_tax_class
+           )
 
     create table(:snitch_tax_configuration) do
       add(:label, :string)

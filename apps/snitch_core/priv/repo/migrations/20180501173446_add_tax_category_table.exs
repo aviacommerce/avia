@@ -11,6 +11,7 @@ defmodule Snitch.Repo.Migrations.AddTaxCategoryTable do
 
       timestamps()
     end
+
     create unique_index(:snitch_tax_categories, [:name], where: "deleted_at is null")
   end
 

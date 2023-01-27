@@ -3,6 +3,7 @@ defmodule Snitch.Repo.Migrations.AddPromotionAction do
 
   def change do
     execute("CREATE EXTENSION IF NOT EXISTS citext")
+
     create table("snitch_promotion_actions") do
       add(:name, :citext, null: false)
       add(:module, PromotionRuleEnum.type(), null: false)

@@ -17,7 +17,6 @@ defmodule Snitch.Repo.Migrations.AddPromotionsTable do
       timestamps()
     end
 
-    create unique_index("snitch_promotions", [:code, :archived_at],
-      name: :unique_promotion_code)
+    create unique_index("snitch_promotions", [:code, :archived_at], name: :unique_promotion_code)
   end
 end

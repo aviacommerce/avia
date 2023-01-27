@@ -2,7 +2,7 @@ defmodule Snitch.Repo.Migrations.AddTaxRateTable do
   use Ecto.Migration
 
   def change do
-    create  table(:snitch_tax_rates) do
+    create table(:snitch_tax_rates) do
       add :name, :string, null: false
       add :value, :decimal, null: false
       add :calculator, :string, null: false
@@ -14,7 +14,6 @@ defmodule Snitch.Repo.Migrations.AddTaxRateTable do
       timestamps()
     end
 
-    create unique_index(:snitch_tax_rates, [:name, :zone_id],
-      name: :unique_name_per_zone)
+    create unique_index(:snitch_tax_rates, [:name, :zone_id], name: :unique_name_per_zone)
   end
 end

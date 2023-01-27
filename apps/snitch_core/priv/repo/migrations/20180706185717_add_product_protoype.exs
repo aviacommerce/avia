@@ -9,13 +9,18 @@ defmodule Snitch.Repo.Migrations.AddProductProtoype do
     end
 
     create table("snitch_prototype_property") do
-      add :product_prototype_id, references("snitch_product_prototype", on_delete: :delete_all), null: false
+      add :product_prototype_id, references("snitch_product_prototype", on_delete: :delete_all),
+        null: false
+
       add :property_id, references("snitch_properties", on_delete: :delete_all), null: false
     end
 
     create table("snitch_prototype_themes") do
-      add :product_prototype_id, references("snitch_product_prototype", on_delete: :delete_all), null: false
-      add :variation_theme_id, references("snitch_variation_theme", on_delete: :delete_all), null: false
+      add :product_prototype_id, references("snitch_product_prototype", on_delete: :delete_all),
+        null: false
+
+      add :variation_theme_id, references("snitch_variation_theme", on_delete: :delete_all),
+        null: false
     end
 
     create unique_index("snitch_product_prototype", [:name])

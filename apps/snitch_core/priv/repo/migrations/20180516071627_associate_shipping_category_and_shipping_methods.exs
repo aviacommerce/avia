@@ -7,7 +7,11 @@ defmodule Snitch.Repo.Migrations.AssociateShippingCategoryAndShippingMethods do
       add :shipping_category_id, references("snitch_shipping_categories", on_delete: :delete_all)
     end
 
-    create unique_index("snitch_shipping_methods_categories", [:shipping_method_id, :shipping_category_id])
+    create unique_index("snitch_shipping_methods_categories", [
+             :shipping_method_id,
+             :shipping_category_id
+           ])
+
     create unique_index("snitch_shipping_methods_zones", [:shipping_method_id, :zone_id])
   end
 end
