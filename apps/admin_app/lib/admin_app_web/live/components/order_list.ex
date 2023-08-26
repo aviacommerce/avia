@@ -1,5 +1,5 @@
 defmodule AdminAppWeb.OrderListComponent do
-  use Phoenix.LiveComponent
+  use AdminAppWeb, :live_component
   import AdminAppWeb.OrderView
   import AdminAppWeb.Live.DataTable
 
@@ -51,7 +51,7 @@ defmodule AdminAppWeb.OrderListComponent do
             <% end %>
         </tbody>
       </table>
-      <%= live_component AdminAppWeb.Live.PaginationComponent, params: @params, pagination_data: @orders %>
+      <%= live_component AdminAppWeb.Live.PaginationComponent, params: @params, pagination_data: @orders, id: "pagination-order-list" %>
     </div>
     """
   end
