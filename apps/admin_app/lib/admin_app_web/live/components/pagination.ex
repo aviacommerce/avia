@@ -1,5 +1,5 @@
 defmodule AdminAppWeb.Live.PaginationComponent do
-  use AdminAppWeb, :live_component
+  use Phoenix.LiveComponent
   import AdminAppWeb.Live.DataTable
 
   @distance 5

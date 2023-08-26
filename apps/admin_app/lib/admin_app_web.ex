@@ -21,8 +21,7 @@ defmodule AdminAppWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller,
-        formats: [:html, :json]
+      use Phoenix.Controller, namespace: AdminAppWeb
 
       import Plug.Conn
       import AdminAppWeb.Router.Helpers

@@ -37,7 +37,7 @@ defmodule AdminAppWeb.Live.DashboardIndex do
     <div class="container">
       <h2 class="pb-5">Dashboard</h2>
       <div class="flex justify-end">
-        <.form class="group relative" let={f} for={:date_range}>
+        <.form class="group relative" :let={f} for={%{}} as={:date_range}>
           <label>from : </label>
           <%= text_input f, :start_date, type: "date", value: @start_date, phx_change: "update-start-date", class: "border-0" %>
           <label>to : </label>

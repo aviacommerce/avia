@@ -36,7 +36,7 @@ defmodule SnitchApi.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.7.0-rc.0", override: true},
+      {:phoenix, "~> 1.7.2", override: true},
       {:phoenix_pubsub, "~> 2.0"},
       {:gettext, "~> 0.11"},
       {:plug_cowboy, "~> 2.5"},

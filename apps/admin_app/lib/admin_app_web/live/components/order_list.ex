@@ -1,5 +1,5 @@
 defmodule AdminAppWeb.OrderListComponent do
-  use AdminAppWeb, :live_component
+  use Phoenix.LiveComponent
   import AdminAppWeb.OrderView
   import AdminAppWeb.Live.DataTable
 
