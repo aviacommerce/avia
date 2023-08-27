@@ -441,7 +441,7 @@ defmodule AdminAppWeb.ProductController do
              product_id: params["product_property"]["product_id"],
              property_id: params["product_property"]["property_id"]
            }),
-         {:ok, _} = Model.ProductProperty.update(product_property, params["product_property"]) do
+         {:ok, _} <- Model.ProductProperty.update(product_property, params["product_property"]) do
       redirect(conn, to: product_path(conn, :edit, params["product_property"]["product_id"]))
     else
       {:error, changeset} ->

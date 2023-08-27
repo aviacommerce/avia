@@ -59,7 +59,7 @@ defmodule AdminAppWeb.OrderController do
 
   def show(conn, %{"number" => _number} = params) do
     with {:ok, %OrderSchema{} = order} <- OrderContext.get_order(params),
-         order_total = OrderContext.get_total(order) do
+         order_total <- OrderContext.get_total(order) do
       render(
         conn,
         "show.html",

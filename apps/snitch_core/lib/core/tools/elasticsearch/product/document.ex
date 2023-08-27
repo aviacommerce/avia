@@ -39,8 +39,7 @@ defimpl Elasticsearch.Document, for: Snitch.Data.Schema.Product do
   defp append_option_value_in_name(%{options: options} = product) do
     postfix =
       options
-      |> Enum.map(&String.capitalize(&1.value))
-      |> Enum.join(",")
+      |> Enum.map_join(",", &String.capitalize(&1.value))
 
     %{product | name: product.name <> " (" <> postfix <> ")"}
   end

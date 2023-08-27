@@ -199,7 +199,7 @@ defmodule Snitch.Data.Model.Product do
          _ <- ESProductStore.update_product_to_es(product, :delete),
          changeset <- Product.delete_changeset(product) do
       product = product |> Repo.preload(:images)
-      Enum.map(product.images, &delete_image(product.id, &1.id))
+      Enum.each(product.images, &delete_image(product.id, &1.id))
       Repo.update(changeset)
     end
   end

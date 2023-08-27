@@ -39,8 +39,7 @@ defmodule SnitchApiWeb.ProductView do
   defp append_option_value_in_name(%{options: options, name: name}) when is_list(options) do
     postfix =
       options
-      |> Enum.map(&String.capitalize(&1.value))
-      |> Enum.join(",")
+      |> Enum.map_join(",", &String.capitalize(&1.value))
 
     name <> " (" <> postfix <> ")"
   end
