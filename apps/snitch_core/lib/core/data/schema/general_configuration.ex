@@ -4,7 +4,7 @@ defmodule Snitch.Data.Schema.GeneralConfiguration do
   """
   use Snitch.Data.Schema
 
-  alias Snitch.Data.Schema.{Image, StoreLogo}
+  alias Snitch.Data.Schema.{StoreLogo}
 
   # TODO : The approach to handle general settings needs
   #       to be optimized!

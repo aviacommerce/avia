@@ -1,0 +1,714 @@
+<script src="https://cdn.ckeditor.com/ckeditor5/11.1.1/classic/ckeditor.js">
+</script>
+<%= if  @conn.request_path == product_path(@conn, :new) do %>
+  <div style="margin-bottom:1rem">
+    <span>Product Category</span>
+    <span class="badge badge-secondary">
+      <%= get_product_category(@conn.params["taxon_id"]) %>
+    </span>
+  </div>
+<% end %>
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link active" href="#tab1default" data-toggle="tab">Product Detail</a>
+  </li>
+  <%= if  @conn.request_path != product_path(@conn, :new) do %>
+    <%= unless is_child_product(@parent_product) do %>
+      <li class="nav-item">
+        <a class="nav-link" href="#inventory_tab" data-toggle="tab">Inventory</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#options_tab" data-toggle="tab">Option and SKU's</a>
+      </li>
+    <% end %>
+    <%= if can_add_variant(@parent_product) do %>
+    <% end %>
+    <li class="nav-item">
+      <a class="nav-link" href="#tab3default" data-toggle="tab">Images</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#tab5default" data-toggle="tab">Properties</a>
+    </li>
+  <% end %>
+</ul>
+<div class="tab-content ">
+  <div class="tab-pane p-3 fade in active show p-3" id="tab1default">
+    <%= form_for @changeset, @action, [multipart: true], fn f -> %>
+      <%= hidden_input(f, :id) %>
+      <%= if  @conn.request_path == product_path(@conn, :new) do %>
+        <%= hidden_input(:taxon_id, :taxon_id, value: get_taxon(@conn), name: "product[taxon_id]") %>
+      <% end %>
+      <%= hidden_input(:publish_redirection, :publish_redirection,
+        value: false,
+        name: "product[publish_redirection]",
+        id: "publish_redirection"
+      ) %>
+      <%= hidden_input(f, :state, class: "form-control", id: "form-state") %>
+      <%= if @rummage_params |> Enum.count > 0 do %>
+        <%= for option <- @rummage_params |> Map.to_list do %>
+          <input type="hidden" name={elem(option, 0)} value={elem(option, 1)} />
+        <% end %>
+      <% end %>
+
+      <div class="form-group row ">
+        <%= input(f, :name, "Title",
+          is_horizontal: true,
+          description: "Include keywords that buyers would use to search for your item."
+        ) %>
+      </div>
+      <div class="form-group row ">
+        <%= textarea_input(f, :description, nil,
+          is_horizontal: true,
+          class: 'invisible',
+          description:
+            "
+          Start with a brief overview that describes your item's finest features.List details like dimensions and key features in easy-to-read bullet points.Tell buyers a bit about your process or the story behind this item.",
+          rows: "10"
+        ) %>
+      </div>
+      <div class="form-group row ">
+        <label class="col-sm-3 col-form-label">
+          <div class="label">
+            Selling Price
+          </div>
+          <div class="label-txt">
+            The price at which product is being currently sold(After any promotional discounts).
+          </div>
+        </label>
+        <div class="col-sm-9 input-group">
+          <%= text_input(:selling_price, :amount,
+            value: get_amount(f.data.selling_price),
+            class: "form-control",
+            name: "product[selling_price][amount]"
+          ) %>
+          <div class="input-group-append">
+            <%= text_input(:selling_price, :currency,
+              value: get_currency_value(),
+              class: "form-control",
+              name: "product[selling_price][currency]",
+              readonly: true
+            ) %>
+          </div>
+        </div>
+      </div>
+
+      <div
+        data-toggle="collapse"
+        data-target="#advanced_section"
+        style="margin-bottom:1rem;padding:0.5rem;border:1px solid #ddd;cursor:pointer"
+      >
+        <span>Advanced Section</span>
+      </div>
+      <div id="advanced_section" class="collapse">
+        <label class="col-sm-3 col-form-label">
+          <div class="label">
+            Maximum Retail Price
+          </div>
+          <div class="label-txt">The original cost of the product.</div>
+        </label>
+        <div class="col-sm-9 input-group">
+          <%= text_input(:max_retail_price, :amount,
+            value: get_amount(f.data.max_retail_price),
+            class: "form-control",
+            name: "product[max_retail_price][amount]"
+          ) %>
+          <div class="input-group-append">
+            <%= text_input(:max_retail_price, :currency,
+              value: get_currency_value(),
+              class: "form-control",
+              name: "product[max_retail_price][currency]",
+              readonly: true
+            ) %>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row ">
+        <%= select_input(f, :shipping_category_id, get_shipping_category(), nil,
+          is_horizontal: true,
+          description:
+            "Select appropriate shipping method for the product eg. Heavy for Washing Machine, Light for T-shirt."
+        ) %>
+      </div>
+      <%= if tax_class_id_check(@changeset) do %>
+        <div class="form-group row ">
+          <%= select_input(f, :tax_class_id, formatted_list(:tax_class), nil,
+            is_horizontal: true,
+            description:
+              "Select the tax class this product belongs to. The tax for product would be calculated based on that."
+          ) %>
+        </div>
+      <% end %>
+      <div class="form-group row ">
+        <%= select_input(f, :brand_id, get_brand_options(@brands), nil,
+          is_horizontal: true,
+          description: "Select branch of the product Eg. Levi's.",
+          prompt: "Choose your brand"
+        ) %>
+      </div>
+      <div class="form-group row ">
+        <%= input(f, :meta_title_, nil,
+          is_horizontal: true,
+          description: "A short title which helps improve the SEO of the product."
+        ) %>
+      </div>
+      <div class="form-group row ">
+        <%= textarea_input(f, :meta_description, nil,
+          is_horizontal: true,
+          description:
+            "Meta description is the short text which helps to improve SEO of the product."
+        ) %>
+      </div>
+      <div class="form-group row ">
+        <%= input(f, :meta_keywords, nil,
+          is_horizontal: true,
+          description: "Meta keywords are tags which helps to improve SEO of the product."
+        ) %>
+      </div>
+      <div class="form-group row ">
+        <%= input(f, :height, nil,
+          is_horizontal: true,
+          description: "Specifies height of the product."
+        ) %>
+      </div>
+      <div class="form-group row ">
+        <%= input(f, :width, nil,
+          is_horizontal: true,
+          description: "Specifies width of the product."
+        ) %>
+      </div>
+      <div class="form-group row ">
+        <%= input(f, :depth, nil,
+          is_horizontal: true,
+          description: "Specifies depth of the product."
+        ) %>
+      </div>
+      <div class="form-group row ">
+        <%= input(f, :weight, nil,
+          is_horizontal: true,
+          description: "Specifies weight of the product."
+        ) %>
+      </div>
+
+      <div class="form-group row stickformbutton">
+        <div class="col-sm-10">
+          <%= button("Cancel",
+            to: product_path(@conn, :index),
+            method: "get",
+            type: "button",
+            class: "btn btn-secondary btn-outline-secondary submit-btn float-left"
+          ) %>
+          <div class="float-right">
+            <%= submit("Save", class: "btn  btn-primary submit-btn", id: "form-save-btn") %>
+            <%= submit("Save & Publish  ",
+              class: "btn  btn-primary submit-btn",
+              id: "form-save-publish-btn"
+            ) %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%= if  @conn.request_path != product_path(@conn, :new) and !is_child_product(@parent_product) do %>
+    <div class="tab-pane p-3 fade in show p-3" id="inventory_tab">
+      <%= form_for @changeset, product_path(@conn, :update_inventory_tracking, @parent_product), [multipart: true, method: "patch"], fn f -> %>
+        <fieldset id="inventory_tracking" data-selected={@parent_product.inventory_tracking}>
+          <div class="custom-control custom-radio">
+            <input
+              type="radio"
+              class="custom-control-input"
+              id="inventory_track_none"
+              value="none"
+              name="product[inventory_tracking]"
+            />
+            <label class="custom-control-label" for="inventory_track_none">
+              Do not track inventory
+            </label>
+          </div>
+          <div class="custom-control custom-radio">
+            <input
+              type="radio"
+              class="custom-control-input"
+              id="inventory_track_product"
+              value="product"
+              name="product[inventory_tracking]"
+            />
+            <label class="custom-control-label" for="inventory_track_product">
+              Track inventory for this product
+            </label>
+          </div>
+          <div id="product_tracking" class="card m-2">
+            <%= hidden_input(:stock, :product_id, value: @parent_product.id, class: "form-control") %>
+            <div class="col-9">
+              <div class="form-group row">
+                <label class="col-sm-6">
+                  <div class="label required">
+                    Stock Location
+                  </div>
+                </label>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <%= select(:stock, :stock_location_id, active_stock_location(),
+                      class: "form-control"
+                    ) %>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-6">
+                  <div class="label required">
+                    Current Stock Level
+                  </div>
+                  <div class="label-txt">
+                    How many units of this product do you currently have in stock?
+                  </div>
+                </label>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <%= text_input(:stock, :count_on_hand, class: "form-control") %>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-6">
+                  <div class="label">
+                    Low Stock Level
+                  </div>
+                  <div class="label-txt">
+                    When inventory levels fall below this number, the product option will be flagged as low stock.
+                  </div>
+                </label>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <%= text_input(:stock, :inventory_warning_level, class: "form-control") %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="custom-control custom-radio">
+            <input
+              type="radio"
+              class="custom-control-input"
+              id="inventory_track_variant"
+              value="variant"
+              name="product[inventory_tracking]"
+            />
+            <label class="custom-control-label" for="inventory_track_variant">
+              Track inventory by variants (from variants tab above)
+            </label>
+          </div>
+        </fieldset>
+        <div class="form-group row stickformbutton">
+          <div class="col-sm-10">
+            <%= button("Cancel",
+              to: product_path(@conn, :index),
+              method: "get",
+              type: "button",
+              class: "btn btn-secondary btn-outline-secondary submit-btn float-left"
+            ) %>
+            <div class="float-right">
+              <%= submit("Save", class: "btn  btn-primary submit-btn", id: "form-save-btn") %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= if  @conn.request_path != product_path(@conn, :new) do %>
+    <%= if !is_child_product(@parent_product) do %>
+      <div class="tab-pane fade p-3" id="options_tab">
+        <div class="row">
+          <div class="col-3">
+            <!-- required for floating -->
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs tabs-left">
+              <li class="active"><a href="#options" data-toggle="tab">Options</a></li>
+              <li><a href="#skus" data-toggle="tab">SKU's</a></li>
+            </ul>
+          </div>
+          <div class="col-9">
+            <!-- Tab panes -->
+            <div class="tab-content">
+              <div class="tab-pane active" id="options">
+                <%= if has_themes(@parent_product) do %>
+                  <div style="background: #f8f9fa;">
+                    <div class="form-group required">
+                      <label>Variation Theme</label>
+                      <%= select(:theme, :theme_id, themes_options(@parent_product),
+                        selected: @parent_product.theme_id,
+                        prompt: "",
+                        class: "form-control",
+                        id: "product_theme_id"
+                      ) %>
+                    </div>
+                    <div id="variation_options" style="padding: 10px 0px 10px 0px;"></div>
+                    <div
+                      class="modal fade"
+                      id="theme_change_modal"
+                      tabindex="-1"
+                      role="dialog"
+                      aria-labelledby="exampleModalCenterTitle"
+                      aria-hidden="true"
+                    >
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Warning</h5>
+                            <button
+                              type="button"
+                              class="close"
+                              data-dismiss="modal"
+                              aria-label="Close"
+                            >
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="alert alert-danger" role="alert">
+                              Changing the variation theme would remove all the existing variants,
+                              are you sure you want to proceed?
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">
+                              No
+                            </button>
+                            <button
+                              id="theme_change_confirm"
+                              type="button"
+                              class="btn btn-primary"
+                            >
+                              Yes
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <% else %>
+                  <div class="alert alert-info">
+                    You can add SKU's by adding Variation Themes to
+                    <span class="badge badge-info">
+                      <%= get_product_category(@parent_product.taxon_id) %>
+                    </span>
+                    category. <br />
+                    Click to <%= link("Add variation theme",
+                      to: "/taxonomy?taxon_id=#{@parent_product.taxon_id}",
+                      class: "btn btn-primary"
+                    ) %>
+                  </div>
+                <% end %>
+              </div>
+
+              <div class="tab-pane" id="skus">
+                <%= if has_variants(@parent_product) do %>
+                  <div class="product_has_variants">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <%= for option_type <- get_option_types(@parent_product) do %>
+                            <th><%= option_type.display_name %></th>
+                          <% end %>
+                          <th>State</th>
+                          <th>Switch State</th>
+                          <%= if is_variant_tracking_enabled(@parent_product) do %>
+                            <th>Stock</th>
+                          <% end %>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <%= for variant <- @parent_product.variants do %>
+                          <%= if variant.state != :deleted do %>
+                            <tr class="product_variants">
+                              <%= for option <- variant.options do %>
+                                <td
+                                  class="option-value"
+                                  contenteditable="true"
+                                  data-option_value_id={option.id}
+                                ><%= option.value %></td>
+                              <% end %>
+                              <td class="variant_state"><%= variant.state %></td>
+                              <td class="variant_activate">
+                                <input type="hidden" value={variant.id} class="variant_id" />
+                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                  <label class="btn btn-sm btn-info">
+                                    <input
+                                      type="radio"
+                                      class="switch-input"
+                                      id="active"
+                                      autocomplete="off"
+                                    />Active
+                                  </label>
+                                  <label class="btn btn-sm btn-info">
+                                    <input
+                                      type="radio"
+                                      class="switch-input"
+                                      id="draft"
+                                      autocomplete="off"
+                                    />Draft
+                                  </label>
+                                  <label class="btn btn-sm btn-info">
+                                    <input
+                                      type="radio"
+                                      class="switch-input"
+                                      id="inactive"
+                                      autocomplete="off"
+                                    />Inactive
+                                  </label>
+                                </div>
+                              </td>
+                              <%= if is_variant_tracking_enabled(@parent_product) do %>
+                                <td><%= get_total_stock(variant) %></td>
+                              <% end %>
+                              <td>
+                                <%= link("Edit",
+                                  to: product_path(@conn, :edit, variant.id),
+                                  class: "btn btn-primary"
+                                ) %>
+                                <%= if is_variant_tracking_enabled(@parent_product) do %>
+                                  <button
+                                    name="variant_stock_add"
+                                    type="button"
+                                    class="btn btn-primary"
+                                    data-prdouct-id={variant.id}
+                                  >
+                                    Add stock
+                                  </button>
+                                <% end %>
+                                <%= link("Delete",
+                                  to:
+                                    product_path(@conn, :delete_variant, variant.id, %{
+                                      parent_id: @parent_product.id
+                                    }),
+                                  class: "btn btn-danger",
+                                  method: "delete"
+                                ) %>
+                              </td>
+                            </tr>
+                          <% end %>
+                        <% end %>
+                      </tbody>
+                    </table>
+                  </div>
+                <% else %>
+                  <div class="alert alert-info">
+                    <p>
+                      No SKUs have been created. Create a SKU from the
+                      <strong>Options tab</strong>
+                      by selecting appropriate variation theme.
+                    </p>
+                  </div>
+                <% end %>
+
+                <div
+                  class="modal fade"
+                  id="variant_stock_modal"
+                  tabindex="-1"
+                  role="dialog"
+                  aria-labelledby="exampleModalCenterTitle"
+                  aria-hidden="true"
+                >
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Add Stock</h5>
+                        <button
+                          type="button"
+                          class="close"
+                          data-dismiss="modal"
+                          aria-label="Close"
+                        >
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <div id="variant_stock_error_msg" class="alert alert-danger">
+                          Request failed
+                        </div>
+                        <div id="variant_tracking" class="card m-2">
+                          <%= hidden_input(:stock, :product_id,
+                            value: @parent_product.id,
+                            class: "form-control"
+                          ) %>
+                          <div class="col-12">
+                            <div class="form-group row">
+                              <label class="col-sm-6">
+                                <div class="label required">
+                                  Stock Location
+                                </div>
+                              </label>
+                              <div class="col-sm-6">
+                                <div class="form-group">
+                                  <%= select(:stock, :stock_location_id, active_stock_location(),
+                                    class: "form-control"
+                                  ) %>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="form-group row">
+                              <label class="col-sm-6">
+                                <div class="label required">
+                                  Current Stock Level
+                                </div>
+                                <div class="label-txt">
+                                  How many units of this product do you currently have in stock?
+                                </div>
+                              </label>
+                              <div class="col-sm-6">
+                                <div class="form-group">
+                                  <%= text_input(:stock, :count_on_hand, class: "form-control") %>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="form-group row">
+                              <label class="col-sm-6">
+                                <div class="label">
+                                  Low Stock Level
+                                </div>
+                                <div class="label-txt">
+                                  When inventory levels fall below this number, the product option will be flagged as low stock.
+                                </div>
+                              </label>
+                              <div class="col-sm-6">
+                                <div class="form-group">
+                                  <%= text_input(:stock, :inventory_warning_level,
+                                    class: "form-control"
+                                  ) %>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">
+                          No
+                        </button>
+                        <button id="variant_stock_confirm" type="button" class="btn btn-primary">
+                          Yes
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%= if  @conn.request_path != product_path(@conn, :new) do %>
+    <div class="tab-pane fade p-3" id="tab3default">
+      <div>
+        <input id="product-id" name="product-id" type="hidden" value={@parent_product.id} />
+        <form
+          id="product-image"
+          accept-charset="UTF-8"
+          enctype="multipart/form-data"
+          method="post"
+        >
+          <input type="hidden" value={@token} name="_csrf_token" />
+          <div id="loadingmessage"></div>
+          <div id="show-upload-response"></div>
+          <div class="form-group row ">
+            <div class="col-sm-3 col-form-label">
+              <div class="label required">
+                Images
+              </div>
+              <div class="label-txt">
+                Add image/s for this product. <br />
+                Select the checkbox to set main image for the product.
+              </div>
+            </div>
+            <div class="col-sm-9">
+              <div class="row imgcol">
+                <%= if length(@parent_product.images) > 0 do %>
+                  <%= for image <- @parent_product.images do %>
+                    <div class="img-wrap col-3 p-1">
+                      <%= if image.is_default do %>
+                        <input
+                          type="checkbox"
+                          id="checkimage"
+                          class="checkbox"
+                          value={image.id}
+                          checked=""
+                        />
+                      <% else %>
+                        <input type="checkbox" id="checkimage" class="checkbox" value={image.id} />
+                      <% end %>
+                      <span class="product-delete">
+                        &times; <input name="delete-image-id" type="hidden" value={image.id} />
+                      </span>
+                      <i
+                        class="fa fa-info-circle product-info"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="can not delete default image"
+                        aria-hidden="true"
+                      >
+                      </i>
+                      <%= img_tag(get_image_url(image, @parent_product), class: "img-thumbnail") %>
+                    </div>
+                  <% end %>
+                <% end %>
+                <div class="file-upload col-3 p-1">
+                  <label for="upload" class="file-upload__label">
+                    <div><i class="fas fa-camera"></i></div>
+                    <div>Add Images</div>
+                  </label>
+                  <input
+                    type="file"
+                    name="product_images[images][]"
+                    id="product-images"
+                    class="file-upload__input"
+                    multiple
+                  />
+                </div>
+                <div id="img-selected-container" class="img-selected-container row m-0 col-12 p-0">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group row stickformbutton">
+            <div class="col-sm-10">
+              <%= button("Cancel",
+                to: product_path(@conn, :index),
+                method: "get",
+                type: "button",
+                class: "btn btn-secondary btn-outline-secondary submit-btn float-left"
+              ) %>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  <% end %>
+
+  <%= if  @conn.request_path != product_path(@conn, :new) do %>
+    <div class="tab-pane fade pt-2" id="tab5default">
+      <%= render("property_index.html",
+        conn: @conn
+      ) %>
+    </div>
+  <% end %>
+</div>
+<html>
+  <head>
+    <%= csrf_meta_tag %>
+  </head>
+</html>
+
+<script>
+  ClassicEditor
+    .create( document.querySelector( '#product_description' ), {
+      removePlugins: [ 'ImageUpload', 'MediaEmbed' ]
+    } )
+    .catch( error => {
+        console.error( error );
+    } );
+</script>

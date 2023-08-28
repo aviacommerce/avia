@@ -6,6 +6,5 @@ defmodule Snitch.Repo.Migrations.RemovingAddressIds do
       remove :billing_address_id
       remove :shipping_address_id
     end
-
   end
 end

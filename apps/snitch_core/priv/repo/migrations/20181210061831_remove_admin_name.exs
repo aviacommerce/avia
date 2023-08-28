@@ -9,4 +9,3 @@ defmodule Snitch.Repo.Migrations.RemoveAdminName do
     create unique_index("snitch_stock_locations", [:name])
   end
 end
-

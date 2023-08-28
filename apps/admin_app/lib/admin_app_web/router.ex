@@ -8,7 +8,8 @@ defmodule AdminAppWeb.Router do
   pipeline :browser do
     plug(:accepts, ["html"])
     plug(:fetch_session)
-    plug(:fetch_flash)
+    plug(:fetch_live_flash)
+    plug(:put_root_layout, {AdminAppWeb.LayoutView, :root})
     plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
   end
@@ -42,10 +43,24 @@ defmodule AdminAppWeb.Router do
   end
 
   scope "/", AdminAppWeb do
+    pipe_through(:browser)
+    get("/orders/:number/show-invoice", OrderController, :show_invoice)
+    get("/orders/:number/show-packing-slip", OrderController, :show_packing_slip)
+    get("/orders/:number/download-packing-slip", OrderController, :download_packing_slip_pdf)
+    get("/orders/:number/download-invoice", OrderController, :download_invoice_pdf)
+    resources("/session", SessionController, only: [:new, :create, :edit, :update])
+    get("/password_reset", SessionController, :password_reset)
+    get("/password_recovery", SessionController, :verify)
+    post("/check_email", SessionController, :check_email)
+  end
+
+  scope "/", AdminAppWeb do
     # Use the default browser stack
     pipe_through([:browser, :authentication])
 
     get("/", PageController, :index)
+    live("/dashboard", Live.DashboardIndex)
+    live("/orders", Live.OrderIndex)
 
     get("/products/export_products", ProductController, :export_product)
     get("/fetch_states/:country_id", StockLocationController, :fetch_country_states)
@@ -104,8 +119,6 @@ defmodule AdminAppWeb.Router do
       :update_inventory_tracking
     )
 
-    get("/dashboard", DashboardController, :index)
-
     post(
       "/products/:product_id/property/:property_id/update",
       ProductController,
@@ -161,18 +174,6 @@ defmodule AdminAppWeb.Router do
     post("/products/variants/new", ProductController, :new_variant)
   end
 
-  scope "/", AdminAppWeb do
-    pipe_through(:browser)
-    get("/orders/:number/show-invoice", OrderController, :show_invoice)
-    get("/orders/:number/show-packing-slip", OrderController, :show_packing_slip)
-    get("/orders/:number/download-packing-slip", OrderController, :download_packing_slip_pdf)
-    get("/orders/:number/download-invoice", OrderController, :download_invoice_pdf)
-    resources("/session", SessionController, only: [:new, :create, :edit, :update])
-    get("/password_reset", SessionController, :password_reset)
-    get("/password_recovery", SessionController, :verify)
-    post("/check_email", SessionController, :check_email)
-  end
-
   # Other scopes may use custom stacks.
   scope "/api", AdminAppWeb do
     pipe_through(:api)
@@ -197,6 +198,16 @@ defmodule AdminAppWeb.Router do
 
     post("/stock", StockController, :get_stock)
     post("/stock_update", StockController, :update_stock)
+  end
+
+  if Mix.env() in [:dev, :test] do
+    import Phoenix.LiveDashboard.Router
+
+    scope "/" do
+      pipe_through(:browser)
+
+      live_dashboard("/live-dashboard", metrics: WeatherAppWeb.Telemetry)
+    end
   end
 
   scope "/", AdminAppWeb do

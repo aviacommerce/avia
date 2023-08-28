@@ -223,9 +223,8 @@ defmodule Avia.Etsy.Importer do
   end
 
   defp get_listing_product_inventory(listing_id) do
-    with {:ok, body} <- request_resource("get", "/listings/#{listing_id}?includes=Images"),
-         {:ok, json} <- Jason.decode(body) do
-      {:ok, json}
+    with {:ok, body} <- request_resource("get", "/listings/#{listing_id}?includes=Images") do
+      Jason.decode(body)
     end
   end
 
@@ -234,9 +233,8 @@ defmodule Avia.Etsy.Importer do
   # You can swap the above URL's if you want to test importer with large data
   def get_shop_listing(shop_id, page_number, :active) do
     with {:ok, body} <-
-           request_resource("get", "/shops/#{shop_id}/listings/active?page=#{page_number}"),
-         {:ok, json} <- Jason.decode(body) do
-      {:ok, json}
+           request_resource("get", "/shops/#{shop_id}/listings/active?page=#{page_number}") do
+      Jason.decode(body)
     end
   end
 
@@ -245,9 +243,8 @@ defmodule Avia.Etsy.Importer do
            request_resource(
              "get",
              "/listings/#{listing_id}/inventory?write_missing_inventory=true"
-           ),
-         {:ok, json} <- Jason.decode(body) do
-      {:ok, json}
+           ) do
+      Jason.decode(body)
     end
   end
 

@@ -3,8 +3,8 @@ defmodule Snitch.Domain.Calculator do
   Base Calculator module.
   """
 
-  @defaults Application.get_env(:snitch_core, :defaults_module)
-  @user_config Application.get_env(:snitch_core, :user_config_module)
+  @defaults Application.compile_env(:snitch_core, :defaults_module)
+  @user_config Application.compile_env(:snitch_core, :user_config_module)
 
   @doc """
   Returns a Money struct after performing computation.

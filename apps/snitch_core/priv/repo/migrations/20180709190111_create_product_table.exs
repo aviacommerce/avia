@@ -2,7 +2,6 @@ defmodule Snitch.Repo.Migrations.CreateProductTable do
   use Ecto.Migration
 
   def change do
-
     create table("snitch_products") do
       add :name, :string, null: false, default: ""
       add :description, :text

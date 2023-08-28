@@ -9,7 +9,7 @@ defmodule SnitchApiWeb.HostedPaymentController do
   plug(SnitchApiWeb.Plug.DataToAttributes)
   action_fallback(SnitchApiWeb.FallbackController)
 
-  @base_url Application.fetch_env!(:snitch_api, :hosted_payment_url)
+  @base_url Application.get_env(:snitch_api, :hosted_payment_url, nil)
 
   def payubiz_request_url(conn, params) do
     {params, url} = payubiz_params_setup(params)

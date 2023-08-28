@@ -6,7 +6,6 @@ defmodule Snitch.Seed.Product do
   alias Snitch.Core.Tools.MultiTenancy.Repo
 
   alias Snitch.Data.Schema.{
-    Image,
     Product,
     ShippingCategory,
     StockItem,
@@ -87,7 +86,7 @@ defmodule Snitch.Seed.Product do
     end
   end
 
-  def variant_image(url, variant_id) do
+  def variant_image(_url, variant_id) do
     %{
       inserted_at: NaiveDateTime.local_now(),
       updated_at: NaiveDateTime.local_now(),

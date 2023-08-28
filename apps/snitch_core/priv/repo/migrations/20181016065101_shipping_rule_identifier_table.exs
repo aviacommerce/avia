@@ -8,6 +8,7 @@ defmodule Snitch.Repo.Migrations.ShippingRuleIdentifierTable do
 
       timestamps()
     end
+
     create unique_index("snitch_shipping_rule_identifiers", [:code])
   end
 end

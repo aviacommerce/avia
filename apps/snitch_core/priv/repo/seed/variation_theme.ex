@@ -8,7 +8,7 @@ defmodule Snitch.Seed.VariationTheme do
   end
 
   def seed!() do
-    option_types = get_option_type
+    option_types = get_option_type()
 
     for i <- 1..length(option_types),
         do: option_types |> Combination.combine(i) |> create_variations

@@ -58,49 +58,43 @@ defmodule AdminApp.OrderContext do
     OrderDomain.total_amount(order)
   end
 
-  def order_list("pending", sort_param, page) do
-    rummage = get_rummage(sort_param)
-    query = query_confirmed_orders(rummage)
-    orders = load_orders(query)
-
-    orders_query =
-      from(order in orders,
-        left_join: package in Package,
-        on: order.id == package.order_id,
-        where: package.state == ^:processing
+  def order_list(state, sort_param, page, date_params) when is_nil(date_params),
+    do:
+      order_list(
+        state,
+        sort_param,
+        page,
+        {initial_date_range.start_date, initial_date_range.end_date}
       )
 
-    Pagination.page(orders_query, page)
+  def order_list(state, sort_param, page, {start_date, end_date}) do
+    sort_param
+    |> get_rummage()
+    |> query_confirmed_orders({start_date, end_date})
+    |> OrderModel.with_package_states_query(OrderModel.order_package_state_map()[state])
+    |> order_preloads()
+    |> Pagination.page(page)
   end
 
-  def order_list("unshipped", sort_param, page) do
-    rummage = get_rummage(sort_param)
-    query = query_confirmed_orders(rummage)
-    orders = load_orders(query)
+  def order_list("complete", sort_param, page, {start_date, end_date}) do
+    {queryable, _rummage} =
+      sort_param
+      |> get_rummage()
+      |> Order.rummage()
 
-    orders_query =
-      from(order in orders,
-        left_join: package in Package,
-        on: order.id == package.order_id,
-        where: package.state == ^:ready
-      )
-
-    Pagination.page(orders_query, page)
+    queryable
+    |> OrderModel.with_states_query(["complete"])
+    |> OrderModel.updated_between_query(start_date, end_date)
+    |> order_preloads()
+    |> Pagination.page(page)
   end
 
-  def order_list("shipped", sort_param, page) do
-    rummage = get_rummage(sort_param)
-    query = query_confirmed_orders(rummage)
-    orders = load_orders(query)
+  defp query_confirmed_orders(rummage, {start_date, end_date}) do
+    {queryable, _rummage} = Order.rummage(rummage)
 
-    orders_query =
-      from(order in orders,
-        left_join: package in Package,
-        on: order.id == package.order_id,
-        where: package.state == ^:shipped or package.state == ^:delivered
-      )
-
-    Pagination.page(orders_query, page)
+    queryable
+    |> OrderModel.with_states_query(["confirmed"])
+    |> OrderModel.updated_between_query(start_date, end_date)
   end
 
   def update_cod_payment(order, state) do
@@ -146,49 +140,9 @@ defmodule AdminApp.OrderContext do
     }
   end
 
-  def order_list("complete", sort_param, page) do
-    rummage = get_rummage(sort_param)
-    {queryable, _rummage} = Order.rummage(rummage)
+  defp get_rummage(sort_param), do: %{ sort: sort_param }
 
-    query =
-      from(p in queryable,
-        where:
-          p.state == "complete" and p.updated_at >= ^initial_date_range.start_date and
-            p.updated_at <= ^initial_date_range.end_date
-      )
-
-    query
-    |> load_orders()
-    |> Pagination.page(page)
-  end
-
-  defp query_confirmed_orders(rummage) do
-    {queryable, _rummage} = Order.rummage(rummage)
-
-    query =
-      from(p in queryable,
-        where:
-          p.state == "confirmed" and p.updated_at >= ^initial_date_range.start_date and
-            p.updated_at <= ^initial_date_range.end_date,
-        select: p
-      )
-  end
-
-  defp get_rummage(sort_param) do
-    case sort_param do
-      nil ->
-        %{}
-
-      _ ->
-        sort_order = String.to_atom(sort_param)
-
-        %{
-          sort: %{field: :inserted_at, order: sort_order}
-        }
-    end
-  end
-
-  defp load_orders(query) do
+  defp order_preloads(query) do
     preload(query, [:user, [packages: :items], [line_items: :product]])
   end
 end

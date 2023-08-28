@@ -20,9 +20,8 @@ defmodule Snitch.Domain.Inventory do
   """
   @spec add_stock(Product.t(), map) :: {:ok, StockSchema.t()} | {:error, Ecto.Changeset.t()}
   def add_stock(product, stock_params) do
-    with {:ok, stock} <- check_stock(product.id, stock_params["stock_location_id"]),
-         {:ok, updated_stock} <- StockModel.update(stock_params, stock) do
-      {:ok, updated_stock}
+    with {:ok, stock} <- check_stock(product.id, stock_params["stock_location_id"]) do
+      StockModel.update(stock_params, stock)
     end
   end
 

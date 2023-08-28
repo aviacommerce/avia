@@ -16,7 +16,10 @@ defmodule Snitch.Repo.Migrations.CreatePackagesTable do
 
       add :order_id, references("snitch_orders", on_delete: :nothing), null: false
       add :origin_id, references("snitch_stock_locations", on_delete: :nothing), null: false
-      add :shipping_category_id, references("snitch_shipping_categories", on_delete: :nothing), null: false
+
+      add :shipping_category_id, references("snitch_shipping_categories", on_delete: :nothing),
+        null: false
+
       add :shipping_method_id, references("snitch_shipping_methods", on_delete: :nothing)
 
       timestamps(type: :utc_datetime)

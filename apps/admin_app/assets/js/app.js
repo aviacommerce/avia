@@ -20,7 +20,6 @@ import "phoenix_html";
 
 // import socket from "./socket"
 
-import "bootstrap";
 import select2Selector from "./form-helpers/select2-selector";
 import loadView from "./views/loader";
 
@@ -35,7 +34,15 @@ if (reactAppContainer) {
 
 function handleDOMContentLoaded() {
   // Get the current view name
-  const viewName = document.getElementsByTagName("body")[0].dataset.jsViewName;
+  let viewName = document.getElementsByTagName("body")[0].dataset.jsViewName;
+  
+  if (viewName === 'ViewTemplateView' || viewName === 'StaticTemplateView') {
+    viewName = document.querySelectorAll('[data-phx-view]')[0].dataset.phxView;
+    viewName = viewName
+      .replace('Elixir.AdminAppWeb.', '')
+      .replace('.', '')
+      .concat('View');
+  }
 
   // Load view class and mount it
   const ViewClass = loadView(viewName);

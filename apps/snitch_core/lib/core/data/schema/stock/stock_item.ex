@@ -4,7 +4,7 @@ defmodule Snitch.Data.Schema.StockItem do
   """
   use Snitch.Data.Schema
 
-  alias Snitch.Data.Schema.{StockLocation, Product}
+  alias Snitch.Data.Schema.{StockLocation, Product, Variant}
 
   @type t :: %__MODULE__{}
 
@@ -15,6 +15,7 @@ defmodule Snitch.Data.Schema.StockItem do
 
     belongs_to(:product, Product)
     belongs_to(:stock_location, StockLocation)
+    belongs_to(:variant, Variant)
 
     timestamps()
   end

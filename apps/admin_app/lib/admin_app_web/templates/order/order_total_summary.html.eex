@@ -1,9 +1,0 @@
-<table class="table table-sm">
-  <caption class="sr-only">order summary</caption>
-    <tbody>
-      <tr> <th>Item Total</th><td><%= order_items_total(@order) %> </td></tr>
-      <tr><th>Tax Total</th> <td><%= tax_total(@order) %></td></tr>
-      <tr><th>Shipping Total</th><td><%= shipping_total(@order) %></td></tr>
-      <tr class="table-secondary" style="background-color: lightgrey;"><th>Total</th><td><%= order_total(@order) %></td></tr>
-    </tbody>
-</table>

@@ -4,7 +4,7 @@ defmodule Snitch.Data.Schema.Taxon do
   use AsNestedSet, scope: [:taxonomy_id]
 
   import Ecto.Query
-  alias Snitch.Data.Schema.{Image, Taxon, Taxonomy, VariationTheme, TaxonImage}
+  alias Snitch.Data.Schema.{Taxon, Taxonomy, VariationTheme, TaxonImage}
   alias Snitch.Domain.Taxonomy, as: TaxonomyDomain
 
   @type t :: %__MODULE__{}
@@ -44,8 +44,6 @@ defmodule Snitch.Data.Schema.Taxon do
     |> handle_slug
   end
 
-  defp get_ancestors_slug_text(nil), do: ""
-
   @doc """
   This method returns the comma separated name of all the taxon above it till
   level 1
@@ -64,7 +62,9 @@ defmodule Snitch.Data.Schema.Taxon do
 
   `Full Sleeve` Category under women it would return `Men Shirt`
   """
-  defp get_ancestors_slug_text(taxon_id) do
+  def get_ancestors_slug_text(nil), do: ""
+
+  def get_ancestors_slug_text(taxon_id) do
     with %Taxon{} = taxon <- TaxonomyDomain.get_taxon(taxon_id),
          {:ok, ancestors} <- TaxonomyDomain.get_ancestors(taxon_id) do
       {_, ancestors_till_level_1} = List.pop_at(ancestors, 0)
@@ -94,9 +94,9 @@ defmodule Snitch.Data.Schema.Taxon do
     |> unique_constraint(:slug, message: "category with this name alreay exist")
   end
 
-  def generate_slug(text), do: Slugger.slugify_downcase(text, ?_)
-
   defp handle_slug(changeset), do: changeset
+
+  def generate_slug(text), do: Slugger.slugify_downcase(text, ?_)
 
   defp put_assoc_variation_theme(changeset, theme) when theme in [nil, ""] do
     variation_theme_ids = Enum.map(changeset.data.variation_themes, & &1.id)

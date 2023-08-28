@@ -6,13 +6,12 @@ defmodule Snitch.Tools.OrderEmail do
   alias Snitch.Tools.Mailer
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Schema.GeneralConfiguration, as: GC
-  alias Snitch.Tools.Helper.ImageUploader
   require EEx
 
   email_template =
     Path.join([
       File.cwd!(),
-      "lib/core/tools/mailer/email_templates/order_confirmation_email.html.eex"
+      "lib/core/tools/mailer/email_templates/order_confirmation_email.html.heex"
     ])
 
   EEx.function_from_file(:defp, :order_email, email_template, [:assigns])
@@ -22,7 +21,7 @@ defmodule Snitch.Tools.OrderEmail do
     send_mail(general_config, order)
   end
 
-  defp send_mail(nil, order), do: nil
+  defp send_mail(nil, _order), do: nil
 
   defp send_mail(general_config, order) do
     sender_email = general_config.sender_mail
@@ -54,7 +53,7 @@ defmodule Snitch.Tools.OrderEmail do
     try do
       email |> Mailer.deliver_now()
     rescue
-      e in ArgumentError -> nil
+      _e in ArgumentError -> nil
     end
   end
 end

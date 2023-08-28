@@ -1,0 +1,28 @@
+<.container>
+  <.alert
+    color="info"
+    class="mb-5"
+    label={live_flash(@flash, :info)}
+    phx-click="lv:clear-flash"
+    phx-value-key="info"
+  />
+
+  <.alert
+    color="danger"
+    class="mb-5"
+    label={live_flash(@flash, :error)}
+    phx-click="lv:clear-flash"
+    phx-value-key="error"
+  />
+
+  <main role="main" class="flex">
+    <%= if @current_user do %>
+      <div class="sidebar h-screen">
+        <%= render("sidebar.html", conn: @conn) %>
+      </div>
+    <% end %>
+    <div class="main p-5 w-full">
+      <%= Map.get(assigns, :inner_layout) || @inner_content %>
+    </div>
+  </main>
+</.container>

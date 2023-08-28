@@ -3,7 +3,7 @@ defmodule Snitch.Tools.EctoType.UnixTimestamp do
   Creates a custom type for unix timestamp
   """
 
-  @behaviour Ecto.Type
+  use Ecto.Type
   alias Ecto.Type
 
   def type, do: :utc_datetime

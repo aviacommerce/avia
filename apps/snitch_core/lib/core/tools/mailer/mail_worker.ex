@@ -2,8 +2,12 @@ defmodule MailManager do
   use GenServer
   alias Snitch.Tools.OrderEmail
 
+  def init(init_arg) do
+    {:ok, init_arg}
+  end
+
   def handle_cast({:send_mail, order}, state) do
-    {ok, _} =
+    {:ok, _} =
       Task.Supervisor.start_child(MailManager.TaskSupervisor, fn ->
         OrderEmail.order_confirmation_mail(order)
       end)

@@ -7,7 +7,7 @@ defmodule Snitch.Demo.StockLocation do
 
   def create_stock_locations do
     Repo.delete_all(StockLocation)
-    state = get_random_state
+    state = get_random_state()
     product_path = Path.join(@base_path, "stock_locations.csv")
 
     product_path

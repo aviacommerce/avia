@@ -10,8 +10,6 @@ defmodule Snitch.Domain.Package do
   alias Snitch.Core.Tools.MultiTenancy.MultiQuery
   alias Snitch.Data.Schema.{Package, Order}
   alias Snitch.Domain.{ShippingCalculator, Inventory}
-  alias Snitch.Tools.Money, as: MoneyTools
-  alias Snitch.Data.Model.StockItem
   alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
   alias Snitch.Domain.Tax
 
@@ -45,9 +43,7 @@ defmodule Snitch.Domain.Package do
     |> Repo.update()
   end
 
-  @doc """
-  Returns shipping cost with tax.
-  """
+  # Returns shipping cost with tax.
   defp shipping_cost_with_tax(package, order) do
     shipping_cost = ShippingCalculator.calculate(package)
     Tax.calculate(:shipping, shipping_cost, order, package.origin)

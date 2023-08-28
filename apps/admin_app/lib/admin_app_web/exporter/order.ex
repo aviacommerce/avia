@@ -43,8 +43,7 @@ defmodule AdminAppWeb.Exporter.Order do
       address ->
         address
         |> Map.from_struct()
-        |> Enum.map(fn {key, value} -> value end)
-        |> Enum.join(" ")
+        |> Enum.map_join(" ", fn {key, value} -> value end)
     end
   end
 end

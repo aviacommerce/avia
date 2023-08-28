@@ -59,7 +59,7 @@ defmodule AdminAppWeb.OrderController do
 
   def show(conn, %{"number" => _number} = params) do
     with {:ok, %OrderSchema{} = order} <- OrderContext.get_order(params),
-         order_total = OrderContext.get_total(order) do
+         order_total <- OrderContext.get_total(order) do
       render(
         conn,
         "show.html",
@@ -70,7 +70,7 @@ defmodule AdminAppWeb.OrderController do
       {:error, _} ->
         conn
         |> put_flash(:error, "No such order exists with given number")
-        |> redirect(to: dashboard_path(conn, :index))
+        |> redirect(to: live_path(conn, AdminAppWeb.Live.DashboardIndex))
     end
   end
 
@@ -305,7 +305,7 @@ defmodule AdminAppWeb.OrderController do
 
     conn
     |> put_flash(:info, "Your request is accepted. Data will be emailed shortly")
-    |> redirect(to: dashboard_path(conn, :index))
+    |> redirect(to: live_path(conn, AdminAppWeb.Live.DashboardIndex))
   end
 
   defp remove_line_item(edit_item, line_items) do

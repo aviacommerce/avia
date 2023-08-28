@@ -15,8 +15,10 @@ defmodule Snitch.Repo.Migrations.CreateHostedPayment do
 
     create unique_index("snitch_hosted_payments", :payment_id)
 
-    create constraint("snitch_hosted_payments",
-      :hosted_payment_exclusivity,
-      check: "#{ prefix() || "public" }.payment_exclusivity(payment_id, '#{@code}') = 1")
+    create constraint(
+             "snitch_hosted_payments",
+             :hosted_payment_exclusivity,
+             check: "#{prefix() || "public"}.payment_exclusivity(payment_id, '#{@code}') = 1"
+           )
   end
 end

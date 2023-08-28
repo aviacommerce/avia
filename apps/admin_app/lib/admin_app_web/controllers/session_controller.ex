@@ -8,7 +8,7 @@ defmodule AdminAppWeb.SessionController do
   alias Snitch.Data.Model.User, as: UserModel
   alias Snitch.Data.Schema.User, as: UserSchema
 
-  @password_reset_salt Application.get_env(:admin_app, AdminAppWeb.Endpoint)[:password_reset_salt]
+  @password_reset_salt Application.get_env(:admin_app, AdminAppWeb.Endpoint, %{})[:password_reset_salt]
 
   defparams(
     signin_params(%{
@@ -135,7 +135,7 @@ defmodule AdminAppWeb.SessionController do
     conn
     |> Plug.sign_in(user)
     |> put_flash(:info, "You are logged in!")
-    |> redirect(to: dashboard_path(conn, :index))
+    |> redirect(to: live_path(conn, AdminAppWeb.Live.DashboardIndex))
   end
 
   defp login({:error, _}, conn) do

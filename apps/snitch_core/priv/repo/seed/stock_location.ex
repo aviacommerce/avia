@@ -4,7 +4,7 @@ defmodule Snitch.Seed.StockLocation do
 
   def seed!() do
     Repo.delete_all(StockLocation)
-    state = get_state
+    state = get_state()
 
     create_stock_location!(
       "default",

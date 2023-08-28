@@ -5,11 +5,8 @@ defmodule Snitch.Data.Model.GeneralConfiguration do
 
   use Snitch.Data.Model
 
-  alias Snitch.Data.Schema.Image
   alias Snitch.Data.Schema.GeneralConfiguration, as: GC
-  alias Snitch.Tools.Helper.ImageUploader
   alias Snitch.Data.Model.Image, as: ImageModel
-  alias Ecto.Multi
   alias Snitch.Tools.Cache
 
   @currency_list ["USD", "INR", "GBP", "EUR"]
@@ -55,7 +52,7 @@ defmodule Snitch.Data.Model.GeneralConfiguration do
     QH.delete(GC, id, Repo)
   end
 
-  def create(%{"image" => image} = params) do
+  def create(%{"image" => _image} = params) do
     ImageModel.create(GC, params, "store_image")
   end
 
@@ -63,7 +60,7 @@ defmodule Snitch.Data.Model.GeneralConfiguration do
     QH.create(GC, params, Repo)
   end
 
-  def update(store, %{"image" => image} = params) do
+  def update(store, %{"image" => _image} = params) do
     ImageModel.update(GC, store, params, "store_image")
   end
 

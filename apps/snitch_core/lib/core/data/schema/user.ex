@@ -127,7 +127,7 @@ defmodule Snitch.Data.Schema.User do
       nil ->
         changeset
 
-      user ->
+      _user ->
         changeset
         |> add_error(:email, "Email already in use")
     end

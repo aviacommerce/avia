@@ -1,0 +1,14 @@
+<main class="container">
+  <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
+  <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+  <main role="main" class="flex">
+    <%= if Guardian.Plug.authenticated?(@conn) do %>
+      <div class="sidebar h-screen">
+        <%= render("sidebar.html", conn: @conn) %>
+      </div>
+    <% end %>
+    <div class="main p-5">
+      <%= Map.get(assigns, :inner_layout) || @inner_content %>
+    </div>
+  </main>
+</main>

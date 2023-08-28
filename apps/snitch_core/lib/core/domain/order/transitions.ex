@@ -19,7 +19,6 @@ defmodule Snitch.Domain.Order.Transitions do
   alias Snitch.Domain.Package, as: PackageDomain
   alias Snitch.Domain.{Payment, Shipment, ShipmentEngine, Splitters.Weight}
   alias Snitch.Domain.Order, as: OrderDomain
-  alias Snitch.Tools.OrderEmail
 
   @doc """
   Embeds the addresses and computes some totals of the `order`.
@@ -319,7 +318,7 @@ defmodule Snitch.Domain.Order.Transitions do
 
   def send_email_confirmation(context), do: context
 
-  def update_stock(%Context{valid?: true, struct: %Order{} = order, multi: multi} = context) do
+  def update_stock(%Context{valid?: true, struct: %Order{} = order, multi: _multi} = context) do
     order = order |> Repo.preload(packages: :items)
 
     packages =
@@ -369,7 +368,7 @@ defmodule Snitch.Domain.Order.Transitions do
   defp order_paid(context), do: context
 
   defp packages_delivered(
-         %Context{valid?: true, struct: %Order{} = order, multi: multi} = context
+         %Context{valid?: true, struct: %Order{} = order} = context
        ) do
     if OrderDomain.order_package_delivered?(order) do
       context

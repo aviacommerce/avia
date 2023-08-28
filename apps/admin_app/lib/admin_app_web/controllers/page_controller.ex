@@ -2,6 +2,6 @@ defmodule AdminAppWeb.PageController do
   use AdminAppWeb, :controller
 
   def index(conn, _params) do
-    redirect(conn, to: dashboard_path(conn, :index))
+    redirect(conn, to: live_path(conn, AdminAppWeb.Live.DashboardIndex))
   end
 end

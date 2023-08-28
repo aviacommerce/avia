@@ -13,13 +13,13 @@ defmodule Snitch.Core.Tools.MultiTenancy.Plug do
   def call(%Plug.Conn{host: host} = conn, opts) do
     root_host = Keyword.get(opts, :endpoint).config(:url)[:host]
 
-    if not root_domain?(host, root_host) do
+    if root_domain?(host, root_host) do
+      conn
+    else
       host
       |> tenant_exists?()
       |> set_repo(host)
       |> handle_conn(conn)
-    else
-      conn
     end
   end
 

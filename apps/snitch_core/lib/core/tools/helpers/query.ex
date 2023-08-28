@@ -27,7 +27,7 @@ defmodule Snitch.Tools.Helper.Query do
     {:error, "#{schema}_not_found" |> String.to_atom()}
   end
 
-  defp handle_get(response, schema) do
+  defp handle_get(response, _schema) do
     {:ok, response}
   end
 
