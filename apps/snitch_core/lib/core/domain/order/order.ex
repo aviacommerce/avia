@@ -9,8 +9,8 @@ defmodule Snitch.Domain.Order do
 
   import Ecto.Changeset
   import Ecto.Query
-  alias Snitch.Data.Schema.{Order, Package, Payment}
-  alias Snitch.Data.Model.{Product, Image}
+  alias Snitch.Data.Schema.{Order, Payment}
+  alias Snitch.Data.Model.{Image}
   alias Snitch.Data.Model.GeneralConfiguration, as: GCModel
 
   @spec validate_change(Ecto.Changeset.t()) :: Ecto.Changeset.t()

@@ -10,7 +10,6 @@ defmodule Snitch.Data.Model.Product do
   alias Snitch.Tools.GenNanoid
   alias Snitch.Data.Model.Image, as: ImageModel
   alias Snitch.Data.Schema.{Image, Product, Variation, Taxon}
-  alias Snitch.Tools.Helper.ImageUploader
   alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Tools.ElasticSearch.Product.Store, as: ESProductStore
 
@@ -32,12 +31,12 @@ defmodule Snitch.Data.Model.Product do
     try do
       Repo.all(Product) |> Repo.preload(preloads)
     rescue
-      e in ArgumentError -> nil
+      _e in ArgumentError -> nil
     end
   end
 
   @doc """
-  Returns all Products with the given parameters.
+  Returns a product with the given parameters.
   """
   @spec get(map | non_neg_integer) :: {:ok, Product.t()} | {:error, atom}
   def get(query_params) do
@@ -181,19 +180,10 @@ defmodule Snitch.Data.Model.Product do
   end
 
   @doc """
-  Returns an Product
-  Takes Product id as input
-  """
-  @spec get(integer) :: Product.t() | nil
-  def get(id) do
-    QH.get(Product, id, Repo)
-  end
-
-  @doc """
   Discontinues a product
   Takes Product id as input
   """
-  @spec get(integer) :: {:ok, Product.t()} | {:error, Ecto.Changeset.t()} | nil
+  @spec delete(integer) :: {:ok, Product.t()} | {:error, Ecto.Changeset.t()} | nil
   def delete(id) do
     with {:ok, %Product{} = product} <- get(id),
          _ <- ESProductStore.update_product_to_es(product, :delete),
@@ -314,7 +304,7 @@ defmodule Snitch.Data.Model.Product do
 
     uploads =
       Enum.map(uploads, fn
-        %{"image" => %{filename: name, path: path, url: url, type: type} = upload} ->
+        %{"image" => %{filename: name, path: path, type: type}} ->
           upload = %Plug.Upload{filename: name, path: path, content_type: type}
           product = %{product | tenant: Repo.get_prefix()}
           ImageModel.store(upload, product)

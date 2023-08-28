@@ -8,13 +8,11 @@ defmodule Snitch.Domain.Taxonomy do
 
   import AsNestedSet.Modifiable
   import AsNestedSet.Queriable, only: [dump_one: 2]
-  import Ecto.Query
 
   alias Ecto.Multi
   alias Snitch.Data.Model.Image, as: ImageModel
-  alias Snitch.Data.Schema.{Taxon, Taxonomy, Image, Product}
+  alias Snitch.Data.Schema.{Taxon, Taxonomy, Image}
   alias Snitch.Tools.Helper.Taxonomy, as: Helper
-  alias Snitch.Tools.Helper.ImageUploader
   alias Snitch.Data.Model.Product, as: ProductModel
 
   @doc """
@@ -247,53 +245,27 @@ defmodule Snitch.Domain.Taxonomy do
     end
   end
 
-  @doc """
-  Updates all category slug based on the name.
-
-  Warning: This methods should be used only when the slug are not present.
-  Running this method might change the existing slug if the tree of above a
-  category is modified.
-  """
-  def update_all_categories_slug() do
-    Taxon
-    |> Repo.all()
-    |> Enum.map(&Taxon.changeset(&1, %{}))
-    |> Enum.map(&Repo.update(&1))
-  end
-
   def create_taxon(parent_taxon, %{image: image} = taxon_params) do
-    multi =
-      Multi.new()
-      |> Multi.run(:struct, fn _ ->
-        taxon_struct = %Taxon{name: taxon_params.name}
-        add_taxon(parent_taxon, taxon_struct, :child)
-      end)
-      |> Multi.run(:image, fn %{struct: struct} ->
-        params = %{"image" => Map.put(image, :url, ImageModel.image_url(image.filename, struct))}
-        QH.create(Image, params, Repo)
-      end)
-      |> Multi.run(:association, fn %{image: image, struct: struct} ->
-        params = Map.put(%{}, :taxon_image, %{image_id: image.id})
+    Multi.new()
+    |> Multi.run(:struct, fn _ ->
+      taxon_struct = %Taxon{name: taxon_params.name}
+      add_taxon(parent_taxon, taxon_struct, :child)
+    end)
+    |> Multi.run(:image, fn %{struct: struct} ->
+      params = %{"image" => Map.put(image, :url, ImageModel.image_url(image.filename, struct))}
+      QH.create(Image, params, Repo)
+    end)
+    |> Multi.run(:association, fn %{image: image, struct: struct} ->
+      params = Map.put(%{}, :taxon_image, %{image_id: image.id})
 
-        Taxon.update_changeset(
-          struct,
-          Map.put(params, :variation_theme_ids, taxon_params.themes)
-        )
-        |> Repo.update()
-      end)
-      |> ImageModel.upload_image_multi(taxon_params.image)
-      |> ImageModel.persist()
-  end
-
-  @doc """
-  Update the given taxon.
-  """
-  def update_taxon(taxon, %{"image" => nil} = params) do
-    taxon |> Taxon.update_changeset(params) |> Repo.update()
-  end
-
-  def update_taxon(taxon, %{"image" => image} = params) do
-    ImageModel.update(Taxon, taxon, params, "taxon_image")
+      Taxon.update_changeset(
+        struct,
+        Map.put(params, :variation_theme_ids, taxon_params.themes)
+      )
+      |> Repo.update()
+    end)
+    |> ImageModel.upload_image_multi(taxon_params.image)
+    |> ImageModel.persist()
   end
 
   @doc """
@@ -309,6 +281,31 @@ defmodule Snitch.Domain.Taxonomy do
       {:ok, taxon}
     end)
     |> Repo.transaction()
+  end
+
+  @doc """
+  Updates all category slug based on the name.
+
+  Warning: This methods should be used only when the slug are not present.
+  Running this method might change the existing slug if the tree of above a
+  category is modified.
+  """
+  def update_all_categories_slug() do
+    Taxon
+    |> Repo.all()
+    |> Enum.map(&Taxon.changeset(&1, %{}))
+    |> Enum.map(&Repo.update(&1))
+  end
+
+  @doc """
+  Update the given taxon.
+  """
+  def update_taxon(taxon, %{"image" => nil} = params) do
+    taxon |> Taxon.update_changeset(params) |> Repo.update()
+  end
+
+  def update_taxon(taxon, %{"image" => _image} = params) do
+    ImageModel.update(Taxon, taxon, params, "taxon_image")
   end
 
   @doc """

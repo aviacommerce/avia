@@ -92,16 +92,16 @@ defmodule Snitch.Demo.Product do
     |> File.read!()
     |> CSV.parse_string()
     |> Enum.filter(fn [
-                        name,
-                        width,
-                        height,
-                        depth,
-                        selling_price,
-                        weight,
-                        maximum_retail_price,
-                        taxon,
+                        _name,
+                        _width,
+                        _height,
+                        _depth,
+                        _selling_price,
+                        _weight,
+                        _maximum_retail_price,
+                        _taxon,
                         parent_sku,
-                        image
+                        _image
                       ] ->
       parent_sku == product.name
     end)
@@ -114,7 +114,7 @@ defmodule Snitch.Demo.Product do
                       weight,
                       maximum_retail_price,
                       taxon,
-                      parent_sku,
+                      _parent_sku,
                       image
                     ] ->
       width = Decimal.new(width)
@@ -195,7 +195,7 @@ defmodule Snitch.Demo.Product do
     associate_image(product, image, image_name)
   end
 
-  def create_product_option_value(variant, product) do
+  def create_product_option_value(variant, _product) do
     option_type = Repo.get_by(OptionType, name: "size")
 
     params = %{
@@ -224,7 +224,7 @@ defmodule Snitch.Demo.Product do
     Product.associate_image_changeset(product, image) |> Repo.update!()
   end
 
-  defp upload_struct([%Image{name: name} = image], product, image_name) do
+  defp upload_struct([%Image{name: name}], product, image_name) do
     base_path = Application.app_dir(:snitch_core)
 
     %Plug.Upload{

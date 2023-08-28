@@ -94,7 +94,7 @@ defmodule Snitch.Demo.Order do
     Logger.info("Inserted #{count} orders.")
 
     packages = build_packages(order_structs, start_time, currency)
-    {count, package_structs} = create_packages(packages)
+    {count, _package_structs} = create_packages(packages)
     Logger.info("Created #{count} packages.")
 
     line_items = build_line_items_for_orders(order_structs, line_items)
@@ -102,7 +102,7 @@ defmodule Snitch.Demo.Order do
     Logger.info("Inserted #{count} line-items.")
 
     package_items = build_package_items(line_item_structs, start_time, currency)
-    {count, package_item_structs} = create_package_items(package_items)
+    {count, _package_item_structs} = create_package_items(package_items)
     Logger.info("Created #{count} package_items.")
 
     start_time = Timex.shift(start_time, days: 1)

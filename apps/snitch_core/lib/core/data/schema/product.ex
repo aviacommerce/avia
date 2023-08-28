@@ -232,7 +232,7 @@ defmodule Snitch.Data.Schema.Product do
       get_change(changeset, :variations)
       |> Enum.map(fn c ->
         if c.action == :replace do
-          Map.update(c, :action, nil, fn x -> nil end)
+          Map.update(c, :action, nil, fn _x -> nil end)
         else
           c
         end

@@ -103,7 +103,7 @@ defmodule Snitch.Data.Model.Role do
   @doc """
   Returns the role for the given roll_name.
   """
-  @spec get_role_by_name(string) :: Role.t()
+  @spec get_role_by_name(String.t()) :: Role.t()
   def get_role_by_name(name) do
     Repo.get_by!(Role, name: name)
   end

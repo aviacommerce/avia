@@ -5,7 +5,6 @@ defmodule Snitch.Tools.Helper.ImageUploader do
   Contains utilties to store and transform the image.
   """
   use Arc.Definition
-  alias Snitch.Core.Tools.MultiTenancy.Repo
   alias Snitch.Data.Model.Image
 
   @versions [:thumb, :large, :small]

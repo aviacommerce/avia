@@ -6,9 +6,7 @@ defmodule Snitch.Data.Model.ShippingRule do
   use Snitch.Data.Model
 
   alias Snitch.Data.Schema.{
-    ShippingRule,
-    ShippingCategory,
-    ShippingRuleIdentifier
+    ShippingRule
   }
 
   @doc """

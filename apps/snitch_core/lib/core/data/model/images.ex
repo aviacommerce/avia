@@ -5,28 +5,26 @@ defmodule Snitch.Data.Model.Image do
   use Snitch.Data.Model
 
   alias Snitch.Data.Schema.Image
-  alias Snitch.Data.Schema.GeneralConfiguration, as: GC
   alias Snitch.Tools.Helper.ImageUploader
   alias Ecto.Multi
 
   @cwd File.cwd!()
 
   def create(module, %{"image" => image} = params, association) do
-    multi =
-      Multi.new()
-      |> Multi.run(:struct, fn _ ->
-        QH.create(module, params, Repo)
-      end)
-      |> Multi.run(:image, fn %{struct: struct} ->
-        params = %{"image" => Map.put(image, :url, image_url(image.filename, struct))}
-        QH.create(Image, params, Repo)
-      end)
-      |> Multi.run(:association, fn %{image: image, struct: struct} ->
-        params = Map.put(%{}, association, %{image_id: image.id})
-        QH.update(module, params, struct, Repo)
-      end)
-      |> upload_image_multi(image)
-      |> persist()
+    Multi.new()
+    |> Multi.run(:struct, fn _ ->
+      QH.create(module, params, Repo)
+    end)
+    |> Multi.run(:image, fn %{struct: struct} ->
+      params = %{"image" => Map.put(image, :url, image_url(image.filename, struct))}
+      QH.create(Image, params, Repo)
+    end)
+    |> Multi.run(:association, fn %{image: image, struct: struct} ->
+      params = Map.put(%{}, association, %{image_id: image.id})
+      QH.update(module, params, struct, Repo)
+    end)
+    |> upload_image_multi(image)
+    |> persist()
   end
 
   @spec update(Image.t(), map) :: {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
@@ -60,7 +58,7 @@ defmodule Snitch.Data.Model.Image do
     |> persist()
   end
 
-  def delete_image_multi(multi, nil, struct) do
+  def delete_image_multi(multi, nil, _struct) do
     multi
   end
 
@@ -92,7 +90,7 @@ defmodule Snitch.Data.Model.Image do
     ImageUploader.delete({image, struct})
   end
 
-  def upload_image_multi(multi, %{filename: name, path: path, type: type} = image) do
+  def upload_image_multi(multi, %{filename: name, path: path, type: type} = _image) do
     Multi.run(multi, :image_upload, fn %{struct: struct} ->
       image = %Plug.Upload{filename: name, path: path, content_type: type}
       struct = %{struct | tenant: Repo.get_prefix()}
@@ -109,7 +107,7 @@ defmodule Snitch.Data.Model.Image do
 
   def persist(multi) do
     case Repo.transaction(multi) do
-      {:ok, %{struct: struct} = multi_result} ->
+      {:ok, %{struct: struct} = _multi_result} ->
         {:ok, struct}
 
       {:ok, _} ->
@@ -136,7 +134,7 @@ defmodule Snitch.Data.Model.Image do
     end
   end
 
-  @doc """
+  """
   Returns the url of the location where image is stored.
 
   Takes as input `name` of the `image` and the corresponding
@@ -146,7 +144,7 @@ defmodule Snitch.Data.Model.Image do
     struct = %{struct | tenant: Repo.get_prefix()}
     image_url = ImageUploader.url({name, struct}, version)
 
-    case check_arc_config do
+    case check_arc_config() do
       true ->
         handle_image_url(image_url)
 

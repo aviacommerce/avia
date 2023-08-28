@@ -3,10 +3,8 @@ defmodule Snitch.Data.Model.ProductBrand do
   Product Brand API
   """
   use Snitch.Data.Model
-  alias Ecto.Multi
-  alias Snitch.Data.Schema.{Image, ProductBrand}
+  alias Snitch.Data.Schema.{ProductBrand}
   alias Snitch.Data.Model.Image, as: ImageModel
-  alias Snitch.Tools.Helper.ImageUploader
 
   @doc """
   Returns all Product Brands
@@ -38,7 +36,7 @@ defmodule Snitch.Data.Model.ProductBrand do
   """
   @spec create(map) ::
           {:ok, ProductBrand.t()} | {:error, Ecto.Changeset.t()} | {:error, String.t()}
-  def create(%{"image" => image} = params) do
+  def create(%{"image" => _image} = params) do
     ImageModel.create(ProductBrand, params, "brand_image")
   end
 
@@ -58,7 +56,7 @@ defmodule Snitch.Data.Model.ProductBrand do
   the configuration.
   """
   @spec update(ProductBrand.t(), map) :: {:ok, ProductBrand.t()} | {:error, Ecto.Changeset.t()}
-  def update(model, %{"image" => image} = params) do
+  def update(model, %{"image" => _image} = params) do
     ImageModel.update(ProductBrand, model, params, "brand_image")
   end
 
