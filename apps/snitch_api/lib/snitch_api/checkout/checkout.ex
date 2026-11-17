@@ -36,7 +36,7 @@ defmodule SnitchApi.Checkout do
       %Address{}
 
   """
-  def get_address!(id), do: Repo.get(Address, id)
+  def get_address!(id, user), do: Repo.get_by!(Address, id: id, user_id: user.id)
 
   @doc """
   Creates a address.

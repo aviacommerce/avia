@@ -31,15 +31,17 @@ defmodule SnitchApiWeb.AddressController do
   end
 
   def show(conn, %{"id" => id}) do
-    address = Checkout.get_address!(id)
+    user = conn.assigns[:current_user]
+    address = Checkout.get_address!(id, user)
     render(conn, "show.json-api", address: address)
   end
 
   def update(conn, address_params) do
     id = address_params["id"]
+    user = conn.assigns[:current_user]
 
     address =
-      Checkout.get_address!(id)
+      Checkout.get_address!(id, user)
       |> Repo.preload([:country, :state])
 
     with {:ok, %Address{} = address} <- Checkout.update_address(address, address_params) do
@@ -48,7 +50,8 @@ defmodule SnitchApiWeb.AddressController do
   end
 
   def delete(conn, %{"id" => id}) do
-    address = Checkout.get_address!(id)
+    user = conn.assigns[:current_user]
+    address = Checkout.get_address!(id, user)
 
     with {:ok, %Address{}} <- Checkout.delete_address(address) do
       conn
